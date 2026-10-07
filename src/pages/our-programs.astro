@@ -5,34 +5,8 @@ import PageHero from '../components/PageHero.astro';
 import SectionHeading from '../components/SectionHeading.astro';
 import Icon from '../components/Icon.astro';
 import { programs, approach, extracurricular } from '../data/programs';
-import { site } from '../data/site';
+import { site, faqs } from '../data/site';
 
-const faqs = [
-  {
-    q: 'What age can my child join?',
-    a: 'Play Group is for 2 – 3 years, Nursery for 3 – 4 years, Junior KG for 4 – 5 years and Senior KG for 5 – 6 years. Day care welcomes children from 2 to 8 years.',
-  },
-  {
-    q: 'Which curriculum do you follow?',
-    a: 'A Montessori-based, thematic curriculum through our Foundational Development Program. By Senior KG it is aligned with the requirements of State, CBSE and ICSE boards, so children are ready for mainstream schools.',
-  },
-  {
-    q: 'What are the timings?',
-    a: `Preschool runs ${site.hours.preschool}. Day care runs ${site.hours.daycare}, so children can move from class straight into day care.`,
-  },
-  {
-    q: 'Can children from other schools join day care?',
-    a: 'Yes. Day care is open to both Crossmaze students and children from other schools, and we offer pick-up from the nearby drop point of other schools.',
-  },
-  {
-    q: 'Can I see my child during the day?',
-    a: 'Yes. Parents get live CCTV access, and the Crossmaze Care parents app keeps you updated on daily activities.',
-  },
-  {
-    q: 'Do you provide transport?',
-    a: 'Yes. In-house transport runs on pre-set routes within a 5 km radius of the centre. Seats are subject to availability, so please check with your nearest branch.',
-  },
-];
 ---
 
 <BaseLayout

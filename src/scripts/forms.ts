@@ -1,9 +1,11 @@
 // Progressive enhancement for every <form data-cm-form>.
-// With PUBLIC_FORM_ENDPOINT set, submissions are POSTed there (Formspree,
-// Web3Forms, Getform or your own API). Without it, the visitor's email app
-// opens with the details filled in, addressed to the school.
+//
+// Submissions go to /api/submit, the Firebase function that saves them and forwards them to LITMUS
+// (override with PUBLIC_FORM_ENDPOINT). If that can't be reached (e.g. local dev without the
+// functions emulator), the visitor's email app opens with the details filled in instead, so no
+// enquiry is lost.
 
-const endpoint = import.meta.env.PUBLIC_FORM_ENDPOINT;
+const endpoint = import.meta.env.PUBLIC_FORM_ENDPOINT || '/api/submit';
 
 function labelFor(form: HTMLFormElement, name: string) {
   const field = form.elements.namedItem(name);
@@ -12,13 +14,27 @@ function labelFor(form: HTMLFormElement, name: string) {
   return label?.firstChild?.textContent?.trim() || name;
 }
 
-function showStatus(form: HTMLFormElement, state: 'success' | 'error' | 'info', message: string) {
+function showStatus(form: HTMLFormElement, state: 'success' | 'error', message: string) {
   const status = form.querySelector<HTMLElement>('.form-status');
   if (!status) return;
-  status.dataset.state = state === 'info' ? 'success' : state;
+  status.dataset.state = state;
   status.textContent = message;
   status.hidden = false;
   status.focus();
+}
+
+function openEmail(form: HTMLFormElement, data: FormData) {
+  const mailto = form.dataset.mailto ?? '';
+  const body = [...data.entries()]
+    .filter(([name, value]) => !name.startsWith('_') && typeof value === 'string' && value.trim())
+    .map(([name, value]) => `${labelFor(form, name)}: ${value}`)
+    .join('\n');
+  window.location.href = `mailto:${mailto}?subject=${encodeURIComponent(form.dataset.subject ?? 'Website enquiry')}&body=${encodeURIComponent(body)}`;
+  showStatus(
+    form,
+    'success',
+    `We couldn't send this online, so your email app should open with these details filled in. If it didn't, write to us at ${mailto}.`,
+  );
 }
 
 const params = new URLSearchParams(window.location.search);
@@ -37,42 +53,35 @@ for (const form of document.querySelectorAll<HTMLFormElement>('form[data-cm-form
     if (!form.reportValidity()) return;
 
     const data = new FormData(form);
-    if (data.get('_gotcha')) return; // honeypot filled in: silently drop bots
-    data.delete('_gotcha');
-
-    const subject = form.dataset.subject ?? 'Website enquiry';
-    const mailto = form.dataset.mailto ?? '';
+    const payload = {
+      ...Object.fromEntries([...data.entries()].filter(([, v]) => typeof v === 'string')),
+      form_type: form.dataset.formType,
+      page: window.location.pathname,
+    };
     const button = form.querySelector<HTMLButtonElement>('button[type="submit"]');
+    button?.setAttribute('disabled', '');
 
-    if (endpoint) {
-      data.set('_subject', subject);
-      button?.setAttribute('disabled', '');
-      try {
-        const res = await fetch(endpoint, { method: 'POST', body: data, headers: { Accept: 'application/json' } });
-        if (!res.ok) throw new Error(String(res.status));
+    try {
+      const res = await fetch(endpoint, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json', Accept: 'application/json' },
+        body: JSON.stringify(payload),
+      });
+      const result = await res.json().catch(() => ({}));
+      if (res.ok) {
         form.reset();
         showStatus(form, 'success', form.dataset.success ?? 'Thank you! We will get back to you shortly.');
-      } catch {
-        showStatus(
-          form,
-          'error',
-          `Sorry, something went wrong. Please try again, or email us at ${mailto}.`,
-        );
-      } finally {
-        button?.removeAttribute('disabled');
+      } else if (res.status === 400 && Array.isArray(result.errors)) {
+        showStatus(form, 'error', `Please check: ${result.errors.join('; ')}.`);
+      } else if (res.status === 429) {
+        showStatus(form, 'error', result.error ?? 'Too many submissions. Please call us instead.');
+      } else {
+        openEmail(form, data);
       }
-      return;
+    } catch {
+      openEmail(form, data);
+    } finally {
+      button?.removeAttribute('disabled');
     }
-
-    const body = [...data.entries()]
-      .filter(([, value]) => typeof value === 'string' && value.trim())
-      .map(([name, value]) => `${labelFor(form, name)}: ${value}`)
-      .join('\n');
-    window.location.href = `mailto:${mailto}?subject=${encodeURIComponent(subject)}&body=${encodeURIComponent(body)}`;
-    showStatus(
-      form,
-      'info',
-      `Your email app should open with these details filled in. If it didn't, write to us at ${mailto}.`,
-    );
   });
 }

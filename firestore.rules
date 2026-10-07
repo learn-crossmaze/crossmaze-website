@@ -1,0 +1,68 @@
+rules_version = '2';
+
+// Only signed-in admins (verified email listed in /admins) can read or change anything.
+// The public website never reads Firestore directly: content is pulled at build time with the
+// Admin SDK, and form submissions arrive through the `submit` Cloud Function.
+service cloud.firestore {
+  match /databases/{database}/documents {
+    function email() {
+      return request.auth.token.email.lower();
+    }
+
+    function isAdmin() {
+      return request.auth != null
+        && request.auth.token.email_verified == true
+        && exists(/databases/$(database)/documents/admins/$(email()));
+    }
+
+    // Website content edited in the admin panel.
+    match /content/{doc} {
+      allow read, write: if isAdmin();
+    }
+    match /branches/{slug} {
+      allow read, write: if isAdmin();
+    }
+    match /programs/{slug} {
+      allow read, write: if isAdmin();
+    }
+    match /jobs/{slug} {
+      allow read, write: if isAdmin();
+    }
+    match /testimonials/{id} {
+      allow read, write: if isAdmin();
+    }
+
+    // Form submissions are created only by the submit function.
+    match /submissions/{id} {
+      allow read, update, delete: if isAdmin();
+      allow create: if false;
+    }
+
+    // LITMUS connection settings, including its API key.
+    match /private/{doc} {
+      allow read, write: if isAdmin();
+    }
+
+    // Publish status is written by the publishSite function and the deploy workflow;
+    // "content" records when an admin last saved a change.
+    match /meta/publish {
+      allow read: if isAdmin();
+      allow write: if false;
+    }
+    match /meta/content {
+      allow read, write: if isAdmin();
+    }
+
+    // People allowed into the admin panel, keyed by lower-case email.
+    // Anyone signed in may check their own entry; admins can't remove themselves.
+    match /admins/{adminEmail} {
+      allow get: if request.auth != null && adminEmail == email();
+      allow list, create, update: if isAdmin();
+      allow delete: if isAdmin() && adminEmail != email();
+    }
+
+    match /ratelimits/{id} {
+      allow read, write: if false;
+    }
+  }
+}

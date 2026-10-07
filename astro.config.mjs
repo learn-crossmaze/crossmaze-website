@@ -1,5 +1,6 @@
 // @ts-check
 import { defineConfig } from 'astro/config';
+import react from '@astrojs/react';
 import sitemap from '@astrojs/sitemap';
 
 export default defineConfig({
@@ -8,5 +9,5 @@ export default defineConfig({
   // serves them at clean URLs (/about) and redirects trailing slashes away.
   trailingSlash: 'never',
   build: { format: 'file' },
-  integrations: [sitemap()],
+  integrations: [react(), sitemap({ filter: (page) => !page.includes('/admin') })],
 });

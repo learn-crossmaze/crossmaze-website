@@ -18,3 +18,10 @@ npm-debug.log*
 # firebase
 .firebase/
 firebase-debug.log
+
+# function settings are not secret and are needed at deploy time
+!functions/.env
+
+# photos pulled from the admin panel at build time
+src/assets/cms/
+*-debug.log

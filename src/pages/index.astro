@@ -8,14 +8,11 @@ import BranchCard from '../components/BranchCard.astro';
 import EnquiryForm from '../components/EnquiryForm.astro';
 import { site, coreValues } from '../data/site';
 import { programs, daycareHighlights } from '../data/programs';
-import { branches, branchPhotos, facilities } from '../data/branches';
+import { branches, facilities } from '../data/branches';
 import { testimonials } from '../data/testimonials';
-import yoga from '../assets/photos/yoga.jpg';
-import bees from '../assets/photos/annual-day-bees.jpg';
-import teacher from '../assets/photos/teacher-flashcards.jpg';
-import napRoom from '../assets/photos/nap-room.jpg';
+import { image } from '../data/content';
 
-const heroPhoto = branchPhotos('crossmaze-neotown')[1] ?? branchPhotos('crossmaze-neotown')[0]!;
+const [heroMain, ...heroSmall] = site.hero.photos;
 const tones = ['navy', 'green', 'coral', 'sky', 'sun', 'navy'];
 ---
 
@@ -25,11 +22,8 @@ const tones = ['navy', 'green', 'coral', 'sky', 'sun', 'navy'];
     <div class="container hero__inner">
       <div class="hero__copy">
         <span class="eyebrow"><Icon name="Sparkles" size={18} /> Preschool & Day Care · Bengaluru</span>
-        <h1>A safe place to <span class="squiggle">grow and learn</span></h1>
-        <p class="lead">
-          A secure, caring and nurturing space where children thrive and learn at their own pace, with a
-          Montessori-based approach at five centres across Electronic City and Begur.
-        </p>
+        <h1>{site.hero.titleStart} <span class="squiggle">{site.hero.titleHighlight}</span></h1>
+        <p class="lead">{site.hero.lead}</p>
         <div class="btn-row">
           <a class="btn btn--sun" href="#enquire">Book a school visit <Icon name="ArrowRight" size={18} /></a>
           <a class="btn btn--ghost" href="/our-programs">Explore programs</a>
@@ -41,20 +35,31 @@ const tones = ['navy', 'green', 'coral', 'sky', 'sun', 'navy'];
         </ul>
       </div>
       <div class="hero__art">
-        <Image
-          class="hero__photo hero__photo--big"
-          src={heroPhoto}
-          alt="A bright Crossmaze classroom with a 'smallest stars shine bright' mural"
-          widths={[480, 720, 960]}
-          sizes="(max-width: 900px) 100vw, 540px"
-          loading="eager"
-        />
-        <Image class="hero__photo" src={yoga} alt="Children doing yoga together at Crossmaze" widths={[280, 480]} sizes="260px" loading="eager" />
-        <Image class="hero__photo" src={bees} alt="Children dressed as bees at the Crossmaze annual day" widths={[280, 450]} sizes="260px" loading="eager" />
-        <div class="hero__badge">
-          <strong>1000+</strong>
-          <span>happy children</span>
-        </div>
+        {
+          heroMain && (
+            <Image
+              class="hero__photo hero__photo--big"
+              src={image(heroMain.image)}
+              alt={heroMain.alt}
+              widths={[480, 720, 960]}
+              sizes="(max-width: 900px) 100vw, 540px"
+              loading="eager"
+            />
+          )
+        }
+        {
+          heroSmall.slice(0, 2).map((p) => (
+            <Image class="hero__photo" src={image(p.image)} alt={p.alt} widths={[280, 480]} sizes="260px" loading="eager" />
+          ))
+        }
+        {
+          site.hero.badgeValue && (
+            <div class="hero__badge">
+              <strong>{site.hero.badgeValue}</strong>
+              <span>{site.hero.badgeLabel}</span>
+            </div>
+          )
+        }
       </div>
     </div>
   </section>
@@ -79,7 +84,7 @@ const tones = ['navy', 'green', 'coral', 'sky', 'sun', 'navy'];
   <section class="section section--white">
     <div class="container about">
       <div class="about__media">
-        <Image src={teacher} alt="A Crossmaze teacher using letter cards with a group of children" widths={[400, 555]} sizes="(max-width: 900px) 100vw, 480px" />
+        <Image src={image(site.aboutPhoto.image)} alt={site.aboutPhoto.alt} widths={[400, 555]} sizes="(max-width: 900px) 100vw, 480px" />
         <blockquote class="about__quote">
           “{site.quote.text}”
           <cite>{site.quote.author}</cite>
@@ -159,7 +164,7 @@ const tones = ['navy', 'green', 'coral', 'sky', 'sun', 'navy'];
         <a class="btn btn--sun" href="/our-programs#day-care">About day care</a>
       </div>
       <div class="care__media">
-        <Image src={napRoom} alt="Air-conditioned nap room with child-sized cots" widths={[400, 555]} sizes="(max-width: 900px) 100vw, 520px" />
+        <Image src={image(site.daycarePhoto.image)} alt={site.daycarePhoto.alt} widths={[400, 555]} sizes="(max-width: 900px) 100vw, 520px" />
       </div>
     </div>
   </section>

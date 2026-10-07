@@ -1,15 +1,17 @@
 ---
 import { Image } from 'astro:assets';
-import logo from '../assets/brand/logo.png';
+import { image } from '../data/content';
+import { site } from '../data/site';
 
 interface Props {
   inverted?: boolean;
 }
 const { inverted = false } = Astro.props;
+const logo = image(site.logo);
 ---
 
 <span class:list={['logo', { 'logo--inverted': inverted }]}>
-  <Image src={logo} alt="Crossmaze" width={300} class="logo__img" loading="eager" />
+  <Image src={logo} alt={site.name} width={300} class="logo__img" loading="eager" />
   <span class="logo__sub">Preschool &amp; Day Care</span>
 </span>
 

@@ -6,19 +6,9 @@ import SectionHeading from '../components/SectionHeading.astro';
 import Icon from '../components/Icon.astro';
 import { site, coreValues } from '../data/site';
 import { approach } from '../data/programs';
-import fairies from '../assets/photos/annual-day-fairies.jpg';
-import bears from '../assets/photos/annual-day-bears.jpg';
-import umbrella from '../assets/photos/dance-umbrella.jpg';
-import solo from '../assets/photos/dance-solo.jpg';
-import bees from '../assets/photos/annual-day-bees.jpg';
+import { image } from '../data/content';
 
-const moments = [
-  { src: umbrella, alt: 'A child dancing with an umbrella on stage at the Crossmaze annual day' },
-  { src: fairies, alt: 'Children dressed as fairies and flowers at the annual day' },
-  { src: solo, alt: 'A child performing a classical dance' },
-  { src: bears, alt: 'Children in bear costumes performing on stage' },
-  { src: bees, alt: 'Children dressed as bees at the annual day' },
-];
+const moments = site.moments.map((m) => ({ src: image(m.image), alt: m.alt }));
 const tones = ['navy', 'green', 'coral', 'sky', 'sun', 'navy'];
 ---
 

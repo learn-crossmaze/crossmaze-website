@@ -2,12 +2,13 @@
 import { Image } from 'astro:assets';
 import Logo from './Logo.astro';
 import Icon from './Icon.astro';
-import mascot from '../assets/brand/mascot.png';
+import { image } from '../data/content';
 import { nav, site } from '../data/site';
 import { branches, shortName } from '../data/branches';
 import { programs } from '../data/programs';
 
 const year = new Date().getFullYear();
+const mascot = image(site.mascot);
 ---
 
 <footer class="site-footer">

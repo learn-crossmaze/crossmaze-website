@@ -1,0 +1,200 @@
+{
+  "coreValues": [
+    {
+      "icon": "Users",
+      "title": "Equality",
+      "text": "We promote equality by embracing diversity and ensuring that every child feels valued and included, regardless of background or ability."
+    },
+    {
+      "icon": "ShieldCheck",
+      "title": "Integrity",
+      "text": "We value transparency and ethical behaviour, fostering a culture of integrity in all interactions and communications."
+    },
+    {
+      "icon": "Award",
+      "title": "Excellence",
+      "text": "We are dedicated to a high-quality educational and nurturing environment, continually striving for improvement and innovation."
+    },
+    {
+      "icon": "Puzzle",
+      "title": "Practical way",
+      "text": "Our curriculum emphasises practical life skills such as problem-solving, communication and collaboration, preparing children for future challenges and successes."
+    },
+    {
+      "icon": "Star",
+      "title": "Achieving targets",
+      "text": "We set attainable goals for each child and work together to help them achieve them, celebrating both small and significant milestones."
+    },
+    {
+      "icon": "Lightbulb",
+      "title": "Interactive education",
+      "text": "We focus on interactive, hands-on educational methods that inspire curiosity and a love for learning in every child."
+    }
+  ],
+  "approach": [
+    {
+      "icon": "Brain",
+      "title": "Foundational Development Program",
+      "text": "Goes beyond traditional preschool education, laying the groundwork for essential life skills and equipping children for the challenges of tomorrow’s world."
+    },
+    {
+      "icon": "Shapes",
+      "title": "Montessori-based learning",
+      "text": "A Montessori-based approach with hands-on materials, so children learn through their senses and build independence."
+    },
+    {
+      "icon": "BookOpen",
+      "title": "Thematic curriculum",
+      "text": "Each theme integrates cognitive, language, personal, social, emotional and physical development into one immersive experience."
+    },
+    {
+      "icon": "Eye",
+      "title": "Visual, practical learning",
+      "text": "Children under 5 have a strong visual understanding, so we teach practically. Visual learning is everlasting."
+    }
+  ],
+  "daycareHighlights": [
+    "Structured routines",
+    "Designated nap rooms",
+    "Expert and trained caregivers",
+    "Live CCTV monitoring",
+    "Parents communication app",
+    "1:6 adult-to-child ratio"
+  ],
+  "extracurricular": [
+    {
+      "icon": "Palette",
+      "label": "Art and craft"
+    },
+    {
+      "icon": "Music",
+      "label": "Music and rhymes"
+    },
+    {
+      "icon": "Smile",
+      "label": "Dance and performance"
+    },
+    {
+      "icon": "Sprout",
+      "label": "Yoga and movement"
+    },
+    {
+      "icon": "Award",
+      "label": "Annual day and celebrations"
+    },
+    {
+      "icon": "Trees",
+      "label": "Indoor and outdoor play"
+    }
+  ],
+  "facilities": [
+    {
+      "icon": "Shapes",
+      "title": "Activity-based learning",
+      "text": "A Montessori-based approach to learning."
+    },
+    {
+      "icon": "ShieldCheck",
+      "title": "Child-safe infrastructure",
+      "text": "Designed with child safety as the top priority."
+    },
+    {
+      "icon": "Building2",
+      "title": "Age-appropriate classes",
+      "text": "Vibrant classrooms tailored to children’s needs."
+    },
+    {
+      "icon": "Cctv",
+      "title": "CCTV surveillance",
+      "text": "Live CCTV streams for parents, in real time."
+    },
+    {
+      "icon": "BedDouble",
+      "title": "Dedicated nap rooms",
+      "text": "Air-conditioned sleeping rooms designed for naps."
+    },
+    {
+      "icon": "Smartphone",
+      "title": "Parents communication app",
+      "text": "Daily updates on the Crossmaze Care parents app."
+    },
+    {
+      "icon": "Blocks",
+      "title": "Indoor play area",
+      "text": "Climate-controlled comfort all year round."
+    },
+    {
+      "icon": "GraduationCap",
+      "title": "Expert teachers",
+      "text": "Well-trained staff who prioritise care and safety."
+    },
+    {
+      "icon": "HandHeart",
+      "title": "Trained caregivers",
+      "text": "Vigilant staff for every child’s safety and comfort."
+    },
+    {
+      "icon": "Flame",
+      "title": "Fire safe",
+      "text": "Fire safety measures focused on prevention."
+    },
+    {
+      "icon": "Bus",
+      "title": "In-house transport",
+      "text": "Safe, reliable transport within a 5 km radius."
+    },
+    {
+      "icon": "Music",
+      "title": "Extra-curricular activities",
+      "text": "Physical well-being and growth beyond the curriculum."
+    }
+  ],
+  "perks": [
+    {
+      "icon": "Heart",
+      "title": "An ideal workplace for women",
+      "text": "Equal opportunities and a culture of respect and inclusivity."
+    },
+    {
+      "icon": "Award",
+      "title": "Career advancement",
+      "text": "Real support to grow, from facilitator to centre leadership."
+    },
+    {
+      "icon": "Clock",
+      "title": "Work-life balance",
+      "text": "Flexible work arrangements, including full-day and half-day roles."
+    },
+    {
+      "icon": "Baby",
+      "title": "Childcare assistance",
+      "text": "Benefits that support working mothers."
+    }
+  ],
+  "faqs": [
+    {
+      "q": "What age can my child join?",
+      "a": "Play Group is for 2 – 3 years, Nursery for 3 – 4 years, Junior KG for 4 – 5 years and Senior KG for 5 – 6 years. Day care welcomes children from 2 to 8 years."
+    },
+    {
+      "q": "Which curriculum do you follow?",
+      "a": "A Montessori-based, thematic curriculum through our Foundational Development Program. By Senior KG it is aligned with the requirements of State, CBSE and ICSE boards, so children are ready for mainstream schools."
+    },
+    {
+      "q": "What are the timings?",
+      "a": "Preschool runs 9:00 am – 12:30 pm. Day care runs 9:00 am – 6:00 pm, so children can move from class straight into day care."
+    },
+    {
+      "q": "Can children from other schools join day care?",
+      "a": "Yes. Day care is open to both Crossmaze students and children from other schools, and we offer pick-up from the nearby drop point of other schools."
+    },
+    {
+      "q": "Can I see my child during the day?",
+      "a": "Yes. Parents get live CCTV access, and the Crossmaze Care parents app keeps you updated on daily activities."
+    },
+    {
+      "q": "Do you provide transport?",
+      "a": "Yes. In-house transport runs on pre-set routes within a 5 km radius of the centre. Seats are subject to availability, so please check with your nearest branch."
+    }
+  ]
+}

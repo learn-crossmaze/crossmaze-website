@@ -1,7 +1,10 @@
 ---
 import BaseLayout from '../layouts/BaseLayout.astro';
 import { Image } from 'astro:assets';
-import mascot from '../assets/brand/mascot.png';
+import { image } from '../data/content';
+import { site } from '../data/site';
+
+const mascot = image(site.mascot);
 ---
 
 <BaseLayout title="Page not found">
