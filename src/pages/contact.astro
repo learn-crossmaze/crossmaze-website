@@ -1,0 +1,164 @@
+---
+import BaseLayout from '../layouts/BaseLayout.astro';
+import PageHero from '../components/PageHero.astro';
+import EnquiryForm from '../components/EnquiryForm.astro';
+import Icon from '../components/Icon.astro';
+import { site } from '../data/site';
+import { branches, telHref } from '../data/branches';
+---
+
+<BaseLayout
+  title="Contact & Admissions"
+  description="Contact Crossmaze Preschool and Day Care for admissions, school visits and enquiries. Call +91 72599 21508 or email admission@crossmaze.in."
+>
+  <PageHero
+    eyebrow="Contact & admissions"
+    title="We’d love to meet you"
+    lead="Have a question or ready to visit? Send us a message, call or WhatsApp, and our admissions team will get back to you quickly."
+    crumbs={[{ label: 'Contact' }]}
+  />
+
+  <section class="section section--white" id="enquire">
+    <div class="container contact">
+      <div class="card contact__form">
+        <h2>Admission enquiry</h2>
+        <EnquiryForm id="contact-enquiry" />
+      </div>
+      <aside class="contact__direct">
+        <a class="direct tone-plum" href={site.phoneHref}>
+          <span class="icon-badge"><Icon name="Phone" size={24} /></span>
+          <span><span class="muted">Call admissions</span><strong>{site.phone}</strong></span>
+        </a>
+        <a class="direct tone-teal" href={site.whatsappHref} target="_blank" rel="noopener">
+          <span class="icon-badge"><Icon name="MessageCircle" size={24} /></span>
+          <span><span class="muted">Chat on WhatsApp</span><strong>Message us</strong></span>
+        </a>
+        <a class="direct tone-coral" href={`mailto:${site.admissionsEmail}`}>
+          <span class="icon-badge"><Icon name="Mail" size={24} /></span>
+          <span><span class="muted">Email admissions</span><strong>{site.admissionsEmail}</strong></span>
+        </a>
+        <div class="direct tone-sun">
+          <span class="icon-badge"><Icon name="Clock" size={24} /></span>
+          <span>
+            <span class="muted">Timings</span>
+            <strong>Preschool {site.hours.preschool}</strong>
+            <strong>Day care {site.hours.daycare}</strong>
+          </span>
+        </div>
+      </aside>
+    </div>
+  </section>
+
+  <section class="section">
+    <div class="container">
+      <h2>Our branches</h2>
+      <div class="grid grid--3 branch-list">
+        {
+          branches.map((b) => (
+            <div class="card">
+              <h3>
+                <a href={`/branch/${b.slug}`}>{b.name.replace('Crossmaze – ', '')}</a>
+              </h3>
+              <p class="line">
+                <Icon name="MapPin" size={18} />
+                <span>
+                  {b.address.join(', ')} – {b.pincode}
+                </span>
+              </p>
+              <p class="line">
+                <Icon name="Phone" size={18} />
+                <a href={telHref(b.phone)}>{b.phone}</a>
+              </p>
+            </div>
+          ))
+        }
+      </div>
+    </div>
+  </section>
+</BaseLayout>
+
+<style>
+  .contact {
+    display: grid;
+    grid-template-columns: 1.3fr 0.7fr;
+    gap: 24px;
+    align-items: start;
+  }
+
+  @media (max-width: 900px) {
+    .contact {
+      grid-template-columns: 1fr;
+    }
+  }
+
+  .contact__form {
+    background: var(--cream);
+  }
+
+  .contact__form h2 {
+    font-size: 1.6rem;
+  }
+
+  .contact__direct {
+    display: grid;
+    gap: 14px;
+  }
+
+  .direct {
+    display: flex;
+    align-items: center;
+    gap: 16px;
+    padding: 18px;
+    border: 1px solid var(--line);
+    border-radius: var(--radius);
+    background: var(--paper);
+    color: var(--ink);
+    text-decoration: none;
+    overflow-wrap: anywhere;
+  }
+
+  a.direct:hover {
+    color: var(--ink);
+    border-color: var(--tone);
+  }
+
+  .direct .icon-badge {
+    margin: 0;
+    flex: none;
+  }
+
+  .direct > span:last-child {
+    display: grid;
+    line-height: 1.35;
+  }
+
+  .direct .muted {
+    font-size: 0.88rem;
+  }
+
+  .branch-list {
+    margin-top: 24px;
+  }
+
+  .branch-list h3 a {
+    color: var(--ink);
+    text-decoration: none;
+  }
+
+  .branch-list h3 a:hover {
+    color: var(--plum);
+  }
+
+  .line {
+    display: flex;
+    gap: 10px;
+    align-items: flex-start;
+    margin-bottom: 8px;
+  }
+
+  .line :global(svg) {
+    flex: none;
+    margin-top: 4px;
+    color: var(--coral);
+  }
+</style>

@@ -1,0 +1,282 @@
+---
+import BaseLayout from '../layouts/BaseLayout.astro';
+import PageHero from '../components/PageHero.astro';
+import SectionHeading from '../components/SectionHeading.astro';
+import CareerForm from '../components/CareerForm.astro';
+import Icon from '../components/Icon.astro';
+import { jobs, perks } from '../data/jobs';
+import { site } from '../data/site';
+---
+
+<BaseLayout
+  title="Careers"
+  description="Join Crossmaze Preschool and Day Care in Bengaluru. Openings for Teachers / Facilitators, Day Care In-Charge and Center Heads."
+>
+  <PageHero
+    eyebrow="Careers"
+    title="Shape the first steps of a lifetime of learning"
+    lead="Crossmaze is a great place to work for women and for anyone who loves working with young children, with equal opportunities, room to grow and flexible arrangements."
+    crumbs={[{ label: 'Careers' }]}
+  >
+    <div class="btn-row hero-actions">
+      <a class="btn btn--sun" href="#openings">See open positions</a>
+      <a class="btn btn--ghost" href="#apply">Apply now</a>
+    </div>
+  </PageHero>
+
+  <section class="section section--white">
+    <div class="container">
+      <SectionHeading eyebrow="Why work with us" title="A workplace that cares about you, too" />
+      <div class="grid grid--4">
+        {
+          perks.map((p, i) => (
+            <div class:list={['card', `tone-${['coral', 'plum', 'teal', 'sun'][i % 4]}`]}>
+              <span class="icon-badge">
+                <Icon name={p.icon} size={26} />
+              </span>
+              <h3>{p.title}</h3>
+              <p class="muted">{p.text}</p>
+            </div>
+          ))
+        }
+      </div>
+    </div>
+  </section>
+
+  <section class="section" id="openings">
+    <div class="container jobs">
+      <SectionHeading
+        eyebrow="Open positions"
+        title="Current openings"
+        lead={`${jobs.length} roles across our branches in Electronic City and Begur.`}
+      />
+      <div class="jobs__list">
+        {
+          jobs.map((job, i) => (
+            <details class="job" id={job.slug} open={i === 0}>
+              <summary>
+                <span class="job__title">
+                  <span class="icon-badge">
+                    <Icon name="Briefcase" size={22} />
+                  </span>
+                  <span>
+                    <strong>{job.title}</strong>
+                    <span class="muted">{job.type}</span>
+                  </span>
+                </span>
+                <Icon name="ChevronDown" size={22} class="job__chev" />
+              </summary>
+              <div class="job__body">
+                <p class="lead">{job.summary}</p>
+                {(job.timings || job.experience) && (
+                  <ul class="job__meta">
+                    {job.timings?.map((t) => (
+                      <li>
+                        <Icon name="Clock" size={18} /> {t}
+                      </li>
+                    ))}
+                    {job.experience && (
+                      <li>
+                        <Icon name="Award" size={18} /> {job.experience}
+                      </li>
+                    )}
+                  </ul>
+                )}
+                <div class="job__cols">
+                  <div>
+                    <h3>What you’ll do</h3>
+                    <ul class="check-list">
+                      {job.responsibilities.map((r) => (
+                        <li>
+                          <Icon name="Check" size={20} />
+                          {r}
+                        </li>
+                      ))}
+                    </ul>
+                  </div>
+                  <div>
+                    <h3>What we’re looking for</h3>
+                    <ul class="check-list">
+                      {job.requirements.map((r) => (
+                        <li>
+                          <Icon name="Check" size={20} />
+                          {r}
+                        </li>
+                      ))}
+                    </ul>
+                  </div>
+                </div>
+                <a class="btn" href={`?position=${encodeURIComponent(job.title)}#apply`} data-apply={job.title}>
+                  Apply for this role
+                </a>
+              </div>
+            </details>
+          ))
+        }
+      </div>
+    </div>
+  </section>
+
+  <section class="section section--white" id="apply">
+    <div class="container apply">
+      <div>
+        <span class="eyebrow">Apply</span>
+        <h2>Send us your application</h2>
+        <p class="lead">
+          Fill in the form and our team will be in touch. Don’t see the right role? Apply anyway and choose “Other”. We’re
+          always happy to meet great people.
+        </p>
+        <p>
+          <Icon name="Mail" size={18} class="inline-icon" />
+          <a href={`mailto:${site.careersEmail}`}>{site.careersEmail}</a>
+        </p>
+      </div>
+      <div class="card apply__form">
+        <CareerForm />
+      </div>
+    </div>
+  </section>
+</BaseLayout>
+
+<script>
+  // Clicking "Apply for this role" pre-selects the position without reloading the page.
+  for (const link of document.querySelectorAll<HTMLAnchorElement>('[data-apply]')) {
+    link.addEventListener('click', (event) => {
+      const select = document.querySelector<HTMLSelectElement>('#job-role');
+      if (!select) return;
+      event.preventDefault();
+      select.value = link.dataset.apply ?? '';
+      document.querySelector('#apply')?.scrollIntoView();
+      document.querySelector<HTMLInputElement>('#job-name')?.focus({ preventScroll: true });
+    });
+  }
+</script>
+
+<style>
+  .hero-actions {
+    margin-top: 28px;
+  }
+
+  .jobs {
+    max-width: 960px;
+  }
+
+  .jobs__list {
+    display: grid;
+    gap: 16px;
+  }
+
+  .job {
+    background: var(--paper);
+    border: 1px solid var(--line);
+    border-radius: var(--radius);
+    box-shadow: var(--shadow-sm);
+  }
+
+  .job summary {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 16px;
+    padding: 20px 24px;
+    cursor: pointer;
+    list-style: none;
+  }
+
+  .job summary::-webkit-details-marker {
+    display: none;
+  }
+
+  .job__title {
+    display: flex;
+    align-items: center;
+    gap: 14px;
+  }
+
+  .job__title .icon-badge {
+    margin: 0;
+    flex: none;
+  }
+
+  .job__title > span:last-child {
+    display: grid;
+    line-height: 1.3;
+  }
+
+  .job__title strong {
+    font-family: var(--font-display);
+    font-weight: 600;
+    font-size: 1.3rem;
+  }
+
+  .job summary :global(.job__chev) {
+    flex: none;
+    transition: transform 0.2s ease;
+  }
+
+  .job[open] summary :global(.job__chev) {
+    transform: rotate(180deg);
+  }
+
+  .job__body {
+    padding: 0 24px 28px;
+    border-top: 1px solid var(--line);
+    padding-top: 24px;
+  }
+
+  .job__meta {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px 24px;
+    margin: 0 0 24px;
+    padding: 0;
+    list-style: none;
+    font-weight: 700;
+  }
+
+  .job__meta li {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+  }
+
+  .job__meta :global(svg) {
+    color: var(--coral);
+  }
+
+  .job__cols {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(min(100%, 300px), 1fr));
+    gap: 28px;
+    margin-bottom: 28px;
+  }
+
+  .job__cols h3 {
+    font-size: 1.1rem;
+    margin-bottom: 14px;
+  }
+
+  .apply {
+    display: grid;
+    grid-template-columns: 0.8fr 1.2fr;
+    gap: clamp(28px, 5vw, 64px);
+    align-items: start;
+  }
+
+  @media (max-width: 860px) {
+    .apply {
+      grid-template-columns: 1fr;
+    }
+  }
+
+  .apply p :global(.inline-icon) {
+    display: inline;
+    vertical-align: -3px;
+    margin-right: 6px;
+    color: var(--coral);
+  }
+
+  .apply__form {
+    background: var(--cream);
+  }
+</style>

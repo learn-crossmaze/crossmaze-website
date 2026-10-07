@@ -1,0 +1,193 @@
+---
+import Logo from './Logo.astro';
+import Icon from './Icon.astro';
+import { nav, site } from '../data/site';
+import { branches } from '../data/branches';
+import { programs } from '../data/programs';
+
+const year = new Date().getFullYear();
+---
+
+<footer class="site-footer">
+  <div class="container">
+    <div class="site-footer__grid">
+      <div class="site-footer__about">
+        <Logo inverted />
+        <p>
+          A Montessori-based preschool and day care helping children in Electronic City and Begur grow into
+          confident, curious and kind learners.
+        </p>
+        <ul class="site-footer__contact">
+          <li>
+            <Icon name="Phone" size={18} />
+            <a href={site.phoneHref}>{site.phone}</a>
+          </li>
+          <li>
+            <Icon name="Mail" size={18} />
+            <a href={`mailto:${site.admissionsEmail}`}>{site.admissionsEmail}</a>
+          </li>
+          <li>
+            <Icon name="Clock" size={18} />
+            <span>Preschool {site.hours.preschool} · Day care {site.hours.daycare}</span>
+          </li>
+        </ul>
+      </div>
+
+      <div>
+        <h2 class="site-footer__heading">Explore</h2>
+        <ul class="site-footer__links">
+          {
+            nav.map((item) => (
+              <li>
+                <a href={item.href}>{item.label}</a>
+              </li>
+            ))
+          }
+        </ul>
+      </div>
+
+      <div>
+        <h2 class="site-footer__heading">Programs</h2>
+        <ul class="site-footer__links">
+          {
+            programs.map((p) => (
+              <li>
+                <a href={`/our-programs#${p.slug}`}>{p.name}</a>
+              </li>
+            ))
+          }
+        </ul>
+      </div>
+
+      <div>
+        <h2 class="site-footer__heading">Our branches</h2>
+        <ul class="site-footer__links">
+          {
+            branches.map((b) => (
+              <li>
+                <a href={`/branch/${b.slug}`}>{b.name.replace('Crossmaze – ', '')}</a>
+              </li>
+            ))
+          }
+        </ul>
+      </div>
+    </div>
+
+    <div class="site-footer__bottom">
+      <p>© {year} {site.legalName}. All rights reserved.</p>
+      <ul class="site-footer__social">
+        {
+          site.social.map((s) => (
+            <li>
+              <a href={s.href} rel="noopener" target="_blank">
+                {s.label}
+              </a>
+            </li>
+          ))
+        }
+      </ul>
+    </div>
+  </div>
+</footer>
+
+<style>
+  .site-footer {
+    padding-block: 64px 28px;
+    background: var(--ink);
+    color: rgb(255 255 255 / 78%);
+  }
+
+  .site-footer a {
+    color: rgb(255 255 255 / 88%);
+    text-decoration: none;
+  }
+
+  .site-footer a:hover {
+    color: var(--sun);
+  }
+
+  .site-footer__grid {
+    display: grid;
+    gap: 40px;
+    grid-template-columns: 1.6fr repeat(3, 1fr);
+  }
+
+  @media (max-width: 900px) {
+    .site-footer__grid {
+      grid-template-columns: 1fr 1fr;
+    }
+    .site-footer__about {
+      grid-column: 1 / -1;
+    }
+  }
+
+  @media (max-width: 480px) {
+    .site-footer__grid {
+      grid-template-columns: 1fr;
+    }
+  }
+
+  .site-footer__about p {
+    max-width: 42ch;
+    margin-top: 18px;
+  }
+
+  .site-footer__heading {
+    margin-bottom: 14px;
+    font-size: 1rem;
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
+    color: #fff;
+  }
+
+  .site-footer__links,
+  .site-footer__contact,
+  .site-footer__social {
+    margin: 0;
+    padding: 0;
+    list-style: none;
+  }
+
+  .site-footer__links {
+    display: grid;
+    gap: 8px;
+  }
+
+  .site-footer__contact {
+    display: grid;
+    gap: 10px;
+  }
+
+  .site-footer__contact li {
+    display: flex;
+    align-items: flex-start;
+    gap: 10px;
+  }
+
+  .site-footer__contact li > :global(svg) {
+    flex: none;
+    margin-top: 4px;
+    color: var(--sun);
+  }
+
+  .site-footer__bottom {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: space-between;
+    gap: 12px 24px;
+    margin-top: 48px;
+    padding-top: 24px;
+    border-top: 1px solid rgb(255 255 255 / 12%);
+    font-size: 0.92rem;
+  }
+
+  .site-footer__bottom p {
+    margin: 0;
+  }
+
+  .site-footer__social {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 18px;
+  }
+</style>

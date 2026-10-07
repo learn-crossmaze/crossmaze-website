@@ -1,0 +1,345 @@
+---
+import BaseLayout from '../../layouts/BaseLayout.astro';
+import PageHero from '../../components/PageHero.astro';
+import SectionHeading from '../../components/SectionHeading.astro';
+import BranchCard from '../../components/BranchCard.astro';
+import EnquiryForm from '../../components/EnquiryForm.astro';
+import Icon from '../../components/Icon.astro';
+import { branches, amenities, telHref, type Branch } from '../../data/branches';
+import { programs } from '../../data/programs';
+import { site } from '../../data/site';
+
+export function getStaticPaths() {
+  return branches.map((branch) => ({ params: { slug: branch.slug }, props: { branch } }));
+}
+
+interface Props {
+  branch: Branch;
+}
+
+const { branch } = Astro.props;
+const shortName = branch.name.replace('Crossmaze – ', '');
+const offered = programs.filter((p) => branch.programs.includes(p.slug));
+const others = branches.filter((b) => b.slug !== branch.slug);
+const mapSrc = `https://www.google.com/maps?q=${encodeURIComponent(branch.mapQuery)}&output=embed`;
+const directions = `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(branch.mapQuery)}`;
+
+const facts = [
+  branch.carpetArea && { icon: 'Ruler', label: 'Carpet area', value: branch.carpetArea },
+  branch.capacity && { icon: 'Users', label: 'Capacity', value: `${branch.capacity} children` },
+  branch.centerHead && { icon: 'UserRound', label: 'Centre head', value: branch.centerHead },
+  { icon: 'Clock', label: 'Preschool', value: site.hours.preschool },
+  { icon: 'Sun', label: 'Day care', value: site.hours.daycare },
+].filter(Boolean) as { icon: string; label: string; value: string }[];
+
+const jsonLd = {
+  '@context': 'https://schema.org',
+  '@type': 'Preschool',
+  name: branch.name,
+  url: new URL(`/branch/${branch.slug}`, site.url).href,
+  telephone: branch.phone,
+  email: branch.email,
+  parentOrganization: { '@type': 'Organization', name: site.fullName, url: site.url },
+  address: {
+    '@type': 'PostalAddress',
+    streetAddress: branch.address.slice(0, -1).join(', '),
+    addressLocality: 'Bengaluru',
+    addressRegion: 'Karnataka',
+    postalCode: branch.pincode,
+    addressCountry: 'IN',
+  },
+};
+---
+
+<BaseLayout
+  title={`${shortName} Branch`}
+  description={`${branch.name}: preschool and day care in ${branch.area}, Bengaluru ${branch.pincode}. Play Group, Nursery, Junior KG, Senior KG and Day Care.`}
+  jsonLd={jsonLd}
+>
+  <PageHero
+    eyebrow={branch.area}
+    title={branch.name}
+    lead={branch.intro}
+    crumbs={[{ label: 'Branches', href: '/branch' }, { label: shortName }]}
+  >
+    <div class="btn-row hero-actions">
+      <a class="btn btn--sun" href="#enquire">Book a visit</a>
+      <a class="btn btn--ghost" href={telHref(branch.phone)}><Icon name="Phone" size={18} /> {branch.phone}</a>
+      <a class="btn btn--ghost" href={directions} target="_blank" rel="noopener">
+        <Icon name="Navigation" size={18} /> Directions
+      </a>
+    </div>
+  </PageHero>
+
+  <section class="section--tight section--white">
+    <div class="container">
+      <ul class="facts">
+        {
+          facts.map((f) => (
+            <li>
+              <span class="icon-badge">
+                <Icon name={f.icon} size={22} />
+              </span>
+              <span>
+                <span class="facts__label">{f.label}</span>
+                <strong>{f.value}</strong>
+              </span>
+            </li>
+          ))
+        }
+      </ul>
+    </div>
+  </section>
+
+  <section class="section">
+    <div class="container location">
+      <div class="card location__card">
+        <h2>Visit us</h2>
+        <address>
+          <Icon name="MapPin" size={22} />
+          <span>
+            {branch.address.map((line) => <>{line}<br /></>)}
+            {branch.pincode}
+          </span>
+        </address>
+        <p>
+          <Icon name="Phone" size={20} />
+          <a href={telHref(branch.phone)}>{branch.phone}</a>
+        </p>
+        <p>
+          <Icon name="Mail" size={20} />
+          <a href={`mailto:${branch.email}`}>{branch.email}</a>
+        </p>
+        <a class="btn btn--sm" href={directions} target="_blank" rel="noopener">Open in Google Maps</a>
+      </div>
+      <div class="location__map">
+        <iframe
+          title={`Map showing ${branch.name}`}
+          src={mapSrc}
+          loading="lazy"
+          referrerpolicy="no-referrer-when-downgrade"
+          allowfullscreen></iframe>
+      </div>
+    </div>
+  </section>
+
+  <section class="section section--white">
+    <div class="container">
+      <SectionHeading eyebrow={`At ${shortName}`} title="Programs at this branch" />
+      <div class="offered">
+        {
+          offered.map((p) => (
+            <a class:list={['offered__item', 'card', `tone-${p.color}`]} href={`/our-programs#${p.slug}`}>
+              <span class="icon-badge">
+                <Icon name={p.icon} size={24} />
+              </span>
+              <span>
+                <strong>{p.name}</strong>
+                <span class="muted">{p.ages}</span>
+              </span>
+            </a>
+          ))
+        }
+      </div>
+
+      <h3 class="amen-title">Facilities</h3>
+      <ul class="amen">
+        {
+          amenities.map((a) => (
+            <li>
+              <Icon name={a.icon} size={20} />
+              {a.label}
+            </li>
+          ))
+        }
+        <li><Icon name="Bus" size={20} /> In-house transport</li>
+      </ul>
+    </div>
+  </section>
+
+  <section class="section" id="enquire">
+    <div class="container enquire">
+      <div>
+        <span class="eyebrow">Admissions open</span>
+        <h2>Book a visit to {shortName}</h2>
+        <p class="lead">
+          Leave your details and the {shortName} team will call you to arrange a visit at a time that suits you.
+        </p>
+      </div>
+      <div class="card">
+        <EnquiryForm branch={branch.slug} id={`enquiry-${branch.slug}`} />
+      </div>
+    </div>
+  </section>
+
+  <section class="section section--white">
+    <div class="container">
+      <SectionHeading eyebrow="More centres" title="Other Crossmaze branches" />
+      <div class="grid grid--4">
+        {others.map((b, i) => <BranchCard branch={b} index={i + 1} />)}
+      </div>
+    </div>
+  </section>
+</BaseLayout>
+
+<style>
+  .hero-actions {
+    margin-top: 28px;
+  }
+
+  .facts {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(min(100%, 200px), 1fr));
+    gap: 20px;
+    margin: 0;
+    padding: 0;
+    list-style: none;
+  }
+
+  .facts li {
+    display: flex;
+    align-items: center;
+    gap: 14px;
+  }
+
+  .facts .icon-badge {
+    margin: 0;
+    flex: none;
+  }
+
+  @media (max-width: 640px) {
+    .facts {
+      grid-template-columns: 1fr 1fr;
+      gap: 24px 16px;
+    }
+    .facts li {
+      flex-direction: column;
+      align-items: flex-start;
+      gap: 10px;
+    }
+  }
+
+  .facts__label {
+    display: block;
+    font-size: 0.85rem;
+    color: var(--muted);
+  }
+
+  .location {
+    display: grid;
+    grid-template-columns: 0.8fr 1.2fr;
+    gap: 24px;
+    align-items: stretch;
+  }
+
+  @media (max-width: 860px) {
+    .location {
+      grid-template-columns: 1fr;
+    }
+  }
+
+  .location__card address,
+  .location__card p {
+    display: flex;
+    gap: 12px;
+    align-items: flex-start;
+    font-style: normal;
+    margin: 0 0 16px;
+  }
+
+  .location__card :global(svg) {
+    flex: none;
+    margin-top: 3px;
+    color: var(--coral);
+  }
+
+  .location__card .btn {
+    margin-top: 8px;
+  }
+
+  .location__map {
+    min-height: 340px;
+    border-radius: var(--radius);
+    overflow: hidden;
+    border: 1px solid var(--line);
+    background: var(--plum-50);
+  }
+
+  .location__map iframe {
+    width: 100%;
+    height: 100%;
+    min-height: 340px;
+    border: 0;
+  }
+
+  .offered {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(min(100%, 200px), 1fr));
+    gap: 16px;
+  }
+
+  .offered__item {
+    display: flex;
+    align-items: center;
+    gap: 14px;
+    padding: 18px;
+    color: inherit;
+    text-decoration: none;
+    transition: transform 0.15s ease;
+  }
+
+  .offered__item:hover {
+    color: inherit;
+    transform: translateY(-3px);
+  }
+
+  .offered__item .icon-badge {
+    margin: 0;
+    flex: none;
+  }
+
+  .offered__item > span:last-child {
+    display: grid;
+    line-height: 1.3;
+  }
+
+  .amen-title {
+    margin-top: 48px;
+  }
+
+  .amen {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 10px;
+    margin: 16px 0 0;
+    padding: 0;
+    list-style: none;
+  }
+
+  .amen li {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    padding: 10px 16px;
+    border-radius: 999px;
+    background: var(--cream);
+    font-weight: 700;
+  }
+
+  .amen :global(svg) {
+    color: var(--teal);
+  }
+
+  .enquire {
+    display: grid;
+    grid-template-columns: 0.9fr 1.1fr;
+    gap: clamp(28px, 5vw, 64px);
+    align-items: start;
+  }
+
+  @media (max-width: 860px) {
+    .enquire {
+      grid-template-columns: 1fr;
+    }
+  }
+</style>

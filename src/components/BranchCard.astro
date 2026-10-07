@@ -1,0 +1,136 @@
+---
+import Icon from './Icon.astro';
+import type { Branch } from '../data/branches';
+import { telHref } from '../data/branches';
+
+interface Props {
+  branch: Branch;
+  index?: number;
+}
+const { branch, index = 0 } = Astro.props;
+const tones = ['plum', 'teal', 'coral', 'sky', 'sun'];
+const tone = tones[index % tones.length];
+---
+
+<article class:list={['branch-card', 'card', `tone-${tone}`]}>
+  <div class="branch-card__media">
+    {
+      branch.image ? (
+        <img src={branch.image} alt={`${branch.name} centre`} loading="lazy" width="640" height="360" />
+      ) : (
+        <div class="branch-card__art" aria-hidden="true">
+          <Icon name="Building2" size={44} strokeWidth={1.6} />
+        </div>
+      )
+    }
+    <span class="branch-card__pin"><Icon name="MapPin" size={16} /> {branch.pincode}</span>
+  </div>
+  <h3><a href={`/branch/${branch.slug}`}>{branch.name.replace('Crossmaze – ', '')}</a></h3>
+  <p class="muted">{branch.area}</p>
+  <ul class="branch-card__facts">
+    {
+      branch.carpetArea && (
+        <li>
+          <Icon name="Ruler" size={18} />
+          {branch.carpetArea}
+        </li>
+      )
+    }
+    {
+      branch.capacity && (
+        <li>
+          <Icon name="Users" size={18} />
+          {branch.capacity} children
+        </li>
+      )
+    }
+  </ul>
+  <div class="branch-card__actions">
+    <a class="btn btn--sm" href={`/branch/${branch.slug}`}>View branch</a>
+    <a class="btn btn--sm btn--ghost" href={telHref(branch.phone)} aria-label={`Call ${branch.name}`}>
+      <Icon name="Phone" size={16} /> Call
+    </a>
+  </div>
+</article>
+
+<style>
+  .branch-card {
+    display: flex;
+    flex-direction: column;
+    padding: 16px 16px 22px;
+  }
+  .branch-card > :not(.branch-card__media) {
+    margin-inline: 8px;
+  }
+  .branch-card__media {
+    position: relative;
+    margin-bottom: 18px;
+    border-radius: 14px;
+    overflow: hidden;
+    aspect-ratio: 16 / 9;
+    background: var(--badge-bg);
+  }
+  .branch-card__media img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+  }
+  .branch-card__art {
+    display: grid;
+    place-items: center;
+    height: 100%;
+    color: var(--badge-fg);
+    background:
+      radial-gradient(circle at 15% 85%, var(--tone) 0 34px, transparent 35px),
+      radial-gradient(circle at 88% 18%, rgb(255 255 255 / 70%) 0 46px, transparent 47px),
+      var(--badge-bg);
+  }
+  .branch-card__pin {
+    position: absolute;
+    top: 12px;
+    left: 12px;
+    display: inline-flex;
+    align-items: center;
+    gap: 4px;
+    padding: 4px 10px;
+    border-radius: 999px;
+    background: rgb(255 255 255 / 92%);
+    font-size: 0.82rem;
+    font-weight: 800;
+    color: var(--ink);
+  }
+  .branch-card h3 a {
+    color: var(--ink);
+    text-decoration: none;
+  }
+  .branch-card h3 a:hover {
+    color: var(--plum);
+  }
+  .branch-card .muted {
+    margin-bottom: 12px;
+  }
+  .branch-card__facts {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px 18px;
+    margin: 0 0 18px;
+    padding: 0;
+    list-style: none;
+    font-weight: 700;
+    font-size: 0.95rem;
+  }
+  .branch-card__facts li {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+  }
+  .branch-card__facts :global(svg) {
+    color: var(--badge-fg);
+  }
+  .branch-card__actions {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+    margin-top: auto;
+  }
+</style>

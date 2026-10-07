@@ -1,0 +1,336 @@
+---
+import BaseLayout from '../layouts/BaseLayout.astro';
+import PageHero from '../components/PageHero.astro';
+import SectionHeading from '../components/SectionHeading.astro';
+import Icon from '../components/Icon.astro';
+import { programs, approach, extracurricular } from '../data/programs';
+import { site } from '../data/site';
+
+const faqs = [
+  {
+    q: 'What age can my child join?',
+    a: 'Children can join Play Group from 2 years. Nursery is for 3 – 4 years, Junior KG for 4 – 5 years and Senior KG for 5 – 6 years. Day care welcomes children from 2 to 8 years.',
+  },
+  {
+    q: 'What are the school timings?',
+    a: `Preschool runs ${site.hours.preschool}. Day care runs ${site.hours.daycare}, so children can move from class straight into day care.`,
+  },
+  {
+    q: 'Can school-going children join day care?',
+    a: 'Yes. Day care is open to children up to 8 years, so older siblings can join after school for supervised play, meals and homework support.',
+  },
+  {
+    q: 'Can I see my child during the day?',
+    a: 'Yes. Parents get access to live CCTV streams, and our parent app shares updates, photos and notices throughout the day.',
+  },
+  {
+    q: 'Do you provide transport?',
+    a: 'Yes, we offer an in-house transport service for pick-up and drop-off. Please check route availability with your nearest branch.',
+  },
+  {
+    q: 'What curriculum do you follow?',
+    a: 'We follow a Montessori-based, thematic curriculum through our Foundational Development Program, which builds cognitive, language, social, emotional and physical skills together.',
+  },
+];
+---
+
+<BaseLayout
+  title="Our Programs"
+  description="Play Group, Nursery, Junior KG, Senior KG and Day Care at Crossmaze, Bengaluru. Montessori-based, thematic learning for children aged 2 to 8."
+>
+  <PageHero
+    eyebrow="Our programs"
+    title="Learning that grows with your child"
+    lead="From a first day at Play Group to the step up to Grade 1, every Crossmaze program builds on the last, with day care for families who need a full day."
+    crumbs={[{ label: 'Our Programs' }]}
+  >
+    <nav class="jump" aria-label="Programs on this page">
+      {
+        programs.map((p) => (
+          <a class:list={['pill', `tone-${p.color}`]} href={`#${p.slug}`}>
+            {p.name} · {p.ages}
+          </a>
+        ))
+      }
+    </nav>
+  </PageHero>
+
+  <section class="section section--white">
+    <div class="container programs">
+      {
+        programs.map((p) => (
+          <article id={p.slug} class:list={['program', `tone-${p.color}`]}>
+            <div class="program__media" aria-hidden="true">
+              <Icon name={p.icon} size={72} strokeWidth={1.5} />
+            </div>
+            <div class="program__body">
+              <div class="program__meta">
+                <span class="pill">
+                  <Icon name="Baby" size={16} /> {p.ages}
+                </span>
+                <span class="pill">
+                  <Icon name="Clock" size={16} /> {p.timing}
+                </span>
+              </div>
+              <h2>{p.name}</h2>
+              <p class="lead">{p.summary}</p>
+              <p>{p.description}</p>
+              <ul class="check-list">
+                {p.highlights.map((h) => (
+                  <li>
+                    <Icon name="Check" size={20} />
+                    {h}
+                  </li>
+                ))}
+              </ul>
+              <a class="btn" href={`/contact?program=${encodeURIComponent(p.name)}#enquire`}>
+                Enquire about {p.name}
+              </a>
+            </div>
+          </article>
+        ))
+      }
+    </div>
+  </section>
+
+  <section class="section">
+    <div class="container">
+      <SectionHeading
+        eyebrow="How we teach"
+        title="Our Foundational Development Program"
+        lead="Through a thematic approach, learning becomes an immersive experience that integrates cognitive, language, personal, social, emotional and physical development within each theme."
+      />
+      <div class="grid grid--4">
+        {
+          approach.map((a) => (
+            <div class="card">
+              <span class="icon-badge">
+                <Icon name={a.icon} size={26} />
+              </span>
+              <h3>{a.title}</h3>
+              <p class="muted">{a.text}</p>
+            </div>
+          ))
+        }
+      </div>
+    </div>
+  </section>
+
+  <section class="section section--white">
+    <div class="container extra">
+      <div>
+        <SectionHeading
+          eyebrow="Beyond the classroom"
+          title="Extra-curricular activities"
+          lead="Activities that build physical well-being, creativity and confidence, outside the core curriculum."
+        />
+      </div>
+      <ul class="extra__list">
+        {
+          extracurricular.map((e, i) => (
+            <li class:list={['card', `tone-${['sun', 'coral', 'teal', 'sky', 'plum', 'sun'][i % 6]}`]}>
+              <span class="icon-badge">
+                <Icon name={e.icon} size={24} />
+              </span>
+              <strong>{e.label}</strong>
+            </li>
+          ))
+        }
+      </ul>
+    </div>
+  </section>
+
+  <section class="section">
+    <div class="container faq">
+      <SectionHeading eyebrow="FAQs" title="Questions parents ask us" />
+      <div class="faq__list">
+        {
+          faqs.map((f) => (
+            <details class="faq__item">
+              <summary>
+                {f.q}
+                <Icon name="ChevronDown" size={20} />
+              </summary>
+              <p>{f.a}</p>
+            </details>
+          ))
+        }
+      </div>
+    </div>
+  </section>
+
+  <section class="section--tight section--plum">
+    <div class="container cta">
+      <div>
+        <h2>Not sure which program fits?</h2>
+        <p class="lead">Tell us your child’s age and we’ll help you choose.</p>
+      </div>
+      <div class="btn-row">
+        <a class="btn btn--sun" href="/contact#enquire">Talk to admissions</a>
+        <a class="btn btn--white btn--ghost" href={site.phoneHref}><Icon name="Phone" size={18} /> Call us</a>
+      </div>
+    </div>
+  </section>
+</BaseLayout>
+
+<style>
+  .jump {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 10px;
+    margin-top: 28px;
+  }
+
+  .jump a {
+    padding: 8px 16px;
+    text-decoration: none;
+  }
+
+  .programs {
+    display: grid;
+    gap: clamp(56px, 8vw, 96px);
+  }
+
+  .program {
+    display: grid;
+    grid-template-columns: 0.8fr 1.2fr;
+    gap: clamp(28px, 5vw, 64px);
+    align-items: center;
+  }
+
+  .program:nth-child(even) .program__media {
+    order: 2;
+  }
+
+  @media (max-width: 860px) {
+    .program {
+      grid-template-columns: 1fr;
+    }
+    .program:nth-child(even) .program__media {
+      order: 0;
+    }
+  }
+
+  .program__media {
+    display: grid;
+    place-items: center;
+    aspect-ratio: 4 / 3;
+    border-radius: var(--radius-lg);
+    color: var(--badge-fg);
+    background:
+      radial-gradient(circle at 18% 82%, var(--tone) 0 56px, transparent 57px),
+      radial-gradient(circle at 86% 16%, rgb(255 255 255 / 75%) 0 70px, transparent 71px),
+      var(--badge-bg);
+  }
+
+  @media (max-width: 860px) {
+    .program__media {
+      aspect-ratio: 16 / 7;
+    }
+  }
+
+  .program__meta {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+    margin-bottom: 16px;
+  }
+
+  .program__body .check-list {
+    margin: 8px 0 28px;
+  }
+
+  .extra {
+    display: grid;
+    grid-template-columns: 0.8fr 1.2fr;
+    gap: clamp(28px, 5vw, 64px);
+    align-items: center;
+  }
+
+  @media (max-width: 860px) {
+    .extra {
+      grid-template-columns: 1fr;
+    }
+  }
+
+  .extra__list {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(min(100%, 170px), 1fr));
+    gap: 16px;
+    margin: 0;
+    padding: 0;
+    list-style: none;
+  }
+
+  .extra__list .card {
+    padding: 20px;
+  }
+
+  .extra__list .icon-badge {
+    margin-bottom: 12px;
+  }
+
+  .faq {
+    max-width: 860px;
+  }
+
+  .faq__list {
+    display: grid;
+    gap: 12px;
+  }
+
+  .faq__item {
+    background: var(--paper);
+    border: 1px solid var(--line);
+    border-radius: var(--radius);
+  }
+
+  .faq__item summary {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 16px;
+    padding: 18px 22px;
+    font-family: var(--font-display);
+    font-weight: 600;
+    font-size: 1.1rem;
+    cursor: pointer;
+    list-style: none;
+  }
+
+  .faq__item summary::-webkit-details-marker {
+    display: none;
+  }
+
+  .faq__item summary :global(svg) {
+    flex: none;
+    transition: transform 0.2s ease;
+  }
+
+  .faq__item[open] summary :global(svg) {
+    transform: rotate(180deg);
+  }
+
+  .faq__item p {
+    margin: 0;
+    padding: 0 22px 20px;
+    color: var(--muted);
+  }
+
+  .cta {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    justify-content: space-between;
+    gap: 24px;
+  }
+
+  .cta h2 {
+    color: #fff;
+    margin-bottom: 0.2em;
+  }
+
+  .cta .lead {
+    margin: 0;
+  }
+</style>

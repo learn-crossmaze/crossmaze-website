@@ -1,0 +1,248 @@
+---
+import BaseLayout from '../layouts/BaseLayout.astro';
+import PageHero from '../components/PageHero.astro';
+import SectionHeading from '../components/SectionHeading.astro';
+import Icon from '../components/Icon.astro';
+import { site } from '../data/site';
+import { approach } from '../data/programs';
+import { branches } from '../data/branches';
+
+const values = [
+  { icon: 'Heart', title: 'Care first', text: 'Children learn best when they feel safe, known and loved.' },
+  { icon: 'Lightbulb', title: 'Curiosity', text: 'We follow children’s questions and turn them into discoveries.' },
+  { icon: 'HandHeart', title: 'Values & manners', text: 'Kindness, respect and good habits are taught every day.' },
+  { icon: 'ShieldCheck', title: 'Transparency', text: 'Live CCTV and a parent app keep families close to every moment.' },
+];
+---
+
+<BaseLayout
+  title="About Us"
+  description="Crossmaze Preschool and Day Care, founded by Manushree Chaturvedi and Abhishek Jain, brings innovative, holistic early education to Electronic City and Begur, Bengaluru."
+>
+  <PageHero
+    eyebrow="About Crossmaze"
+    title="Innovative, joyful early learning for the whole child"
+    lead="Crossmaze began with a simple belief: children learn best when lessons are engaging, unconventional and fun, and when values matter as much as academics."
+    crumbs={[{ label: 'About' }]}
+  />
+
+  <section class="section section--white">
+    <div class="container story">
+      <div>
+        <SectionHeading eyebrow="Our story" title="From one classroom to five centres" />
+        <p>
+          Crossmaze opened its doors in {site.foundedYear} with a focus on innovative, unconventional and engaging teaching
+          strategies that help children understand ideas easily and enjoyably. Founders {site.founders[0]} and
+          {site.founders[1]} set out to build a preschool that parents could trust completely, and that children would
+          love walking into every morning.
+        </p>
+        <p>
+          Today Crossmaze has {branches.length} centres across Electronic City and Begur in Bengaluru, offering Play Group,
+          Nursery, Junior KG, Senior KG and Day Care. Every centre follows the same Montessori-based, thematic
+          curriculum, with the same attention to safety, hygiene and care.
+        </p>
+        <p>
+          We believe education should be centred on the child’s whole development. Academics and discipline are valued
+          equally with culture, manners and behaviour, because that is what helps children grow into confident, kind
+          and capable people.
+        </p>
+      </div>
+      <aside class="story__stats">
+        <div class="stat tone-sun">
+          <strong>{branches.length}</strong>
+          <span>centres in Bengaluru</span>
+        </div>
+        <div class="stat tone-teal">
+          <strong>2 – 8</strong>
+          <span>years age range</span>
+        </div>
+        <div class="stat tone-coral">
+          <strong>{site.foundedYear}</strong>
+          <span>year we started</span>
+        </div>
+        <div class="stat tone-sky">
+          <strong>5</strong>
+          <span>programs</span>
+        </div>
+      </aside>
+    </div>
+  </section>
+
+  <section class="section">
+    <div class="container">
+      <SectionHeading eyebrow="What we value" title="The things we never compromise on" align="center" />
+      <div class="grid grid--4">
+        {
+          values.map((v, i) => (
+            <div class:list={['card', `tone-${['coral', 'sun', 'teal', 'plum'][i % 4]}`]}>
+              <span class="icon-badge">
+                <Icon name={v.icon} size={26} />
+              </span>
+              <h3>{v.title}</h3>
+              <p class="muted">{v.text}</p>
+            </div>
+          ))
+        }
+      </div>
+    </div>
+  </section>
+
+  <section class="section section--white">
+    <div class="container">
+      <SectionHeading
+        eyebrow="Our approach"
+        title="How children learn at Crossmaze"
+        lead="Our Foundational Development Program uses Montessori-based methods and a thematic curriculum to build the skills children need for school and for life."
+      />
+      <div class="grid grid--2">
+        {
+          approach.map((a) => (
+            <div class="approach">
+              <span class="icon-badge">
+                <Icon name={a.icon} size={26} />
+              </span>
+              <div>
+                <h3>{a.title}</h3>
+                <p class="muted">{a.text}</p>
+              </div>
+            </div>
+          ))
+        }
+      </div>
+    </div>
+  </section>
+
+  <section class="section">
+    <div class="container founders">
+      <SectionHeading eyebrow="Leadership" title="Meet our founders" />
+      <div class="grid grid--2">
+        {
+          site.founders.map((name) => (
+            <div class="card founder">
+              <span class="founder__avatar" aria-hidden="true">
+                {name
+                  .split(' ')
+                  .map((n) => n[0])
+                  .join('')}
+              </span>
+              <div>
+                <h3>{name}</h3>
+                <p class="muted">Co-founder, {site.legalName}</p>
+              </div>
+            </div>
+          ))
+        }
+      </div>
+    </div>
+  </section>
+
+  <section class="section--tight section--plum">
+    <div class="container cta">
+      <div>
+        <h2>See Crossmaze for yourself</h2>
+        <p class="lead">Visit your nearest centre and meet our team.</p>
+      </div>
+      <div class="btn-row">
+        <a class="btn btn--sun" href="/contact#enquire">Book a visit</a>
+        <a class="btn btn--white btn--ghost" href="/branch">Find a branch</a>
+      </div>
+    </div>
+  </section>
+</BaseLayout>
+
+<style>
+  .story {
+    display: grid;
+    grid-template-columns: 1.3fr 0.7fr;
+    gap: clamp(32px, 5vw, 72px);
+    align-items: center;
+  }
+
+  @media (max-width: 860px) {
+    .story {
+      grid-template-columns: 1fr;
+    }
+  }
+
+  .story p {
+    color: var(--muted);
+    max-width: 65ch;
+  }
+
+  .story__stats {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 16px;
+  }
+
+  .stat {
+    display: grid;
+    padding: 24px 20px;
+    border-radius: var(--radius);
+    background: var(--badge-bg);
+  }
+
+  .stat strong {
+    font-family: var(--font-display);
+    font-size: clamp(1.8rem, 3vw, 2.4rem);
+    font-weight: 600;
+    line-height: 1.1;
+    color: var(--badge-fg);
+  }
+
+  .stat span {
+    font-weight: 700;
+    font-size: 0.95rem;
+  }
+
+  .approach {
+    display: flex;
+    gap: 18px;
+  }
+
+  .approach .icon-badge {
+    flex: none;
+    margin: 0;
+  }
+
+  .founder {
+    display: flex;
+    align-items: center;
+    gap: 20px;
+  }
+
+  .founder__avatar {
+    display: grid;
+    place-items: center;
+    flex: none;
+    width: 76px;
+    height: 76px;
+    border-radius: 50%;
+    background: var(--plum);
+    color: var(--sun);
+    font-family: var(--font-display);
+    font-size: 1.6rem;
+    font-weight: 600;
+  }
+
+  .founder p {
+    margin: 0;
+  }
+
+  .cta {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    justify-content: space-between;
+    gap: 24px;
+  }
+
+  .cta h2 {
+    color: #fff;
+    margin-bottom: 0.2em;
+  }
+
+  .cta .lead {
+    margin: 0;
+  }
+</style>

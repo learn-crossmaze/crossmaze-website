@@ -1,0 +1,51 @@
+---
+import Icon from './Icon.astro';
+import type { Program } from '../data/programs';
+
+interface Props {
+  program: Program;
+}
+const { program } = Astro.props;
+---
+
+<a class:list={['program-card', 'card', `tone-${program.color}`]} href={`/our-programs#${program.slug}`}>
+  <span class="icon-badge"><Icon name={program.icon} size={26} /></span>
+  <h3>{program.name}</h3>
+  <span class="pill">{program.ages}</span>
+  <p>{program.summary}</p>
+  <span class="program-card__more">Learn more <Icon name="ArrowRight" size={18} /></span>
+</a>
+
+<style>
+  .program-card {
+    display: flex;
+    flex-direction: column;
+    color: inherit;
+    text-decoration: none;
+    border-top: 6px solid var(--tone);
+    transition:
+      transform 0.18s ease,
+      box-shadow 0.18s ease;
+  }
+  .program-card:hover {
+    color: inherit;
+    transform: translateY(-4px);
+    box-shadow: var(--shadow);
+  }
+  .program-card .pill {
+    align-self: flex-start;
+    margin-bottom: 14px;
+  }
+  .program-card p {
+    color: var(--muted);
+    flex: 1;
+  }
+  .program-card__more {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    margin-top: 8px;
+    font-weight: 800;
+    color: var(--plum);
+  }
+</style>
