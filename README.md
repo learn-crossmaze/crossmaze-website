@@ -60,14 +60,29 @@ The admission enquiry and job application forms work in two modes:
 
 A hidden honeypot field filters out simple spam bots.
 
-## Deploying
+## Deploying (Firebase Hosting)
 
-`npm run build` produces a static `dist/` folder that can be hosted anywhere:
+The site is set up for the Firebase project `crossmaze-website` (`firebase.json`, `.firebaserc`).
+Pages build to files like `about.html`, and Firebase serves them at clean URLs (`/about`). URLs ending in `/` redirect to the version without it.
 
-- **Netlify / Vercel / Cloudflare Pages:** connect this repo. Build command `npm run build`, output folder `dist`.
-- **GitHub Pages / any web host:** upload the contents of `dist/`.
+**Automatic (GitHub Actions).** `.github/workflows/firebase-hosting.yml` builds every push and pull request. Once the secret below exists:
+- merging to `main` deploys to the live site;
+- every pull request gets a temporary preview link, posted as a comment.
 
-Then point `www.crossmaze.in` at the new host.
+One-time setup:
+1. In the [Firebase console](https://console.firebase.google.com/project/crossmaze-website/settings/serviceaccounts/adminsdk), open **Project settings → Service accounts → Generate new private key**. Or run `npx firebase-tools init hosting:github`, which creates the account and the secret for you.
+2. In GitHub, open **Settings → Secrets and variables → Actions → New repository secret**. Name it `FIREBASE_SERVICE_ACCOUNT_CROSSMAZE_WEBSITE` and paste the whole JSON key.
+3. Optional: add a repository **variable** `PUBLIC_FORM_ENDPOINT` to turn on the form service (see Forms).
+
+**Manual (from your computer).**
+
+```sh
+npm run build
+npx firebase-tools login
+npx firebase-tools deploy --only hosting
+```
+
+**Custom domain.** In Firebase console → Hosting → **Add custom domain**, add `www.crossmaze.in` (and `crossmaze.in`), then update the DNS records it shows at your domain registrar.
 
 ## Please verify before launch
 
@@ -82,3 +97,4 @@ The live crossmaze.in could not be reached while this was built, so the content 
 - [ ] **Job descriptions**: the Teacher / Facilitator and Center Head descriptions are drafts. Day Care In-Charge follows the current careers page.
 - [ ] **Program copy and FAQs**: check that they match how you describe your programs today.
 - [ ] **Photos and logo**: add real centre photos and the official logo.
+- [ ] **Firebase project ID**: `.firebaserc` and the workflow use `crossmaze-website`. If the console shows a different ID (e.g. `crossmaze-website-1a2b3`), update both.

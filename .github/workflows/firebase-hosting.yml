@@ -1,0 +1,51 @@
+# Builds the site on every push and pull request, then deploys to Firebase Hosting:
+#   - pushes to main  -> the live site
+#   - pull requests   -> a temporary preview URL, posted as a PR comment
+# Deploys are skipped until the FIREBASE_SERVICE_ACCOUNT_CROSSMAZE_WEBSITE secret is added.
+name: Firebase Hosting
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+
+permissions:
+  checks: write
+  contents: read
+  pull-requests: write
+
+jobs:
+  build-and-deploy:
+    runs-on: ubuntu-latest
+    env:
+      FIREBASE_SERVICE_ACCOUNT: ${{ secrets.FIREBASE_SERVICE_ACCOUNT_CROSSMAZE_WEBSITE }}
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+
+      - run: npm ci
+
+      - run: npm run build
+        env:
+          PUBLIC_FORM_ENDPOINT: ${{ vars.PUBLIC_FORM_ENDPOINT }}
+
+      - name: Deploy preview
+        if: github.event_name == 'pull_request' && env.FIREBASE_SERVICE_ACCOUNT != ''
+        uses: FirebaseExtended/action-hosting-deploy@v0
+        with:
+          repoToken: ${{ secrets.GITHUB_TOKEN }}
+          firebaseServiceAccount: ${{ secrets.FIREBASE_SERVICE_ACCOUNT_CROSSMAZE_WEBSITE }}
+          projectId: crossmaze-website
+
+      - name: Deploy live
+        if: github.event_name == 'push' && env.FIREBASE_SERVICE_ACCOUNT != ''
+        uses: FirebaseExtended/action-hosting-deploy@v0
+        with:
+          repoToken: ${{ secrets.GITHUB_TOKEN }}
+          firebaseServiceAccount: ${{ secrets.FIREBASE_SERVICE_ACCOUNT_CROSSMAZE_WEBSITE }}
+          projectId: crossmaze-website
+          channelId: live
