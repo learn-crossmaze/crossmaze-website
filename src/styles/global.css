@@ -1,16 +1,16 @@
 /* ---------- Design tokens ---------- */
 :root {
-  --ink: #1f1640;
-  --muted: #5d5776;
-  --plum: #4b2a8c;
-  --plum-700: #371d6b;
-  --plum-50: #f3eefc;
-  --sun: #ffc23d;
+  --ink: #131a3a;
+  --muted: #535a76;
+  --navy: #14307f;
+  --navy-700: #0b1d5e;
+  --navy-50: #eaf0fb;
+  --sun: #ffc93c;
   --sun-50: #fff4d6;
-  --coral: #ff6f59;
-  --coral-50: #ffe9e4;
-  --teal: #0f9d8b;
-  --teal-50: #dcf5f1;
+  --coral: #ee4035;
+  --coral-50: #fde8e6;
+  --green: #2f9a46;
+  --green-50: #e2f4e3;
   --sky: #2f7ff0;
   --sky-50: #e2eefe;
   --cream: #fff8ee;
@@ -68,13 +68,13 @@ svg {
 }
 
 a {
-  color: var(--plum);
+  color: var(--navy);
   text-decoration-thickness: 1.5px;
   text-underline-offset: 3px;
 }
 
 a:hover {
-  color: var(--plum-700);
+  color: var(--navy-700);
 }
 
 h1,
@@ -176,8 +176,8 @@ ul {
   background: var(--paper);
 }
 
-.section--plum {
-  background: var(--plum);
+.section--navy {
+  background: var(--navy);
   color: #fff;
 }
 
@@ -222,8 +222,8 @@ ul {
   max-width: 62ch;
 }
 
-.section--plum .lead,
-.section--plum .eyebrow {
+.section--navy .lead,
+.section--navy .eyebrow {
   color: rgb(255 255 255 / 85%);
 }
 
@@ -233,7 +233,7 @@ ul {
 
 /* ---------- Buttons ---------- */
 .btn {
-  --btn-bg: var(--plum);
+  --btn-bg: var(--navy);
   --btn-fg: #fff;
   display: inline-flex;
   align-items: center;
@@ -279,7 +279,7 @@ ul {
 
 .btn--white {
   --btn-bg: #fff;
-  --btn-fg: var(--plum);
+  --btn-fg: var(--navy);
 }
 
 .btn--sm {
@@ -319,34 +319,34 @@ ul {
   height: 52px;
   margin-bottom: 18px;
   border-radius: 16px;
-  background: var(--badge-bg, var(--plum-50));
-  color: var(--badge-fg, var(--plum));
+  background: var(--badge-bg, var(--navy-50));
+  color: var(--badge-fg, var(--navy));
 }
 
 .tone-sun {
   --badge-bg: var(--sun-50);
-  --badge-fg: #a86b00;
+  --badge-fg: #9a6500;
   --tone: var(--sun);
 }
 .tone-coral {
   --badge-bg: var(--coral-50);
-  --badge-fg: #c53e29;
+  --badge-fg: #c42b22;
   --tone: var(--coral);
 }
-.tone-teal {
-  --badge-bg: var(--teal-50);
-  --badge-fg: var(--teal);
-  --tone: var(--teal);
+.tone-green {
+  --badge-bg: var(--green-50);
+  --badge-fg: var(--green);
+  --tone: var(--green);
 }
 .tone-sky {
   --badge-bg: var(--sky-50);
   --badge-fg: var(--sky);
   --tone: var(--sky);
 }
-.tone-plum {
-  --badge-bg: var(--plum-50);
-  --badge-fg: var(--plum);
-  --tone: var(--plum);
+.tone-navy {
+  --badge-bg: var(--navy-50);
+  --badge-fg: var(--navy);
+  --tone: var(--navy);
 }
 
 .pill {
@@ -355,8 +355,8 @@ ul {
   gap: 6px;
   padding: 4px 12px;
   border-radius: 999px;
-  background: var(--badge-bg, var(--plum-50));
-  color: var(--badge-fg, var(--plum));
+  background: var(--badge-bg, var(--navy-50));
+  color: var(--badge-fg, var(--navy));
   font-weight: 700;
   font-size: 0.85rem;
 }
@@ -378,7 +378,7 @@ ul {
 .check-list li > :first-child {
   flex: none;
   margin-top: 3px;
-  color: var(--teal);
+  color: var(--green);
 }
 
 /* ---------- Page hero (inner pages) ---------- */
@@ -388,7 +388,7 @@ ul {
   padding-block: clamp(48px, 7vw, 88px) clamp(40px, 6vw, 72px);
   background:
     radial-gradient(circle at 92% 18%, var(--sun-50) 0 120px, transparent 121px),
-    radial-gradient(circle at 6% 92%, var(--teal-50) 0 90px, transparent 91px),
+    radial-gradient(circle at 6% 92%, var(--green-50) 0 90px, transparent 91px),
     var(--cream);
 }
 
@@ -470,8 +470,8 @@ ul {
 .field select:focus,
 .field textarea:focus {
   outline: none;
-  border-color: var(--plum);
-  box-shadow: 0 0 0 4px rgb(75 42 140 / 14%);
+  border-color: var(--navy);
+  box-shadow: 0 0 0 4px rgb(20 48 127 / 14%);
 }
 
 .form-status {
@@ -486,8 +486,8 @@ ul {
 }
 
 .form-status[data-state='success'] {
-  background: var(--teal-50);
-  color: #08665a;
+  background: var(--green-50);
+  color: #1e6b31;
 }
 
 .form-status[data-state='error'] {

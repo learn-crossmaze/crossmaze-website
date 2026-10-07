@@ -1,16 +1,26 @@
-// Programs offered across Crossmaze branches.
+// Programs offered across Crossmaze branches. Text follows the original crossmaze.in program pages.
 // `icon` is a lucide-static icon name (https://lucide.dev/icons).
+import type { ImageMetadata } from 'astro';
+import playArea from '../assets/photos/play-area.jpg';
+import classTable from '../assets/photos/class-table.jpg';
+import teacherFlashcards from '../assets/photos/teacher-flashcards.jpg';
+import yoga from '../assets/photos/yoga.jpg';
+import napRoom from '../assets/photos/nap-room.jpg';
 
 export interface Program {
   slug: string;
   name: string;
   ages: string;
   icon: string;
-  color: 'sun' | 'coral' | 'teal' | 'sky' | 'plum';
+  color: 'sun' | 'coral' | 'green' | 'sky' | 'navy';
   timing: string;
+  headline: string;
   summary: string;
-  description: string;
-  highlights: string[];
+  paragraphs: string[];
+  focusTitle: string;
+  focus: string[];
+  photo: ImageMetadata;
+  photoAlt: string;
 }
 
 export const programs: Program[] = [
@@ -21,32 +31,34 @@ export const programs: Program[] = [
     icon: 'Blocks',
     color: 'sun',
     timing: '9:00 am – 12:30 pm',
-    summary: 'A gentle first step away from home, built around play, movement and making friends.',
-    description:
-      'Our Play Group sessions nurture physical development, spark problem-solving, build early communication and encourage positive social interaction. Qualified, caring staff create a safe space where two-year-olds can explore, learn and play together at their own pace.',
-    highlights: [
-      'Sensory and free-play corners',
-      'Gross and fine motor activities',
-      'Rhymes, stories and music',
-      'Settling-in support for first-time separation',
+    headline: 'Where learning meets fun and friendship',
+    summary: 'A joyful first journey of discovery: learning about the world, making friends and building social skills.',
+    paragraphs: [
+      'Playgroup is one of the most delightful ways for your child to begin a journey of discovery. It’s a place to learn about the world, cultivate friendships and hone essential social skills, and an enriching experience for parents, grandparents and caregivers too.',
+      'Our Playgroup sessions nurture physical development, stimulate problem-solving, foster effective communication and encourage positive social interaction, with every moment packed with joy. Our qualified staff create a safe space where children aged 2 and above can explore, learn and play together.',
     ],
+    focusTitle: 'What children build',
+    focus: ['Physical development', 'Problem-solving', 'Communication', 'Sensory and social skills'],
+    photo: playArea,
+    photoAlt: 'Colourful indoor play area with rockers and a slide at a Crossmaze centre',
   },
   {
     slug: 'nursery',
     name: 'Nursery',
     ages: '3 – 4 years',
     icon: 'Sprout',
-    color: 'teal',
+    color: 'green',
     timing: '9:00 am – 12:30 pm',
-    summary: 'Early academic foundations woven together with creativity and themed exploration.',
-    description:
-      'The Nursery program blends early literacy and numeracy with art, music and themed exploration. Children begin to recognise letters, sounds, numbers and shapes through hands-on Montessori materials, while building confidence, independence and friendships.',
-    highlights: [
-      'Montessori practical-life and sensorial work',
-      'Phonics readiness and early numeracy',
-      'Theme-based weekly learning',
-      'Art, craft and pretend play',
+    headline: 'Where comfort and confidence flourish',
+    summary: 'A second home where children build self-esteem, friendships and their first academic foundations.',
+    paragraphs: [
+      'Nursery is often a child’s first experience away from their parents, so we have crafted it to be a second home, full of materials that captivate, comfort and keep them secure.',
+      'Here children discover themselves and build self-esteem: they understand the significance of their own name, the value of their belongings and the joy of friendship. Our Nursery program weaves academic foundations together with creativity and thematic exploration, setting the stage for future success. A strong start leads to a triumphant finish.',
     ],
+    focusTitle: 'What children build',
+    focus: ['Self-discovery and self-esteem', 'Effective communication', 'Early academic foundations', 'Creativity and thematic exploration'],
+    photo: classTable,
+    photoAlt: 'Children in Crossmaze uniforms working together at a classroom table',
   },
   {
     slug: 'junior-kg',
@@ -55,15 +67,16 @@ export const programs: Program[] = [
     icon: 'Puzzle',
     color: 'coral',
     timing: '9:00 am – 12:30 pm',
-    summary: 'Reading, writing and number sense, learnt by doing, asking and discovering.',
-    description:
-      'In Junior KG children move from recognising to using: blending sounds into words, writing letters with control, and working with numbers. A thematic curriculum connects language, maths, science and the world around them, so every concept is learnt in context.',
-    highlights: [
-      'Phonics, blending and early reading',
-      'Pre-writing to letter formation',
-      'Number operations with concrete materials',
-      'Show-and-tell and confidence building',
+    headline: 'Nurturing holistic development',
+    summary: 'Numeracy, literacy, fine motor skills, logical thinking and problem-solving, learnt together.',
+    paragraphs: [
+      'Junior KG is a pivotal phase where we embrace each child’s comprehensive development. Our curriculum focuses on the key areas that lay the foundation for a bright future: numeracy, literacy, fine motor skills, logical thinking and problem-solving.',
+      'At this age children are refining their language and cognitive abilities and are eager to explore new languages, while a keen sense of numbers develops. Through engaging group activities our teachers build teamwork, participation, sharing and taking turns.',
     ],
+    focusTitle: 'Focus areas',
+    focus: ['Numeracy', 'Literacy', 'Fine motor skills', 'Logical thinking', 'Problem-solving'],
+    photo: teacherFlashcards,
+    photoAlt: 'A Crossmaze teacher showing a letter card to a group of children',
   },
   {
     slug: 'senior-kg',
@@ -72,63 +85,81 @@ export const programs: Program[] = [
     icon: 'GraduationCap',
     color: 'sky',
     timing: '9:00 am – 12:30 pm',
-    summary: 'Confident, curious and ready for Grade 1, academically and socially.',
-    description:
-      'Senior KG prepares children for a smooth move to primary school. Children read simple sentences, write independently, solve number problems and express their ideas clearly, while practical life skills like problem-solving, communication and collaboration grow alongside.',
-    highlights: [
-      'Independent reading and sentence writing',
-      'Addition, subtraction, time and money',
-      'Simple science and environment projects',
-      'School-readiness and life skills',
+    headline: 'Preparing for school success',
+    summary: 'A confident, seamless step into primary school, aligned with State, CBSE and ICSE boards.',
+    paragraphs: [
+      'At 5 to 6, we prepare your child for a seamless transition into school. A stimulating environment encourages them to explore language, mathematics, science, physical activity, music and art, so they grow competent and confident while staying compassionate and caring.',
+      'Learning goes beyond language and writing: we place strong emphasis on cognitive development, communication and problem-solving, with extracurricular activities that let children express themselves. Our curriculum is aligned with the requirements of State, CBSE and ICSE boards, so children step into mainstream schools well prepared.',
     ],
+    focusTitle: 'Focus areas',
+    focus: ['Language and mathematics', 'Science and discovery', 'Music, art and movement', 'Aligned with State, CBSE and ICSE boards'],
+    photo: yoga,
+    photoAlt: 'Children doing a yoga pose together in a bright Crossmaze hall',
   },
   {
     slug: 'day-care',
     name: 'Day Care',
     ages: '2 – 8 years',
     icon: 'Sun',
-    color: 'plum',
+    color: 'navy',
     timing: '9:00 am – 6:00 pm',
-    summary: 'A secure, homely full day for children of working parents, with naps, meals and play.',
-    description:
-      'Our in-house Day Care gives children a safe and nurturing place to spend the rest of their day. Air-conditioned sleeping rooms, supervised meals, homework help for older children and plenty of indoor play keep the day calm and happy, and parents can check in any time on live CCTV.',
-    highlights: [
-      'Air-conditioned sleeping rooms',
-      'Supervised meals and snack time',
-      'Homework support for school-goers',
-      'Live CCTV access for parents',
+    headline: 'Day care and enrichment centre, where learning meets safety',
+    summary: 'A nurturing, home-like full day with trained caregivers and a 1:6 adult-to-child ratio.',
+    paragraphs: [
+      'Our Day Care and Activity Centre is a unique haven where learning takes an unconventional yet captivating form. Dedicated, trained caretakers keep children safe at all times, giving working parents peace of mind while they pursue their careers.',
+      'Day care is open to both Crossmaze students and children from other schools, with a smooth transition from preschool to end-of-day activities.',
     ],
+    focusTitle: 'What’s included',
+    focus: [
+      'Live CCTV access for parents',
+      'Collaborative parenting app',
+      'Air-conditioned resting and indoor play areas',
+      'A hygienic, professional and welcoming atmosphere',
+      'Visiting instructors for art, craft, dance and more (additional charges may apply)',
+      'Pick-up from the nearby drop point of other schools',
+    ],
+    photo: napRoom,
+    photoAlt: 'Rows of child-sized nap cots in an air-conditioned Crossmaze sleeping room',
   },
+];
+
+export const daycareHighlights = [
+  'Structured routines',
+  'Designated nap rooms',
+  'Expert and trained caregivers',
+  'Live CCTV monitoring',
+  'Parents communication app',
+  '1:6 adult-to-child ratio',
 ];
 
 export const approach = [
   {
     icon: 'Brain',
     title: 'Foundational Development Program',
-    text: 'Lays the groundwork for essential life skills such as problem-solving, communication and collaboration, preparing children for the challenges of tomorrow.',
+    text: 'Goes beyond traditional preschool education, laying the groundwork for essential life skills and equipping children for the challenges of tomorrow’s world.',
   },
   {
     icon: 'Shapes',
     title: 'Montessori-based learning',
-    text: 'Hands-on Montessori materials let children learn through their senses, follow their curiosity and build independence and concentration.',
+    text: 'A Montessori-based approach with hands-on materials, so children learn through their senses and build independence.',
   },
   {
     icon: 'BookOpen',
     title: 'Thematic curriculum',
-    text: 'Every theme brings together cognitive, language, personal, social, emotional and physical development, so learning feels like one connected adventure.',
+    text: 'Each theme integrates cognitive, language, personal, social, emotional and physical development into one immersive experience.',
   },
   {
-    icon: 'HandHeart',
-    title: 'Values and manners',
-    text: 'Academics and discipline are valued equally with culture, manners and behaviour, for the holistic growth of every child.',
+    icon: 'Eye',
+    title: 'Visual, practical learning',
+    text: 'Children under 5 have a strong visual understanding, so we teach practically. Visual learning is everlasting.',
   },
 ];
 
 export const extracurricular = [
-  { icon: 'Music', label: 'Music and rhythm' },
   { icon: 'Palette', label: 'Art and craft' },
-  { icon: 'Trees', label: 'Outdoor and physical play' },
-  { icon: 'Smile', label: 'Dance and movement' },
-  { icon: 'Lightbulb', label: 'Brain development activities' },
-  { icon: 'Award', label: 'Celebrations and events' },
+  { icon: 'Music', label: 'Music and rhymes' },
+  { icon: 'Smile', label: 'Dance and performance' },
+  { icon: 'Sprout', label: 'Yoga and movement' },
+  { icon: 'Award', label: 'Annual day and celebrations' },
+  { icon: 'Trees', label: 'Indoor and outdoor play' },
 ];

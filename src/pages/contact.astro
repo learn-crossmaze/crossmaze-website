@@ -4,12 +4,12 @@ import PageHero from '../components/PageHero.astro';
 import EnquiryForm from '../components/EnquiryForm.astro';
 import Icon from '../components/Icon.astro';
 import { site } from '../data/site';
-import { branches, telHref } from '../data/branches';
+import { branches, shortName, telHref } from '../data/branches';
 ---
 
 <BaseLayout
   title="Contact & Admissions"
-  description="Contact Crossmaze Preschool and Day Care for admissions, school visits and enquiries. Call +91 72599 21508 or email admission@crossmaze.in."
+  description="Contact Crossmaze Preschool and Day Care for admissions, school visits and enquiries. Call +91 72040 21508 or email admission@crossmaze.in."
 >
   <PageHero
     eyebrow="Contact & admissions"
@@ -25,11 +25,11 @@ import { branches, telHref } from '../data/branches';
         <EnquiryForm id="contact-enquiry" />
       </div>
       <aside class="contact__direct">
-        <a class="direct tone-plum" href={site.phoneHref}>
+        <a class="direct tone-navy" href={site.phoneHref}>
           <span class="icon-badge"><Icon name="Phone" size={24} /></span>
           <span><span class="muted">Call admissions</span><strong>{site.phone}</strong></span>
         </a>
-        <a class="direct tone-teal" href={site.whatsappHref} target="_blank" rel="noopener">
+        <a class="direct tone-green" href={site.whatsappHref} target="_blank" rel="noopener">
           <span class="icon-badge"><Icon name="MessageCircle" size={24} /></span>
           <span><span class="muted">Chat on WhatsApp</span><strong>Message us</strong></span>
         </a>
@@ -37,6 +37,17 @@ import { branches, telHref } from '../data/branches';
           <span class="icon-badge"><Icon name="Mail" size={24} /></span>
           <span><span class="muted">Email admissions</span><strong>{site.admissionsEmail}</strong></span>
         </a>
+        <a class="direct tone-sky" href={`mailto:${site.careEmail}`}>
+          <span class="icon-badge"><Icon name="HandHeart" size={24} /></span>
+          <span><span class="muted">Parent support</span><strong>{site.careEmail}</strong></span>
+        </a>
+        <div class="direct tone-navy">
+          <span class="icon-badge"><Icon name="MapPin" size={24} /></span>
+          <span>
+            <span class="muted">Address</span>
+            {site.address.map((line, i) => (i === 0 ? <strong>{line}</strong> : <span>{line}</span>))}
+          </span>
+        </div>
         <div class="direct tone-sun">
           <span class="icon-badge"><Icon name="Clock" size={24} /></span>
           <span>
@@ -57,7 +68,7 @@ import { branches, telHref } from '../data/branches';
           branches.map((b) => (
             <div class="card">
               <h3>
-                <a href={`/branch/${b.slug}`}>{b.name.replace('Crossmaze – ', '')}</a>
+                <a href={`/branch/${b.slug}`}>{shortName(b)}</a>
               </h3>
               <p class="line">
                 <Icon name="MapPin" size={18} />
@@ -146,7 +157,7 @@ import { branches, telHref } from '../data/branches';
   }
 
   .branch-list h3 a:hover {
-    color: var(--plum);
+    color: var(--navy);
   }
 
   .line {

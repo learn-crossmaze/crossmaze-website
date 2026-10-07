@@ -1,22 +1,24 @@
 ---
+import { Image } from 'astro:assets';
 import Icon from './Icon.astro';
 import type { Branch } from '../data/branches';
-import { telHref } from '../data/branches';
+import { branchPhotos, shortName, telHref } from '../data/branches';
 
 interface Props {
   branch: Branch;
   index?: number;
 }
 const { branch, index = 0 } = Astro.props;
-const tones = ['plum', 'teal', 'coral', 'sky', 'sun'];
+const tones = ['navy', 'green', 'coral', 'sky', 'sun'];
 const tone = tones[index % tones.length];
+const cover = branchPhotos(branch.slug)[0];
 ---
 
 <article class:list={['branch-card', 'card', `tone-${tone}`]}>
   <div class="branch-card__media">
     {
-      branch.image ? (
-        <img src={branch.image} alt={`${branch.name} centre`} loading="lazy" width="640" height="360" />
+      cover ? (
+        <Image src={cover} alt={`Inside ${branch.name}`} widths={[400, 640, 800]} sizes="(max-width: 700px) 100vw, 380px" />
       ) : (
         <div class="branch-card__art" aria-hidden="true">
           <Icon name="Building2" size={44} strokeWidth={1.6} />
@@ -25,7 +27,7 @@ const tone = tones[index % tones.length];
     }
     <span class="branch-card__pin"><Icon name="MapPin" size={16} /> {branch.pincode}</span>
   </div>
-  <h3><a href={`/branch/${branch.slug}`}>{branch.name.replace('Crossmaze – ', '')}</a></h3>
+  <h3><a href={`/branch/${branch.slug}`}>{shortName(branch)}</a></h3>
   <p class="muted">{branch.area}</p>
   <ul class="branch-card__facts">
     {
@@ -70,7 +72,7 @@ const tone = tones[index % tones.length];
     aspect-ratio: 16 / 9;
     background: var(--badge-bg);
   }
-  .branch-card__media img {
+  .branch-card__media :global(img) {
     width: 100%;
     height: 100%;
     object-fit: cover;
@@ -104,7 +106,7 @@ const tone = tones[index % tones.length];
     text-decoration: none;
   }
   .branch-card h3 a:hover {
-    color: var(--plum);
+    color: var(--navy);
   }
   .branch-card .muted {
     margin-bottom: 12px;

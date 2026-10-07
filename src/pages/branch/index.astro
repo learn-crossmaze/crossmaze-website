@@ -3,12 +3,12 @@ import BaseLayout from '../../layouts/BaseLayout.astro';
 import PageHero from '../../components/PageHero.astro';
 import BranchCard from '../../components/BranchCard.astro';
 import Icon from '../../components/Icon.astro';
-import { branches, amenities } from '../../data/branches';
+import { branches, facilities } from '../../data/branches';
 ---
 
 <BaseLayout
   title="Our Branches"
-  description="Find your nearest Crossmaze Preschool and Day Care: Neotown, Neeladri Nagar, SNN Greenbay, Ananth Nagar in Electronic City, and The Hub in Begur, Bengaluru."
+  description="Find your nearest Crossmaze Preschool and Day Care: The Hub in Begur, and Neotown, SNN Greenbay, Neeladri Nagar and Ananth Nagar in Electronic City, Bengaluru."
 >
   <PageHero
     eyebrow="Our branches"
@@ -27,15 +27,15 @@ import { branches, amenities } from '../../data/branches';
 
   <section class="section--tight">
     <div class="container">
-      <h2 class="amen-title">At every branch</h2>
+      <h2 class="amen-title">Our facilities</h2>
       <ul class="amen">
         {
-          amenities.map((a) => (
+          facilities.map((f) => (
             <li>
               <span class="icon-badge">
-                <Icon name={a.icon} size={22} />
+                <Icon name={f.icon} size={22} />
               </span>
-              {a.label}
+              {f.title}
             </li>
           ))
         }

@@ -1,11 +1,19 @@
 ---
+import { Image, getImage } from 'astro:assets';
 import BaseLayout from '../../layouts/BaseLayout.astro';
-import PageHero from '../../components/PageHero.astro';
 import SectionHeading from '../../components/SectionHeading.astro';
 import BranchCard from '../../components/BranchCard.astro';
 import EnquiryForm from '../../components/EnquiryForm.astro';
 import Icon from '../../components/Icon.astro';
-import { branches, amenities, telHref, type Branch } from '../../data/branches';
+import {
+  branches,
+  amenityList,
+  branchPhotos,
+  headPhoto,
+  shortName as toShortName,
+  telHref,
+  type Branch,
+} from '../../data/branches';
 import { programs } from '../../data/programs';
 import { site } from '../../data/site';
 
@@ -18,16 +26,22 @@ interface Props {
 }
 
 const { branch } = Astro.props;
-const shortName = branch.name.replace('Crossmaze – ', '');
+const shortName = toShortName(branch);
 const offered = programs.filter((p) => branch.programs.includes(p.slug));
 const others = branches.filter((b) => b.slug !== branch.slug);
+const photos = branchPhotos(branch.slug);
+// The cover photo sits in the hero; the next five fill the gallery's 2×2 + 4 grid.
+const [cover, ...rest] = photos;
+const gallery = rest.slice(0, 5);
+const fullSize = await Promise.all(photos.map((p) => getImage({ src: p, width: 1600, format: 'webp' })));
+const head = headPhoto(branch.slug);
 const mapSrc = `https://www.google.com/maps?q=${encodeURIComponent(branch.mapQuery)}&output=embed`;
 const directions = `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(branch.mapQuery)}`;
 
 const facts = [
   branch.carpetArea && { icon: 'Ruler', label: 'Carpet area', value: branch.carpetArea },
   branch.capacity && { icon: 'Users', label: 'Capacity', value: `${branch.capacity} children` },
-  branch.centerHead && { icon: 'UserRound', label: 'Centre head', value: branch.centerHead },
+  branch.centerHead && { icon: 'UserRound', label: 'Centre head', value: branch.centerHead.name },
   { icon: 'Clock', label: 'Preschool', value: site.hours.preschool },
   { icon: 'Sun', label: 'Day care', value: site.hours.daycare },
 ].filter(Boolean) as { icon: string; label: string; value: string }[];
@@ -39,6 +53,7 @@ const jsonLd = {
   url: new URL(`/branch/${branch.slug}`, site.url).href,
   telephone: branch.phone,
   email: branch.email,
+  ...(cover ? { image: new URL(fullSize[0]!.src, site.url).href } : {}),
   parentOrganization: { '@type': 'Organization', name: site.fullName, url: site.url },
   address: {
     '@type': 'PostalAddress',
@@ -56,20 +71,41 @@ const jsonLd = {
   description={`${branch.name}: preschool and day care in ${branch.area}, Bengaluru ${branch.pincode}. Play Group, Nursery, Junior KG, Senior KG and Day Care.`}
   jsonLd={jsonLd}
 >
-  <PageHero
-    eyebrow={branch.area}
-    title={branch.name}
-    lead={branch.intro}
-    crumbs={[{ label: 'Branches', href: '/branch' }, { label: shortName }]}
-  >
-    <div class="btn-row hero-actions">
-      <a class="btn btn--sun" href="#enquire">Book a visit</a>
-      <a class="btn btn--ghost" href={telHref(branch.phone)}><Icon name="Phone" size={18} /> {branch.phone}</a>
-      <a class="btn btn--ghost" href={directions} target="_blank" rel="noopener">
-        <Icon name="Navigation" size={18} /> Directions
-      </a>
+  <section class="page-hero branch-hero">
+    <div class="container branch-hero__inner">
+      <div>
+        <nav aria-label="Breadcrumb">
+          <ol class="breadcrumbs">
+            <li><a href="/">Home</a></li>
+            <li><a href="/branch">Branches</a></li>
+            <li><span aria-current="page">{shortName}</span></li>
+          </ol>
+        </nav>
+        <span class="eyebrow">{branch.area} · {branch.pincode}</span>
+        <h1>{branch.name}</h1>
+        <p class="lead">{branch.intro}</p>
+        <div class="btn-row">
+          <a class="btn btn--sun" href="#enquire">Book a visit</a>
+          <a class="btn btn--ghost" href={telHref(branch.phone)}><Icon name="Phone" size={18} /> {branch.phone}</a>
+          <a class="btn btn--ghost" href={directions} target="_blank" rel="noopener">
+            <Icon name="Navigation" size={18} /> Directions
+          </a>
+        </div>
+      </div>
+      {
+        cover && (
+          <Image
+            class="branch-hero__photo"
+            src={cover}
+            alt={`Inside ${branch.name}`}
+            widths={[480, 720, 1000]}
+            sizes="(max-width: 900px) 100vw, 560px"
+            loading="eager"
+          />
+        )
+      }
     </div>
-  </PageHero>
+  </section>
 
   <section class="section--tight section--white">
     <div class="container">
@@ -92,6 +128,85 @@ const jsonLd = {
   </section>
 
   <section class="section">
+    <div class="container about">
+      <div>
+        <SectionHeading eyebrow="About this centre" title={`Welcome to ${shortName}`} />
+        {branch.description.map((p) => <p class="muted">{p}</p>)}
+      </div>
+      <div class="card about__amenities">
+        <h3>Amenities</h3>
+        <ul class="amen">
+          {
+            branch.amenities.map((key) => (
+              <li>
+                <Icon name={amenityList[key].icon} size={20} />
+                {amenityList[key].label}
+              </li>
+            ))
+          }
+        </ul>
+      </div>
+    </div>
+  </section>
+
+  {
+    gallery.length > 0 && (
+      <section class="section section--white" aria-labelledby="gallery-title">
+        <div class="container">
+          <SectionHeading eyebrow="Gallery" title="Take a look inside" id="gallery-title" />
+          <ul class="gallery">
+            {gallery.map((photo, i) => (
+              <li>
+                <a href={fullSize[i + 1]!.src} target="_blank" rel="noopener">
+                  <Image
+                    src={photo}
+                    alt={`${branch.name} – photo ${i + 2}`}
+                    widths={[360, 600, 900]}
+                    sizes={i === 0 ? '(max-width: 700px) 100vw, 580px' : '(max-width: 700px) 50vw, 290px'}
+                  />
+                </a>
+              </li>
+            ))}
+          </ul>
+        </div>
+      </section>
+    )
+  }
+
+  {
+    branch.centerHead && (
+      <section class="section">
+        <div class="container">
+          <div class="card head">
+            {head ? (
+              <Image class="head__photo" src={head} alt={`${branch.centerHead.name}, Centre Head`} width={240} height={240} />
+            ) : (
+              <span class="head__photo head__photo--initials" aria-hidden="true">
+                {branch.centerHead.name.replace(/^(Mrs?s?\.|Dr\.)\s*/, '').split(' ').map((n) => n[0]).join('')}
+              </span>
+            )}
+            <div>
+              <span class="eyebrow">Know our centre head</span>
+              <h2>{branch.centerHead.name}</h2>
+              <p>{branch.centerHead.bio[0]}</p>
+              {branch.centerHead.bio.length > 1 && (
+                <details class="head__more">
+                  <summary>
+                    Read more <Icon name="ChevronDown" size={18} />
+                  </summary>
+                  {branch.centerHead.bio.slice(1).map((p) => (
+                    <p>{p}</p>
+                  ))}
+                </details>
+              )}
+            </div>
+          </div>
+        </div>
+      </section>
+    )
+  }
+
+  <section class="section section--white">
     <div class="container location">
       <div class="card location__card">
         <h2>Visit us</h2>
@@ -123,7 +238,7 @@ const jsonLd = {
     </div>
   </section>
 
-  <section class="section section--white">
+  <section class="section">
     <div class="container">
       <SectionHeading eyebrow={`At ${shortName}`} title="Programs at this branch" />
       <div class="offered">
@@ -141,23 +256,10 @@ const jsonLd = {
           ))
         }
       </div>
-
-      <h3 class="amen-title">Facilities</h3>
-      <ul class="amen">
-        {
-          amenities.map((a) => (
-            <li>
-              <Icon name={a.icon} size={20} />
-              {a.label}
-            </li>
-          ))
-        }
-        <li><Icon name="Bus" size={20} /> In-house transport</li>
-      </ul>
     </div>
   </section>
 
-  <section class="section" id="enquire">
+  <section class="section section--white" id="enquire">
     <div class="container enquire">
       <div>
         <span class="eyebrow">Admissions open</span>
@@ -166,13 +268,13 @@ const jsonLd = {
           Leave your details and the {shortName} team will call you to arrange a visit at a time that suits you.
         </p>
       </div>
-      <div class="card">
+      <div class="card enquire__form">
         <EnquiryForm branch={branch.slug} id={`enquiry-${branch.slug}`} />
       </div>
     </div>
   </section>
 
-  <section class="section section--white">
+  <section class="section">
     <div class="container">
       <SectionHeading eyebrow="More centres" title="Other Crossmaze branches" />
       <div class="grid grid--4">
@@ -183,8 +285,35 @@ const jsonLd = {
 </BaseLayout>
 
 <style>
-  .hero-actions {
+  .branch-hero__inner {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: clamp(28px, 5vw, 64px);
+    align-items: center;
+  }
+
+  @media (max-width: 900px) {
+    .branch-hero__inner {
+      grid-template-columns: 1fr;
+    }
+  }
+
+  .branch-hero h1 {
+    max-width: 16ch;
+  }
+
+  .branch-hero .btn-row {
     margin-top: 28px;
+  }
+
+  .branch-hero :global(.branch-hero__photo) {
+    width: 100%;
+    height: auto;
+    aspect-ratio: 4 / 3;
+    object-fit: cover;
+    border-radius: var(--radius-lg);
+    border: 6px solid #fff;
+    box-shadow: var(--shadow);
   }
 
   .facts {
@@ -225,6 +354,156 @@ const jsonLd = {
     color: var(--muted);
   }
 
+  .about {
+    display: grid;
+    grid-template-columns: 1.3fr 0.7fr;
+    gap: clamp(28px, 5vw, 64px);
+    align-items: start;
+  }
+
+  @media (max-width: 900px) {
+    .about {
+      grid-template-columns: 1fr;
+    }
+  }
+
+  .about p {
+    max-width: 68ch;
+  }
+
+  .about__amenities h3 {
+    margin-bottom: 16px;
+  }
+
+  .amen {
+    display: grid;
+    gap: 12px;
+    margin: 0;
+    padding: 0;
+    list-style: none;
+    font-weight: 700;
+  }
+
+  .amen li {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+  }
+
+  .amen :global(svg) {
+    flex: none;
+    color: var(--green);
+  }
+
+  .gallery {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    grid-auto-rows: 180px;
+    gap: 12px;
+    margin: 0;
+    padding: 0;
+    list-style: none;
+  }
+
+  .gallery li:first-child {
+    grid-column: span 2;
+    grid-row: span 2;
+  }
+
+  @media (max-width: 700px) {
+    .gallery {
+      grid-template-columns: 1fr 1fr;
+      grid-auto-rows: 130px;
+    }
+  }
+
+  .gallery a {
+    display: block;
+    height: 100%;
+    border-radius: var(--radius);
+    overflow: hidden;
+  }
+
+  .gallery :global(img) {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    transition: transform 0.3s ease;
+  }
+
+  .gallery a:hover :global(img) {
+    transform: scale(1.04);
+  }
+
+  .head {
+    display: grid;
+    grid-template-columns: 220px 1fr;
+    gap: clamp(24px, 4vw, 48px);
+    align-items: start;
+    padding: clamp(24px, 4vw, 40px);
+  }
+
+  @media (max-width: 700px) {
+    .head {
+      grid-template-columns: 1fr;
+    }
+  }
+
+  .head :global(.head__photo) {
+    width: 220px;
+    height: 220px;
+    border-radius: 50%;
+    object-fit: cover;
+    border: 6px solid var(--sun-50);
+  }
+
+  @media (max-width: 700px) {
+    .head :global(.head__photo) {
+      width: 160px;
+      height: 160px;
+    }
+  }
+
+  .head__photo--initials {
+    display: grid;
+    place-items: center;
+    background: var(--navy);
+    color: var(--sun);
+    font-family: var(--font-display);
+    font-size: 3rem;
+  }
+
+  .head h2 {
+    font-size: clamp(1.6rem, 3vw, 2.1rem);
+  }
+
+  .head p {
+    color: var(--muted);
+    max-width: 70ch;
+  }
+
+  .head__more summary {
+    display: inline-flex;
+    align-items: center;
+    gap: 4px;
+    font-weight: 800;
+    color: var(--navy);
+    cursor: pointer;
+    list-style: none;
+  }
+
+  .head__more summary::-webkit-details-marker {
+    display: none;
+  }
+
+  .head__more[open] summary {
+    margin-bottom: 1em;
+  }
+
+  .head__more[open] summary :global(svg) {
+    transform: rotate(180deg);
+  }
+
   .location {
     display: grid;
     grid-template-columns: 0.8fr 1.2fr;
@@ -262,7 +541,7 @@ const jsonLd = {
     border-radius: var(--radius);
     overflow: hidden;
     border: 1px solid var(--line);
-    background: var(--plum-50);
+    background: var(--navy-50);
   }
 
   .location__map iframe {
@@ -303,33 +582,6 @@ const jsonLd = {
     line-height: 1.3;
   }
 
-  .amen-title {
-    margin-top: 48px;
-  }
-
-  .amen {
-    display: flex;
-    flex-wrap: wrap;
-    gap: 10px;
-    margin: 16px 0 0;
-    padding: 0;
-    list-style: none;
-  }
-
-  .amen li {
-    display: inline-flex;
-    align-items: center;
-    gap: 8px;
-    padding: 10px 16px;
-    border-radius: 999px;
-    background: var(--cream);
-    font-weight: 700;
-  }
-
-  .amen :global(svg) {
-    color: var(--teal);
-  }
-
   .enquire {
     display: grid;
     grid-template-columns: 0.9fr 1.1fr;
@@ -341,5 +593,9 @@ const jsonLd = {
     .enquire {
       grid-template-columns: 1fr;
     }
+  }
+
+  .enquire__form {
+    background: var(--cream);
   }
 </style>

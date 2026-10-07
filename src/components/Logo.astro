@@ -1,6 +1,7 @@
 ---
-// Placeholder mark: a rounded maze tile. Swap in the official logo by
-// replacing this component's SVG with an <img src="/logo.svg">.
+import { Image } from 'astro:assets';
+import logo from '../assets/brand/logo.png';
+
 interface Props {
   inverted?: boolean;
 }
@@ -8,52 +9,35 @@ const { inverted = false } = Astro.props;
 ---
 
 <span class:list={['logo', { 'logo--inverted': inverted }]}>
-  <svg class="logo__mark" viewBox="0 0 48 48" width="40" height="40" aria-hidden="true">
-    <rect width="48" height="48" rx="14" fill="#4b2a8c"></rect>
-    <path
-      d="M12 12h24v24H18V18h12v12h-6"
-      fill="none"
-      stroke="#ffc23d"
-      stroke-width="4.5"
-      stroke-linecap="round"
-      stroke-linejoin="round"></path>
-    <circle cx="24" cy="30" r="3.2" fill="#ff6f59"></circle>
-  </svg>
-  <span class="logo__text">
-    <span class="logo__name">Crossmaze</span>
-    <span class="logo__sub">Preschool &amp; Day Care</span>
-  </span>
+  <Image src={logo} alt="Crossmaze" width={300} class="logo__img" loading="eager" />
+  <span class="logo__sub">Preschool &amp; Day Care</span>
 </span>
 
 <style>
   .logo {
-    display: inline-flex;
-    align-items: center;
-    gap: 10px;
-    color: var(--ink);
+    display: inline-grid;
+    gap: 3px;
+    justify-items: start;
   }
-  .logo__text {
-    display: grid;
-    line-height: 1.05;
-  }
-  .logo__name {
-    font-family: var(--font-display);
-    font-weight: 600;
-    font-size: 1.45rem;
-    letter-spacing: -0.01em;
-    color: var(--plum);
+  .logo__img {
+    width: auto;
+    height: 34px;
   }
   .logo__sub {
-    font-size: 0.72rem;
-    font-weight: 700;
-    letter-spacing: 0.08em;
+    padding-left: 6px;
+    font-size: 0.7rem;
+    font-weight: 800;
+    letter-spacing: 0.12em;
     text-transform: uppercase;
     color: var(--muted);
-  }
-  .logo--inverted .logo__name {
-    color: #fff;
+    line-height: 1;
   }
   .logo--inverted .logo__sub {
     color: rgb(255 255 255 / 70%);
+  }
+  @media (max-width: 400px) {
+    .logo__img {
+      height: 28px;
+    }
   }
 </style>

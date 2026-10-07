@@ -1,85 +1,92 @@
-// Open positions shown on /careers. Remove an entry to close a role.
+// Open positions shown on /careers, as listed on the original crossmaze.in careers page.
+// Remove an entry to close a role.
+
+export interface Responsibility {
+  title?: string;
+  text: string;
+}
 
 export interface Job {
   slug: string;
   title: string;
-  type: string;
-  timings?: string[];
-  experience?: string;
-  summary: string;
-  responsibilities: string[];
-  requirements: string[];
+  qualification: string;
+  experience: string;
+  timings: string[];
+  ageLimit?: string;
+  overview: string;
+  responsibilities: Responsibility[];
+  extra?: { title: string; text: string };
 }
+
+const overview =
+  'We are seeking female graduates with a warm personality, abundant energy, and a passion for nurturing young children in a fast-growing organisation.';
 
 export const jobs: Job[] = [
   {
     slug: 'teacher-facilitator',
     title: 'Teacher / Facilitator',
-    type: 'Full time',
-    summary:
-      'Guide a small group of children through our Montessori-based, thematic curriculum, and help every child feel seen, safe and excited to learn.',
+    qualification:
+      'Graduation, with specialised certification in early childhood education, such as NTT, Montessori, ECE or CIDTT.',
+    experience: '6+ months of teaching experience',
+    timings: ['8:30 am – 3:30 pm'],
+    overview,
     responsibilities: [
-      'Plan and deliver age-appropriate, theme-based lessons and activities',
-      'Use Montessori materials to support hands-on, self-directed learning',
-      'Observe, record and share each child’s progress with parents',
-      'Keep the classroom safe, organised and welcoming',
-      'Take part in events, celebrations and parent-teacher meetings',
-    ],
-    requirements: [
-      'Graduate, with a certification in ECCE / Montessori / NTT or similar',
-      'Good spoken and written English',
-      'Patience, warmth and genuine love for young children',
-      'Creativity in storytelling, art, music or movement is a plus',
+      { text: 'Develop and implement engaging, developmentally appropriate lesson plans and activities that support the social, emotional, cognitive and physical growth of preschool children.' },
+      { text: 'Create a warm and inclusive classroom where every child feels valued, supported and encouraged to explore and learn.' },
+      { text: 'Build positive relationships with students, parents and colleagues through open communication, collaboration and mutual respect.' },
+      { text: 'Assess children’s progress and development, and share findings with parents and caregivers in a timely, constructive way.' },
+      { text: 'Maintain accurate records of attendance, observations and assessments, and use them to individualise learning.' },
+      { text: 'Take part in professional development, staff meetings and parent-teacher conferences.' },
     ],
   },
   {
     slug: 'day-care-in-charge',
     title: 'Day Care In-Charge',
-    type: 'Full day or half day',
+    qualification:
+      'Graduation and training in Early Childhood Education or a related field, with strong knowledge of child development, excellent communication and interpersonal skills, leadership ability, and flexibility.',
+    experience: '6+ months of day care management experience',
     timings: ['Full day: 9:00 am – 6:00 pm', 'Half day: 11:00 am – 6:00 pm'],
-    experience: 'Minimum 6 months of day care management experience',
-    summary:
-      'Run the day-to-day of our day care so that children are cared for, engaged and safe, and parents always know how their child’s day went.',
+    overview,
     responsibilities: [
-      'Oversee daily day care operations: meals, naps, play and hygiene',
-      'Lead, schedule and support the day care staff',
-      'Keep open, regular communication with parents on each child’s day',
-      'Coordinate staff training and development',
-      'Ensure safety, cleanliness and compliance at all times',
-    ],
-    requirements: [
-      'Graduation, plus training in Early Childhood Education or a related field',
-      'Prior experience in day care or early childhood education',
-      'Strong understanding of child development',
-      'Excellent communication and people skills, with leadership ability',
-      'Flexible and adaptable to the needs of a busy centre',
+      { title: 'Daily operations', text: 'Manage the day care’s daily operations, ensuring a safe, nurturing and stimulating environment for children.' },
+      { title: 'Staff supervision', text: 'Lead and guide teachers, assistants and support staff to uphold the highest standards of care and professionalism.' },
+      { title: 'Parent communication', text: 'Keep open, transparent communication with parents, with regular updates on their child’s progress.' },
+      { title: 'Training and development', text: 'Coordinate staff training sessions, workshops and professional development.' },
+      { title: 'Emergency preparedness', text: 'Develop and implement emergency procedures to keep children and staff safe.' },
+      { title: 'Quality assurance', text: 'Regularly evaluate operations, programs and staff performance to keep improving the quality of care.' },
+      { title: 'Community outreach', text: 'Represent the day care in the community and build relationships with local organisations.' },
     ],
   },
   {
     slug: 'center-head',
-    title: 'Center Head',
-    type: 'Full time',
-    summary:
-      'Lead a Crossmaze centre end to end: academics, operations, people and parent relationships.',
+    title: 'Center Head / Center Director',
+    qualification:
+      'At least 1 year of administrative experience, strong organisational skills, proficiency in Microsoft Office, excellent communication, problem-solving ability and a commitment to confidentiality. A Master’s degree is preferred but not mandatory.',
+    experience: '1+ year as Center Head',
+    timings: ['8:30 am – 5:00 pm'],
+    ageLimit: '25 – 45 years',
+    overview:
+      'We are seeking a meticulous and organised female individual to join our team as Center Head. You will provide comprehensive administrative support for the efficient operation of the centre, with excellent communication, multitasking and attention to detail.',
     responsibilities: [
-      'Own the academic quality and daily operations of the centre',
-      'Hire, mentor and lead teachers and support staff',
-      'Handle admissions enquiries, centre visits and parent relationships',
-      'Ensure safety, hygiene and compliance standards are met',
-      'Plan events and drive the centre’s growth in the community',
+      { text: 'Provide administrative support, including managing calls, emails and correspondence.' },
+      { text: 'Maintain accurate, confidential student records in line with data protection rules.' },
+      { text: 'Schedule and coordinate meetings, workshops and events, and prepare their materials.' },
+      { text: 'Manage inventory and procurement of office supplies.' },
+      { text: 'Support recruitment and onboarding of new staff.' },
+      { text: 'Liaise with external vendors and service providers.' },
+      { text: 'Assist with financial tasks such as processing invoices and monitoring expenses.' },
+      { text: 'Help develop and implement administrative policies and procedures.' },
     ],
-    requirements: [
-      'Graduate / postgraduate, with ECCE or education management training preferred',
-      'Experience managing a preschool or day care centre',
-      'Confident communicator with parents and staff',
-      'Organised, hands-on and calm under pressure',
-    ],
+    extra: {
+      title: 'Leadership skills',
+      text: 'Setting vision and goals, building and motivating teams, effective communication, problem-solving and decision-making, and continuous improvement.',
+    },
   },
 ];
 
 export const perks = [
-  { icon: 'Heart', title: 'A workplace built for women', text: 'Equal opportunities, respect and an inclusive culture, every single day.' },
-  { icon: 'Award', title: 'Room to grow', text: 'Real support for career advancement, from facilitator to centre leadership.' },
-  { icon: 'Clock', title: 'Flexible arrangements', text: 'Full-day and half-day roles that fit around your life.' },
-  { icon: 'Sparkles', title: 'Training that matters', text: 'Regular training in Montessori methods and early childhood development.' },
+  { icon: 'Heart', title: 'An ideal workplace for women', text: 'Equal opportunities and a culture of respect and inclusivity.' },
+  { icon: 'Award', title: 'Career advancement', text: 'Real support to grow, from facilitator to centre leadership.' },
+  { icon: 'Clock', title: 'Work-life balance', text: 'Flexible work arrangements, including full-day and half-day roles.' },
+  { icon: 'Baby', title: 'Childcare assistance', text: 'Benefits that support working mothers.' },
 ];

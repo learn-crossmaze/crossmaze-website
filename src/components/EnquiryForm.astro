@@ -1,5 +1,5 @@
 ---
-import { branches } from '../data/branches';
+import { branches, shortName } from '../data/branches';
 import { programs } from '../data/programs';
 import { site } from '../data/site';
 
@@ -38,12 +38,12 @@ const { branch, id = 'enquiry' } = Astro.props;
   </div>
   <div class="form-row">
     <div class="field">
-      <label for={`${id}-email`}>Email <span class="hint">(optional)</span></label>
-      <input id={`${id}-email`} name="email" type="email" autocomplete="email" />
+      <label for={`${id}-child`}>Child’s name</label>
+      <input id={`${id}-child`} name="child_name" required />
     </div>
     <div class="field">
-      <label for={`${id}-child`}>Child’s age</label>
-      <input id={`${id}-child`} name="child_age" placeholder="e.g. 2 years 6 months" required />
+      <label for={`${id}-age`}>Child’s age</label>
+      <input id={`${id}-age`} name="child_age" placeholder="e.g. 2 years 6 months" required />
     </div>
   </div>
   <div class="form-row">
@@ -62,12 +62,16 @@ const { branch, id = 'enquiry' } = Astro.props;
         {
           branches.map((b) => (
             <option value={b.name} selected={b.slug === branch}>
-              {b.name.replace('Crossmaze – ', '')}
+              {shortName(b)}
             </option>
           ))
         }
       </select>
     </div>
+  </div>
+  <div class="field">
+    <label for={`${id}-email`}>Email <span class="hint">(optional)</span></label>
+    <input id={`${id}-email`} name="email" type="email" autocomplete="email" />
   </div>
   <div class="field">
     <label for={`${id}-message`}>Anything you’d like us to know? <span class="hint">(optional)</span></label>

@@ -2,7 +2,7 @@
 import Logo from './Logo.astro';
 import Icon from './Icon.astro';
 import { nav, site } from '../data/site';
-import { branches } from '../data/branches';
+import { branches, shortName } from '../data/branches';
 import { cleanPath } from '../utils';
 
 const path = cleanPath(Astro.url.pathname);
@@ -41,7 +41,7 @@ const isActive = (href: string) => (href === '/' ? path === '/' : path === href 
                   {branches.map((b) => (
                     <li>
                       <a href={`/branch/${b.slug}`} aria-current={path === `/branch/${b.slug}` ? 'page' : undefined}>
-                        <strong>{b.name.replace('Crossmaze – ', '')}</strong>
+                        <strong>{shortName(b)}</strong>
                         <span>{b.area}</span>
                       </a>
                     </li>
@@ -142,8 +142,8 @@ const isActive = (href: string) => (href === '/' ? path === '/' : path === href 
 
   .site-nav__item > a:hover,
   .site-nav__item > a[aria-current='page'] {
-    background: var(--plum-50);
-    color: var(--plum);
+    background: var(--navy-50);
+    color: var(--navy);
   }
 
   .has-sub {
@@ -201,7 +201,7 @@ const isActive = (href: string) => (href === '/' ? path === '/' : path === href 
 
   .site-nav__sub a:hover,
   .site-nav__sub a[aria-current='page'] {
-    background: var(--plum-50);
+    background: var(--navy-50);
   }
 
   .site-nav__cta {
@@ -216,8 +216,8 @@ const isActive = (href: string) => (href === '/' ? path === '/' : path === href 
     height: 46px;
     border: 0;
     border-radius: 14px;
-    background: var(--plum-50);
-    color: var(--plum);
+    background: var(--navy-50);
+    color: var(--navy);
     cursor: pointer;
   }
 

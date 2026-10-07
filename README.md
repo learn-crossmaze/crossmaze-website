@@ -9,17 +9,18 @@ The URLs match the current site, so existing links and Google results keep worki
 
 | URL | Page |
 | --- | --- |
-| `/` | Home: hero, approach, programs, safety, a day at Crossmaze, branches, admission enquiry |
-| `/about` | Story, values, approach, founders |
+| `/` | Home: hero, stats, about, core values, programs, day care, facilities, testimonials, branches, admission enquiry |
+| `/about` | Who we are, core values, approach, annual-day photos, founders |
 | `/our-programs` | Play Group, Nursery, Junior KG, Senior KG, Day Care, extra-curriculars, FAQs |
 | `/branch` | All branches |
-| `/branch/crossmaze-neotown` | One page per branch: facts, map, programs, facilities, enquiry form |
+| `/branch/crossmaze-neotown` | One page per branch: photos, facts, amenities, gallery, centre head, map, programs, enquiry form |
 | `/branch/crossmaze-neeladri` | |
 | `/branch/crossmaze-snn-greenbay` | |
 | `/branch/crossmaze-the-hub` | |
 | `/branch/crossmaze-ananth-nagar` | |
 | `/careers` | Why work with us, open roles, application form |
 | `/contact` | Admission enquiry, phone / WhatsApp / email, all branch addresses |
+| `/privacy-policy`, `/terms` | Carried over from the old site (`src/pages/*.md`) |
 
 A sitemap (`/sitemap-index.xml`), `robots.txt`, social-share image and schema.org `Preschool` data for each branch are generated automatically.
 
@@ -40,16 +41,16 @@ Almost all text lives in `src/data/`, so most changes don't need any page code:
 
 | File | What it controls |
 | --- | --- |
-| `src/data/site.ts` | School name, phone, emails, WhatsApp, timings, founders, social links, main menu |
-| `src/data/branches.ts` | Branches: address, phone, centre head, size, capacity, map, programs, optional photo |
-| `src/data/programs.ts` | Programs, ages, descriptions, highlights; teaching approach; extra-curriculars |
+| `src/data/site.ts` | School name, phone, emails, WhatsApp, address, timings, about text, stats, core values, social links, menu |
+| `src/data/branches.ts` | Branches: description, address, phone, centre head and bio, size, capacity, amenities, map; shared facilities |
+| `src/data/programs.ts` | Programs, ages, write-ups, focus areas, photos; day care highlights; approach; extra-curriculars |
 | `src/data/jobs.ts` | Open positions and "why work with us". Delete an entry to close a role |
-| `src/data/testimonials.ts` | Parent quotes. The section stays hidden until you add at least one |
+| `src/data/testimonials.ts` | Parent testimonials (from the old site) |
 
 - **Add a branch:** add an entry to `branches` and its page is created at `/branch/<slug>`.
-- **Add photos:** put images in `public/images/` and set `image: '/images/branches/crossmaze-neotown.jpg'` on a branch.
-- **Logo:** the maze mark in `src/components/Logo.astro` and `public/favicon.svg` is a placeholder. Swap in the official logo files.
-- **Colours and fonts:** tokens at the top of `src/styles/global.css`.
+- **Branch photos:** put photos in `src/assets/branches/<slug>/`. They're used in name order: `01.jpg` is the cover, the next five fill the gallery. The centre head's photo is `src/assets/heads/<slug>.jpg`. Astro resizes and converts them to WebP automatically at build time.
+- **Other photos:** `src/assets/photos/` (programs, home and about pages); logo and mascot in `src/assets/brand/`.
+- **Colours and fonts:** tokens at the top of `src/styles/global.css` (navy, red, yellow and green, taken from the logo).
 
 ## Forms
 
@@ -86,15 +87,12 @@ npx firebase-tools deploy --only hosting
 
 ## Please verify before launch
 
-The live crossmaze.in could not be reached while this was built, so the content comes from public listings of the school. Please check:
+Content, photos, logo, centre heads and testimonials come from the old crossmaze.in. A few details came from public listings or are new, so please check:
 
-- [ ] **Begur branch URL**: assumed to be `/branch/crossmaze-the-hub`. If the old site used a different slug, change it in `branches.ts`.
-- [ ] **Ananth Nagar**: full street address and phone number (currently uses the main number).
-- [ ] **Phone numbers per branch**: Neotown, Neeladri, SNN Greenbay and Ananth Nagar use +91 72599 21508; The Hub, Begur uses +91 72040 21508.
-- [ ] **Centre heads**: only Neotown (Ms. Aishwarya) and Neeladri (Mrs. Pallavi Priya) are listed.
-- [ ] **Founding year**: set to 2018 in `site.ts`. Public sources disagree.
+- [ ] **Phone number**: every branch uses +91 72040 21508, the only number on the old site. Add branch-specific numbers in `branches.ts` if you have them.
+- [ ] **WhatsApp**: the WhatsApp button opens a chat with +91 72040 21508. Change `whatsappHref` in `site.ts` if WhatsApp is on a different number.
+- [ ] **Timings**: preschool 9:00 am – 12:30 pm and day care 9:00 am – 6:00 pm came from public listings, not the old site.
+- [ ] **Street addresses** for Neotown, SNN Greenbay and Neeladri Nagar came from public listings; the old site showed only area and PIN code. Ananth Nagar has no street address yet.
+- [ ] **Founders and founding year** (About page) came from public sources, not the old site.
 - [ ] **Careers email**: currently `admin@crossmaze.in`.
-- [ ] **Job descriptions**: the Teacher / Facilitator and Center Head descriptions are drafts. Day Care In-Charge follows the current careers page.
-- [ ] **Program copy and FAQs**: check that they match how you describe your programs today.
-- [ ] **Photos and logo**: add real centre photos and the official logo.
 - [ ] **Firebase project ID**: `.firebaserc` and the workflow use `crossmaze-website`. If the console shows a different ID (e.g. `crossmaze-website-1a2b3`), update both.

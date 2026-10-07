@@ -1,5 +1,5 @@
 ---
-import { branches } from '../data/branches';
+import { branches, shortName } from '../data/branches';
 import { jobs } from '../data/jobs';
 import { site } from '../data/site';
 ---
@@ -41,7 +41,7 @@ import { site } from '../data/site';
       <label for="job-branch">Preferred branch</label>
       <select id="job-branch" name="branch">
         <option value="Any branch">Any branch</option>
-        {branches.map((b) => <option value={b.name}>{b.name.replace('Crossmaze – ', '')}</option>)}
+        {branches.map((b) => <option value={b.name}>{shortName(b)}</option>)}
       </select>
     </div>
     <div class="field">

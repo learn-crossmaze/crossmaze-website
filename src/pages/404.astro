@@ -1,12 +1,13 @@
 ---
 import BaseLayout from '../layouts/BaseLayout.astro';
-import Icon from '../components/Icon.astro';
+import { Image } from 'astro:assets';
+import mascot from '../assets/brand/mascot.png';
 ---
 
 <BaseLayout title="Page not found">
   <section class="section">
     <div class="container notfound">
-      <span class="icon-badge tone-coral"><Icon name="Puzzle" size={34} /></span>
+      <Image src={mascot} alt="" width={200} class="notfound__mascot" />
       <h1>Oops, this path leads nowhere</h1>
       <p class="lead">Even the best mazes have dead ends. Let’s get you back on track.</p>
       <div class="btn-row">
@@ -26,10 +27,10 @@ import Icon from '../components/Icon.astro';
     min-height: 50vh;
     align-content: center;
   }
-  .notfound .icon-badge {
-    width: 76px;
-    height: 76px;
-    border-radius: 22px;
+  .notfound :global(.notfound__mascot) {
+    width: 180px;
+    height: auto;
+    margin-bottom: 16px;
   }
   .notfound .btn-row {
     justify-content: center;

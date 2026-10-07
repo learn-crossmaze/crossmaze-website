@@ -1,4 +1,5 @@
 ---
+import { Image } from 'astro:assets';
 import BaseLayout from '../layouts/BaseLayout.astro';
 import PageHero from '../components/PageHero.astro';
 import SectionHeading from '../components/SectionHeading.astro';
@@ -9,27 +10,27 @@ import { site } from '../data/site';
 const faqs = [
   {
     q: 'What age can my child join?',
-    a: 'Children can join Play Group from 2 years. Nursery is for 3 – 4 years, Junior KG for 4 – 5 years and Senior KG for 5 – 6 years. Day care welcomes children from 2 to 8 years.',
+    a: 'Play Group is for 2 – 3 years, Nursery for 3 – 4 years, Junior KG for 4 – 5 years and Senior KG for 5 – 6 years. Day care welcomes children from 2 to 8 years.',
   },
   {
-    q: 'What are the school timings?',
+    q: 'Which curriculum do you follow?',
+    a: 'A Montessori-based, thematic curriculum through our Foundational Development Program. By Senior KG it is aligned with the requirements of State, CBSE and ICSE boards, so children are ready for mainstream schools.',
+  },
+  {
+    q: 'What are the timings?',
     a: `Preschool runs ${site.hours.preschool}. Day care runs ${site.hours.daycare}, so children can move from class straight into day care.`,
   },
   {
-    q: 'Can school-going children join day care?',
-    a: 'Yes. Day care is open to children up to 8 years, so older siblings can join after school for supervised play, meals and homework support.',
+    q: 'Can children from other schools join day care?',
+    a: 'Yes. Day care is open to both Crossmaze students and children from other schools, and we offer pick-up from the nearby drop point of other schools.',
   },
   {
     q: 'Can I see my child during the day?',
-    a: 'Yes. Parents get access to live CCTV streams, and our parent app shares updates, photos and notices throughout the day.',
+    a: 'Yes. Parents get live CCTV access, and the Crossmaze Care parents app keeps you updated on daily activities.',
   },
   {
     q: 'Do you provide transport?',
-    a: 'Yes, we offer an in-house transport service for pick-up and drop-off. Please check route availability with your nearest branch.',
-  },
-  {
-    q: 'What curriculum do you follow?',
-    a: 'We follow a Montessori-based, thematic curriculum through our Foundational Development Program, which builds cognitive, language, social, emotional and physical skills together.',
+    a: 'Yes. In-house transport runs on pre-set routes within a 5 km radius of the centre. Seats are subject to availability, so please check with your nearest branch.',
   },
 ];
 ---
@@ -41,7 +42,7 @@ const faqs = [
   <PageHero
     eyebrow="Our programs"
     title="Learning that grows with your child"
-    lead="From a first day at Play Group to the step up to Grade 1, every Crossmaze program builds on the last, with day care for families who need a full day."
+    lead="Our Foundational Development Program goes above and beyond traditional preschool education, laying the groundwork for essential life skills and equipping children for the challenges of tomorrow’s world."
     crumbs={[{ label: 'Our Programs' }]}
   >
     <nav class="jump" aria-label="Programs on this page">
@@ -60,8 +61,11 @@ const faqs = [
       {
         programs.map((p) => (
           <article id={p.slug} class:list={['program', `tone-${p.color}`]}>
-            <div class="program__media" aria-hidden="true">
-              <Icon name={p.icon} size={72} strokeWidth={1.5} />
+            <div class="program__media">
+              <Image src={p.photo} alt={p.photoAlt} widths={[480, 720]} sizes="(max-width: 860px) 100vw, 460px" />
+              <span class="icon-badge">
+                <Icon name={p.icon} size={28} />
+              </span>
             </div>
             <div class="program__body">
               <div class="program__meta">
@@ -73,10 +77,13 @@ const faqs = [
                 </span>
               </div>
               <h2>{p.name}</h2>
-              <p class="lead">{p.summary}</p>
-              <p>{p.description}</p>
+              <p class="lead">{p.headline}</p>
+              {p.paragraphs.map((para) => (
+                <p class="muted">{para}</p>
+              ))}
+              <h3 class="program__focus-title">{p.focusTitle}</h3>
               <ul class="check-list">
-                {p.highlights.map((h) => (
+                {p.focus.map((h) => (
                   <li>
                     <Icon name="Check" size={20} />
                     {h}
@@ -98,7 +105,7 @@ const faqs = [
       <SectionHeading
         eyebrow="How we teach"
         title="Our Foundational Development Program"
-        lead="Through a thematic approach, learning becomes an immersive experience that integrates cognitive, language, personal, social, emotional and physical development within each theme."
+        lead="Through our thematic approach, learning becomes an immersive experience, integrating cognitive, language, personal, social, emotional and physical development within each theme."
       />
       <div class="grid grid--4">
         {
@@ -128,7 +135,7 @@ const faqs = [
       <ul class="extra__list">
         {
           extracurricular.map((e, i) => (
-            <li class:list={['card', `tone-${['sun', 'coral', 'teal', 'sky', 'plum', 'sun'][i % 6]}`]}>
+            <li class:list={['card', `tone-${['sun', 'coral', 'green', 'sky', 'navy', 'sun'][i % 6]}`]}>
               <span class="icon-badge">
                 <Icon name={e.icon} size={24} />
               </span>
@@ -159,7 +166,7 @@ const faqs = [
     </div>
   </section>
 
-  <section class="section--tight section--plum">
+  <section class="section--tight section--navy">
     <div class="container cta">
       <div>
         <h2>Not sure which program fits?</h2>
@@ -212,21 +219,40 @@ const faqs = [
   }
 
   .program__media {
-    display: grid;
-    place-items: center;
+    position: relative;
     aspect-ratio: 4 / 3;
     border-radius: var(--radius-lg);
-    color: var(--badge-fg);
-    background:
-      radial-gradient(circle at 18% 82%, var(--tone) 0 56px, transparent 57px),
-      radial-gradient(circle at 86% 16%, rgb(255 255 255 / 75%) 0 70px, transparent 71px),
-      var(--badge-bg);
+    background: var(--badge-bg);
+  }
+
+  .program__media :global(img) {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    border-radius: var(--radius-lg);
+  }
+
+  .program__media .icon-badge {
+    position: absolute;
+    right: -14px;
+    bottom: -14px;
+    width: 64px;
+    height: 64px;
+    margin: 0;
+    border: 5px solid var(--paper);
+    border-radius: 20px;
+    box-sizing: content-box;
   }
 
   @media (max-width: 860px) {
-    .program__media {
-      aspect-ratio: 16 / 7;
+    .program__media .icon-badge {
+      right: 12px;
     }
+  }
+
+  .program__focus-title {
+    margin-top: 1.4em;
+    font-size: 1.05rem;
   }
 
   .program__meta {

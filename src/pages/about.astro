@@ -1,80 +1,73 @@
 ---
+import { Image } from 'astro:assets';
 import BaseLayout from '../layouts/BaseLayout.astro';
 import PageHero from '../components/PageHero.astro';
 import SectionHeading from '../components/SectionHeading.astro';
 import Icon from '../components/Icon.astro';
-import { site } from '../data/site';
+import { site, coreValues } from '../data/site';
 import { approach } from '../data/programs';
-import { branches } from '../data/branches';
+import fairies from '../assets/photos/annual-day-fairies.jpg';
+import bears from '../assets/photos/annual-day-bears.jpg';
+import umbrella from '../assets/photos/dance-umbrella.jpg';
+import solo from '../assets/photos/dance-solo.jpg';
+import bees from '../assets/photos/annual-day-bees.jpg';
 
-const values = [
-  { icon: 'Heart', title: 'Care first', text: 'Children learn best when they feel safe, known and loved.' },
-  { icon: 'Lightbulb', title: 'Curiosity', text: 'We follow children’s questions and turn them into discoveries.' },
-  { icon: 'HandHeart', title: 'Values & manners', text: 'Kindness, respect and good habits are taught every day.' },
-  { icon: 'ShieldCheck', title: 'Transparency', text: 'Live CCTV and a parent app keep families close to every moment.' },
+const moments = [
+  { src: umbrella, alt: 'A child dancing with an umbrella on stage at the Crossmaze annual day' },
+  { src: fairies, alt: 'Children dressed as fairies and flowers at the annual day' },
+  { src: solo, alt: 'A child performing a classical dance' },
+  { src: bears, alt: 'Children in bear costumes performing on stage' },
+  { src: bees, alt: 'Children dressed as bees at the annual day' },
 ];
+const tones = ['navy', 'green', 'coral', 'sky', 'sun', 'navy'];
 ---
 
 <BaseLayout
   title="About Us"
-  description="Crossmaze Preschool and Day Care, founded by Manushree Chaturvedi and Abhishek Jain, brings innovative, holistic early education to Electronic City and Begur, Bengaluru."
+  description="About Crossmaze Preschool and Day Care, Bengaluru: an interactive, Montessori-based preschool where every child is special. Our story, core values and approach."
 >
   <PageHero
     eyebrow="About Crossmaze"
-    title="Innovative, joyful early learning for the whole child"
-    lead="Crossmaze began with a simple belief: children learn best when lessons are engaging, unconventional and fun, and when values matter as much as academics."
+    title="An interactive place where every child can excel"
+    lead={site.promise}
     crumbs={[{ label: 'About' }]}
   />
 
   <section class="section section--white">
     <div class="container story">
       <div>
-        <SectionHeading eyebrow="Our story" title="From one classroom to five centres" />
-        <p>
-          Crossmaze opened its doors in {site.foundedYear} with a focus on innovative, unconventional and engaging teaching
-          strategies that help children understand ideas easily and enjoyably. Founders {site.founders[0]} and
-          {site.founders[1]} set out to build a preschool that parents could trust completely, and that children would
-          love walking into every morning.
-        </p>
-        <p>
-          Today Crossmaze has {branches.length} centres across Electronic City and Begur in Bengaluru, offering Play Group,
-          Nursery, Junior KG, Senior KG and Day Care. Every centre follows the same Montessori-based, thematic
-          curriculum, with the same attention to safety, hygiene and care.
-        </p>
-        <p>
-          We believe education should be centred on the child’s whole development. Academics and discipline are valued
-          equally with culture, manners and behaviour, because that is what helps children grow into confident, kind
-          and capable people.
-        </p>
+        <SectionHeading eyebrow="Who we are" title="Every child is special" />
+        {site.about.map((p) => <p>{p}</p>)}
+        <blockquote class="story__quote">
+          “{site.quote.text}”
+          <cite>{site.quote.author}</cite>
+        </blockquote>
       </div>
       <aside class="story__stats">
-        <div class="stat tone-sun">
-          <strong>{branches.length}</strong>
-          <span>centres in Bengaluru</span>
-        </div>
-        <div class="stat tone-teal">
-          <strong>2 – 8</strong>
-          <span>years age range</span>
-        </div>
-        <div class="stat tone-coral">
-          <strong>{site.foundedYear}</strong>
-          <span>year we started</span>
-        </div>
-        <div class="stat tone-sky">
-          <strong>5</strong>
-          <span>programs</span>
-        </div>
+        {
+          site.stats.map((s, i) => (
+            <div class:list={['stat', `tone-${['sun', 'green', 'coral', 'sky'][i % 4]}`]}>
+              <strong>{s.value}</strong>
+              <span>{s.label}</span>
+            </div>
+          ))
+        }
       </aside>
     </div>
   </section>
 
   <section class="section">
     <div class="container">
-      <SectionHeading eyebrow="What we value" title="The things we never compromise on" align="center" />
-      <div class="grid grid--4">
+      <SectionHeading
+        eyebrow="Our core values"
+        title="More than guiding principles"
+        lead="Our core values are the foundation of our commitment to excellence in early childhood education, and they shape our daily practices, our learning environment and how we work with children, parents and the community."
+        align="center"
+      />
+      <div class="grid grid--3">
         {
-          values.map((v, i) => (
-            <div class:list={['card', `tone-${['coral', 'sun', 'teal', 'plum'][i % 4]}`]}>
+          coreValues.map((v, i) => (
+            <div class:list={['card', `tone-${tones[i % tones.length]}`]}>
               <span class="icon-badge">
                 <Icon name={v.icon} size={26} />
               </span>
@@ -92,7 +85,7 @@ const values = [
       <SectionHeading
         eyebrow="Our approach"
         title="How children learn at Crossmaze"
-        lead="Our Foundational Development Program uses Montessori-based methods and a thematic curriculum to build the skills children need for school and for life."
+        lead="Our Foundational Development Program uses a Montessori-based, thematic approach to build the skills children need for school and for life."
       />
       <div class="grid grid--2">
         {
@@ -113,8 +106,23 @@ const values = [
   </section>
 
   <section class="section">
+    <div class="container">
+      <SectionHeading eyebrow="Life at Crossmaze" title="Moments that build confidence" align="center" />
+      <ul class="moments">
+        {
+          moments.map((m) => (
+            <li>
+              <Image src={m.src} alt={m.alt} widths={[300, 500]} sizes="(max-width: 700px) 50vw, 240px" />
+            </li>
+          ))
+        }
+      </ul>
+    </div>
+  </section>
+
+  <section class="section section--white">
     <div class="container founders">
-      <SectionHeading eyebrow="Leadership" title="Meet our founders" />
+      <SectionHeading eyebrow="Leadership" title="Our founders" />
       <div class="grid grid--2">
         {
           site.founders.map((name) => (
@@ -136,7 +144,7 @@ const values = [
     </div>
   </section>
 
-  <section class="section--tight section--plum">
+  <section class="section--tight section--navy">
     <div class="container cta">
       <div>
         <h2>See Crossmaze for yourself</h2>
@@ -169,6 +177,26 @@ const values = [
     max-width: 65ch;
   }
 
+  .story__quote {
+    margin: 28px 0 0;
+    padding: 20px 24px;
+    border-left: 5px solid var(--sun);
+    border-radius: 0 var(--radius) var(--radius) 0;
+    background: var(--cream);
+    font-family: var(--font-display);
+    font-size: 1.2rem;
+    line-height: 1.4;
+  }
+
+  .story__quote cite {
+    display: block;
+    margin-top: 8px;
+    font-family: var(--font-body);
+    font-size: 0.9rem;
+    font-style: normal;
+    color: var(--muted);
+  }
+
   .story__stats {
     display: grid;
     grid-template-columns: 1fr 1fr;
@@ -184,7 +212,7 @@ const values = [
 
   .stat strong {
     font-family: var(--font-display);
-    font-size: clamp(1.8rem, 3vw, 2.4rem);
+    font-size: clamp(1.6rem, 3vw, 2.2rem);
     font-weight: 600;
     line-height: 1.1;
     color: var(--badge-fg);
@@ -205,6 +233,38 @@ const values = [
     margin: 0;
   }
 
+  .moments {
+    display: grid;
+    grid-template-columns: repeat(5, 1fr);
+    gap: 14px;
+    margin: 0;
+    padding: 0;
+    list-style: none;
+  }
+
+  @media (max-width: 860px) {
+    .moments {
+      grid-template-columns: repeat(2, 1fr);
+    }
+    .moments li:first-child {
+      grid-column: 1 / -1;
+    }
+  }
+
+  .moments :global(img) {
+    width: 100%;
+    height: 100%;
+    aspect-ratio: 3 / 4;
+    object-fit: cover;
+    border-radius: var(--radius);
+  }
+
+  @media (max-width: 860px) {
+    .moments li:first-child :global(img) {
+      aspect-ratio: 16 / 10;
+    }
+  }
+
   .founder {
     display: flex;
     align-items: center;
@@ -218,7 +278,7 @@ const values = [
     width: 76px;
     height: 76px;
     border-radius: 50%;
-    background: var(--plum);
+    background: var(--navy);
     color: var(--sun);
     font-family: var(--font-display);
     font-size: 1.6rem;

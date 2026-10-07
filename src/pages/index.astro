@@ -1,58 +1,22 @@
 ---
+import { Image } from 'astro:assets';
 import BaseLayout from '../layouts/BaseLayout.astro';
 import Icon from '../components/Icon.astro';
 import SectionHeading from '../components/SectionHeading.astro';
 import ProgramCard from '../components/ProgramCard.astro';
 import BranchCard from '../components/BranchCard.astro';
 import EnquiryForm from '../components/EnquiryForm.astro';
-import { site } from '../data/site';
-import { programs, approach } from '../data/programs';
-import { branches, amenities } from '../data/branches';
+import { site, coreValues } from '../data/site';
+import { programs, daycareHighlights } from '../data/programs';
+import { branches, branchPhotos, facilities } from '../data/branches';
 import { testimonials } from '../data/testimonials';
+import yoga from '../assets/photos/yoga.jpg';
+import bees from '../assets/photos/annual-day-bees.jpg';
+import teacher from '../assets/photos/teacher-flashcards.jpg';
+import napRoom from '../assets/photos/nap-room.jpg';
 
-const tiles = [
-  { icon: 'Blocks', tone: 'sun' },
-  { icon: 'Music', tone: 'plum' },
-  { icon: 'Palette', tone: 'coral' },
-  { icon: 'BookOpen', tone: 'teal' },
-  { icon: 'Heart', tone: 'coral', big: true },
-  { icon: 'Puzzle', tone: 'sky' },
-  { icon: 'Sprout', tone: 'teal' },
-  { icon: 'Star', tone: 'sun' },
-  { icon: 'Sun', tone: 'plum' },
-];
-
-const careHighlights = [
-  {
-    icon: 'Cctv',
-    title: 'Live CCTV for parents',
-    text: 'Watch your child’s day in real time, from anywhere.',
-  },
-  {
-    icon: 'Smartphone',
-    title: 'Parent app',
-    text: 'Daily updates, photos, notices and reports in one place.',
-  },
-  {
-    icon: 'Bus',
-    title: 'In-house transport',
-    text: 'Convenient pick-up and drop-off with our own transport service.',
-  },
-  {
-    icon: 'BedDouble',
-    title: 'AC sleeping rooms',
-    text: 'Calm, air-conditioned nap rooms designed just for little ones.',
-  },
-];
-
-const day = [
-  { icon: 'Smile', title: 'Warm welcome & circle time', text: 'Greetings, songs, weather and the day’s theme.' },
-  { icon: 'Shapes', title: 'Montessori work time', text: 'Hands-on materials for language, numbers and life skills.' },
-  { icon: 'Utensils', title: 'Snack break', text: 'Healthy habits, table manners and sharing.' },
-  { icon: 'Palette', title: 'Theme activity', text: 'Art, craft, music or a science discovery tied to the theme.' },
-  { icon: 'Trees', title: 'Active play', text: 'Movement, games and gross-motor fun.' },
-  { icon: 'BookOpen', title: 'Story & goodbye', text: 'A story, a recap of the day, and home – or on to day care.' },
-];
+const heroPhoto = branchPhotos('crossmaze-neotown')[1] ?? branchPhotos('crossmaze-neotown')[0]!;
+const tones = ['navy', 'green', 'coral', 'sky', 'sun', 'navy'];
 ---
 
 <BaseLayout>
@@ -61,10 +25,10 @@ const day = [
     <div class="container hero__inner">
       <div class="hero__copy">
         <span class="eyebrow"><Icon name="Sparkles" size={18} /> Preschool & Day Care · Bengaluru</span>
-        <h1>Where little minds <span class="squiggle">find their way</span></h1>
+        <h1>A safe place to <span class="squiggle">grow and learn</span></h1>
         <p class="lead">
-          A Montessori-based preschool and day care where children aged 2 to 8 learn through play, discovery and
-          care, at five centres across Electronic City and Begur.
+          A secure, caring and nurturing space where children thrive and learn at their own pace, with a
+          Montessori-based approach at five centres across Electronic City and Begur.
         </p>
         <div class="btn-row">
           <a class="btn btn--sun" href="#enquire">Book a school visit <Icon name="ArrowRight" size={18} /></a>
@@ -73,38 +37,80 @@ const day = [
         <ul class="hero__facts">
           <li><Icon name="Building2" size={20} /> {branches.length} centres</li>
           <li><Icon name="Baby" size={20} /> Ages 2 – 8</li>
-          <li><Icon name="Clock" size={20} /> Day care till 6 pm</li>
+          <li><Icon name="Users" size={20} /> 1:6 day care ratio</li>
         </ul>
       </div>
-      <div class="hero__art" aria-hidden="true">
-        {
-          tiles.map((t) => (
-            <span class:list={['hero__tile', `tone-${t.tone}`, { 'hero__tile--big': t.big }]}>
-              <Icon name={t.icon} size={t.big ? 56 : 34} strokeWidth={1.8} />
-            </span>
-          ))
-        }
+      <div class="hero__art">
+        <Image
+          class="hero__photo hero__photo--big"
+          src={heroPhoto}
+          alt="A bright Crossmaze classroom with a 'smallest stars shine bright' mural"
+          widths={[480, 720, 960]}
+          sizes="(max-width: 900px) 100vw, 540px"
+          loading="eager"
+        />
+        <Image class="hero__photo" src={yoga} alt="Children doing yoga together at Crossmaze" widths={[280, 480]} sizes="260px" loading="eager" />
+        <Image class="hero__photo" src={bees} alt="Children dressed as bees at the Crossmaze annual day" widths={[280, 450]} sizes="260px" loading="eager" />
+        <div class="hero__badge">
+          <strong>1000+</strong>
+          <span>happy children</span>
+        </div>
       </div>
     </div>
   </section>
 
-  <!-- Approach -->
+  <!-- Stats -->
+  <section class="stats" aria-label="Crossmaze in numbers">
+    <div class="container">
+      <ul class="stats__list">
+        {
+          site.stats.map((s) => (
+            <li>
+              <strong>{s.value}</strong>
+              <span>{s.label}</span>
+            </li>
+          ))
+        }
+      </ul>
+    </div>
+  </section>
+
+  <!-- About -->
   <section class="section section--white">
+    <div class="container about">
+      <div class="about__media">
+        <Image src={teacher} alt="A Crossmaze teacher using letter cards with a group of children" widths={[400, 555]} sizes="(max-width: 900px) 100vw, 480px" />
+        <blockquote class="about__quote">
+          “{site.quote.text}”
+          <cite>{site.quote.author}</cite>
+        </blockquote>
+      </div>
+      <div>
+        <SectionHeading eyebrow="About us" title="Every child is special" />
+        {site.about.map((p) => <p class="muted">{p}</p>)}
+        <a class="btn btn--ghost" href="/about">More about Crossmaze</a>
+      </div>
+    </div>
+  </section>
+
+  <!-- Core values -->
+  <section class="section">
     <div class="container">
       <SectionHeading
-        eyebrow="Why Crossmaze"
-        title="Education centred on the whole child"
-        lead="Academics and discipline matter to us, and so do values, culture, manners and kindness. Our approach brings them together so children grow in every way."
+        eyebrow="Our core values"
+        title="The foundation of everything we do"
+        lead="Our values guide our daily practices, shape our learning environment and influence how we work with children, parents and the community."
+        align="center"
       />
-      <div class="grid grid--4">
+      <div class="grid grid--3">
         {
-          approach.map((a, i) => (
-            <div class:list={['card', `tone-${['plum', 'teal', 'coral', 'sky'][i % 4]}`]}>
+          coreValues.map((v, i) => (
+            <div class:list={['card', `tone-${tones[i % tones.length]}`]}>
               <span class="icon-badge">
-                <Icon name={a.icon} size={26} />
+                <Icon name={v.icon} size={26} />
               </span>
-              <h3>{a.title}</h3>
-              <p class="muted">{a.text}</p>
+              <h3>{v.title}</h3>
+              <p class="muted">{v.text}</p>
             </div>
           ))
         }
@@ -113,13 +119,13 @@ const day = [
   </section>
 
   <!-- Programs -->
-  <section class="section">
+  <section class="section section--white">
     <div class="container">
       <div class="split-heading">
         <SectionHeading
           eyebrow="Our programs"
           title="A program for every stage"
-          lead={`Preschool runs ${site.hours.preschool}. Day care runs ${site.hours.daycare} for families who need a full day.`}
+          lead="Our Foundational Development Program goes beyond traditional preschool, building essential life skills through a thematic approach."
         />
         <a class="btn btn--ghost" href="/our-programs">All program details</a>
       </div>
@@ -129,63 +135,59 @@ const day = [
     </div>
   </section>
 
-  <!-- Safety & care -->
-  <section class="section section--plum care">
+  <!-- Day care -->
+  <section class="section section--navy care">
     <div class="container care__inner">
       <div>
-        <span class="eyebrow">Safety & peace of mind</span>
-        <h2>Safe, secure and always within reach</h2>
+        <span class="eyebrow">Day care</span>
+        <h2>A nurturing, home-like day care</h2>
         <p class="lead">
-          Every Crossmaze centre is designed around children: child-friendly spaces, trained staff and tools that keep
-          parents connected throughout the day.
+          Our in-house day care is open to both Crossmaze students and children from other schools, with a smooth
+          transition from preschool to end-of-day activities. Experienced caregivers focus on safety and enrichment, so
+          parents can attend to their day with peace of mind.
         </p>
-        <ul class="care__amenities">
+        <ul class="care__list">
           {
-            amenities.map((a) => (
+            daycareHighlights.map((h) => (
               <li>
-                <Icon name={a.icon} size={18} />
-                {a.label}
+                <Icon name="Check" size={20} />
+                {h}
               </li>
             ))
           }
         </ul>
+        <a class="btn btn--sun" href="/our-programs#day-care">About day care</a>
       </div>
-      <div class="care__grid">
-        {
-          careHighlights.map((c) => (
-            <div class="care__card">
-              <Icon name={c.icon} size={30} />
-              <h3>{c.title}</h3>
-              <p>{c.text}</p>
-            </div>
-          ))
-        }
+      <div class="care__media">
+        <Image src={napRoom} alt="Air-conditioned nap room with child-sized cots" widths={[400, 555]} sizes="(max-width: 900px) 100vw, 520px" />
       </div>
     </div>
   </section>
 
-  <!-- A day at Crossmaze -->
-  <section class="section section--white">
+  <!-- Facilities -->
+  <section class="section section--white" id="facilities">
     <div class="container">
       <SectionHeading
-        eyebrow="A day at Crossmaze"
-        title="Every morning is a little adventure"
-        lead="A predictable rhythm helps young children feel secure, and leaves room for wonder."
+        eyebrow="Our facilities"
+        title="Safe, secure and creative"
+        lead="Every centre is built around children, with tools that keep parents connected throughout the day."
         align="center"
       />
-      <ol class="day">
+      <ul class="facilities">
         {
-          day.map((d, i) => (
-            <li class:list={['day__step', `tone-${['sun', 'teal', 'coral', 'sky', 'plum', 'sun'][i]}`]}>
+          facilities.map((f, i) => (
+            <li class:list={[`tone-${tones[i % tones.length]}`]}>
               <span class="icon-badge">
-                <Icon name={d.icon} size={24} />
+                <Icon name={f.icon} size={24} />
               </span>
-              <h3>{d.title}</h3>
-              <p class="muted">{d.text}</p>
+              <span>
+                <strong>{f.title}</strong>
+                <span class="muted">{f.text}</span>
+              </span>
             </li>
           ))
         }
-      </ol>
+      </ul>
     </div>
   </section>
 
@@ -193,11 +195,12 @@ const day = [
     testimonials.length > 0 && (
       <section class="section">
         <div class="container">
-          <SectionHeading eyebrow="Parents say" title="Loved by families" align="center" />
-          <div class="grid grid--3">
+          <SectionHeading eyebrow="Testimonials" title="What parents say" align="center" />
+          <div class="testimonials">
             {testimonials.map((t) => (
               <figure class="card testimonial">
-                <blockquote>“{t.quote}”</blockquote>
+                <Icon name="Heart" size={22} class="testimonial__icon" />
+                <blockquote>{t.quote}</blockquote>
                 <figcaption>
                   <strong>{t.name}</strong>
                   <span class="muted">{t.detail}</span>
@@ -211,7 +214,7 @@ const day = [
   }
 
   <!-- Branches -->
-  <section class="section">
+  <section class="section section--white">
     <div class="container">
       <div class="split-heading">
         <SectionHeading
@@ -228,14 +231,14 @@ const day = [
   </section>
 
   <!-- Enquiry -->
-  <section class="section section--white" id="enquire">
+  <section class="section" id="enquire">
     <div class="container enquire">
       <div>
         <span class="eyebrow">Admissions open</span>
-        <h2>Come and see us in action</h2>
+        <h2>Admission enquiry</h2>
         <p class="lead">
-          Share a few details and our admissions team will call you to answer your questions and set up a visit to
-          your nearest centre.
+          Share a few details and our admissions team will call you to answer your questions and set up a visit to your
+          nearest centre.
         </p>
         <ul class="check-list">
           <li><Icon name="Check" size={20} /> Tour the classrooms and Montessori area</li>
@@ -260,17 +263,17 @@ const day = [
   .hero {
     position: relative;
     overflow: hidden;
-    padding-block: clamp(48px, 7vw, 96px) clamp(56px, 8vw, 112px);
+    padding-block: clamp(40px, 6vw, 80px) clamp(48px, 7vw, 96px);
     background:
       radial-gradient(circle at 100% 0%, var(--sun-50) 0 260px, transparent 261px),
-      radial-gradient(circle at 0% 100%, var(--teal-50) 0 180px, transparent 181px),
+      radial-gradient(circle at 0% 100%, var(--green-50) 0 180px, transparent 181px),
       var(--cream);
   }
 
   .hero__inner {
     display: grid;
-    grid-template-columns: 1.1fr 1fr;
-    gap: clamp(32px, 5vw, 72px);
+    grid-template-columns: 1fr 1.05fr;
+    gap: clamp(32px, 5vw, 64px);
     align-items: center;
   }
 
@@ -283,6 +286,7 @@ const day = [
   .hero h1 {
     position: relative;
     z-index: 0;
+    max-width: 14ch;
   }
 
   .hero__facts {
@@ -306,46 +310,144 @@ const day = [
   }
 
   .hero__art {
+    position: relative;
     display: grid;
-    grid-template-columns: repeat(3, 1fr);
-    gap: clamp(10px, 1.6vw, 18px);
-    max-width: 480px;
+    grid-template-columns: 1fr 1fr;
+    gap: 14px;
+  }
+
+  .hero__art :global(.hero__photo) {
     width: 100%;
-    margin-inline: auto;
-    transform: rotate(-4deg);
-  }
-
-  .hero__tile {
-    display: grid;
-    place-items: center;
-    aspect-ratio: 1;
-    border-radius: clamp(18px, 2.4vw, 28px);
-    background: var(--badge-bg);
-    color: var(--badge-fg);
-    box-shadow: var(--shadow-sm);
-    animation: float 6s ease-in-out infinite;
-  }
-
-  .hero__tile:nth-child(odd) {
-    animation-delay: -3s;
-  }
-
-  .hero__tile--big {
-    background: var(--plum);
-    color: var(--sun);
+    height: 100%;
+    aspect-ratio: 4 / 3;
+    object-fit: cover;
+    border-radius: var(--radius);
     box-shadow: var(--shadow);
+    border: 5px solid #fff;
   }
 
-  @keyframes float {
-    50% {
-      transform: translateY(-6px);
-    }
+  .hero__art :global(.hero__photo--big) {
+    grid-column: 1 / -1;
+    aspect-ratio: 16 / 9;
+  }
+
+  .hero__badge {
+    position: absolute;
+    left: -18px;
+    top: 42%;
+    display: grid;
+    padding: 12px 18px;
+    border-radius: var(--radius);
+    background: var(--sun);
+    color: var(--ink);
+    box-shadow: var(--shadow);
+    transform: rotate(-4deg);
+    line-height: 1.15;
+  }
+
+  .hero__badge strong {
+    font-family: var(--font-display);
+    font-size: 1.6rem;
+    font-weight: 600;
+  }
+
+  .hero__badge span {
+    font-weight: 800;
+    font-size: 0.85rem;
   }
 
   @media (max-width: 900px) {
-    .hero__art {
-      max-width: 340px;
+    .hero__badge {
+      left: auto;
+      right: 10px;
+      top: 10px;
     }
+  }
+
+  .stats {
+    background: var(--navy-700);
+    color: #fff;
+    padding-block: 28px;
+  }
+
+  .stats__list {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 20px;
+    margin: 0;
+    padding: 0;
+    list-style: none;
+    text-align: center;
+  }
+
+  @media (max-width: 700px) {
+    .stats__list {
+      grid-template-columns: 1fr 1fr;
+    }
+  }
+
+  .stats__list li {
+    display: grid;
+  }
+
+  .stats__list strong {
+    font-family: var(--font-display);
+    font-size: clamp(1.6rem, 3vw, 2.2rem);
+    font-weight: 600;
+    color: var(--sun);
+    line-height: 1.2;
+  }
+
+  .stats__list span {
+    font-weight: 700;
+    color: rgb(255 255 255 / 85%);
+  }
+
+  .about {
+    display: grid;
+    grid-template-columns: 0.9fr 1.1fr;
+    gap: clamp(32px, 5vw, 72px);
+    align-items: center;
+  }
+
+  @media (max-width: 900px) {
+    .about {
+      grid-template-columns: 1fr;
+    }
+  }
+
+  .about__media {
+    position: relative;
+  }
+
+  .about__media :global(img) {
+    width: 100%;
+    height: auto;
+    aspect-ratio: 4 / 3;
+    object-fit: cover;
+    border-radius: var(--radius-lg);
+  }
+
+  .about__quote {
+    margin: -48px 24px 0;
+    position: relative;
+    padding: 20px 24px;
+    border-radius: var(--radius);
+    background: var(--navy);
+    color: #fff;
+    font-family: var(--font-display);
+    font-size: 1.15rem;
+    line-height: 1.4;
+    box-shadow: var(--shadow);
+  }
+
+  .about__quote cite {
+    display: block;
+    margin-top: 8px;
+    font-family: var(--font-body);
+    font-size: 0.88rem;
+    font-style: normal;
+    color: var(--sun);
   }
 
   .split-heading {
@@ -366,7 +468,7 @@ const day = [
 
   .care__inner {
     display: grid;
-    grid-template-columns: 1fr 1fr;
+    grid-template-columns: 1.1fr 0.9fr;
     gap: clamp(32px, 5vw, 72px);
     align-items: center;
   }
@@ -377,102 +479,94 @@ const day = [
     }
   }
 
-  .care__amenities {
-    display: flex;
-    flex-wrap: wrap;
-    gap: 10px;
-    margin: 28px 0 0;
+  .care__list {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(min(100%, 220px), 1fr));
+    gap: 10px 20px;
+    margin: 24px 0 32px;
     padding: 0;
     list-style: none;
-  }
-
-  .care__amenities li {
-    display: inline-flex;
-    align-items: center;
-    gap: 8px;
-    padding: 8px 14px;
-    border-radius: 999px;
-    background: rgb(255 255 255 / 10%);
     font-weight: 700;
-    font-size: 0.92rem;
   }
 
-  .care__amenities :global(svg) {
+  .care__list li {
+    display: flex;
+    gap: 10px;
+    align-items: center;
+  }
+
+  .care__list :global(svg) {
+    flex: none;
     color: var(--sun);
   }
 
-  .care__grid {
+  .care__media :global(img) {
+    width: 100%;
+    height: auto;
+    aspect-ratio: 4 / 3;
+    object-fit: cover;
+    border-radius: var(--radius-lg);
+    border: 6px solid rgb(255 255 255 / 12%);
+  }
+
+  .facilities {
     display: grid;
-    grid-template-columns: repeat(2, 1fr);
+    grid-template-columns: repeat(auto-fit, minmax(min(100%, 260px), 1fr));
     gap: 16px;
-  }
-
-  @media (max-width: 480px) {
-    .care__grid {
-      grid-template-columns: 1fr;
-    }
-  }
-
-  .care__card {
-    padding: 24px;
-    border-radius: var(--radius);
-    background: rgb(255 255 255 / 8%);
-    border: 1px solid rgb(255 255 255 / 14%);
-  }
-
-  .care__card :global(svg) {
-    margin-bottom: 14px;
-    color: var(--sun);
-  }
-
-  .care__card h3 {
-    color: #fff;
-    font-size: 1.15rem;
-  }
-
-  .care__card p {
-    margin: 0;
-    color: rgb(255 255 255 / 80%);
-  }
-
-  .day {
-    display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(min(100%, 170px), 1fr));
-    gap: 20px;
     margin: 0;
     padding: 0;
     list-style: none;
-    counter-reset: step;
   }
 
-  .day__step {
-    position: relative;
-    padding: 24px 20px;
+  .facilities li {
+    display: flex;
+    gap: 14px;
+    align-items: flex-start;
+    padding: 18px;
     border-radius: var(--radius);
     background: var(--cream);
-    text-align: center;
   }
 
-  .day__step .icon-badge {
-    margin-inline: auto;
-  }
-
-  .day__step h3 {
-    font-size: 1.05rem;
-  }
-
-  .day__step p {
+  .facilities .icon-badge {
+    flex: none;
     margin: 0;
-    font-size: 0.95rem;
+    width: 46px;
+    height: 46px;
+    border-radius: 14px;
+    background: var(--paper);
+  }
+
+  .facilities li > span:last-child {
+    display: grid;
+    line-height: 1.4;
+  }
+
+  .facilities .muted {
+    font-size: 0.93rem;
+  }
+
+  .testimonials {
+    columns: 3 300px;
+    column-gap: 20px;
+  }
+
+  .testimonial {
+    break-inside: avoid;
+    margin: 0 0 20px;
+  }
+
+  .testimonial :global(.testimonial__icon) {
+    margin-bottom: 12px;
+    color: var(--coral);
   }
 
   .testimonial blockquote {
     margin: 0 0 16px;
-    font-size: 1.1rem;
   }
 
   .testimonial figcaption {
     display: grid;
+    line-height: 1.35;
   }
 
   .enquire {
@@ -497,9 +591,5 @@ const day = [
     flex-wrap: wrap;
     gap: 10px;
     margin-top: 28px;
-  }
-
-  .enquire__form {
-    background: var(--cream);
   }
 </style>

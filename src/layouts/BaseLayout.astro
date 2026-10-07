@@ -25,7 +25,16 @@ const organization = {
   url: site.url,
   telephone: site.phone,
   email: site.admissionsEmail,
-  logo: new URL('/favicon.svg', site.url).href,
+  logo: new URL('/logo.png', site.url).href,
+  image: ogImage,
+  address: {
+    '@type': 'PostalAddress',
+    streetAddress: site.address.slice(0, 2).join(', '),
+    addressLocality: 'Bengaluru',
+    addressRegion: 'Karnataka',
+    postalCode: '560068',
+    addressCountry: 'IN',
+  },
   founder: site.founders.map((name) => ({ '@type': 'Person', name })),
   sameAs: site.social.map((s) => s.href),
 };
@@ -40,9 +49,10 @@ const structuredData = [organization, ...(jsonLd ? (Array.isArray(jsonLd) ? json
     <title>{pageTitle}</title>
     <meta name="description" content={description} />
     <link rel="canonical" href={canonical} />
-    <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+    <link rel="icon" type="image/png" href="/favicon.png" />
+    <link rel="apple-touch-icon" href="/apple-touch-icon.png" />
     <link rel="sitemap" href="/sitemap-index.xml" />
-    <meta name="theme-color" content="#4b2a8c" />
+    <meta name="theme-color" content="#0b1d5e" />
 
     <meta property="og:type" content="website" />
     <meta property="og:site_name" content={site.fullName} />

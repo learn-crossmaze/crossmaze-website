@@ -10,12 +10,12 @@ import { site } from '../data/site';
 
 <BaseLayout
   title="Careers"
-  description="Join Crossmaze Preschool and Day Care in Bengaluru. Openings for Teachers / Facilitators, Day Care In-Charge and Center Heads."
+  description="Careers at Crossmaze Preschool and Day Care, Bengaluru: openings for Teacher / Facilitator, Day Care In-Charge and Center Head. An ideal workplace for women."
 >
   <PageHero
     eyebrow="Careers"
-    title="Shape the first steps of a lifetime of learning"
-    lead="Crossmaze is a great place to work for women and for anyone who loves working with young children, with equal opportunities, room to grow and flexible arrangements."
+    title="Join us"
+    lead="Crossmaze is an ideal workplace for women, with equal opportunities, support for career advancement, flexible work arrangements and a culture of respect and inclusivity. Join a community where your talents are recognised and your voice is heard."
     crumbs={[{ label: 'Careers' }]}
   >
     <div class="btn-row hero-actions">
@@ -30,7 +30,7 @@ import { site } from '../data/site';
       <div class="grid grid--4">
         {
           perks.map((p, i) => (
-            <div class:list={['card', `tone-${['coral', 'plum', 'teal', 'sun'][i % 4]}`]}>
+            <div class:list={['card', `tone-${['coral', 'navy', 'green', 'sun'][i % 4]}`]}>
               <span class="icon-badge">
                 <Icon name={p.icon} size={26} />
               </span>
@@ -61,51 +61,50 @@ import { site } from '../data/site';
                   </span>
                   <span>
                     <strong>{job.title}</strong>
-                    <span class="muted">{job.type}</span>
+                    <span class="muted">{job.timings.join(' · ')}</span>
                   </span>
                 </span>
                 <Icon name="ChevronDown" size={22} class="job__chev" />
               </summary>
               <div class="job__body">
-                <p class="lead">{job.summary}</p>
-                {(job.timings || job.experience) && (
-                  <ul class="job__meta">
-                    {job.timings?.map((t) => (
-                      <li>
-                        <Icon name="Clock" size={18} /> {t}
-                      </li>
-                    ))}
-                    {job.experience && (
-                      <li>
-                        <Icon name="Award" size={18} /> {job.experience}
-                      </li>
-                    )}
-                  </ul>
+                <p class="lead">{job.overview}</p>
+                <dl class="job__facts">
+                  <div>
+                    <dt><Icon name="GraduationCap" size={18} /> Qualification</dt>
+                    <dd>{job.qualification}</dd>
+                  </div>
+                  <div>
+                    <dt><Icon name="Award" size={18} /> Experience</dt>
+                    <dd>{job.experience}</dd>
+                  </div>
+                  <div>
+                    <dt><Icon name="Clock" size={18} /> Work timings</dt>
+                    <dd>{job.timings.join(' · ')}</dd>
+                  </div>
+                  {job.ageLimit && (
+                    <div>
+                      <dt><Icon name="UserRound" size={18} /> Age limit</dt>
+                      <dd>{job.ageLimit}</dd>
+                    </div>
+                  )}
+                </dl>
+                <h3>Primary responsibilities</h3>
+                <ul class="check-list job__list">
+                  {job.responsibilities.map((r) => (
+                    <li>
+                      <Icon name="Check" size={20} />
+                      <span>
+                        {r.title && <strong>{r.title}: </strong>}
+                        {r.text}
+                      </span>
+                    </li>
+                  ))}
+                </ul>
+                {job.extra && (
+                  <p class="job__extra">
+                    <strong>{job.extra.title}:</strong> {job.extra.text}
+                  </p>
                 )}
-                <div class="job__cols">
-                  <div>
-                    <h3>What you’ll do</h3>
-                    <ul class="check-list">
-                      {job.responsibilities.map((r) => (
-                        <li>
-                          <Icon name="Check" size={20} />
-                          {r}
-                        </li>
-                      ))}
-                    </ul>
-                  </div>
-                  <div>
-                    <h3>What we’re looking for</h3>
-                    <ul class="check-list">
-                      {job.requirements.map((r) => (
-                        <li>
-                          <Icon name="Check" size={20} />
-                          {r}
-                        </li>
-                      ))}
-                    </ul>
-                  </div>
-                </div>
                 <a class="btn" href={`?position=${encodeURIComponent(job.title)}#apply`} data-apply={job.title}>
                   Apply for this role
                 </a>
@@ -224,36 +223,44 @@ import { site } from '../data/site';
     padding-top: 24px;
   }
 
-  .job__meta {
-    display: flex;
-    flex-wrap: wrap;
-    gap: 8px 24px;
-    margin: 0 0 24px;
-    padding: 0;
-    list-style: none;
-    font-weight: 700;
+  .job__facts {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(min(100%, 240px), 1fr));
+    gap: 16px 28px;
+    margin: 0 0 28px;
+    padding: 20px;
+    border-radius: var(--radius);
+    background: var(--cream);
   }
 
-  .job__meta li {
-    display: inline-flex;
+  .job__facts dt {
+    display: flex;
     align-items: center;
     gap: 8px;
+    font-weight: 800;
   }
 
-  .job__meta :global(svg) {
+  .job__facts dt :global(svg) {
     color: var(--coral);
   }
 
-  .job__cols {
-    display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(min(100%, 300px), 1fr));
-    gap: 28px;
-    margin-bottom: 28px;
+  .job__facts dd {
+    margin: 4px 0 0;
+    color: var(--muted);
+    font-size: 0.97rem;
   }
 
-  .job__cols h3 {
+  .job__body h3 {
     font-size: 1.1rem;
     margin-bottom: 14px;
+  }
+
+  .job__list {
+    margin-bottom: 24px;
+  }
+
+  .job__extra {
+    color: var(--muted);
   }
 
   .apply {

@@ -1,8 +1,10 @@
 ---
+import { Image } from 'astro:assets';
 import Logo from './Logo.astro';
 import Icon from './Icon.astro';
+import mascot from '../assets/brand/mascot.png';
 import { nav, site } from '../data/site';
-import { branches } from '../data/branches';
+import { branches, shortName } from '../data/branches';
 import { programs } from '../data/programs';
 
 const year = new Date().getFullYear();
@@ -19,6 +21,10 @@ const year = new Date().getFullYear();
         </p>
         <ul class="site-footer__contact">
           <li>
+            <Icon name="MapPin" size={18} />
+            <span>{site.address.slice(1).join(', ')}</span>
+          </li>
+          <li>
             <Icon name="Phone" size={18} />
             <a href={site.phoneHref}>{site.phone}</a>
           </li>
@@ -31,6 +37,7 @@ const year = new Date().getFullYear();
             <span>Preschool {site.hours.preschool} · Day care {site.hours.daycare}</span>
           </li>
         </ul>
+        <Image src={mascot} alt="" width={140} class="site-footer__mascot" />
       </div>
 
       <div>
@@ -65,7 +72,7 @@ const year = new Date().getFullYear();
           {
             branches.map((b) => (
               <li>
-                <a href={`/branch/${b.slug}`}>{b.name.replace('Crossmaze – ', '')}</a>
+                <a href={`/branch/${b.slug}`}>{shortName(b)}</a>
               </li>
             ))
           }
@@ -76,6 +83,8 @@ const year = new Date().getFullYear();
     <div class="site-footer__bottom">
       <p>© {year} {site.legalName}. All rights reserved.</p>
       <ul class="site-footer__social">
+        <li><a href="/privacy-policy">Privacy policy</a></li>
+        <li><a href="/terms">Terms &amp; conditions</a></li>
         {
           site.social.map((s) => (
             <li>
@@ -125,6 +134,18 @@ const year = new Date().getFullYear();
     .site-footer__grid {
       grid-template-columns: 1fr;
     }
+  }
+
+  .site-footer__about {
+    position: relative;
+  }
+
+  .site-footer__about :global(.site-footer__mascot) {
+    width: 120px;
+    height: auto;
+    margin-top: 24px;
+    border-radius: 18px;
+    background: #fff;
   }
 
   .site-footer__about p {
