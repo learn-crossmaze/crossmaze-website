@@ -90,7 +90,7 @@ Run this again whenever `firestore.rules`, `storage.rules` or anything in `funct
 
 ### 4. GitHub repository settings (Settings → Secrets and variables → Actions)
 
-- **Secret** `FIREBASE_SERVICE_ACCOUNT_CROSSMAZE_WEBSITE`: a service-account key (Firebase console → Project settings → Service accounts → **Generate new private key**; paste the whole JSON). The account needs the **Firebase Admin** role (the default `firebase-adminsdk` account has it).
+- **Secret** `FIREBASE_SERVICE_ACCOUNT_CROSSMAZE_WEBSITE`: a service-account key (Firebase console → Project settings → Service accounts → **Generate new private key**; paste the whole JSON file). Then give that account (`firebase-adminsdk-…@crossmaze-website.iam.gserviceaccount.com`) these roles in Google Cloud console → **IAM & Admin → IAM** → pencil icon: **Firebase Admin**, **Cloud Run Viewer** and **API Keys Viewer**. The deploy needs them to read content, download photos and publish the site.
 - **Variable** `ADMIN_EMAILS`: your email (comma-separate several). These people are added as admins on the next deploy.
 - **Variable** `FIREBASE_STORAGE_BUCKET`: only if your bucket isn't `crossmaze-website.firebasestorage.app`.
 
