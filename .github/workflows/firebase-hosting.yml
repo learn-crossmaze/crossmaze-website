@@ -49,6 +49,7 @@ jobs:
       - run: npm run build
         env:
           PUBLIC_FORM_ENDPOINT: ${{ vars.PUBLIC_FORM_ENDPOINT }}
+          PUBLIC_ADMIN_GOOGLE_SIGNIN: ${{ vars.PUBLIC_ADMIN_GOOGLE_SIGNIN }}
 
       - name: Deploy preview
         if: github.event_name == 'pull_request' && env.FIREBASE_SERVICE_ACCOUNT != ''

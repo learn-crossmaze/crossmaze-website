@@ -284,6 +284,10 @@ function Shell() {
   );
 }
 
+// Google sign-in is off unless it's enabled in Firebase (Authentication → Sign-in method)
+// and PUBLIC_ADMIN_GOOGLE_SIGNIN=true is set for the build.
+const GOOGLE_SIGN_IN = import.meta.env.PUBLIC_ADMIN_GOOGLE_SIGNIN === 'true';
+
 const LOGIN_ERRORS: Record<string, string> = {
   'auth/invalid-credential': 'Wrong email or password.',
   'auth/wrong-password': 'Wrong email or password.',
@@ -335,7 +339,7 @@ function Login({ services }: { services: FirebaseServices }) {
     <Centered>
       <h1>{mode === 'signup' ? 'Create your account' : mode === 'reset' ? 'Reset your password' : 'Sign in'}</h1>
       <p className="muted">Crossmaze website admin</p>
-      {mode !== 'reset' && (
+      {GOOGLE_SIGN_IN && mode !== 'reset' && (
         <>
           <button className="btn btn-google" disabled={busy} onClick={() => run(() => signInWithPopup(services.auth, new GoogleAuthProvider()))}>
             <svg width="18" height="18" viewBox="0 0 48 48" aria-hidden="true">

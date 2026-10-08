@@ -3,7 +3,7 @@
 The website for **Crossmaze Preschool and Day Care**, Bengaluru (www.crossmaze.in), with an **admin panel** at `/admin` for editing it and a connection that sends every website enquiry and job application to **LITMUS**.
 
 - **Website:** a fast static site built with [Astro](https://astro.build), hosted on Firebase Hosting.
-- **Admin panel:** staff sign in with Google or email to edit branches, programs, the logo, contact details, jobs, testimonials and page text, upload photos, and press **Publish**.
+- **Admin panel:** staff sign in with their email and password to edit branches, programs, the logo, contact details, jobs, testimonials and page text, upload photos, and press **Publish**.
 - **Forms → LITMUS:** every admission enquiry and job application is saved in Firebase (so nothing is lost) and forwarded to LITMUS.
 
 ```
@@ -52,14 +52,24 @@ Do these once, in this order. Commands are for PowerShell, run in the project fo
 ### 1. Firebase console (console.firebase.google.com → project `crossmaze-website`)
 
 1. **Upgrade to the Blaze plan** (Cloud Functions and Storage need it). A school website's traffic normally stays within the free allowance; set a budget alert to be safe.
-2. **Authentication → Get started → Sign-in method:** enable **Google** and **Email/Password**. Under **Settings → Authorized domains**, add `www.crossmaze.in` and `crossmaze.in`.
+2. **Authentication → Get started → Sign-in method:** enable **Email/Password**. Under **Settings → Authorized domains**, add `www.crossmaze.in` and `crossmaze.in`. (Optional: to also offer “Continue with Google”, enable Google there and add the GitHub variable `PUBLIC_ADMIN_GOOGLE_SIGNIN` = `true`.)
 3. **Firestore Database → Create database** in **production mode**, location **asia-south1 (Mumbai)**.
 4. **Storage → Get started** (production mode, same location). Note the bucket name shown (e.g. `crossmaze-website.firebasestorage.app`).
 5. **Project settings → General → Your apps → Add app → Web** (any nickname). The admin panel loads this config automatically on Firebase Hosting.
 
 ### 2. A GitHub token for the Publish button
 
-On GitHub: **Settings → Developer settings → Fine-grained personal access tokens → Generate new token**. Repository access: only `learn-crossmaze/crossmaze-website`. Permissions: **Actions: Read and write**. Copy the token, then:
+The Publish button asks GitHub to run the deploy, so it needs a token that can start workflows on this repository (and nothing else).
+
+1. On github.com, click your profile picture → **Settings** → **Developer settings** (bottom of the left menu) → **Personal access tokens** → **Fine-grained tokens** → **Generate new token**.
+2. **Token name:** `Crossmaze website publish`. **Expiration:** 1 year (put a reminder in your calendar to renew it).
+3. **Resource owner:** `learn-crossmaze` (the organization, not your personal account).
+4. **Repository access:** *Only select repositories* → `crossmaze-website`.
+5. **Permissions:** under *Repository permissions*, set **Actions** to **Read and write**. (*Metadata: Read-only* is added automatically.)
+6. **Generate token** and copy it (it starts with `github_pat_` and is shown only once).
+7. If the organization requires approval, an owner approves it under the organization's **Settings → Personal access tokens → Pending requests**.
+
+Then save it in Firebase (paste when asked; the input is hidden):
 
 ```powershell
 npm ci
@@ -68,7 +78,7 @@ npx firebase-tools login
 npx firebase-tools functions:secrets:set GITHUB_DISPATCH_TOKEN
 ```
 
-(paste the token when asked).
+When the token expires, create a new one the same way and run the last command again (then `npx firebase-tools deploy --only functions`).
 
 ### 3. Deploy the database rules and functions
 
@@ -88,7 +98,7 @@ Run this again whenever `firestore.rules`, `storage.rules` or anything in `funct
 
 Merge this branch into `main`. The first deploy copies the current website content and photos into Firestore and Storage, adds the `ADMIN_EMAILS` admins, and publishes the site. After that, **the admin panel is the place to edit content**: the `content/*.json` files in the repository are only the starting copy.
 
-Then go to `/admin` and sign in with one of the `ADMIN_EMAILS`. With email and password, choose **Create an account** first and click the verification link sent to your inbox.
+Then go to `/admin`, choose **Create an account** with one of the `ADMIN_EMAILS`, and click the verification link Firebase emails you (check spam). After that, sign in normally. New admins you add on the Admins page do the same.
 
 ### 6. Point the domain
 
