@@ -6,6 +6,7 @@ import SectionHeading from '../components/SectionHeading.astro';
 import ProgramCard from '../components/ProgramCard.astro';
 import BranchCard from '../components/BranchCard.astro';
 import EnquiryForm from '../components/EnquiryForm.astro';
+import FloatingShapes from '../components/FloatingShapes.astro';
 import { site, coreValues } from '../data/site';
 import { programs, daycareHighlights } from '../data/programs';
 import { branches, facilities } from '../data/branches';
@@ -19,6 +20,7 @@ const tones = ['navy', 'green', 'coral', 'sky', 'sun', 'navy'];
 <BaseLayout>
   <!-- Hero -->
   <section class="hero">
+    <FloatingShapes variant="home" />
     <div class="container hero__inner">
       <div class="hero__copy">
         <span class="eyebrow"><Icon name="Sparkles" size={18} /> Preschool & Day Care · Bengaluru</span>
@@ -55,7 +57,7 @@ const tones = ['navy', 'green', 'coral', 'sky', 'sun', 'navy'];
         {
           site.hero.badgeValue && (
             <div class="hero__badge">
-              <strong>{site.hero.badgeValue}</strong>
+              <strong data-countup>{site.hero.badgeValue}</strong>
               <span>{site.hero.badgeLabel}</span>
             </div>
           )
@@ -65,13 +67,13 @@ const tones = ['navy', 'green', 'coral', 'sky', 'sun', 'navy'];
   </section>
 
   <!-- Stats -->
-  <section class="stats" aria-label="Crossmaze in numbers">
+  <section class="stats no-shapes" aria-label="Crossmaze in numbers">
     <div class="container">
       <ul class="stats__list">
         {
           site.stats.map((s) => (
             <li>
-              <strong>{s.value}</strong>
+              <strong data-countup>{s.value}</strong>
               <span>{s.label}</span>
             </li>
           ))
@@ -141,7 +143,7 @@ const tones = ['navy', 'green', 'coral', 'sky', 'sun', 'navy'];
   </section>
 
   <!-- Day care -->
-  <section class="section section--navy care">
+  <section class="section section--feature care">
     <div class="container care__inner">
       <div>
         <span class="eyebrow">Day care</span>
@@ -269,10 +271,7 @@ const tones = ['navy', 'green', 'coral', 'sky', 'sun', 'navy'];
     position: relative;
     overflow: hidden;
     padding-block: clamp(40px, 6vw, 80px) clamp(48px, 7vw, 96px);
-    background:
-      radial-gradient(circle at 100% 0%, var(--sun-50) 0 260px, transparent 261px),
-      radial-gradient(circle at 0% 100%, var(--green-50) 0 180px, transparent 181px),
-      var(--cream);
+    background: var(--cream);
   }
 
   .hero__inner {
@@ -370,9 +369,17 @@ const tones = ['navy', 'green', 'coral', 'sky', 'sun', 'navy'];
   }
 
   .stats {
-    background: var(--navy-700);
-    color: #fff;
-    padding-block: 28px;
+    background: linear-gradient(90deg, var(--p-butter) 0%, var(--p-peach) 35%, var(--p-pink) 65%, var(--p-lavender) 100%);
+    background-size: 200% 100%;
+    animation: stats-shimmer 14s ease-in-out infinite alternate;
+    padding-block: 30px;
+    border-block: 1px solid rgb(19 26 58 / 6%);
+  }
+
+  @keyframes stats-shimmer {
+    to {
+      background-position: 100% 0;
+    }
   }
 
   .stats__list {
@@ -399,13 +406,25 @@ const tones = ['navy', 'green', 'coral', 'sky', 'sun', 'navy'];
     font-family: var(--font-display);
     font-size: clamp(1.6rem, 3vw, 2.2rem);
     font-weight: 600;
-    color: var(--sun);
+    color: var(--navy);
     line-height: 1.2;
+  }
+
+  .stats__list li:nth-child(4n + 2) strong {
+    color: #b2342b;
+  }
+
+  .stats__list li:nth-child(4n + 3) strong {
+    color: #23793a;
+  }
+
+  .stats__list li:nth-child(4n + 4) strong {
+    color: #1f63c4;
   }
 
   .stats__list span {
     font-weight: 700;
-    color: rgb(255 255 255 / 85%);
+    color: var(--muted);
   }
 
   .about {
@@ -438,8 +457,9 @@ const tones = ['navy', 'green', 'coral', 'sky', 'sun', 'navy'];
     position: relative;
     padding: 20px 24px;
     border-radius: var(--radius);
-    background: var(--navy);
-    color: #fff;
+    background: var(--p-lavender);
+    border: 2px solid #fff;
+    color: var(--ink);
     font-family: var(--font-display);
     font-size: 1.15rem;
     line-height: 1.4;
@@ -452,7 +472,7 @@ const tones = ['navy', 'green', 'coral', 'sky', 'sun', 'navy'];
     font-family: var(--font-body);
     font-size: 0.88rem;
     font-style: normal;
-    color: var(--sun);
+    color: var(--navy);
   }
 
   .split-heading {
@@ -465,10 +485,6 @@ const tones = ['navy', 'green', 'coral', 'sky', 'sun', 'navy'];
 
   .split-heading > .btn {
     margin-bottom: clamp(32px, 4vw, 48px);
-  }
-
-  .care h2 {
-    color: #fff;
   }
 
   .care__inner {
@@ -502,7 +518,12 @@ const tones = ['navy', 'green', 'coral', 'sky', 'sun', 'navy'];
 
   .care__list :global(svg) {
     flex: none;
-    color: var(--sun);
+    padding: 3px;
+    border-radius: 50%;
+    background: #fff;
+    color: var(--green);
+    width: 26px;
+    height: 26px;
   }
 
   .care__media :global(img) {
@@ -511,7 +532,8 @@ const tones = ['navy', 'green', 'coral', 'sky', 'sun', 'navy'];
     aspect-ratio: 4 / 3;
     object-fit: cover;
     border-radius: var(--radius-lg);
-    border: 6px solid rgb(255 255 255 / 12%);
+    border: 6px solid #fff;
+    box-shadow: var(--shadow);
   }
 
   .facilities {
