@@ -15,7 +15,7 @@ const mascot = image(site.mascot);
   <div class="container">
     <div class="site-footer__grid">
       <div class="site-footer__about">
-        <Logo inverted />
+        <Logo />
         <p>
           A Montessori-based preschool and day care helping children in Electronic City and Begur grow into
           confident, curious and kind learners.
@@ -102,18 +102,33 @@ const mascot = image(site.mascot);
 
 <style>
   .site-footer {
-    padding-block: 64px 28px;
-    background: var(--ink);
-    color: rgb(255 255 255 / 78%);
+    position: relative;
+    margin-top: 0;
+    padding-block: 56px 28px;
+    background: linear-gradient(160deg, var(--p-lavender) 0%, var(--p-sky) 55%, var(--p-mint) 100%);
+    color: var(--muted);
+  }
+
+  /* Wavy top edge */
+  .site-footer::before {
+    content: '';
+    position: absolute;
+    left: 0;
+    right: 0;
+    bottom: 100%;
+    height: 48px;
+    background: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 1440 48' preserveAspectRatio='none'%3E%3Cpath d='M0 48V22c120-18 240-18 360 0s240 18 360 0 240-18 360 0 240 18 360 0v26z' fill='%23f3efff'/%3E%3C/svg%3E")
+      no-repeat bottom / 100% 100%;
   }
 
   .site-footer a {
-    color: rgb(255 255 255 / 88%);
+    color: var(--ink);
     text-decoration: none;
   }
 
   .site-footer a:hover {
-    color: var(--sun);
+    color: var(--navy);
+    text-decoration: underline;
   }
 
   .site-footer__grid {
@@ -147,6 +162,14 @@ const mascot = image(site.mascot);
     margin-top: 24px;
     border-radius: 18px;
     background: #fff;
+    box-shadow: var(--shadow-sm);
+    animation: mascot-bob 6s ease-in-out infinite alternate;
+  }
+
+  @keyframes mascot-bob {
+    to {
+      transform: translateY(-6px) rotate(-2deg);
+    }
   }
 
   .site-footer__about p {
@@ -159,7 +182,7 @@ const mascot = image(site.mascot);
     font-size: 1rem;
     letter-spacing: 0.06em;
     text-transform: uppercase;
-    color: #fff;
+    color: var(--navy);
   }
 
   .site-footer__links,
@@ -189,7 +212,7 @@ const mascot = image(site.mascot);
   .site-footer__contact li > :global(svg) {
     flex: none;
     margin-top: 4px;
-    color: var(--sun);
+    color: #c2362c;
   }
 
   .site-footer__bottom {
@@ -199,7 +222,7 @@ const mascot = image(site.mascot);
     gap: 12px 24px;
     margin-top: 48px;
     padding-top: 24px;
-    border-top: 1px solid rgb(255 255 255 / 12%);
+    border-top: 1px solid rgb(20 48 127 / 12%);
     font-size: 0.92rem;
   }
 

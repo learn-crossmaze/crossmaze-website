@@ -37,7 +37,7 @@ const tones = ['navy', 'green', 'coral', 'sky', 'sun', 'navy'];
         {
           site.stats.map((s, i) => (
             <div class:list={['stat', `tone-${['sun', 'green', 'coral', 'sky'][i % 4]}`]}>
-              <strong>{s.value}</strong>
+              <strong data-countup>{s.value}</strong>
               <span>{s.label}</span>
             </div>
           ))
@@ -134,7 +134,7 @@ const tones = ['navy', 'green', 'coral', 'sky', 'sun', 'navy'];
     </div>
   </section>
 
-  <section class="section--tight section--navy">
+  <section class="section--tight section--feature">
     <div class="container cta">
       <div>
         <h2>See Crossmaze for yourself</h2>
@@ -142,7 +142,7 @@ const tones = ['navy', 'green', 'coral', 'sky', 'sun', 'navy'];
       </div>
       <div class="btn-row">
         <a class="btn btn--sun" href="/contact#enquire">Book a visit</a>
-        <a class="btn btn--white btn--ghost" href="/branch">Find a branch</a>
+        <a class="btn btn--ghost" href="/branch">Find a branch</a>
       </div>
     </div>
   </section>
@@ -288,7 +288,6 @@ const tones = ['navy', 'green', 'coral', 'sky', 'sun', 'navy'];
   }
 
   .cta h2 {
-    color: #fff;
     margin-bottom: 0.2em;
   }
 

@@ -13,9 +13,23 @@
   --green-50: #e2f4e3;
   --sky: #2f7ff0;
   --sky-50: #e2eefe;
-  --cream: #fff8ee;
+  --cream: #fffaf3;
   --paper: #ffffff;
   --line: #ece3d4;
+
+  /* Pastels: section backgrounds (light) and floating shapes (deeper). */
+  --p-pink: #fff0f5;
+  --p-lavender: #f3efff;
+  --p-mint: #e9f8f0;
+  --p-peach: #fff1e8;
+  --p-sky: #ebf4ff;
+  --p-butter: #fff8df;
+  --p-pink-2: #ffcfe1;
+  --p-lavender-2: #d9cdff;
+  --p-mint-2: #bdebd3;
+  --p-peach-2: #ffd2bd;
+  --p-sky-2: #c3defe;
+  --p-butter-2: #ffe59a;
 
   --font-display: 'Fredoka', 'Nunito', system-ui, sans-serif;
   --font-body: 'Nunito', system-ui, -apple-system, 'Segoe UI', sans-serif;
@@ -128,6 +142,13 @@ ul {
   }
 }
 
+/* Set by src/scripts/motion.ts until the element scrolls into view. */
+@media screen {
+  [data-reveal='pending'] {
+    opacity: 0;
+  }
+}
+
 .sr-only {
   position: absolute;
   width: 1px;
@@ -156,6 +177,124 @@ ul {
   color: #fff;
 }
 
+
+/* ---------- Pastel sections with floating shapes ----------
+   Every section in <main> gets the next pastel in a six-colour cycle and two softly drifting
+   shapes, so new pages and sections pick up the look automatically. */
+main > section {
+  position: relative;
+  isolation: isolate;
+  overflow: hidden;
+  background-color: var(--section-bg, transparent);
+}
+
+main > section > :not(.fx) {
+  position: relative;
+  z-index: 1;
+}
+
+main > section::before,
+main > section::after {
+  content: '';
+  position: absolute;
+  z-index: 0;
+  aspect-ratio: 1;
+  pointer-events: none;
+  background: no-repeat center / contain;
+  animation: cm-drift-a 19s ease-in-out infinite alternate;
+}
+
+main > section::before {
+  inset: var(--shape-1-at);
+  width: clamp(80px, 11vw, 150px);
+  background-image: var(--shape-1);
+}
+
+main > section::after {
+  inset: var(--shape-2-at);
+  width: clamp(70px, 9vw, 120px);
+  background-image: var(--shape-2);
+  animation-name: cm-drift-b;
+  animation-duration: 25s;
+  animation-delay: -6s;
+}
+
+main > section:nth-of-type(6n+1) {
+  --section-bg: var(--p-pink);
+  --shape-1: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Cpath d='M50 8l12 25 27 4-20 19 5 27-24-13-24 13 5-27-20-19 27-4z' fill='%23ffe59a' stroke='%23ffe59a' stroke-width='8' stroke-linejoin='round'/%3E%3C/svg%3E");
+  --shape-2: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Cpath d='M27 74h48a17 17 0 0 0 1-34 24 24 0 0 0-46-7 20 20 0 0 0-3 41z' fill='%23c3defe'/%3E%3C/svg%3E");
+  --shape-1-at: 8% auto auto -46px;
+  --shape-2-at: auto -34px 6% auto;
+}
+
+main > section:nth-of-type(6n+2) {
+  --section-bg: var(--p-lavender);
+  --shape-1: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Cg fill='%23ffcfe1'%3E%3Ccircle cx='50' cy='27' r='17'/%3E%3Ccircle cx='72' cy='43' r='17'/%3E%3Ccircle cx='64' cy='69' r='17'/%3E%3Ccircle cx='36' cy='69' r='17'/%3E%3Ccircle cx='28' cy='43' r='17'/%3E%3C/g%3E%3Ccircle cx='50' cy='50' r='12' fill='%23ffffff' fill-opacity='.65'/%3E%3C/svg%3E");
+  --shape-2: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Ccircle cx='50' cy='50' r='34' fill='none' stroke='%23bdebd3' stroke-width='12'/%3E%3C/svg%3E");
+  --shape-1-at: 10% -40px auto auto;
+  --shape-2-at: auto auto 8% -30px;
+}
+
+main > section:nth-of-type(6n+3) {
+  --section-bg: var(--p-mint);
+  --shape-1: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Cpath d='M50 4c5 27 19 41 46 46-27 5-41 19-46 46-5-27-19-41-46-46 27-5 41-19 46-46z' fill='%23d9cdff'/%3E%3C/svg%3E");
+  --shape-2: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Cpath d='M50 6c18 0 36 10 41 28s-2 40-18 50-40 12-56 0S2 52 8 34 32 6 50 6z' fill='%23ffe59a'/%3E%3C/svg%3E");
+  --shape-1-at: 6% auto auto -50px;
+  --shape-2-at: auto -40px 10% auto;
+}
+
+main > section:nth-of-type(6n+4) {
+  --section-bg: var(--p-peach);
+  --shape-1: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Cpath d='M27 74h48a17 17 0 0 0 1-34 24 24 0 0 0-46-7 20 20 0 0 0-3 41z' fill='%23d9cdff'/%3E%3C/svg%3E");
+  --shape-2: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Cpath d='M50 8l12 25 27 4-20 19 5 27-24-13-24 13 5-27-20-19 27-4z' fill='%23c3defe' stroke='%23c3defe' stroke-width='8' stroke-linejoin='round'/%3E%3C/svg%3E");
+  --shape-1-at: 7% -50px auto auto;
+  --shape-2-at: auto auto 6% -40px;
+}
+
+main > section:nth-of-type(6n+5) {
+  --section-bg: var(--p-sky);
+  --shape-1: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Cpath d='M8 56c10-18 21-18 31 0s21 18 31 0 21-18 31 0' fill='none' stroke='%23ffd2bd' stroke-width='10' stroke-linecap='round'/%3E%3C/svg%3E");
+  --shape-2: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Cg fill='%23ffe59a'%3E%3Ccircle cx='50' cy='27' r='17'/%3E%3Ccircle cx='72' cy='43' r='17'/%3E%3Ccircle cx='64' cy='69' r='17'/%3E%3Ccircle cx='36' cy='69' r='17'/%3E%3Ccircle cx='28' cy='43' r='17'/%3E%3C/g%3E%3Ccircle cx='50' cy='50' r='12' fill='%23ffffff' fill-opacity='.65'/%3E%3C/svg%3E");
+  --shape-1-at: 9% auto auto -60px;
+  --shape-2-at: auto -36px 7% auto;
+}
+
+main > section:nth-of-type(6n) {
+  --section-bg: var(--p-butter);
+  --shape-1: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Cpath d='M50 6c18 0 36 10 41 28s-2 40-18 50-40 12-56 0S2 52 8 34 32 6 50 6z' fill='%23bdebd3'/%3E%3C/svg%3E");
+  --shape-2: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Cpath d='M50 4c5 27 19 41 46 46-27 5-41 19-46 46-5-27-19-41-46-46 27-5 41-19 46-46z' fill='%23ffcfe1'/%3E%3C/svg%3E");
+  --shape-1-at: 5% -50px auto auto;
+  --shape-2-at: auto auto 9% -40px;
+}
+
+/* Banners have their own animated background (components/FloatingShapes.astro). */
+main > section.hero::before,
+main > section.hero::after,
+main > section.page-hero::before,
+main > section.page-hero::after,
+main > section.no-shapes::before,
+main > section.no-shapes::after {
+  content: none;
+}
+
+@keyframes cm-drift-a {
+  from {
+    transform: translate3d(0, 0, 0) rotate(0deg);
+  }
+  to {
+    transform: translate3d(28px, -22px, 0) rotate(14deg);
+  }
+}
+
+@keyframes cm-drift-b {
+  from {
+    transform: translate3d(0, 0, 0) rotate(0deg) scale(1);
+  }
+  to {
+    transform: translate3d(-26px, 18px, 0) rotate(-12deg) scale(1.08);
+  }
+}
+
 /* ---------- Layout ---------- */
 .container {
   width: 100%;
@@ -172,13 +311,9 @@ ul {
   padding-block: clamp(40px, 6vw, 72px);
 }
 
-.section--white {
-  background: var(--paper);
-}
-
-.section--navy {
-  background: var(--navy);
-  color: #fff;
+/* A soft multi-pastel panel for call-outs (day care, calls to action). */
+main > section.section--feature {
+  background: linear-gradient(120deg, var(--p-lavender) 0%, var(--p-sky) 45%, var(--p-mint) 100%);
 }
 
 .grid {
@@ -213,18 +348,13 @@ ul {
   font-size: 0.9rem;
   letter-spacing: 0.06em;
   text-transform: uppercase;
-  color: var(--coral);
+  color: #c2362c;
 }
 
 .lead {
   font-size: clamp(1.1rem, 1.6vw, 1.25rem);
   color: var(--muted);
   max-width: 62ch;
-}
-
-.section--navy .lead,
-.section--navy .eyebrow {
-  color: rgb(255 255 255 / 85%);
 }
 
 .muted {
@@ -386,10 +516,7 @@ ul {
   position: relative;
   overflow: hidden;
   padding-block: clamp(48px, 7vw, 88px) clamp(40px, 6vw, 72px);
-  background:
-    radial-gradient(circle at 92% 18%, var(--sun-50) 0 120px, transparent 121px),
-    radial-gradient(circle at 6% 92%, var(--green-50) 0 90px, transparent 91px),
-    var(--cream);
+  background: var(--cream);
 }
 
 .page-hero h1 {

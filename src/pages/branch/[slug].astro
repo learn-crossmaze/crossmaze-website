@@ -5,6 +5,7 @@ import SectionHeading from '../../components/SectionHeading.astro';
 import BranchCard from '../../components/BranchCard.astro';
 import EnquiryForm from '../../components/EnquiryForm.astro';
 import Icon from '../../components/Icon.astro';
+import FloatingShapes from '../../components/FloatingShapes.astro';
 import {
   branches,
   amenityList,
@@ -72,6 +73,7 @@ const jsonLd = {
   jsonLd={jsonLd}
 >
   <section class="page-hero branch-hero">
+    <FloatingShapes />
     <div class="container branch-hero__inner">
       <div>
         <nav aria-label="Breadcrumb">

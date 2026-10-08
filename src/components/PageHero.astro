@@ -1,4 +1,6 @@
 ---
+import FloatingShapes from './FloatingShapes.astro';
+
 interface Props {
   eyebrow?: string;
   title: string;
@@ -9,6 +11,7 @@ const { eyebrow, title, lead, crumbs = [] } = Astro.props;
 ---
 
 <section class="page-hero">
+  <FloatingShapes />
   <div class="container">
     {
       crumbs.length > 0 && (
