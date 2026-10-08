@@ -1,0 +1,73 @@
+# Builds and deploys the site to Firebase Hosting.
+#   - pushes to main and the admin panel's "Publish" button  -> the live site
+#   - pull requests                                            -> a temporary preview URL, posted as a PR comment
+# Before building, content and photos are pulled from the admin panel (Firestore + Storage).
+# Deploys are skipped until the FIREBASE_SERVICE_ACCOUNT_CROSSMAZE_WEBSITE secret is added.
+name: Firebase Hosting
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+  workflow_dispatch:
+
+concurrency:
+  group: firebase-hosting-${{ github.ref }}
+  cancel-in-progress: false
+
+permissions:
+  checks: write
+  contents: read
+  pull-requests: write
+
+jobs:
+  build-and-deploy:
+    runs-on: ubuntu-latest
+    env:
+      FIREBASE_SERVICE_ACCOUNT: ${{ secrets.FIREBASE_SERVICE_ACCOUNT_CROSSMAZE_WEBSITE }}
+      FIREBASE_STORAGE_BUCKET: ${{ vars.FIREBASE_STORAGE_BUCKET }}
+      ADMIN_EMAILS: ${{ vars.ADMIN_EMAILS }}
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+
+      - run: npm ci
+
+      - run: npm ci --prefix functions
+
+      - name: Test functions
+        run: npm test
+
+      - name: Pull content from the admin panel
+        if: env.FIREBASE_SERVICE_ACCOUNT != ''
+        run: node scripts/sync-content.mjs ${{ github.event_name != 'pull_request' && '--seed-if-empty' || '' }}
+
+      - run: npm run build
+        env:
+          PUBLIC_FORM_ENDPOINT: ${{ vars.PUBLIC_FORM_ENDPOINT }}
+          PUBLIC_ADMIN_GOOGLE_SIGNIN: ${{ vars.PUBLIC_ADMIN_GOOGLE_SIGNIN }}
+
+      - name: Deploy preview
+        if: github.event_name == 'pull_request' && env.FIREBASE_SERVICE_ACCOUNT != ''
+        uses: FirebaseExtended/action-hosting-deploy@v0
+        with:
+          repoToken: ${{ secrets.GITHUB_TOKEN }}
+          firebaseServiceAccount: ${{ secrets.FIREBASE_SERVICE_ACCOUNT_CROSSMAZE_WEBSITE }}
+          projectId: crossmaze-website
+
+      - name: Deploy live
+        if: github.event_name != 'pull_request' && env.FIREBASE_SERVICE_ACCOUNT != ''
+        uses: FirebaseExtended/action-hosting-deploy@v0
+        with:
+          repoToken: ${{ secrets.GITHUB_TOKEN }}
+          firebaseServiceAccount: ${{ secrets.FIREBASE_SERVICE_ACCOUNT_CROSSMAZE_WEBSITE }}
+          projectId: crossmaze-website
+          channelId: live
+
+      - name: Report result to the admin panel
+        if: always() && github.event_name != 'pull_request' && env.FIREBASE_SERVICE_ACCOUNT != ''
+        run: node scripts/report-publish.mjs ${{ job.status }}

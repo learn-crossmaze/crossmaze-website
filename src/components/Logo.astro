@@ -1,0 +1,45 @@
+---
+import { Image } from 'astro:assets';
+import { image } from '../data/content';
+import { site } from '../data/site';
+
+interface Props {
+  inverted?: boolean;
+}
+const { inverted = false } = Astro.props;
+const logo = image(site.logo);
+---
+
+<span class:list={['logo', { 'logo--inverted': inverted }]}>
+  <Image src={logo} alt={site.name} width={300} class="logo__img" loading="eager" />
+  <span class="logo__sub">Preschool &amp; Day Care</span>
+</span>
+
+<style>
+  .logo {
+    display: inline-grid;
+    gap: 3px;
+    justify-items: start;
+  }
+  .logo__img {
+    width: auto;
+    height: 34px;
+  }
+  .logo__sub {
+    padding-left: 6px;
+    font-size: 0.7rem;
+    font-weight: 800;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    color: var(--muted);
+    line-height: 1;
+  }
+  .logo--inverted .logo__sub {
+    color: rgb(255 255 255 / 70%);
+  }
+  @media (max-width: 400px) {
+    .logo__img {
+      height: 28px;
+    }
+  }
+</style>

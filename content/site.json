@@ -1,0 +1,123 @@
+{
+  "name": "Crossmaze",
+  "fullName": "Crossmaze Preschool and Day Care",
+  "legalName": "Crossmaze Education India Pvt. Ltd.",
+  "tagline": "A safe place to grow and learn",
+  "description": "Crossmaze Preschool and Day Care, Bengaluru: Montessori-based Play Group, Nursery, Junior KG, Senior KG and Day Care at five centres in Electronic City and Begur, with live CCTV, a parent app and in-house transport.",
+  "url": "https://www.crossmaze.in",
+  "logo": "brand/logo.png",
+  "mascot": "brand/mascot.png",
+  "phone": "+91 72040 21508",
+  "whatsapp": "917204021508",
+  "admissionsEmail": "admission@crossmaze.in",
+  "careEmail": "care@crossmaze.in",
+  "careersEmail": "admin@crossmaze.in",
+  "address": [
+    "Crossmaze Preschool and Day Care – The Hub",
+    "In front of SNN Raj Serenity, Suraksha Nagar",
+    "Yelenahalli, Begur, Bengaluru, Karnataka 560068"
+  ],
+  "addressPincode": "560068",
+  "hours": {
+    "preschool": "9:00 am – 12:30 pm",
+    "daycare": "9:00 am – 6:00 pm"
+  },
+  "hero": {
+    "titleStart": "A safe place to",
+    "titleHighlight": "grow and learn",
+    "lead": "A secure, caring and nurturing space where children thrive and learn at their own pace, with a Montessori-based approach at five centres across Electronic City and Begur.",
+    "photos": [
+      {
+        "image": "branches/crossmaze-neotown/02.jpg",
+        "alt": "A bright Crossmaze classroom with a 'smallest stars shine bright' mural"
+      },
+      {
+        "image": "photos/yoga.jpg",
+        "alt": "Children doing yoga together at Crossmaze"
+      },
+      {
+        "image": "photos/annual-day-bees.jpg",
+        "alt": "Children dressed as bees at the Crossmaze annual day"
+      }
+    ],
+    "badgeValue": "1000+",
+    "badgeLabel": "happy children"
+  },
+  "promise": "Crossmaze offers a secure, caring, and nurturing space for children to thrive and learn at their own pace. Our inclusive learning center is dedicated to fostering positive connections among children, parents, and staff. We are deeply committed to creating a safe and supportive environment where every child is cherished and respected.",
+  "about": [
+    "Crossmaze is an interactive education place where children learn to excel along with the choice of their preferences. Children under the age of 5 have a strong visual understanding, so a practical approach suits them best, and visual learning is everlasting. We understand that each kid is special, and with a wide range of activities and learning material we lay a strong foundation for each child.",
+    "Our learning and education program is designed to eliminate the achievement gap and encourage every student to become equally successful. Good pre-schooling is the first milestone in the development and growth of children, and a strong, positive self-image is the best possible preparation for success.",
+    "At Crossmaze, activities are designed to give children opportunities to develop confidence and a positive image of themselves. Continuous motivation from teachers helps our students build a positive self-image, which in turn makes them confident individuals."
+  ],
+  "aboutPhoto": {
+    "image": "photos/teacher-flashcards.jpg",
+    "alt": "A Crossmaze teacher using letter cards with a group of children"
+  },
+  "quote": {
+    "text": "Good moral values are mostly molded from a place where love, faith and hope exist.",
+    "author": "Arsenio V. Manalo Jr."
+  },
+  "stats": [
+    {
+      "value": "1000+",
+      "label": "happy children"
+    },
+    {
+      "value": "2000+",
+      "label": "happy parents"
+    },
+    {
+      "value": "100+",
+      "label": "passionate individuals"
+    },
+    {
+      "value": "6+ years",
+      "label": "of childcare"
+    }
+  ],
+  "daycarePhoto": {
+    "image": "photos/nap-room.jpg",
+    "alt": "Air-conditioned nap room with child-sized cots"
+  },
+  "moments": [
+    {
+      "image": "photos/dance-umbrella.jpg",
+      "alt": "A child dancing with an umbrella on stage at the Crossmaze annual day"
+    },
+    {
+      "image": "photos/annual-day-fairies.jpg",
+      "alt": "Children dressed as fairies and flowers at the annual day"
+    },
+    {
+      "image": "photos/dance-solo.jpg",
+      "alt": "A child performing a classical dance"
+    },
+    {
+      "image": "photos/annual-day-bears.jpg",
+      "alt": "Children in bear costumes performing on stage"
+    },
+    {
+      "image": "photos/annual-day-bees.jpg",
+      "alt": "Children dressed as bees at the annual day"
+    }
+  ],
+  "founders": [
+    "Manushree Chaturvedi",
+    "Abhishek Jain"
+  ],
+  "foundedYear": 2018,
+  "social": [
+    {
+      "label": "Facebook",
+      "href": "https://www.facebook.com/crossmaze.care"
+    },
+    {
+      "label": "Instagram",
+      "href": "https://www.instagram.com/crossmaze.in/"
+    },
+    {
+      "label": "LinkedIn",
+      "href": "https://www.linkedin.com/company/crossmaze-education/"
+    }
+  ]
+}

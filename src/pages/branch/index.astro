@@ -1,0 +1,72 @@
+---
+import BaseLayout from '../../layouts/BaseLayout.astro';
+import PageHero from '../../components/PageHero.astro';
+import BranchCard from '../../components/BranchCard.astro';
+import Icon from '../../components/Icon.astro';
+import { branches, facilities } from '../../data/branches';
+---
+
+<BaseLayout
+  title="Our Branches"
+  description="Find your nearest Crossmaze Preschool and Day Care: The Hub in Begur, and Neotown, SNN Greenbay, Neeladri Nagar and Ananth Nagar in Electronic City, Bengaluru."
+>
+  <PageHero
+    eyebrow="Our branches"
+    title="Five centres, one Crossmaze family"
+    lead="Every centre follows the same curriculum, safety standards and caring approach, so your child gets the Crossmaze experience wherever you are."
+    crumbs={[{ label: 'Branches' }]}
+  />
+
+  <section class="section section--white">
+    <div class="container">
+      <div class="grid grid--3">
+        {branches.map((b, i) => <BranchCard branch={b} index={i} />)}
+      </div>
+    </div>
+  </section>
+
+  <section class="section--tight">
+    <div class="container">
+      <h2 class="amen-title">Our facilities</h2>
+      <ul class="amen">
+        {
+          facilities.map((f) => (
+            <li>
+              <span class="icon-badge">
+                <Icon name={f.icon} size={22} />
+              </span>
+              {f.title}
+            </li>
+          ))
+        }
+      </ul>
+    </div>
+  </section>
+</BaseLayout>
+
+<style>
+  .amen-title {
+    font-size: 1.6rem;
+  }
+  .amen {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(min(100%, 220px), 1fr));
+    gap: 12px;
+    margin: 24px 0 0;
+    padding: 0;
+    list-style: none;
+  }
+  .amen li {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    font-weight: 700;
+  }
+  .amen .icon-badge {
+    margin: 0;
+    width: 44px;
+    height: 44px;
+    border-radius: 12px;
+    background: var(--paper);
+  }
+</style>

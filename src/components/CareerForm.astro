@@ -1,0 +1,84 @@
+---
+import { branches, shortName } from '../data/branches';
+import { jobs } from '../data/jobs';
+import { site } from '../data/site';
+---
+
+<form
+  class="form"
+  data-cm-form
+  data-form-type="job_application"
+  data-subject="Job application – Crossmaze website"
+  data-mailto={site.careersEmail}
+  data-success="Thank you for applying! Our team will review your profile and get in touch."
+  novalidate
+>
+  <div class="form-row">
+    <div class="field">
+      <label for="job-name">Full name</label>
+      <input id="job-name" name="name" autocomplete="name" required />
+    </div>
+    <div class="field">
+      <label for="job-phone">Phone number</label>
+      <input id="job-phone" name="phone" type="tel" inputmode="tel" autocomplete="tel" pattern="[0-9 +\-]{10,16}" required />
+    </div>
+  </div>
+  <div class="form-row">
+    <div class="field">
+      <label for="job-email">Email</label>
+      <input id="job-email" name="email" type="email" autocomplete="email" required />
+    </div>
+    <div class="field">
+      <label for="job-role">Position</label>
+      <select id="job-role" name="position" required>
+        <option value="">Choose a position</option>
+        {jobs.map((j) => <option value={j.title}>{j.title}</option>)}
+        <option value="Other">Other</option>
+      </select>
+    </div>
+  </div>
+  <div class="form-row">
+    <div class="field">
+      <label for="job-branch">Preferred branch</label>
+      <select id="job-branch" name="branch">
+        <option value="Any branch">Any branch</option>
+        {branches.map((b) => <option value={b.name}>{shortName(b)}</option>)}
+      </select>
+    </div>
+    <div class="field">
+      <label for="job-exp">Experience</label>
+      <select id="job-exp" name="experience" required>
+        <option value="">Select</option>
+        <option>Fresher</option>
+        <option>Less than 1 year</option>
+        <option>1 – 3 years</option>
+        <option>3 – 5 years</option>
+        <option>More than 5 years</option>
+      </select>
+    </div>
+  </div>
+  <div class="field">
+    <label for="job-qual">Highest qualification and certifications</label>
+    <input id="job-qual" name="qualification" placeholder="e.g. B.Com, Diploma in ECCE" required />
+  </div>
+  <div class="field">
+    <label for="job-resume">Link to your resume <span class="hint">(Google Drive, Dropbox, LinkedIn…)</span></label>
+    <input id="job-resume" name="resume_link" type="url" inputmode="url" placeholder="https://" />
+  </div>
+  <div class="field">
+    <label for="job-about">Tell us a little about yourself <span class="hint">(optional)</span></label>
+    <textarea id="job-about" name="about" rows="4"></textarea>
+  </div>
+  <input type="text" name="_gotcha" tabindex="-1" autocomplete="off" class="sr-only" aria-hidden="true" />
+  <p class="form-status" role="status" tabindex="-1" hidden></p>
+  <div class="btn-row">
+    <button class="btn" type="submit">Submit application</button>
+  </div>
+  <p class="form-note">
+    You can also email your resume to <a href={`mailto:${site.careersEmail}`}>{site.careersEmail}</a>.
+  </p>
+</form>
+
+<script>
+  import '../scripts/forms';
+</script>

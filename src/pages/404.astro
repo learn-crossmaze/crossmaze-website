@@ -1,0 +1,41 @@
+---
+import BaseLayout from '../layouts/BaseLayout.astro';
+import { Image } from 'astro:assets';
+import { image } from '../data/content';
+import { site } from '../data/site';
+
+const mascot = image(site.mascot);
+---
+
+<BaseLayout title="Page not found">
+  <section class="section">
+    <div class="container notfound">
+      <Image src={mascot} alt="" width={200} class="notfound__mascot" />
+      <h1>Oops, this path leads nowhere</h1>
+      <p class="lead">Even the best mazes have dead ends. Let’s get you back on track.</p>
+      <div class="btn-row">
+        <a class="btn" href="/">Go to home page</a>
+        <a class="btn btn--ghost" href="/our-programs">Our programs</a>
+        <a class="btn btn--ghost" href="/branch">Find a branch</a>
+      </div>
+    </div>
+  </section>
+</BaseLayout>
+
+<style>
+  .notfound {
+    display: grid;
+    justify-items: center;
+    text-align: center;
+    min-height: 50vh;
+    align-content: center;
+  }
+  .notfound :global(.notfound__mascot) {
+    width: 180px;
+    height: auto;
+    margin-bottom: 16px;
+  }
+  .notfound .btn-row {
+    justify-content: center;
+  }
+</style>

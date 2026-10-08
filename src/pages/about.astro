@@ -1,0 +1,298 @@
+---
+import { Image } from 'astro:assets';
+import BaseLayout from '../layouts/BaseLayout.astro';
+import PageHero from '../components/PageHero.astro';
+import SectionHeading from '../components/SectionHeading.astro';
+import Icon from '../components/Icon.astro';
+import { site, coreValues } from '../data/site';
+import { approach } from '../data/programs';
+import { image } from '../data/content';
+
+const moments = site.moments.map((m) => ({ src: image(m.image), alt: m.alt }));
+const tones = ['navy', 'green', 'coral', 'sky', 'sun', 'navy'];
+---
+
+<BaseLayout
+  title="About Us"
+  description="About Crossmaze Preschool and Day Care, Bengaluru: an interactive, Montessori-based preschool where every child is special. Our story, core values and approach."
+>
+  <PageHero
+    eyebrow="About Crossmaze"
+    title="An interactive place where every child can excel"
+    lead={site.promise}
+    crumbs={[{ label: 'About' }]}
+  />
+
+  <section class="section section--white">
+    <div class="container story">
+      <div>
+        <SectionHeading eyebrow="Who we are" title="Every child is special" />
+        {site.about.map((p) => <p>{p}</p>)}
+        <blockquote class="story__quote">
+          “{site.quote.text}”
+          <cite>{site.quote.author}</cite>
+        </blockquote>
+      </div>
+      <aside class="story__stats">
+        {
+          site.stats.map((s, i) => (
+            <div class:list={['stat', `tone-${['sun', 'green', 'coral', 'sky'][i % 4]}`]}>
+              <strong>{s.value}</strong>
+              <span>{s.label}</span>
+            </div>
+          ))
+        }
+      </aside>
+    </div>
+  </section>
+
+  <section class="section">
+    <div class="container">
+      <SectionHeading
+        eyebrow="Our core values"
+        title="More than guiding principles"
+        lead="Our core values are the foundation of our commitment to excellence in early childhood education, and they shape our daily practices, our learning environment and how we work with children, parents and the community."
+        align="center"
+      />
+      <div class="grid grid--3">
+        {
+          coreValues.map((v, i) => (
+            <div class:list={['card', `tone-${tones[i % tones.length]}`]}>
+              <span class="icon-badge">
+                <Icon name={v.icon} size={26} />
+              </span>
+              <h3>{v.title}</h3>
+              <p class="muted">{v.text}</p>
+            </div>
+          ))
+        }
+      </div>
+    </div>
+  </section>
+
+  <section class="section section--white">
+    <div class="container">
+      <SectionHeading
+        eyebrow="Our approach"
+        title="How children learn at Crossmaze"
+        lead="Our Foundational Development Program uses a Montessori-based, thematic approach to build the skills children need for school and for life."
+      />
+      <div class="grid grid--2">
+        {
+          approach.map((a) => (
+            <div class="approach">
+              <span class="icon-badge">
+                <Icon name={a.icon} size={26} />
+              </span>
+              <div>
+                <h3>{a.title}</h3>
+                <p class="muted">{a.text}</p>
+              </div>
+            </div>
+          ))
+        }
+      </div>
+    </div>
+  </section>
+
+  <section class="section">
+    <div class="container">
+      <SectionHeading eyebrow="Life at Crossmaze" title="Moments that build confidence" align="center" />
+      <ul class="moments">
+        {
+          moments.map((m) => (
+            <li>
+              <Image src={m.src} alt={m.alt} widths={[300, 500]} sizes="(max-width: 700px) 50vw, 240px" />
+            </li>
+          ))
+        }
+      </ul>
+    </div>
+  </section>
+
+  <section class="section section--white">
+    <div class="container founders">
+      <SectionHeading eyebrow="Leadership" title="Our founders" />
+      <div class="grid grid--2">
+        {
+          site.founders.map((name) => (
+            <div class="card founder">
+              <span class="founder__avatar" aria-hidden="true">
+                {name
+                  .split(' ')
+                  .map((n) => n[0])
+                  .join('')}
+              </span>
+              <div>
+                <h3>{name}</h3>
+                <p class="muted">Co-founder, {site.legalName}</p>
+              </div>
+            </div>
+          ))
+        }
+      </div>
+    </div>
+  </section>
+
+  <section class="section--tight section--navy">
+    <div class="container cta">
+      <div>
+        <h2>See Crossmaze for yourself</h2>
+        <p class="lead">Visit your nearest centre and meet our team.</p>
+      </div>
+      <div class="btn-row">
+        <a class="btn btn--sun" href="/contact#enquire">Book a visit</a>
+        <a class="btn btn--white btn--ghost" href="/branch">Find a branch</a>
+      </div>
+    </div>
+  </section>
+</BaseLayout>
+
+<style>
+  .story {
+    display: grid;
+    grid-template-columns: 1.3fr 0.7fr;
+    gap: clamp(32px, 5vw, 72px);
+    align-items: center;
+  }
+
+  @media (max-width: 860px) {
+    .story {
+      grid-template-columns: 1fr;
+    }
+  }
+
+  .story p {
+    color: var(--muted);
+    max-width: 65ch;
+  }
+
+  .story__quote {
+    margin: 28px 0 0;
+    padding: 20px 24px;
+    border-left: 5px solid var(--sun);
+    border-radius: 0 var(--radius) var(--radius) 0;
+    background: var(--cream);
+    font-family: var(--font-display);
+    font-size: 1.2rem;
+    line-height: 1.4;
+  }
+
+  .story__quote cite {
+    display: block;
+    margin-top: 8px;
+    font-family: var(--font-body);
+    font-size: 0.9rem;
+    font-style: normal;
+    color: var(--muted);
+  }
+
+  .story__stats {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 16px;
+  }
+
+  .stat {
+    display: grid;
+    padding: 24px 20px;
+    border-radius: var(--radius);
+    background: var(--badge-bg);
+  }
+
+  .stat strong {
+    font-family: var(--font-display);
+    font-size: clamp(1.6rem, 3vw, 2.2rem);
+    font-weight: 600;
+    line-height: 1.1;
+    color: var(--badge-fg);
+  }
+
+  .stat span {
+    font-weight: 700;
+    font-size: 0.95rem;
+  }
+
+  .approach {
+    display: flex;
+    gap: 18px;
+  }
+
+  .approach .icon-badge {
+    flex: none;
+    margin: 0;
+  }
+
+  .moments {
+    display: grid;
+    grid-template-columns: repeat(5, 1fr);
+    gap: 14px;
+    margin: 0;
+    padding: 0;
+    list-style: none;
+  }
+
+  @media (max-width: 860px) {
+    .moments {
+      grid-template-columns: repeat(2, 1fr);
+    }
+    .moments li:first-child {
+      grid-column: 1 / -1;
+    }
+  }
+
+  .moments :global(img) {
+    width: 100%;
+    height: 100%;
+    aspect-ratio: 3 / 4;
+    object-fit: cover;
+    border-radius: var(--radius);
+  }
+
+  @media (max-width: 860px) {
+    .moments li:first-child :global(img) {
+      aspect-ratio: 16 / 10;
+    }
+  }
+
+  .founder {
+    display: flex;
+    align-items: center;
+    gap: 20px;
+  }
+
+  .founder__avatar {
+    display: grid;
+    place-items: center;
+    flex: none;
+    width: 76px;
+    height: 76px;
+    border-radius: 50%;
+    background: var(--navy);
+    color: var(--sun);
+    font-family: var(--font-display);
+    font-size: 1.6rem;
+    font-weight: 600;
+  }
+
+  .founder p {
+    margin: 0;
+  }
+
+  .cta {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    justify-content: space-between;
+    gap: 24px;
+  }
+
+  .cta h2 {
+    color: #fff;
+    margin-bottom: 0.2em;
+  }
+
+  .cta .lead {
+    margin: 0;
+  }
+</style>

@@ -1,0 +1,601 @@
+---
+import { Image, getImage } from 'astro:assets';
+import BaseLayout from '../../layouts/BaseLayout.astro';
+import SectionHeading from '../../components/SectionHeading.astro';
+import BranchCard from '../../components/BranchCard.astro';
+import EnquiryForm from '../../components/EnquiryForm.astro';
+import Icon from '../../components/Icon.astro';
+import {
+  branches,
+  amenityList,
+  branchPhotos,
+  headPhoto,
+  shortName as toShortName,
+  telHref,
+  type Branch,
+} from '../../data/branches';
+import { programs } from '../../data/programs';
+import { site } from '../../data/site';
+
+export function getStaticPaths() {
+  return branches.map((branch) => ({ params: { slug: branch.slug }, props: { branch } }));
+}
+
+interface Props {
+  branch: Branch;
+}
+
+const { branch } = Astro.props;
+const shortName = toShortName(branch);
+const offered = programs.filter((p) => branch.programs.includes(p.slug));
+const others = branches.filter((b) => b.slug !== branch.slug);
+const photos = branchPhotos(branch.slug);
+// The cover photo sits in the hero; the next five fill the gallery's 2×2 + 4 grid.
+const [cover, ...rest] = photos;
+const gallery = rest.slice(0, 5);
+const fullSize = await Promise.all(photos.map((p) => getImage({ src: p, width: 1600, format: 'webp' })));
+const head = headPhoto(branch.slug);
+const mapSrc = `https://www.google.com/maps?q=${encodeURIComponent(branch.mapQuery)}&output=embed`;
+const directions = `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(branch.mapQuery)}`;
+
+const facts = [
+  branch.carpetArea && { icon: 'Ruler', label: 'Carpet area', value: branch.carpetArea },
+  branch.capacity && { icon: 'Users', label: 'Capacity', value: `${branch.capacity} children` },
+  branch.centerHead && { icon: 'UserRound', label: 'Centre head', value: branch.centerHead.name },
+  { icon: 'Clock', label: 'Preschool', value: site.hours.preschool },
+  { icon: 'Sun', label: 'Day care', value: site.hours.daycare },
+].filter(Boolean) as { icon: string; label: string; value: string }[];
+
+const jsonLd = {
+  '@context': 'https://schema.org',
+  '@type': 'Preschool',
+  name: branch.name,
+  url: new URL(`/branch/${branch.slug}`, site.url).href,
+  telephone: branch.phone,
+  email: branch.email,
+  ...(cover ? { image: new URL(fullSize[0]!.src, site.url).href } : {}),
+  parentOrganization: { '@type': 'Organization', name: site.fullName, url: site.url },
+  address: {
+    '@type': 'PostalAddress',
+    streetAddress: branch.address.slice(0, -1).join(', '),
+    addressLocality: 'Bengaluru',
+    addressRegion: 'Karnataka',
+    postalCode: branch.pincode,
+    addressCountry: 'IN',
+  },
+};
+---
+
+<BaseLayout
+  title={`${shortName} Branch`}
+  description={`${branch.name}: preschool and day care in ${branch.area}, Bengaluru ${branch.pincode}. Play Group, Nursery, Junior KG, Senior KG and Day Care.`}
+  jsonLd={jsonLd}
+>
+  <section class="page-hero branch-hero">
+    <div class="container branch-hero__inner">
+      <div>
+        <nav aria-label="Breadcrumb">
+          <ol class="breadcrumbs">
+            <li><a href="/">Home</a></li>
+            <li><a href="/branch">Branches</a></li>
+            <li><span aria-current="page">{shortName}</span></li>
+          </ol>
+        </nav>
+        <span class="eyebrow">{branch.area} · {branch.pincode}</span>
+        <h1>{branch.name}</h1>
+        <p class="lead">{branch.intro}</p>
+        <div class="btn-row">
+          <a class="btn btn--sun" href="#enquire">Book a visit</a>
+          <a class="btn btn--ghost" href={telHref(branch.phone)}><Icon name="Phone" size={18} /> {branch.phone}</a>
+          <a class="btn btn--ghost" href={directions} target="_blank" rel="noopener">
+            <Icon name="Navigation" size={18} /> Directions
+          </a>
+        </div>
+      </div>
+      {
+        cover && (
+          <Image
+            class="branch-hero__photo"
+            src={cover}
+            alt={`Inside ${branch.name}`}
+            widths={[480, 720, 1000]}
+            sizes="(max-width: 900px) 100vw, 560px"
+            loading="eager"
+          />
+        )
+      }
+    </div>
+  </section>
+
+  <section class="section--tight section--white">
+    <div class="container">
+      <ul class="facts">
+        {
+          facts.map((f) => (
+            <li>
+              <span class="icon-badge">
+                <Icon name={f.icon} size={22} />
+              </span>
+              <span>
+                <span class="facts__label">{f.label}</span>
+                <strong>{f.value}</strong>
+              </span>
+            </li>
+          ))
+        }
+      </ul>
+    </div>
+  </section>
+
+  <section class="section">
+    <div class="container about">
+      <div>
+        <SectionHeading eyebrow="About this centre" title={`Welcome to ${shortName}`} />
+        {branch.description.map((p) => <p class="muted">{p}</p>)}
+      </div>
+      <div class="card about__amenities">
+        <h3>Amenities</h3>
+        <ul class="amen">
+          {
+            branch.amenities.map((key) => (
+              <li>
+                <Icon name={amenityList[key].icon} size={20} />
+                {amenityList[key].label}
+              </li>
+            ))
+          }
+        </ul>
+      </div>
+    </div>
+  </section>
+
+  {
+    gallery.length > 0 && (
+      <section class="section section--white" aria-labelledby="gallery-title">
+        <div class="container">
+          <SectionHeading eyebrow="Gallery" title="Take a look inside" id="gallery-title" />
+          <ul class="gallery">
+            {gallery.map((photo, i) => (
+              <li>
+                <a href={fullSize[i + 1]!.src} target="_blank" rel="noopener">
+                  <Image
+                    src={photo}
+                    alt={`${branch.name} – photo ${i + 2}`}
+                    widths={[360, 600, 900]}
+                    sizes={i === 0 ? '(max-width: 700px) 100vw, 580px' : '(max-width: 700px) 50vw, 290px'}
+                  />
+                </a>
+              </li>
+            ))}
+          </ul>
+        </div>
+      </section>
+    )
+  }
+
+  {
+    branch.centerHead && (
+      <section class="section">
+        <div class="container">
+          <div class="card head">
+            {head ? (
+              <Image class="head__photo" src={head} alt={`${branch.centerHead.name}, Centre Head`} width={240} height={240} />
+            ) : (
+              <span class="head__photo head__photo--initials" aria-hidden="true">
+                {branch.centerHead.name.replace(/^(Mrs?s?\.|Dr\.)\s*/, '').split(' ').map((n) => n[0]).join('')}
+              </span>
+            )}
+            <div>
+              <span class="eyebrow">Know our centre head</span>
+              <h2>{branch.centerHead.name}</h2>
+              <p>{branch.centerHead.bio[0]}</p>
+              {branch.centerHead.bio.length > 1 && (
+                <details class="head__more">
+                  <summary>
+                    Read more <Icon name="ChevronDown" size={18} />
+                  </summary>
+                  {branch.centerHead.bio.slice(1).map((p) => (
+                    <p>{p}</p>
+                  ))}
+                </details>
+              )}
+            </div>
+          </div>
+        </div>
+      </section>
+    )
+  }
+
+  <section class="section section--white">
+    <div class="container location">
+      <div class="card location__card">
+        <h2>Visit us</h2>
+        <address>
+          <Icon name="MapPin" size={22} />
+          <span>
+            {branch.address.map((line) => <>{line}<br /></>)}
+            {branch.pincode}
+          </span>
+        </address>
+        <p>
+          <Icon name="Phone" size={20} />
+          <a href={telHref(branch.phone)}>{branch.phone}</a>
+        </p>
+        <p>
+          <Icon name="Mail" size={20} />
+          <a href={`mailto:${branch.email}`}>{branch.email}</a>
+        </p>
+        <a class="btn btn--sm" href={directions} target="_blank" rel="noopener">Open in Google Maps</a>
+      </div>
+      <div class="location__map">
+        <iframe
+          title={`Map showing ${branch.name}`}
+          src={mapSrc}
+          loading="lazy"
+          referrerpolicy="no-referrer-when-downgrade"
+          allowfullscreen></iframe>
+      </div>
+    </div>
+  </section>
+
+  <section class="section">
+    <div class="container">
+      <SectionHeading eyebrow={`At ${shortName}`} title="Programs at this branch" />
+      <div class="offered">
+        {
+          offered.map((p) => (
+            <a class:list={['offered__item', 'card', `tone-${p.color}`]} href={`/our-programs#${p.slug}`}>
+              <span class="icon-badge">
+                <Icon name={p.icon} size={24} />
+              </span>
+              <span>
+                <strong>{p.name}</strong>
+                <span class="muted">{p.ages}</span>
+              </span>
+            </a>
+          ))
+        }
+      </div>
+    </div>
+  </section>
+
+  <section class="section section--white" id="enquire">
+    <div class="container enquire">
+      <div>
+        <span class="eyebrow">Admissions open</span>
+        <h2>Book a visit to {shortName}</h2>
+        <p class="lead">
+          Leave your details and the {shortName} team will call you to arrange a visit at a time that suits you.
+        </p>
+      </div>
+      <div class="card enquire__form">
+        <EnquiryForm branch={branch.slug} id={`enquiry-${branch.slug}`} />
+      </div>
+    </div>
+  </section>
+
+  <section class="section">
+    <div class="container">
+      <SectionHeading eyebrow="More centres" title="Other Crossmaze branches" />
+      <div class="grid grid--4">
+        {others.map((b, i) => <BranchCard branch={b} index={i + 1} />)}
+      </div>
+    </div>
+  </section>
+</BaseLayout>
+
+<style>
+  .branch-hero__inner {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: clamp(28px, 5vw, 64px);
+    align-items: center;
+  }
+
+  @media (max-width: 900px) {
+    .branch-hero__inner {
+      grid-template-columns: 1fr;
+    }
+  }
+
+  .branch-hero h1 {
+    max-width: 16ch;
+  }
+
+  .branch-hero .btn-row {
+    margin-top: 28px;
+  }
+
+  .branch-hero :global(.branch-hero__photo) {
+    width: 100%;
+    height: auto;
+    aspect-ratio: 4 / 3;
+    object-fit: cover;
+    border-radius: var(--radius-lg);
+    border: 6px solid #fff;
+    box-shadow: var(--shadow);
+  }
+
+  .facts {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(min(100%, 200px), 1fr));
+    gap: 20px;
+    margin: 0;
+    padding: 0;
+    list-style: none;
+  }
+
+  .facts li {
+    display: flex;
+    align-items: center;
+    gap: 14px;
+  }
+
+  .facts .icon-badge {
+    margin: 0;
+    flex: none;
+  }
+
+  @media (max-width: 640px) {
+    .facts {
+      grid-template-columns: 1fr 1fr;
+      gap: 24px 16px;
+    }
+    .facts li {
+      flex-direction: column;
+      align-items: flex-start;
+      gap: 10px;
+    }
+  }
+
+  .facts__label {
+    display: block;
+    font-size: 0.85rem;
+    color: var(--muted);
+  }
+
+  .about {
+    display: grid;
+    grid-template-columns: 1.3fr 0.7fr;
+    gap: clamp(28px, 5vw, 64px);
+    align-items: start;
+  }
+
+  @media (max-width: 900px) {
+    .about {
+      grid-template-columns: 1fr;
+    }
+  }
+
+  .about p {
+    max-width: 68ch;
+  }
+
+  .about__amenities h3 {
+    margin-bottom: 16px;
+  }
+
+  .amen {
+    display: grid;
+    gap: 12px;
+    margin: 0;
+    padding: 0;
+    list-style: none;
+    font-weight: 700;
+  }
+
+  .amen li {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+  }
+
+  .amen :global(svg) {
+    flex: none;
+    color: var(--green);
+  }
+
+  .gallery {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    grid-auto-rows: 180px;
+    gap: 12px;
+    margin: 0;
+    padding: 0;
+    list-style: none;
+  }
+
+  .gallery li:first-child {
+    grid-column: span 2;
+    grid-row: span 2;
+  }
+
+  @media (max-width: 700px) {
+    .gallery {
+      grid-template-columns: 1fr 1fr;
+      grid-auto-rows: 130px;
+    }
+  }
+
+  .gallery a {
+    display: block;
+    height: 100%;
+    border-radius: var(--radius);
+    overflow: hidden;
+  }
+
+  .gallery :global(img) {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    transition: transform 0.3s ease;
+  }
+
+  .gallery a:hover :global(img) {
+    transform: scale(1.04);
+  }
+
+  .head {
+    display: grid;
+    grid-template-columns: 220px 1fr;
+    gap: clamp(24px, 4vw, 48px);
+    align-items: start;
+    padding: clamp(24px, 4vw, 40px);
+  }
+
+  @media (max-width: 700px) {
+    .head {
+      grid-template-columns: 1fr;
+    }
+  }
+
+  .head :global(.head__photo) {
+    width: 220px;
+    height: 220px;
+    border-radius: 50%;
+    object-fit: cover;
+    border: 6px solid var(--sun-50);
+  }
+
+  @media (max-width: 700px) {
+    .head :global(.head__photo) {
+      width: 160px;
+      height: 160px;
+    }
+  }
+
+  .head__photo--initials {
+    display: grid;
+    place-items: center;
+    background: var(--navy);
+    color: var(--sun);
+    font-family: var(--font-display);
+    font-size: 3rem;
+  }
+
+  .head h2 {
+    font-size: clamp(1.6rem, 3vw, 2.1rem);
+  }
+
+  .head p {
+    color: var(--muted);
+    max-width: 70ch;
+  }
+
+  .head__more summary {
+    display: inline-flex;
+    align-items: center;
+    gap: 4px;
+    font-weight: 800;
+    color: var(--navy);
+    cursor: pointer;
+    list-style: none;
+  }
+
+  .head__more summary::-webkit-details-marker {
+    display: none;
+  }
+
+  .head__more[open] summary {
+    margin-bottom: 1em;
+  }
+
+  .head__more[open] summary :global(svg) {
+    transform: rotate(180deg);
+  }
+
+  .location {
+    display: grid;
+    grid-template-columns: 0.8fr 1.2fr;
+    gap: 24px;
+    align-items: stretch;
+  }
+
+  @media (max-width: 860px) {
+    .location {
+      grid-template-columns: 1fr;
+    }
+  }
+
+  .location__card address,
+  .location__card p {
+    display: flex;
+    gap: 12px;
+    align-items: flex-start;
+    font-style: normal;
+    margin: 0 0 16px;
+  }
+
+  .location__card :global(svg) {
+    flex: none;
+    margin-top: 3px;
+    color: var(--coral);
+  }
+
+  .location__card .btn {
+    margin-top: 8px;
+  }
+
+  .location__map {
+    min-height: 340px;
+    border-radius: var(--radius);
+    overflow: hidden;
+    border: 1px solid var(--line);
+    background: var(--navy-50);
+  }
+
+  .location__map iframe {
+    width: 100%;
+    height: 100%;
+    min-height: 340px;
+    border: 0;
+  }
+
+  .offered {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(min(100%, 200px), 1fr));
+    gap: 16px;
+  }
+
+  .offered__item {
+    display: flex;
+    align-items: center;
+    gap: 14px;
+    padding: 18px;
+    color: inherit;
+    text-decoration: none;
+    transition: transform 0.15s ease;
+  }
+
+  .offered__item:hover {
+    color: inherit;
+    transform: translateY(-3px);
+  }
+
+  .offered__item .icon-badge {
+    margin: 0;
+    flex: none;
+  }
+
+  .offered__item > span:last-child {
+    display: grid;
+    line-height: 1.3;
+  }
+
+  .enquire {
+    display: grid;
+    grid-template-columns: 0.9fr 1.1fr;
+    gap: clamp(28px, 5vw, 64px);
+    align-items: start;
+  }
+
+  @media (max-width: 860px) {
+    .enquire {
+      grid-template-columns: 1fr;
+    }
+  }
+
+  .enquire__form {
+    background: var(--cream);
+  }
+</style>

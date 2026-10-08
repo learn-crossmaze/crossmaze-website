@@ -1,0 +1,91 @@
+---
+import { branches, shortName } from '../data/branches';
+import { programs } from '../data/programs';
+import { site } from '../data/site';
+
+interface Props {
+  branch?: string;
+  id?: string;
+}
+const { branch, id = 'enquiry' } = Astro.props;
+---
+
+<form
+  class="form"
+  data-cm-form
+  data-form-type="admission_enquiry"
+  data-subject="Admission enquiry – Crossmaze website"
+  data-mailto={site.admissionsEmail}
+  data-success="Thank you! Our admissions team will call you within one working day."
+  novalidate
+>
+  <div class="form-row">
+    <div class="field">
+      <label for={`${id}-parent`}>Parent’s name</label>
+      <input id={`${id}-parent`} name="parent_name" autocomplete="name" required />
+    </div>
+    <div class="field">
+      <label for={`${id}-phone`}>Phone number</label>
+      <input
+        id={`${id}-phone`}
+        name="phone"
+        type="tel"
+        inputmode="tel"
+        autocomplete="tel"
+        pattern="[0-9 +\-]{10,16}"
+        required
+      />
+    </div>
+  </div>
+  <div class="form-row">
+    <div class="field">
+      <label for={`${id}-child`}>Child’s name</label>
+      <input id={`${id}-child`} name="child_name" required />
+    </div>
+    <div class="field">
+      <label for={`${id}-age`}>Child’s age</label>
+      <input id={`${id}-age`} name="child_age" placeholder="e.g. 2 years 6 months" required />
+    </div>
+  </div>
+  <div class="form-row">
+    <div class="field">
+      <label for={`${id}-program`}>Program</label>
+      <select id={`${id}-program`} name="program" required>
+        <option value="">Choose a program</option>
+        {programs.map((p) => <option value={p.name}>{`${p.name} (${p.ages})`}</option>)}
+        <option value="Not sure yet">Not sure yet</option>
+      </select>
+    </div>
+    <div class="field">
+      <label for={`${id}-branch`}>Preferred branch</label>
+      <select id={`${id}-branch`} name="branch" required>
+        <option value="">Choose a branch</option>
+        {
+          branches.map((b) => (
+            <option value={b.name} selected={b.slug === branch}>
+              {shortName(b)}
+            </option>
+          ))
+        }
+      </select>
+    </div>
+  </div>
+  <div class="field">
+    <label for={`${id}-email`}>Email <span class="hint">(optional)</span></label>
+    <input id={`${id}-email`} name="email" type="email" autocomplete="email" />
+  </div>
+  <div class="field">
+    <label for={`${id}-message`}>Anything you’d like us to know? <span class="hint">(optional)</span></label>
+    <textarea id={`${id}-message`} name="message" rows="3"></textarea>
+  </div>
+  <input type="text" name="_gotcha" tabindex="-1" autocomplete="off" class="sr-only" aria-hidden="true" />
+  <p class="form-status" role="status" tabindex="-1" hidden></p>
+  <div class="btn-row">
+    <button class="btn" type="submit">Request a call back</button>
+  </div>
+  <p class="form-note">We only use your details to respond to your enquiry.</p>
+</form>
+
+<script>
+  import '../scripts/forms';
+</script>

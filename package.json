@@ -1,0 +1,34 @@
+{
+  "name": "crossmaze-website",
+  "type": "module",
+  "version": "1.0.0",
+  "private": true,
+  "description": "Website for Crossmaze Preschool and Day Care, Bengaluru",
+  "scripts": {
+    "dev": "astro dev",
+    "build": "astro check && astro build",
+    "preview": "astro preview",
+    "check": "astro check",
+    "content:pull": "node scripts/sync-content.mjs",
+    "content:seed": "node scripts/sync-content.mjs --seed",
+    "test": "npm --prefix functions test",
+    "test:rules": "npx firebase-tools emulators:exec --only firestore,storage --project demo-crossmaze \"node --test tests/rules.test.mjs\""
+  },
+  "dependencies": {
+    "@astrojs/react": "^7.0.1",
+    "@astrojs/sitemap": "^3.7.4",
+    "astro": "^7.3.6",
+    "firebase": "^12.19.0",
+    "lucide-static": "^1.52.0",
+    "react": "^19.3.0",
+    "react-dom": "^19.3.0"
+  },
+  "devDependencies": {
+    "@astrojs/check": "^0.9.10",
+    "@firebase/rules-unit-testing": "^5.0.2",
+    "@types/react": "^19.3.0",
+    "@types/react-dom": "^19.3.0",
+    "firebase-admin": "^14.5.0",
+    "typescript": "^6.0.3"
+  }
+}

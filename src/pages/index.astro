@@ -1,0 +1,600 @@
+---
+import { Image } from 'astro:assets';
+import BaseLayout from '../layouts/BaseLayout.astro';
+import Icon from '../components/Icon.astro';
+import SectionHeading from '../components/SectionHeading.astro';
+import ProgramCard from '../components/ProgramCard.astro';
+import BranchCard from '../components/BranchCard.astro';
+import EnquiryForm from '../components/EnquiryForm.astro';
+import { site, coreValues } from '../data/site';
+import { programs, daycareHighlights } from '../data/programs';
+import { branches, facilities } from '../data/branches';
+import { testimonials } from '../data/testimonials';
+import { image } from '../data/content';
+
+const [heroMain, ...heroSmall] = site.hero.photos;
+const tones = ['navy', 'green', 'coral', 'sky', 'sun', 'navy'];
+---
+
+<BaseLayout>
+  <!-- Hero -->
+  <section class="hero">
+    <div class="container hero__inner">
+      <div class="hero__copy">
+        <span class="eyebrow"><Icon name="Sparkles" size={18} /> Preschool & Day Care · Bengaluru</span>
+        <h1>{site.hero.titleStart} <span class="squiggle">{site.hero.titleHighlight}</span></h1>
+        <p class="lead">{site.hero.lead}</p>
+        <div class="btn-row">
+          <a class="btn btn--sun" href="#enquire">Book a school visit <Icon name="ArrowRight" size={18} /></a>
+          <a class="btn btn--ghost" href="/our-programs">Explore programs</a>
+        </div>
+        <ul class="hero__facts">
+          <li><Icon name="Building2" size={20} /> {branches.length} centres</li>
+          <li><Icon name="Baby" size={20} /> Ages 2 – 8</li>
+          <li><Icon name="Users" size={20} /> 1:6 day care ratio</li>
+        </ul>
+      </div>
+      <div class="hero__art">
+        {
+          heroMain && (
+            <Image
+              class="hero__photo hero__photo--big"
+              src={image(heroMain.image)}
+              alt={heroMain.alt}
+              widths={[480, 720, 960]}
+              sizes="(max-width: 900px) 100vw, 540px"
+              loading="eager"
+            />
+          )
+        }
+        {
+          heroSmall.slice(0, 2).map((p) => (
+            <Image class="hero__photo" src={image(p.image)} alt={p.alt} widths={[280, 480]} sizes="260px" loading="eager" />
+          ))
+        }
+        {
+          site.hero.badgeValue && (
+            <div class="hero__badge">
+              <strong>{site.hero.badgeValue}</strong>
+              <span>{site.hero.badgeLabel}</span>
+            </div>
+          )
+        }
+      </div>
+    </div>
+  </section>
+
+  <!-- Stats -->
+  <section class="stats" aria-label="Crossmaze in numbers">
+    <div class="container">
+      <ul class="stats__list">
+        {
+          site.stats.map((s) => (
+            <li>
+              <strong>{s.value}</strong>
+              <span>{s.label}</span>
+            </li>
+          ))
+        }
+      </ul>
+    </div>
+  </section>
+
+  <!-- About -->
+  <section class="section section--white">
+    <div class="container about">
+      <div class="about__media">
+        <Image src={image(site.aboutPhoto.image)} alt={site.aboutPhoto.alt} widths={[400, 555]} sizes="(max-width: 900px) 100vw, 480px" />
+        <blockquote class="about__quote">
+          “{site.quote.text}”
+          <cite>{site.quote.author}</cite>
+        </blockquote>
+      </div>
+      <div>
+        <SectionHeading eyebrow="About us" title="Every child is special" />
+        {site.about.map((p) => <p class="muted">{p}</p>)}
+        <a class="btn btn--ghost" href="/about">More about Crossmaze</a>
+      </div>
+    </div>
+  </section>
+
+  <!-- Core values -->
+  <section class="section">
+    <div class="container">
+      <SectionHeading
+        eyebrow="Our core values"
+        title="The foundation of everything we do"
+        lead="Our values guide our daily practices, shape our learning environment and influence how we work with children, parents and the community."
+        align="center"
+      />
+      <div class="grid grid--3">
+        {
+          coreValues.map((v, i) => (
+            <div class:list={['card', `tone-${tones[i % tones.length]}`]}>
+              <span class="icon-badge">
+                <Icon name={v.icon} size={26} />
+              </span>
+              <h3>{v.title}</h3>
+              <p class="muted">{v.text}</p>
+            </div>
+          ))
+        }
+      </div>
+    </div>
+  </section>
+
+  <!-- Programs -->
+  <section class="section section--white">
+    <div class="container">
+      <div class="split-heading">
+        <SectionHeading
+          eyebrow="Our programs"
+          title="A program for every stage"
+          lead="Our Foundational Development Program goes beyond traditional preschool, building essential life skills through a thematic approach."
+        />
+        <a class="btn btn--ghost" href="/our-programs">All program details</a>
+      </div>
+      <div class="grid grid--3">
+        {programs.map((p) => <ProgramCard program={p} />)}
+      </div>
+    </div>
+  </section>
+
+  <!-- Day care -->
+  <section class="section section--navy care">
+    <div class="container care__inner">
+      <div>
+        <span class="eyebrow">Day care</span>
+        <h2>A nurturing, home-like day care</h2>
+        <p class="lead">
+          Our in-house day care is open to both Crossmaze students and children from other schools, with a smooth
+          transition from preschool to end-of-day activities. Experienced caregivers focus on safety and enrichment, so
+          parents can attend to their day with peace of mind.
+        </p>
+        <ul class="care__list">
+          {
+            daycareHighlights.map((h) => (
+              <li>
+                <Icon name="Check" size={20} />
+                {h}
+              </li>
+            ))
+          }
+        </ul>
+        <a class="btn btn--sun" href="/our-programs#day-care">About day care</a>
+      </div>
+      <div class="care__media">
+        <Image src={image(site.daycarePhoto.image)} alt={site.daycarePhoto.alt} widths={[400, 555]} sizes="(max-width: 900px) 100vw, 520px" />
+      </div>
+    </div>
+  </section>
+
+  <!-- Facilities -->
+  <section class="section section--white" id="facilities">
+    <div class="container">
+      <SectionHeading
+        eyebrow="Our facilities"
+        title="Safe, secure and creative"
+        lead="Every centre is built around children, with tools that keep parents connected throughout the day."
+        align="center"
+      />
+      <ul class="facilities">
+        {
+          facilities.map((f, i) => (
+            <li class:list={[`tone-${tones[i % tones.length]}`]}>
+              <span class="icon-badge">
+                <Icon name={f.icon} size={24} />
+              </span>
+              <span>
+                <strong>{f.title}</strong>
+                <span class="muted">{f.text}</span>
+              </span>
+            </li>
+          ))
+        }
+      </ul>
+    </div>
+  </section>
+
+  {
+    testimonials.length > 0 && (
+      <section class="section">
+        <div class="container">
+          <SectionHeading eyebrow="Testimonials" title="What parents say" align="center" />
+          <div class="testimonials">
+            {testimonials.map((t) => (
+              <figure class="card testimonial">
+                <Icon name="Heart" size={22} class="testimonial__icon" />
+                <blockquote>{t.quote}</blockquote>
+                <figcaption>
+                  <strong>{t.name}</strong>
+                  <span class="muted">{t.detail}</span>
+                </figcaption>
+              </figure>
+            ))}
+          </div>
+        </div>
+      </section>
+    )
+  }
+
+  <!-- Branches -->
+  <section class="section section--white">
+    <div class="container">
+      <div class="split-heading">
+        <SectionHeading
+          eyebrow="Our branches"
+          title="A Crossmaze near you"
+          lead="Five centres across Electronic City and Begur, each with the same curriculum, care and safety standards."
+        />
+        <a class="btn btn--ghost" href="/branch">See all branches</a>
+      </div>
+      <div class="grid grid--3">
+        {branches.map((b, i) => <BranchCard branch={b} index={i} />)}
+      </div>
+    </div>
+  </section>
+
+  <!-- Enquiry -->
+  <section class="section" id="enquire">
+    <div class="container enquire">
+      <div>
+        <span class="eyebrow">Admissions open</span>
+        <h2>Admission enquiry</h2>
+        <p class="lead">
+          Share a few details and our admissions team will call you to answer your questions and set up a visit to your
+          nearest centre.
+        </p>
+        <ul class="check-list">
+          <li><Icon name="Check" size={20} /> Tour the classrooms and Montessori area</li>
+          <li><Icon name="Check" size={20} /> Meet the centre head and teachers</li>
+          <li><Icon name="Check" size={20} /> Find the right program for your child</li>
+        </ul>
+        <div class="enquire__direct">
+          <a class="btn btn--ghost" href={site.phoneHref}><Icon name="Phone" size={18} /> {site.phone}</a>
+          <a class="btn btn--ghost" href={site.whatsappHref} target="_blank" rel="noopener">
+            <Icon name="MessageCircle" size={18} /> WhatsApp us
+          </a>
+        </div>
+      </div>
+      <div class="card enquire__form">
+        <EnquiryForm id="home-enquiry" />
+      </div>
+    </div>
+  </section>
+</BaseLayout>
+
+<style>
+  .hero {
+    position: relative;
+    overflow: hidden;
+    padding-block: clamp(40px, 6vw, 80px) clamp(48px, 7vw, 96px);
+    background:
+      radial-gradient(circle at 100% 0%, var(--sun-50) 0 260px, transparent 261px),
+      radial-gradient(circle at 0% 100%, var(--green-50) 0 180px, transparent 181px),
+      var(--cream);
+  }
+
+  .hero__inner {
+    display: grid;
+    grid-template-columns: 1fr 1.05fr;
+    gap: clamp(32px, 5vw, 64px);
+    align-items: center;
+  }
+
+  @media (max-width: 900px) {
+    .hero__inner {
+      grid-template-columns: 1fr;
+    }
+  }
+
+  .hero h1 {
+    position: relative;
+    z-index: 0;
+    max-width: 14ch;
+  }
+
+  .hero__facts {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 10px 24px;
+    margin: 32px 0 0;
+    padding: 0;
+    list-style: none;
+    font-weight: 800;
+  }
+
+  .hero__facts li {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+  }
+
+  .hero__facts :global(svg) {
+    color: var(--coral);
+  }
+
+  .hero__art {
+    position: relative;
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 14px;
+  }
+
+  .hero__art :global(.hero__photo) {
+    width: 100%;
+    height: 100%;
+    aspect-ratio: 4 / 3;
+    object-fit: cover;
+    border-radius: var(--radius);
+    box-shadow: var(--shadow);
+    border: 5px solid #fff;
+  }
+
+  .hero__art :global(.hero__photo--big) {
+    grid-column: 1 / -1;
+    aspect-ratio: 16 / 9;
+  }
+
+  .hero__badge {
+    position: absolute;
+    left: -18px;
+    top: 42%;
+    display: grid;
+    padding: 12px 18px;
+    border-radius: var(--radius);
+    background: var(--sun);
+    color: var(--ink);
+    box-shadow: var(--shadow);
+    transform: rotate(-4deg);
+    line-height: 1.15;
+  }
+
+  .hero__badge strong {
+    font-family: var(--font-display);
+    font-size: 1.6rem;
+    font-weight: 600;
+  }
+
+  .hero__badge span {
+    font-weight: 800;
+    font-size: 0.85rem;
+  }
+
+  @media (max-width: 900px) {
+    .hero__badge {
+      left: auto;
+      right: 10px;
+      top: 10px;
+    }
+  }
+
+  .stats {
+    background: var(--navy-700);
+    color: #fff;
+    padding-block: 28px;
+  }
+
+  .stats__list {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 20px;
+    margin: 0;
+    padding: 0;
+    list-style: none;
+    text-align: center;
+  }
+
+  @media (max-width: 700px) {
+    .stats__list {
+      grid-template-columns: 1fr 1fr;
+    }
+  }
+
+  .stats__list li {
+    display: grid;
+  }
+
+  .stats__list strong {
+    font-family: var(--font-display);
+    font-size: clamp(1.6rem, 3vw, 2.2rem);
+    font-weight: 600;
+    color: var(--sun);
+    line-height: 1.2;
+  }
+
+  .stats__list span {
+    font-weight: 700;
+    color: rgb(255 255 255 / 85%);
+  }
+
+  .about {
+    display: grid;
+    grid-template-columns: 0.9fr 1.1fr;
+    gap: clamp(32px, 5vw, 72px);
+    align-items: center;
+  }
+
+  @media (max-width: 900px) {
+    .about {
+      grid-template-columns: 1fr;
+    }
+  }
+
+  .about__media {
+    position: relative;
+  }
+
+  .about__media :global(img) {
+    width: 100%;
+    height: auto;
+    aspect-ratio: 4 / 3;
+    object-fit: cover;
+    border-radius: var(--radius-lg);
+  }
+
+  .about__quote {
+    margin: -48px 24px 0;
+    position: relative;
+    padding: 20px 24px;
+    border-radius: var(--radius);
+    background: var(--navy);
+    color: #fff;
+    font-family: var(--font-display);
+    font-size: 1.15rem;
+    line-height: 1.4;
+    box-shadow: var(--shadow);
+  }
+
+  .about__quote cite {
+    display: block;
+    margin-top: 8px;
+    font-family: var(--font-body);
+    font-size: 0.88rem;
+    font-style: normal;
+    color: var(--sun);
+  }
+
+  .split-heading {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: flex-end;
+    justify-content: space-between;
+    gap: 0 24px;
+  }
+
+  .split-heading > .btn {
+    margin-bottom: clamp(32px, 4vw, 48px);
+  }
+
+  .care h2 {
+    color: #fff;
+  }
+
+  .care__inner {
+    display: grid;
+    grid-template-columns: 1.1fr 0.9fr;
+    gap: clamp(32px, 5vw, 72px);
+    align-items: center;
+  }
+
+  @media (max-width: 900px) {
+    .care__inner {
+      grid-template-columns: 1fr;
+    }
+  }
+
+  .care__list {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(min(100%, 220px), 1fr));
+    gap: 10px 20px;
+    margin: 24px 0 32px;
+    padding: 0;
+    list-style: none;
+    font-weight: 700;
+  }
+
+  .care__list li {
+    display: flex;
+    gap: 10px;
+    align-items: center;
+  }
+
+  .care__list :global(svg) {
+    flex: none;
+    color: var(--sun);
+  }
+
+  .care__media :global(img) {
+    width: 100%;
+    height: auto;
+    aspect-ratio: 4 / 3;
+    object-fit: cover;
+    border-radius: var(--radius-lg);
+    border: 6px solid rgb(255 255 255 / 12%);
+  }
+
+  .facilities {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(min(100%, 260px), 1fr));
+    gap: 16px;
+    margin: 0;
+    padding: 0;
+    list-style: none;
+  }
+
+  .facilities li {
+    display: flex;
+    gap: 14px;
+    align-items: flex-start;
+    padding: 18px;
+    border-radius: var(--radius);
+    background: var(--cream);
+  }
+
+  .facilities .icon-badge {
+    flex: none;
+    margin: 0;
+    width: 46px;
+    height: 46px;
+    border-radius: 14px;
+    background: var(--paper);
+  }
+
+  .facilities li > span:last-child {
+    display: grid;
+    line-height: 1.4;
+  }
+
+  .facilities .muted {
+    font-size: 0.93rem;
+  }
+
+  .testimonials {
+    columns: 3 300px;
+    column-gap: 20px;
+  }
+
+  .testimonial {
+    break-inside: avoid;
+    margin: 0 0 20px;
+  }
+
+  .testimonial :global(.testimonial__icon) {
+    margin-bottom: 12px;
+    color: var(--coral);
+  }
+
+  .testimonial blockquote {
+    margin: 0 0 16px;
+  }
+
+  .testimonial figcaption {
+    display: grid;
+    line-height: 1.35;
+  }
+
+  .enquire {
+    display: grid;
+    grid-template-columns: 0.9fr 1.1fr;
+    gap: clamp(32px, 5vw, 64px);
+    align-items: start;
+  }
+
+  @media (max-width: 900px) {
+    .enquire {
+      grid-template-columns: 1fr;
+    }
+  }
+
+  .enquire .check-list {
+    margin-top: 24px;
+  }
+
+  .enquire__direct {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 10px;
+    margin-top: 28px;
+  }
+</style>
