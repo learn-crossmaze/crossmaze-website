@@ -44,7 +44,7 @@ jobs:
 
       - name: Pull content from the admin panel
         if: env.FIREBASE_SERVICE_ACCOUNT != ''
-        run: node scripts/sync-content.mjs ${{ github.event_name != 'pull_request' && '--seed-if-empty' || '' }}
+        run: node scripts/sync-content.mjs ${{ github.event_name != 'pull_request' && '--seed-if-empty --add-missing' || '' }}
 
       - run: npm run build
         env:

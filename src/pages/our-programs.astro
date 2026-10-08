@@ -4,8 +4,9 @@ import BaseLayout from '../layouts/BaseLayout.astro';
 import PageHero from '../components/PageHero.astro';
 import SectionHeading from '../components/SectionHeading.astro';
 import Icon from '../components/Icon.astro';
+import Steps from '../components/Steps.astro';
 import { programs, approach, extracurricular } from '../data/programs';
-import { site, faqs } from '../data/site';
+import { site, faqs, dayRoutine } from '../data/site';
 
 ---
 
@@ -96,6 +97,22 @@ import { site, faqs } from '../data/site';
       </div>
     </div>
   </section>
+
+  {
+    dayRoutine.length > 0 && (
+      <section class="section" id="a-day-at-crossmaze">
+        <div class="container">
+          <SectionHeading
+            eyebrow="A day at Crossmaze"
+            title="Busy, happy little days"
+            lead="Every day balances calm, focused Montessori work with play, stories, music and movement."
+            align="center"
+          />
+          <Steps items={dayRoutine} />
+        </div>
+      </section>
+    )
+  }
 
   <section class="section section--white">
     <div class="container extra">
@@ -196,7 +213,7 @@ import { site, faqs } from '../data/site';
     position: relative;
     aspect-ratio: 4 / 3;
     border-radius: var(--radius-lg);
-    background: var(--badge-bg);
+    background: linear-gradient(135deg, var(--badge-bg) 0%, var(--badge-bg-2, var(--badge-bg)) 100%);
   }
 
   .program__media :global(img) {
@@ -280,7 +297,7 @@ import { site, faqs } from '../data/site';
   }
 
   .faq__item {
-    background: var(--paper);
+    background: var(--g-card);
     border: 1px solid var(--line);
     border-radius: var(--radius);
   }

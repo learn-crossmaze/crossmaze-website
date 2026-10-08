@@ -4,6 +4,8 @@
 //   node scripts/sync-content.mjs                 pull Firestore content + photos into the repo files
 //   node scripts/sync-content.mjs --seed-if-empty first copy the repo content into Firestore if it's empty, then pull
 //   node scripts/sync-content.mjs --seed          only copy the repo content into Firestore (overwrites!)
+//   … --add-missing                               also store content fields that are new in the repo (e.g. a new
+//                                                 page section) in Firestore, so the admin panel can edit them
 //   ADMIN_EMAILS=a@x.com,b@y.com …                also makes sure these people can sign in to /admin
 //
 // Photos: Firestore stores Cloud Storage paths ("site/…"). When pulling, a photo that is unchanged from the
@@ -109,7 +111,9 @@ const normalize = {
   }),
   sections: (s) =>
     Object.fromEntries(
-      ['coreValues', 'approach', 'daycareHighlights', 'extracurricular', 'facilities', 'perks', 'faqs'].map((k) => [k, list(s[k])]),
+      ['coreValues', 'approach', 'daycareHighlights', 'extracurricular', 'facilities', 'perks', 'faqs', 'dayRoutine', 'admissionSteps'].map(
+        (k) => [k, list(s[k])],
+      ),
     ),
   branches: (b) => ({
     ...b,
@@ -141,6 +145,25 @@ function check(kind, item, label) {
   if (kind === 'branches' && !/^[a-z0-9-]+$/.test(item.slug)) throw new Error(`Branch "${item.name}" has an invalid web address.`);
 }
 
+/**
+ * Content fields added to the site after Firestore was seeded (such as a new page section) aren't in
+ * Firestore yet. Build them from the repository's copy, and with --add-missing also store them in
+ * Firestore so they appear in the admin panel. Fields an editor emptied are left alone.
+ */
+async function withNewFields(db, name, data) {
+  const repo = readJson(name);
+  const missing = Object.keys(repo).filter((key) => !(key in data));
+  if (!missing.length) return data;
+  const added = Object.fromEntries(missing.map((key) => [key, repo[key]]));
+  if (args.has('--add-missing')) {
+    await db.doc(`content/${name}`).set(added, { merge: true });
+    console.log(`Added new content to Firestore (content/${name}): ${missing.join(', ')}`);
+  } else {
+    console.log(`Firestore content/${name} has no ${missing.join(', ')} yet; using the repository's copy.`);
+  }
+  return { ...data, ...added };
+}
+
 async function pull(db, bucket) {
   const download = async (storagePath) => {
     if (!storagePath) return '';
@@ -162,7 +185,7 @@ async function pull(db, bucket) {
   for (const name of SINGLETONS) {
     const snap = await db.doc(`content/${name}`).get();
     if (!snap.exists) throw new Error(`Firestore has no content/${name}. Run with --seed-if-empty first.`);
-    const data = normalize[name](snap.data());
+    const data = normalize[name](await withNewFields(db, name, snap.data()));
     check(name, data, name === 'site' ? 'Site settings' : 'Page sections');
     out[name] = await mapImages(name, data, download);
   }

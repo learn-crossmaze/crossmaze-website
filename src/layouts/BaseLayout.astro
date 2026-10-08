@@ -5,6 +5,7 @@ import Footer from '../components/Footer.astro';
 import Icon from '../components/Icon.astro';
 import { site } from '../data/site';
 import { cleanPath } from '../utils';
+import { sectionDoodleCss } from '../components/doodles';
 
 interface Props {
   title?: string;
@@ -71,6 +72,7 @@ const structuredData = [organization, ...(jsonLd ? (Array.isArray(jsonLd) ? json
     />
 
     {structuredData.map((data) => <script type="application/ld+json" set:html={JSON.stringify(data)} />)}
+    <style is:inline set:html={sectionDoodleCss}></style>
   </head>
   <body>
     <a class="skip-link" href="#main">Skip to content</a>
@@ -99,7 +101,7 @@ const structuredData = [organization, ...(jsonLd ? (Array.isArray(jsonLd) ? json
         width: 58px;
         height: 58px;
         border-radius: 50%;
-        background: #25d366;
+        background: var(--g-whatsapp);
         color: #fff;
         box-shadow: 0 8px 24px rgb(37 211 102 / 40%);
         transition: transform 0.15s ease;

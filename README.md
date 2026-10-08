@@ -18,12 +18,12 @@ The URLs match the old site, so existing links and Google results keep working.
 
 | URL | Page |
 | --- | --- |
-| `/` | Home: hero, stats, about, core values, programs, day care, facilities, testimonials, branches, admission enquiry |
+| `/` | Home: hero, stats, about, core values, programs, a day at Crossmaze, day care, facilities, testimonials, branches, how admission works, admission enquiry |
 | `/about` | Who we are, core values, approach, annual-day photos, founders |
-| `/our-programs` | Play Group, Nursery, Junior KG, Senior KG, Day Care, extra-curriculars, FAQs |
+| `/our-programs` | Play Group, Nursery, Junior KG, Senior KG, Day Care, how we teach, a day at Crossmaze, extra-curriculars, FAQs |
 | `/branch` and `/branch/<slug>` | All branches, then one page per branch: photos, facts, amenities, gallery, centre head, map, enquiry form |
 | `/careers` | Why work with us, open roles, application form |
-| `/contact` | Admission enquiry, phone / WhatsApp / email, all branch addresses |
+| `/contact` | Admission enquiry, phone / WhatsApp / email, how admission works, all branch addresses |
 | `/privacy-policy`, `/terms` | Carried over from the old site (`src/pages/*.md`) |
 | `/admin` | The admin panel (not indexed by search engines) |
 
@@ -38,7 +38,7 @@ Go to **www.crossmaze.in/admin** and sign in.
 | Programs | Add, hide, reorder; name, age group, timing, icon, colour, photo, description, focus list |
 | Jobs | Open positions on the careers page |
 | Testimonials | Parent quotes on the home page |
-| Page sections | Core values, teaching approach, day care highlights, extra-curriculars, facilities, careers perks, FAQs |
+| Page sections | Core values, teaching approach, a day at Crossmaze, how admission works, day care highlights, extra-curriculars, facilities, careers perks, FAQs |
 | Submissions | Every enquiry and application; mark as handled, resend to LITMUS, export to CSV |
 | LITMUS | Where submissions are sent, its API key, and a **Send test** button |
 | Admins | Who can sign in |
@@ -158,6 +158,7 @@ FIREBASE_STORAGE_BUCKET=demo-crossmaze.appspot.com ADMIN_EMAILS=you@example.com 
 
 - `content/*.json` is what the site is built from. `src/data/*.ts` loads it; image fields are paths under `src/assets/`.
 - `scripts/sync-content.mjs` runs before every deploy. It pulls Firestore content into those JSON files and downloads new photos into `src/assets/cms/`, which isn't committed. Astro then resizes the photos and converts them to WebP.
+- A field that's new in `content/site.json` or `content/sections.json` (such as a new page section) is copied into Firestore on the next deploy from `main`, so it appears in the admin panel. Pull-request previews use the repository's copy without writing to Firestore.
 - `scripts/report-publish.mjs` tells the admin panel whether a deploy succeeded.
 - The admin panel lives in `src/admin/`. Its forms are generated from `src/admin/schemas.ts`, so adding a field there and in `src/data/content.ts` is all it takes.
 
@@ -168,4 +169,5 @@ FIREBASE_STORAGE_BUCKET=demo-crossmaze.appspot.com ADMIN_EMAILS=you@example.com 
 - [ ] **Street addresses** for Neotown, SNN Greenbay and Neeladri Nagar came from public listings, and Ananth Nagar has none yet.
 - [ ] **Founders and founding year** (About page) came from public sources.
 - [ ] **Careers email**: currently `admin@crossmaze.in`.
+- [ ] **A day at Crossmaze** and **How admission works** were written for the new site from what the old site says. Check they match how your centres work (admin panel → Page sections).
 - [ ] **Firebase project ID**: `.firebaserc` and the workflow use `crossmaze-website`. If the console shows a different ID, update both.

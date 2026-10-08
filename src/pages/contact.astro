@@ -3,7 +3,9 @@ import BaseLayout from '../layouts/BaseLayout.astro';
 import PageHero from '../components/PageHero.astro';
 import EnquiryForm from '../components/EnquiryForm.astro';
 import Icon from '../components/Icon.astro';
-import { site } from '../data/site';
+import SectionHeading from '../components/SectionHeading.astro';
+import Steps from '../components/Steps.astro';
+import { site, admissionSteps } from '../data/site';
 import { branches, shortName, telHref } from '../data/branches';
 ---
 
@@ -60,6 +62,22 @@ import { branches, shortName, telHref } from '../data/branches';
     </div>
   </section>
 
+  {
+    admissionSteps.length > 0 && (
+      <section class="section">
+        <div class="container">
+          <SectionHeading
+            eyebrow="How admission works"
+            title="What happens after you enquire"
+            lead="From your first question to your child’s first day, we are with you at every step."
+            align="center"
+          />
+          <Steps items={admissionSteps} numbered />
+        </div>
+      </section>
+    )
+  }
+
   <section class="section">
     <div class="container">
       <h2>Our branches</h2>
@@ -103,7 +121,7 @@ import { branches, shortName, telHref } from '../data/branches';
   }
 
   .contact__form {
-    background: var(--cream);
+    background: var(--g-soft);
   }
 
   .contact__form h2 {
@@ -122,7 +140,7 @@ import { branches, shortName, telHref } from '../data/branches';
     padding: 18px;
     border: 1px solid var(--line);
     border-radius: var(--radius);
-    background: var(--paper);
+    background: var(--g-card);
     color: var(--ink);
     text-decoration: none;
     overflow-wrap: anywhere;

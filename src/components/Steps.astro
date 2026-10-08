@@ -1,0 +1,142 @@
+---
+// A row of steps joined by a dashed path: "A day at Crossmaze" and "How admission works".
+// Wraps to two columns on tablets and becomes a vertical timeline on phones.
+import Icon from './Icon.astro';
+import type { IconItem } from '../data/content';
+
+interface Props {
+  items: IconItem[];
+  /** Shows 1, 2, 3… on each step (for a process rather than a routine). */
+  numbered?: boolean;
+}
+const { items, numbered = false } = Astro.props;
+const tones = ['coral', 'sun', 'green', 'sky', 'navy', 'coral'];
+---
+
+<ol class="steps" style={`--count:${items.length}`}>
+  {
+    items.map((step, i) => (
+      <li class:list={['steps__item', `tone-${tones[i % tones.length]}`]}>
+        <span class="steps__icon">
+          <Icon name={step.icon} size={28} />
+          {numbered && <span class="steps__num">{i + 1}</span>}
+        </span>
+        <h3>{step.title}</h3>
+        {step.text && <p class="muted">{step.text}</p>}
+      </li>
+    ))
+  }
+</ol>
+
+<style>
+  .steps {
+    position: relative;
+    display: grid;
+    grid-template-columns: repeat(var(--count), minmax(0, 1fr));
+    gap: 28px 20px;
+    margin: 0;
+    padding: 0;
+    list-style: none;
+  }
+
+  /* The dashed path linking the steps, behind the icons. */
+  .steps::before {
+    content: '';
+    position: absolute;
+    top: 38px;
+    left: calc(50% / var(--count));
+    right: calc(50% / var(--count));
+    border-top: 3px dashed rgb(20 48 127 / 22%);
+  }
+
+  .steps__item {
+    position: relative;
+    text-align: center;
+  }
+
+  .steps__icon {
+    position: relative;
+    display: grid;
+    place-items: center;
+    width: 76px;
+    height: 76px;
+    margin: 0 auto 16px;
+    border: 4px solid #fff;
+    border-radius: 50%;
+    background: linear-gradient(135deg, var(--badge-bg) 0%, var(--badge-bg-2, var(--badge-bg)) 100%);
+    color: var(--badge-fg);
+    box-shadow: var(--shadow-sm);
+  }
+
+  .steps__num {
+    position: absolute;
+    top: -6px;
+    right: -8px;
+    display: grid;
+    place-items: center;
+    width: 28px;
+    height: 28px;
+    border: 2px solid #fff;
+    border-radius: 50%;
+    background: var(--g-navy);
+    color: #fff;
+    font-family: var(--font-display);
+    font-size: 0.95rem;
+    font-weight: 600;
+  }
+
+  .steps__item h3 {
+    margin-bottom: 0.3em;
+    font-size: 1.12rem;
+  }
+
+  .steps__item p {
+    margin: 0;
+    font-size: 0.96rem;
+    line-height: 1.5;
+  }
+
+  @media (max-width: 1000px) {
+    .steps {
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+    }
+    .steps::before {
+      content: none;
+    }
+  }
+
+  /* Phones: a vertical timeline. */
+  @media (max-width: 560px) {
+    .steps {
+      grid-template-columns: 1fr;
+      gap: 22px;
+    }
+    .steps::before {
+      content: '';
+      top: 38px;
+      bottom: 38px;
+      left: 37px;
+      right: auto;
+      border-top: 0;
+      border-left: 3px dashed rgb(20 48 127 / 22%);
+    }
+    .steps__item {
+      display: grid;
+      grid-template-columns: 76px 1fr;
+      column-gap: 16px;
+      align-items: center;
+      text-align: left;
+    }
+    .steps__icon {
+      grid-row: span 2;
+      margin: 0;
+    }
+    .steps__item h3 {
+      align-self: end;
+      margin: 0;
+    }
+    .steps__item p {
+      align-self: start;
+    }
+  }
+</style>

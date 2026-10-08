@@ -1,14 +1,17 @@
 ---
-// Animated pastel background for page banners: a slowly shifting colour wash plus floating
-// playful shapes. Purely decorative (aria-hidden) and frozen for visitors who prefer reduced motion.
+// Animated background for page banners: a slowly shifting pastel wash plus floating preschool
+// doodles (see doodles.ts). Purely decorative (aria-hidden) and still for visitors who prefer
+// reduced motion.
+import { doodle, pastel, type Colors, type DoodleKind } from './doodles';
+
 interface Props {
   variant?: 'home' | 'page';
 }
 const { variant = 'page' } = Astro.props;
 
 type Shape = {
-  kind: 'star' | 'cloud' | 'balloon' | 'circle' | 'flower' | 'sparkle' | 'block' | 'squiggle';
-  color: string;
+  kind: DoodleKind;
+  colors: Colors;
   size: number;
   top: string;
   left: string;
@@ -23,49 +26,29 @@ type Shape = {
 };
 
 const home: Shape[] = [
-  { kind: 'cloud', color: '#cfe4ff', size: 130, top: '6%', left: '34%', motion: 'drift', dur: 28, delay: -4, hideOnMobile: true },
-  { kind: 'star', color: '#ffd96b', size: 40, top: '14%', left: '4%', motion: 'spin', dur: 22, delay: 0, hideOnMobile: true },
-  { kind: 'balloon', color: '#ffb8c9', size: 54, top: '58%', left: '2%', motion: 'bob', dur: 7, delay: -2, mobile: { top: '47%', left: '86%' } },
-  { kind: 'sparkle', color: '#cbbcff', size: 30, top: '80%', left: '30%', motion: 'spin', dur: 16, delay: -5 },
-  { kind: 'block', color: '#bdebd3', size: 46, top: '84%', left: '46%', motion: 'bob', dur: 8, delay: -1, letter: 'A', hideOnMobile: true },
-  { kind: 'flower', color: '#ffd2bd', size: 48, top: '8%', left: '88%', motion: 'spin', dur: 26, delay: -8 },
-  { kind: 'circle', color: '#ffe59a', size: 22, top: '42%', left: '50%', motion: 'bob', dur: 6, delay: -3, hideOnMobile: true },
-  { kind: 'block', color: '#ffcfe1', size: 42, top: '88%', left: '92%', motion: 'bob', dur: 9, delay: -4, letter: 'B', hideOnMobile: true },
-  { kind: 'squiggle', color: '#c3defe', size: 70, top: '30%', left: '93%', motion: 'drift', dur: 18, delay: -6, hideOnMobile: true },
-  { kind: 'balloon', color: '#c3defe', size: 44, top: '66%', left: '86%', motion: 'bob', dur: 8, delay: -5, hideOnMobile: true },
+  { kind: 'cloud', colors: pastel.sky, size: 130, top: '6%', left: '34%', motion: 'drift', dur: 28, delay: -4, hideOnMobile: true },
+  { kind: 'star', colors: pastel.butter, size: 40, top: '14%', left: '4%', motion: 'spin', dur: 22, delay: 0, hideOnMobile: true },
+  { kind: 'balloon', colors: pastel.pink, size: 54, top: '58%', left: '2%', motion: 'bob', dur: 7, delay: -2, mobile: { top: '47%', left: '86%' } },
+  { kind: 'plane', colors: pastel.lavender, size: 48, top: '80%', left: '28%', motion: 'drift', dur: 16, delay: -5 },
+  { kind: 'block', colors: pastel.mint, size: 50, top: '84%', left: '46%', motion: 'bob', dur: 8, delay: -1, letter: 'A', hideOnMobile: true },
+  { kind: 'sun', colors: pastel.butter, size: 60, top: '6%', left: '87%', motion: 'bob', dur: 9, delay: -8 },
+  { kind: 'crayon', colors: pastel.peach, size: 44, top: '24%', left: '46%', motion: 'bob', dur: 6, delay: -3, hideOnMobile: true },
+  { kind: 'block', colors: pastel.pink, size: 46, top: '88%', left: '92%', motion: 'bob', dur: 9, delay: -4, letter: 'B', hideOnMobile: true },
+  { kind: 'kite', colors: pastel.sky, size: 58, top: '30%', left: '94%', motion: 'bob', dur: 10, delay: -6, hideOnMobile: true },
+  { kind: 'rainbow', colors: pastel.pink, size: 70, top: '86%', left: '64%', motion: 'bob', dur: 11, delay: -5, hideOnMobile: true },
 ];
 
 const page: Shape[] = [
-  { kind: 'cloud', color: '#cfe4ff', size: 110, top: '10%', left: '62%', motion: 'drift', dur: 26, delay: -3, mobile: { top: '1%', left: '66%' } },
-  { kind: 'star', color: '#ffd96b', size: 34, top: '18%', left: '90%', motion: 'spin', dur: 20, delay: -2 },
-  { kind: 'balloon', color: '#ffb8c9', size: 48, top: '56%', left: '84%', motion: 'bob', dur: 7, delay: -1, hideOnMobile: true },
-  { kind: 'sparkle', color: '#cbbcff', size: 26, top: '30%', left: '54%', motion: 'spin', dur: 15, delay: -6, hideOnMobile: true },
-  { kind: 'flower', color: '#ffd2bd', size: 40, top: '78%', left: '4%', motion: 'spin', dur: 24, delay: -4, hideOnMobile: true },
-  { kind: 'block', color: '#bdebd3', size: 38, top: '12%', left: '46%', motion: 'bob', dur: 9, delay: -2, letter: 'C', hideOnMobile: true },
+  { kind: 'cloud', colors: pastel.sky, size: 110, top: '10%', left: '62%', motion: 'drift', dur: 26, delay: -3, mobile: { top: '1%', left: '66%' } },
+  { kind: 'star', colors: pastel.butter, size: 34, top: '18%', left: '90%', motion: 'spin', dur: 20, delay: -2 },
+  { kind: 'balloon', colors: pastel.pink, size: 48, top: '56%', left: '84%', motion: 'bob', dur: 7, delay: -1, hideOnMobile: true },
+  { kind: 'plane', colors: pastel.lavender, size: 40, top: '30%', left: '53%', motion: 'drift', dur: 15, delay: -6, hideOnMobile: true },
+  { kind: 'crayon', colors: pastel.peach, size: 42, top: '80%', left: '1.5%', motion: 'bob', dur: 9, delay: -4, hideOnMobile: true },
+  { kind: 'block', colors: pastel.mint, size: 40, top: '12%', left: '46%', motion: 'bob', dur: 9, delay: -2, letter: 'C', hideOnMobile: true },
+  { kind: 'rainbow', colors: pastel.pink, size: 66, top: '62%', left: '68%', motion: 'bob', dur: 12, delay: -7, hideOnMobile: true },
 ];
 
 const shapes = variant === 'home' ? home : page;
-
-const svg = (s: Shape) => {
-  switch (s.kind) {
-    case 'star':
-      return `<path d="M50 8l12 25 27 4-20 19 5 27-24-13-24 13 5-27-20-19 27-4z" fill="${s.color}" stroke="${s.color}" stroke-width="8" stroke-linejoin="round"/>`;
-    case 'cloud':
-      return `<path d="M27 74h48a17 17 0 0 0 1-34 24 24 0 0 0-46-7 20 20 0 0 0-3 41z" fill="${s.color}"/>`;
-    case 'balloon':
-      return `<ellipse cx="50" cy="38" rx="27" ry="32" fill="${s.color}"/><path d="M50 70l-5 7h10z" fill="${s.color}"/><path d="M50 77c-6 8 6 12 0 20" fill="none" stroke="${s.color}" stroke-width="2.5" stroke-linecap="round"/><ellipse cx="40" cy="28" rx="6" ry="9" fill="#fff" fill-opacity=".45"/>`;
-    case 'circle':
-      return `<circle cx="50" cy="50" r="46" fill="${s.color}"/>`;
-    case 'flower':
-      return `<g fill="${s.color}"><circle cx="50" cy="27" r="17"/><circle cx="72" cy="43" r="17"/><circle cx="64" cy="69" r="17"/><circle cx="36" cy="69" r="17"/><circle cx="28" cy="43" r="17"/></g><circle cx="50" cy="50" r="12" fill="#fff" fill-opacity=".7"/>`;
-    case 'sparkle':
-      return `<path d="M50 4c5 27 19 41 46 46-27 5-41 19-46 46-5-27-19-41-46-46 27-5 41-19 46-46z" fill="${s.color}"/>`;
-    case 'squiggle':
-      return `<path d="M8 56c10-18 21-18 31 0s21 18 31 0 21-18 31 0" fill="none" stroke="${s.color}" stroke-width="10" stroke-linecap="round"/>`;
-    case 'block':
-      return `<rect x="8" y="8" width="84" height="84" rx="18" fill="${s.color}"/><text x="50" y="68" text-anchor="middle" font-family="Fredoka, Nunito, sans-serif" font-weight="600" font-size="52" fill="#fff">${s.letter ?? ''}</text>`;
-  }
-};
 ---
 
 <div class:list={['fx', `fx--${variant}`]} aria-hidden="true">
@@ -76,7 +59,7 @@ const svg = (s: Shape) => {
         class:list={['fx__shape', `fx__shape--${s.motion}`, { 'fx__shape--desktop': s.hideOnMobile }]}
         style={`--size:${s.size}px;--top:${s.top};--left:${s.left};--dur:${s.dur}s;--delay:${s.delay}s${s.mobile ? `;--top-m:${s.mobile.top};--left-m:${s.mobile.left}` : ''}`}
       >
-        <svg viewBox="0 0 100 100" set:html={svg(s)} />
+        <svg viewBox="0 0 100 100" set:html={doodle(s.kind, s.colors, s.letter)} />
       </span>
     ))
   }
