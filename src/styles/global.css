@@ -13,37 +13,37 @@
   --green-50: #e2f4e3;
   --sky: #2f7ff0;
   --sky-50: #e2eefe;
-  --cream: #fffaf3;
   --paper: #ffffff;
   --line: #ece3d4;
 
-  /* Pastels: section backgrounds (light) and floating shapes (deeper). */
-  --p-pink: #fff0f5;
-  --p-lavender: #f3efff;
-  --p-mint: #e9f8f0;
-  --p-peach: #fff1e8;
-  --p-sky: #ebf4ff;
-  --p-butter: #fff8df;
-  --p-pink-2: #ffcfe1;
-  --p-lavender-2: #d9cdff;
-  --p-mint-2: #bdebd3;
-  --p-peach-2: #ffd2bd;
-  --p-sky-2: #c3defe;
-  --p-butter-2: #ffe59a;
-
   /* Gradients: every background on the site is one of these (no flat fills). */
-  --g-page: linear-gradient(180deg, #fffaf3 0%, #fff5f9 45%, #f4f7ff 100%);
-  --g-banner: linear-gradient(135deg, #fff3f8 0%, #fffaf0 40%, #f0f6ff 75%, #f1fbf5 100%);
-  --g-pink: linear-gradient(135deg, #fff5f9 0%, #ffe8f1 55%, #fff1e7 100%);
-  --g-lavender: linear-gradient(135deg, #f8f4ff 0%, #ede6ff 55%, #e7f0ff 100%);
-  --g-mint: linear-gradient(135deg, #f1fbf6 0%, #e0f5ea 55%, #e8f3ff 100%);
-  --g-peach: linear-gradient(135deg, #fff8f1 0%, #ffeadd 55%, #fff4d4 100%);
-  --g-sky: linear-gradient(135deg, #f3f8ff 0%, #e1eeff 55%, #efe8ff 100%);
-  --g-butter: linear-gradient(135deg, #fffcee 0%, #fff2c9 55%, #e8f7ee 100%);
-  --g-rainbow: linear-gradient(120deg, #f3efff 0%, #ebf4ff 33%, #e9f8f0 66%, #fff6d6 100%);
-  --g-card: linear-gradient(165deg, #ffffff 0%, #ffffff 50%, #fff1e6 160%);
-  --g-glass: linear-gradient(160deg, rgb(255 255 255 / 94%) 0%, rgb(255 255 255 / 72%) 100%);
-  --g-soft: linear-gradient(135deg, #fffaf3 0%, #fff1f6 55%, #eef4ff 100%);
+  /* The page background: one pastel gradient that flows down the whole page (pink, peach,
+     butter, mint, sky, lavender and round again), so sections blend with no hard edges. */
+  --flow-1: #fff0f6;
+  --flow-2: #fff2e6;
+  --flow-3: #fffbe0;
+  --flow-4: #eafaf1;
+  --flow-5: #e9f3ff;
+  --flow-6: #f3eeff;
+  --flow-length: 3600px;
+  --g-flow: repeating-linear-gradient(
+    180deg,
+    var(--flow-1) 0,
+    var(--flow-2) calc(var(--flow-length) / 6),
+    var(--flow-3) calc(var(--flow-length) / 3),
+    var(--flow-4) calc(var(--flow-length) / 2),
+    var(--flow-5) calc(var(--flow-length) * 2 / 3),
+    var(--flow-6) calc(var(--flow-length) * 5 / 6),
+    var(--flow-1) var(--flow-length)
+  );
+  /* Frosted-glass surfaces: white gradients that let the flowing page colour show through. */
+  --g-card: linear-gradient(160deg, rgb(255 255 255 / 92%) 0%, rgb(255 255 255 / 76%) 100%);
+  --g-glass: linear-gradient(160deg, rgb(255 255 255 / 86%) 0%, rgb(255 255 255 / 60%) 100%);
+  --g-soft: linear-gradient(150deg, rgb(255 255 255 / 90%) 0%, rgb(255 246 250 / 82%) 55%, rgb(240 246 255 / 82%) 100%);
+  --g-ring: linear-gradient(135deg, #ffc9dc 0%, #d9cbff 50%, #bfdcff 100%);
+  --g-heading: linear-gradient(100deg, #14307f 0%, #263d9e 50%, #5b3fc2 100%);
+  --g-highlight: linear-gradient(90deg, #e2456f 0%, #b346c8 55%, #7a4fe0 100%);
+  --glass-edge: rgb(255 255 255 / 85%);
   --g-navy: linear-gradient(135deg, #2a4fb3 0%, #14307f 55%, #0b1d5e 100%);
   --g-sun: linear-gradient(135deg, #ffde75 0%, #ffc93c 50%, #ffb224 100%);
   --g-ink: linear-gradient(135deg, #2a3366 0%, #131a3a 100%);
@@ -55,8 +55,9 @@
   --radius-sm: 10px;
   --radius: 18px;
   --radius-lg: 28px;
-  --shadow-sm: 0 1px 2px rgb(31 22 64 / 6%), 0 2px 8px rgb(31 22 64 / 5%);
-  --shadow: 0 2px 4px rgb(31 22 64 / 5%), 0 12px 32px rgb(31 22 64 / 9%);
+  --shadow-sm: 0 1px 2px rgb(60 40 120 / 6%), 0 8px 22px -10px rgb(60 40 120 / 18%);
+  --shadow: 0 2px 6px rgb(60 40 120 / 6%), 0 22px 48px -20px rgb(60 40 120 / 28%);
+  --shadow-lift: 0 4px 10px rgb(60 40 120 / 7%), 0 30px 60px -22px rgb(60 40 120 / 34%);
 
   --container: 1180px;
   --gutter: 20px;
@@ -85,7 +86,7 @@ html {
 
 body {
   margin: 0;
-  background: var(--g-page);
+  background: var(--flow-1) var(--g-flow);
   color: var(--ink);
   font-family: var(--font-body);
   font-size: 1.0625rem;
@@ -123,6 +124,22 @@ h4 {
 
 h1 {
   font-size: clamp(2.25rem, 5.5vw, 3.75rem);
+}
+
+/* Page headings in a deep navy-to-violet gradient. */
+main h1,
+main h2 {
+  background: var(--g-heading);
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
+}
+
+@media (forced-colors: active) {
+  main h1,
+  main h2 {
+    color: CanvasText;
+  }
 }
 
 h2 {
@@ -167,6 +184,30 @@ ul {
   }
 }
 
+/* Soft colour glows that stay on screen and drift slowly while the page gradient scrolls past. */
+body::before {
+  content: '';
+  position: fixed;
+  inset: -15vmax;
+  z-index: -1;
+  pointer-events: none;
+  background:
+    radial-gradient(38vmax 34vmax at 12% 18%, rgb(255 190 214 / 34%), transparent 70%),
+    radial-gradient(40vmax 36vmax at 88% 26%, rgb(186 208 255 / 36%), transparent 70%),
+    radial-gradient(36vmax 32vmax at 24% 86%, rgb(178 236 206 / 30%), transparent 70%),
+    radial-gradient(34vmax 30vmax at 82% 84%, rgb(255 226 150 / 30%), transparent 70%);
+  animation: glow-drift 36s ease-in-out infinite alternate;
+}
+
+@keyframes glow-drift {
+  50% {
+    transform: translate3d(3vmax, -2vmax, 0) rotate(6deg) scale(1.05);
+  }
+  100% {
+    transform: translate3d(-3vmax, 2vmax, 0) rotate(-5deg) scale(1.02);
+  }
+}
+
 .sr-only {
   position: absolute;
   width: 1px;
@@ -196,17 +237,16 @@ ul {
 }
 
 
-/* ---------- Gradient sections with preschool doodles ----------
-   Every section in <main> gets the next pastel gradient in a six-step cycle and two softly
-   drifting doodles (crayons, ABC blocks, kites…; drawn in components/doodles.ts), so new pages
-   and sections pick up the look automatically. The doodles sit in the page margin on wide
-   screens and peek in from the edge on narrow ones. */
+/* ---------- Sections with preschool doodles ----------
+   Sections have no background of their own: the flowing page gradient (body) runs behind all
+   of them, so colours change smoothly with no hard edges. Each section gets two softly drifting
+   doodles (crayons, ABC blocks, kites…; drawn in components/doodles.ts), in the page margin on
+   wide screens and peeking in from the edge on narrow ones. */
 main > section {
   --doodle-edge: max(-30px, calc(50vw - var(--container) / 2 - 170px));
   position: relative;
   isolation: isolate;
   overflow: hidden;
-  background: var(--section-bg, transparent);
 }
 
 main > section > :not(.fx) {
@@ -249,30 +289,6 @@ main > section:nth-of-type(odd) {
 main > section:nth-of-type(even) {
   --shape-1-at: 22px var(--doodle-edge) auto auto;
   --shape-2-at: auto auto 22px var(--doodle-edge);
-}
-
-main > section:nth-of-type(6n+1) {
-  --section-bg: var(--g-pink);
-}
-
-main > section:nth-of-type(6n+2) {
-  --section-bg: var(--g-lavender);
-}
-
-main > section:nth-of-type(6n+3) {
-  --section-bg: var(--g-mint);
-}
-
-main > section:nth-of-type(6n+4) {
-  --section-bg: var(--g-peach);
-}
-
-main > section:nth-of-type(6n+5) {
-  --section-bg: var(--g-sky);
-}
-
-main > section:nth-of-type(6n) {
-  --section-bg: var(--g-butter);
 }
 
 @media (max-width: 640px) {
@@ -326,9 +342,29 @@ main > section.no-shapes::after {
   padding-block: clamp(40px, 6vw, 72px);
 }
 
-/* A soft multi-pastel panel for call-outs (day care, calls to action). */
+/* Call-outs (day care, calls to action) sit on a floating rainbow-glass panel rather than a
+   full-width band, so the page gradient still flows around them without hard edges. */
+main > section.section--feature > .container::before {
+  --panel-pad: clamp(24px, 4vw, 48px);
+  content: '';
+  position: absolute;
+  z-index: -1;
+  inset: calc(-1 * var(--panel-pad)) calc(var(--gutter) - min(var(--panel-pad), var(--gutter) - 8px));
+  border: 1px solid var(--glass-edge);
+  border-radius: 36px;
+  background:
+    radial-gradient(60% 90% at 0% 0%, rgb(255 214 230 / 70%), transparent 70%),
+    radial-gradient(60% 90% at 100% 100%, rgb(200 236 216 / 70%), transparent 70%),
+    linear-gradient(120deg, rgb(243 239 255 / 92%) 0%, rgb(235 244 255 / 92%) 50%, rgb(255 248 222 / 92%) 100%);
+  box-shadow: var(--shadow);
+}
+
 main > section.section--feature {
-  background: var(--g-rainbow);
+  padding-block: clamp(72px, 9vw, 120px);
+}
+
+main > section.section--tight.section--feature {
+  padding-block: clamp(56px, 7vw, 88px);
 }
 
 .grid {
@@ -357,13 +393,31 @@ main > section.section--feature {
   display: inline-flex;
   align-items: center;
   gap: 8px;
-  margin-bottom: 14px;
+  margin-bottom: 16px;
+  padding: 6px 14px 6px 12px;
+  border: 1px solid var(--glass-edge);
+  border-radius: 999px;
+  background: linear-gradient(135deg, rgb(255 255 255 / 92%) 0%, rgb(255 236 243 / 88%) 100%);
+  box-shadow: 0 6px 16px -10px rgb(194 54 44 / 45%);
   font-family: var(--font-display);
   font-weight: 600;
-  font-size: 0.9rem;
-  letter-spacing: 0.06em;
+  font-size: 0.82rem;
+  letter-spacing: 0.08em;
   text-transform: uppercase;
   color: #c2362c;
+}
+
+.eyebrow::before {
+  content: '';
+  flex: none;
+  width: 7px;
+  height: 7px;
+  border-radius: 50%;
+  background: var(--g-highlight);
+}
+
+.eyebrow:has(svg)::before {
+  content: none;
 }
 
 .lead {
@@ -397,24 +451,29 @@ main > section.section--feature {
   line-height: 1;
   text-decoration: none;
   cursor: pointer;
+  box-shadow: 0 10px 22px -12px var(--btn-glow, rgb(20 48 127 / 60%));
   transition:
-    transform 0.15s ease,
-    box-shadow 0.15s ease;
+    transform 0.2s ease,
+    box-shadow 0.2s ease,
+    filter 0.2s ease;
 }
 
 .btn:hover {
   color: var(--btn-fg);
-  transform: translateY(-1px);
-  box-shadow: var(--shadow-sm);
+  transform: translateY(-2px);
+  box-shadow: 0 16px 30px -14px var(--btn-glow, rgb(20 48 127 / 70%));
+  filter: saturate(1.08) brightness(1.04);
 }
 
 .btn--sun {
   --btn-bg: var(--sun);
   --btn-fg: var(--ink);
   --btn-grad: var(--g-sun);
+  --btn-glow: rgb(255 170 30 / 75%);
 }
 
 .btn--ghost {
+  --btn-glow: rgb(20 48 127 / 28%);
   border-color: var(--btn-bg);
   background: var(--g-glass) padding-box;
   color: var(--btn-bg);
@@ -445,12 +504,28 @@ main > section.section--feature {
 /* ---------- Cards ---------- */
 .card {
   position: relative;
-  /* Inline (not var(--g-card)) so each card's tone tints its corner. */
-  background: linear-gradient(165deg, #ffffff 0%, #ffffff 50%, var(--badge-bg, #fff1e6) 160%);
-  border: 1px solid var(--line);
-  border-radius: var(--radius);
+  /* Frosted glass; written out (not var(--g-card)) so each card's tone tints its corner. */
+  background:
+    radial-gradient(120% 90% at 100% 100%, color-mix(in srgb, var(--badge-bg, #fff1e6) 75%, transparent) 0%, transparent 60%),
+    linear-gradient(160deg, rgb(255 255 255 / 94%) 0%, rgb(255 255 255 / 80%) 100%);
+  border: 1px solid var(--glass-edge);
+  border-radius: 22px;
   padding: 28px;
   box-shadow: var(--shadow-sm);
+}
+
+/* Cards in a grid (values, programs, branches, testimonials) lift gently on hover. */
+.grid > .card,
+.testimonial {
+  transition:
+    transform 0.25s ease,
+    box-shadow 0.25s ease;
+}
+
+.grid > .card:hover,
+.testimonial:hover {
+  transform: translateY(-4px);
+  box-shadow: var(--shadow-lift);
 }
 
 .card h3 {
@@ -469,6 +544,9 @@ main > section.section--feature {
   margin-bottom: 18px;
   border-radius: 16px;
   background: linear-gradient(135deg, var(--badge-bg, var(--navy-50)) 0%, var(--badge-bg-2, #d3def7) 100%);
+  box-shadow:
+    inset 0 0 0 1px rgb(255 255 255 / 70%),
+    0 8px 18px -10px color-mix(in srgb, var(--badge-fg, var(--navy)) 45%, transparent);
   color: var(--badge-fg, var(--navy));
 }
 
@@ -540,7 +618,6 @@ main > section.section--feature {
   position: relative;
   overflow: hidden;
   padding-block: clamp(48px, 7vw, 88px) clamp(40px, 6vw, 72px);
-  background: var(--g-banner);
 }
 
 .page-hero h1 {
@@ -657,6 +734,10 @@ main > section.section--feature {
   display: inline-block;
   position: relative;
   white-space: nowrap;
+  background: var(--g-highlight);
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
 }
 
 .squiggle::after {

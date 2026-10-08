@@ -314,7 +314,6 @@ const tones = ['navy', 'green', 'coral', 'sky', 'sun', 'navy'];
     position: relative;
     overflow: hidden;
     padding-block: clamp(40px, 6vw, 80px) clamp(48px, 7vw, 96px);
-    background: var(--g-banner);
   }
 
   .hero__inner {
@@ -368,9 +367,10 @@ const tones = ['navy', 'green', 'coral', 'sky', 'sun', 'navy'];
     height: 100%;
     aspect-ratio: 4 / 3;
     object-fit: cover;
-    border-radius: var(--radius);
+    padding: 5px;
+    border-radius: 22px;
+    background: var(--g-ring);
     box-shadow: var(--shadow);
-    border: 5px solid #fff;
   }
 
   .hero__art :global(.hero__photo--big) {
@@ -412,17 +412,7 @@ const tones = ['navy', 'green', 'coral', 'sky', 'sun', 'navy'];
   }
 
   .stats {
-    background: linear-gradient(90deg, var(--p-butter) 0%, var(--p-peach) 35%, var(--p-pink) 65%, var(--p-lavender) 100%);
-    background-size: 200% 100%;
-    animation: stats-shimmer 14s ease-in-out infinite alternate;
-    padding-block: 30px;
-    border-block: 1px solid rgb(19 26 58 / 6%);
-  }
-
-  @keyframes stats-shimmer {
-    to {
-      background-position: 100% 0;
-    }
+    padding-block: 8px;
   }
 
   .stats__list {
@@ -430,9 +420,13 @@ const tones = ['navy', 'green', 'coral', 'sky', 'sun', 'navy'];
     grid-template-columns: repeat(4, 1fr);
     gap: 20px;
     margin: 0;
-    padding: 0;
+    padding: 26px 20px;
     list-style: none;
     text-align: center;
+    border: 1px solid var(--glass-edge);
+    border-radius: 28px;
+    background: var(--g-card);
+    box-shadow: var(--shadow);
   }
 
   @media (max-width: 700px) {
@@ -446,23 +440,27 @@ const tones = ['navy', 'green', 'coral', 'sky', 'sun', 'navy'];
   }
 
   .stats__list strong {
+    --num: linear-gradient(135deg, #2a4fb3 0%, #14307f 100%);
     font-family: var(--font-display);
-    font-size: clamp(1.6rem, 3vw, 2.2rem);
+    font-size: clamp(1.8rem, 3.4vw, 2.5rem);
     font-weight: 600;
-    color: var(--navy);
     line-height: 1.2;
+    background: var(--num);
+    -webkit-background-clip: text;
+    background-clip: text;
+    color: transparent;
   }
 
   .stats__list li:nth-child(4n + 2) strong {
-    color: #b2342b;
+    --num: linear-gradient(135deg, #e2456f 0%, #b2342b 100%);
   }
 
   .stats__list li:nth-child(4n + 3) strong {
-    color: #23793a;
+    --num: linear-gradient(135deg, #2fa55a 0%, #1d6e3a 100%);
   }
 
   .stats__list li:nth-child(4n + 4) strong {
-    color: #1f63c4;
+    --num: linear-gradient(135deg, #7a4fe0 0%, #1f63c4 100%);
   }
 
   .stats__list span {
@@ -492,7 +490,10 @@ const tones = ['navy', 'green', 'coral', 'sky', 'sun', 'navy'];
     height: auto;
     aspect-ratio: 4 / 3;
     object-fit: cover;
-    border-radius: var(--radius-lg);
+    padding: 6px;
+    border-radius: 32px;
+    background: var(--g-ring);
+    box-shadow: var(--shadow);
   }
 
   .about__quote {
@@ -574,8 +575,9 @@ const tones = ['navy', 'green', 'coral', 'sky', 'sun', 'navy'];
     height: auto;
     aspect-ratio: 4 / 3;
     object-fit: cover;
-    border-radius: var(--radius-lg);
-    border: 6px solid #fff;
+    padding: 6px;
+    border-radius: 32px;
+    background: var(--g-ring);
     box-shadow: var(--shadow);
   }
 
@@ -593,9 +595,18 @@ const tones = ['navy', 'green', 'coral', 'sky', 'sun', 'navy'];
     gap: 14px;
     align-items: flex-start;
     padding: 18px;
-    border-radius: var(--radius);
+    border: 1px solid var(--glass-edge);
+    border-radius: 20px;
     background: var(--g-glass);
     box-shadow: var(--shadow-sm);
+    transition:
+      transform 0.25s ease,
+      box-shadow 0.25s ease;
+  }
+
+  .facilities li:hover {
+    transform: translateY(-3px);
+    box-shadow: var(--shadow);
   }
 
   .facilities .icon-badge {
@@ -626,8 +637,13 @@ const tones = ['navy', 'green', 'coral', 'sky', 'sun', 'navy'];
   }
 
   .testimonial :global(.testimonial__icon) {
-    margin-bottom: 12px;
-    color: var(--coral);
+    box-sizing: content-box;
+    margin-bottom: 14px;
+    padding: 9px;
+    border-radius: 50%;
+    background: linear-gradient(135deg, #ffe3ec 0%, #ffc9dc 100%);
+    box-shadow: 0 8px 18px -10px rgb(226 69 111 / 60%);
+    color: #d4365f;
   }
 
   .testimonial blockquote {
