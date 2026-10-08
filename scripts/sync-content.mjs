@@ -212,6 +212,13 @@ await ensureAdmins(db);
 if (args.has('--seed')) {
   await seed(db, bucket);
 } else {
-  if (args.has('--seed-if-empty') && !(await db.doc('content/site').get()).exists) await seed(db, bucket);
+  const empty = !(await db.doc('content/site').get()).exists;
+  if (empty && args.has('--seed-if-empty')) {
+    await seed(db, bucket);
+  } else if (empty) {
+    // e.g. a pull-request preview before the first deploy to main has filled Firestore.
+    console.log('Firestore has no content yet; building from the content already in the repository.');
+    process.exit(0);
+  }
   await pull(db, bucket);
 }
