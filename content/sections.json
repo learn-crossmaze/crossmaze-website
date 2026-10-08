@@ -196,5 +196,59 @@
       "q": "Do you provide transport?",
       "a": "Yes. In-house transport runs on pre-set routes within a 5 km radius of the centre. Seats are subject to availability, so please check with your nearest branch."
     }
+  ],
+  "dayRoutine": [
+    {
+      "icon": "Sun",
+      "title": "Good morning",
+      "text": "A warm welcome at the door, then circle time to say hello, share news and talk about the day."
+    },
+    {
+      "icon": "Shapes",
+      "title": "Montessori work time",
+      "text": "Hands-on materials for language, numbers and practical life, explored at each child’s own pace."
+    },
+    {
+      "icon": "Utensils",
+      "title": "Snack and stories",
+      "text": "Snack time together, followed by stories, rhymes and plenty of conversation."
+    },
+    {
+      "icon": "Palette",
+      "title": "Theme activities",
+      "text": "Art and craft, music and show-and-tell, all built around the theme of the week."
+    },
+    {
+      "icon": "Trees",
+      "title": "Play and movement",
+      "text": "Indoor and outdoor play, dance and yoga to build strength, balance and confidence."
+    },
+    {
+      "icon": "BedDouble",
+      "title": "Day care afternoon",
+      "text": "Day care children have lunch, a rest in the nap room and calm afternoon activities until pick-up."
+    }
+  ],
+  "admissionSteps": [
+    {
+      "icon": "Pencil",
+      "title": "Send an enquiry",
+      "text": "Fill in the enquiry form, call us or message us on WhatsApp."
+    },
+    {
+      "icon": "Phone",
+      "title": "We call you back",
+      "text": "Our admissions team answers your questions and suggests the nearest centre."
+    },
+    {
+      "icon": "School",
+      "title": "Visit the centre",
+      "text": "Tour the classrooms and Montessori area, and meet the centre head and teachers."
+    },
+    {
+      "icon": "Sparkles",
+      "title": "Join Crossmaze",
+      "text": "Choose the right program for your child and complete the admission at the centre."
+    }
   ]
 }

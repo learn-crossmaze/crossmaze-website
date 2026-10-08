@@ -77,6 +77,8 @@ export interface SectionsContent {
   facilities: IconItem[];
   perks: IconItem[];
   faqs: { q: string; a: string }[];
+  dayRoutine: IconItem[];
+  admissionSteps: IconItem[];
 }
 
 export type ToneColor = 'sun' | 'coral' | 'green' | 'sky' | 'navy';

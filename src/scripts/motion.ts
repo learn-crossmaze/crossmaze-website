@@ -18,6 +18,7 @@ const REVEAL = [
   '.about__media',
   '.faq__item',
   '.job',
+  '.steps__item',
 ].join(',');
 
 function inViewport(el: Element) {

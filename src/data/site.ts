@@ -12,6 +12,8 @@ export const site = {
 
 export const coreValues = sectionsContent.coreValues;
 export const faqs = sectionsContent.faqs;
+export const dayRoutine = sectionsContent.dayRoutine ?? [];
+export const admissionSteps = sectionsContent.admissionSteps ?? [];
 
 export const nav = [
   { label: 'Home', href: '/' },

@@ -7,7 +7,8 @@ import ProgramCard from '../components/ProgramCard.astro';
 import BranchCard from '../components/BranchCard.astro';
 import EnquiryForm from '../components/EnquiryForm.astro';
 import FloatingShapes from '../components/FloatingShapes.astro';
-import { site, coreValues } from '../data/site';
+import Steps from '../components/Steps.astro';
+import { site, coreValues, dayRoutine, admissionSteps } from '../data/site';
 import { programs, daycareHighlights } from '../data/programs';
 import { branches, facilities } from '../data/branches';
 import { testimonials } from '../data/testimonials';
@@ -142,6 +143,23 @@ const tones = ['navy', 'green', 'coral', 'sky', 'sun', 'navy'];
     </div>
   </section>
 
+  <!-- A day at Crossmaze -->
+  {
+    dayRoutine.length > 0 && (
+      <section class="section" id="a-day-at-crossmaze">
+        <div class="container">
+          <SectionHeading
+            eyebrow="A day at Crossmaze"
+            title="Busy, happy little days"
+            lead="Every day balances calm, focused Montessori work with play, stories, music and movement."
+            align="center"
+          />
+          <Steps items={dayRoutine} />
+        </div>
+      </section>
+    )
+  }
+
   <!-- Day care -->
   <section class="section section--feature care">
     <div class="container care__inner">
@@ -237,6 +255,26 @@ const tones = ['navy', 'green', 'coral', 'sky', 'sun', 'navy'];
     </div>
   </section>
 
+  <!-- How admission works -->
+  {
+    admissionSteps.length > 0 && (
+      <section class="section" id="admissions">
+        <div class="container">
+          <SectionHeading
+            eyebrow="Admissions"
+            title="Joining Crossmaze is easy"
+            lead="From your first question to your child’s first day, we are with you at every step."
+            align="center"
+          />
+          <Steps items={admissionSteps} numbered />
+          <p class="steps-cta">
+            <a class="btn btn--sun" href="#enquire">Start with an enquiry <Icon name="ArrowRight" size={18} /></a>
+          </p>
+        </div>
+      </section>
+    )
+  }
+
   <!-- Enquiry -->
   <section class="section" id="enquire">
     <div class="container enquire">
@@ -267,11 +305,16 @@ const tones = ['navy', 'green', 'coral', 'sky', 'sun', 'navy'];
 </BaseLayout>
 
 <style>
+  .steps-cta {
+    margin: clamp(32px, 4vw, 44px) 0 0;
+    text-align: center;
+  }
+
   .hero {
     position: relative;
     overflow: hidden;
     padding-block: clamp(40px, 6vw, 80px) clamp(48px, 7vw, 96px);
-    background: var(--cream);
+    background: var(--g-banner);
   }
 
   .hero__inner {
@@ -342,7 +385,7 @@ const tones = ['navy', 'green', 'coral', 'sky', 'sun', 'navy'];
     display: grid;
     padding: 12px 18px;
     border-radius: var(--radius);
-    background: var(--sun);
+    background: var(--g-sun);
     color: var(--ink);
     box-shadow: var(--shadow);
     transform: rotate(-4deg);
@@ -457,7 +500,7 @@ const tones = ['navy', 'green', 'coral', 'sky', 'sun', 'navy'];
     position: relative;
     padding: 20px 24px;
     border-radius: var(--radius);
-    background: var(--p-lavender);
+    background: linear-gradient(135deg, #f8f4ff 0%, #ebe4ff 100%);
     border: 2px solid #fff;
     color: var(--ink);
     font-family: var(--font-display);
@@ -520,7 +563,7 @@ const tones = ['navy', 'green', 'coral', 'sky', 'sun', 'navy'];
     flex: none;
     padding: 3px;
     border-radius: 50%;
-    background: #fff;
+    background: linear-gradient(135deg, #ffffff 0%, #e2f4e3 100%);
     color: var(--green);
     width: 26px;
     height: 26px;
@@ -551,7 +594,8 @@ const tones = ['navy', 'green', 'coral', 'sky', 'sun', 'navy'];
     align-items: flex-start;
     padding: 18px;
     border-radius: var(--radius);
-    background: var(--cream);
+    background: var(--g-glass);
+    box-shadow: var(--shadow-sm);
   }
 
   .facilities .icon-badge {
@@ -560,7 +604,6 @@ const tones = ['navy', 'green', 'coral', 'sky', 'sun', 'navy'];
     width: 46px;
     height: 46px;
     border-radius: 14px;
-    background: var(--paper);
   }
 
   .facilities li > span:last-child {

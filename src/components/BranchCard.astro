@@ -70,7 +70,7 @@ const cover = branchPhotos(branch.slug)[0];
     border-radius: 14px;
     overflow: hidden;
     aspect-ratio: 16 / 9;
-    background: var(--badge-bg);
+    background: linear-gradient(135deg, var(--badge-bg) 0%, var(--badge-bg-2, var(--badge-bg)) 100%);
   }
   .branch-card__media :global(img) {
     width: 100%;
@@ -85,7 +85,7 @@ const cover = branchPhotos(branch.slug)[0];
     background:
       radial-gradient(circle at 15% 85%, var(--tone) 0 34px, transparent 35px),
       radial-gradient(circle at 88% 18%, rgb(255 255 255 / 70%) 0 46px, transparent 47px),
-      var(--badge-bg);
+      linear-gradient(135deg, var(--badge-bg) 0%, var(--badge-bg-2, var(--badge-bg)) 100%);
   }
   .branch-card__pin {
     position: absolute;
@@ -96,7 +96,7 @@ const cover = branchPhotos(branch.slug)[0];
     gap: 4px;
     padding: 4px 10px;
     border-radius: 999px;
-    background: rgb(255 255 255 / 92%);
+    background: var(--g-glass);
     font-size: 0.82rem;
     font-weight: 800;
     color: var(--ink);

@@ -165,6 +165,18 @@ export const sectionsSchema: Field[] = [
   { ...iconItem('Facility'), key: 'facilities', label: 'Facilities', help: 'Home and Branches pages.' },
   { ...iconItem('Perk'), key: 'perks', label: 'Why work with us', help: 'Careers page.' },
   {
+    ...iconItem('Part of the day'),
+    key: 'dayRoutine',
+    label: 'A day at Crossmaze',
+    help: 'Home and Programs pages, in order. Remove every entry to hide the section.',
+  },
+  {
+    ...iconItem('Step'),
+    key: 'admissionSteps',
+    label: 'How admission works',
+    help: 'Home and Contact pages, in order. Remove every entry to hide the section.',
+  },
+  {
     key: 'faqs',
     label: 'Frequently asked questions',
     type: 'objects',
