@@ -4,8 +4,9 @@ See README.md for how the site, admin panel and LITMUS integration fit together.
 
 ## Design rules (from the school)
 
-- **Every background is a gradient, never a flat colour:** page, sections, banners, header, footer, cards, buttons, badges, panels and form boxes. Use the `--g-*` tokens in `src/styles/global.css`, or a two-stop tint (`--badge-bg` → `--badge-bg-2`) for toned items.
-- Soft pastel palette. Sections cycle through six pastel gradients automatically (`main > section:nth-of-type(…)`).
+- **Every background is a gradient, never a flat colour:** page, banners, header, footer, cards, buttons, badges, panels and form boxes. Use the `--g-*` tokens in `src/styles/global.css`, or a two-stop tint (`--badge-bg` → `--badge-bg-2`) for toned items.
+- **No hard colour changes between sections.** The page background is one pastel gradient that flows down the whole page (`--g-flow` on `body`, plus soft glows in `body::before`). Sections, banners and the footer have no full-width background of their own. Set a call-out apart with a floating panel (`section--feature`) or frosted-glass cards, never a coloured band with straight edges.
+- Surfaces are frosted glass (`--g-card`, `--g-glass`, `--g-soft`) with soft violet-tinted shadows (`--shadow-sm`, `--shadow`, `--shadow-lift`). Page headings use `--g-heading`; photos get a gradient ring (`--g-ring`).
 - Decorations are preschool doodles (crayons, ABC blocks, kites, rainbows…) from `src/components/doodles.ts`. They must not cover text: check banners at 1366, 900 and 390px wide.
 - Anything that moves must stop for `prefers-reduced-motion`.
 

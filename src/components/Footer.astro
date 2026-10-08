@@ -101,24 +101,36 @@ const mascot = image(site.mascot);
 </footer>
 
 <style>
+  /* No background of its own: the flowing page gradient continues underneath, and the footer
+     content sits on a frosted-glass panel, so there is no hard colour change. */
   .site-footer {
     position: relative;
-    margin-top: 0;
-    padding-block: 56px 28px;
-    background: linear-gradient(160deg, var(--p-lavender) 0%, var(--p-sky) 55%, var(--p-mint) 100%);
+    padding-block: 24px 28px;
     color: var(--muted);
   }
 
-  /* Wavy top edge */
-  .site-footer::before {
+  .site-footer > .container {
+    position: relative;
+    isolation: isolate;
+    padding-bottom: 24px;
+  }
+
+  .site-footer > .container::before {
     content: '';
     position: absolute;
-    left: 0;
-    right: 0;
-    bottom: 100%;
-    height: 48px;
-    background: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 1440 48' preserveAspectRatio='none'%3E%3Cpath d='M0 48V22c120-18 240-18 360 0s240 18 360 0 240-18 360 0 240 18 360 0v26z' fill='%23f3efff'/%3E%3C/svg%3E")
-      no-repeat bottom / 100% 100%;
+    z-index: -1;
+    inset: 0 calc(var(--gutter) - min(40px, var(--gutter) - 8px));
+    border: 1px solid var(--glass-edge);
+    border-radius: 36px;
+    background:
+      radial-gradient(50% 80% at 100% 0%, rgb(217 203 255 / 45%), transparent 70%),
+      radial-gradient(50% 80% at 0% 100%, rgb(191 234 207 / 40%), transparent 70%),
+      linear-gradient(160deg, rgb(255 255 255 / 82%) 0%, rgb(255 255 255 / 58%) 100%);
+    box-shadow: var(--shadow);
+  }
+
+  .site-footer__grid {
+    padding-top: 48px;
   }
 
   .site-footer a {
@@ -222,7 +234,7 @@ const mascot = image(site.mascot);
     gap: 12px 24px;
     margin-top: 48px;
     padding-top: 24px;
-    border-top: 1px solid rgb(20 48 127 / 12%);
+    border-top: 1px solid rgb(20 48 127 / 10%);
     font-size: 0.92rem;
   }
 

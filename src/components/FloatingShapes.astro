@@ -83,6 +83,9 @@ const shapes = variant === 'home' ? home : page;
       radial-gradient(34% 40% at 70% 78%, #d6f3e4 0%, transparent 70%),
       radial-gradient(30% 36% at 28% 82%, #fff1c2 0%, transparent 70%),
       radial-gradient(26% 30% at 50% 50%, #e1efff 0%, transparent 70%);
+    /* Fade out well before the banner's bottom edge so it melts into the page gradient. */
+    -webkit-mask-image: linear-gradient(180deg, #000 0%, #000 40%, transparent 70%);
+    mask-image: linear-gradient(180deg, #000 0%, #000 40%, transparent 70%);
     animation: fx-aurora 26s ease-in-out infinite alternate;
   }
 
@@ -91,10 +94,10 @@ const shapes = variant === 'home' ? home : page;
       transform: translate3d(0, 0, 0) rotate(0deg) scale(1);
     }
     50% {
-      transform: translate3d(5%, -4%, 0) rotate(10deg) scale(1.08);
+      transform: translate3d(5%, -3%, 0) rotate(6deg) scale(1.06);
     }
     100% {
-      transform: translate3d(-4%, 5%, 0) rotate(-8deg) scale(1.04);
+      transform: translate3d(-4%, 3%, 0) rotate(-5deg) scale(1.03);
     }
   }
 

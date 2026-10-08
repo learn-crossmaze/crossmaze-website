@@ -11,7 +11,9 @@ const { program } = Astro.props;
 
 <a class:list={['program-card', 'card', `tone-${program.color}`]} href={`/our-programs#${program.slug}`}>
   <span class="program-card__media">
-    <Image src={program.photo} alt={program.photoAlt} widths={[360, 560]} sizes="(max-width: 700px) 100vw, 360px" />
+    <span class="program-card__photo">
+      <Image src={program.photo} alt={program.photoAlt} widths={[360, 560]} sizes="(max-width: 700px) 100vw, 360px" />
+    </span>
     <span class="icon-badge"><Icon name={program.icon} size={24} /></span>
   </span>
   <span class="program-card__body">
@@ -37,7 +39,7 @@ const { program } = Astro.props;
   .program-card:hover {
     color: inherit;
     transform: translateY(-4px);
-    box-shadow: var(--shadow);
+    box-shadow: var(--shadow-lift);
   }
   .program-card__media {
     position: relative;
@@ -45,10 +47,20 @@ const { program } = Astro.props;
     aspect-ratio: 16 / 9;
     background: linear-gradient(135deg, var(--badge-bg) 0%, var(--badge-bg-2, var(--badge-bg)) 100%);
   }
+  /* Clips the photo's hover zoom; the icon badge overlaps the edge, so it sits outside this. */
+  .program-card__photo {
+    display: block;
+    height: 100%;
+    overflow: hidden;
+  }
   .program-card__media :global(img) {
     width: 100%;
     height: 100%;
     object-fit: cover;
+    transition: transform 0.5s ease;
+  }
+  .program-card:hover .program-card__media :global(img) {
+    transform: scale(1.05);
   }
   .program-card__media .icon-badge {
     position: absolute;

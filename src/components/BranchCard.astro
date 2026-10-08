@@ -76,6 +76,10 @@ const cover = branchPhotos(branch.slug)[0];
     width: 100%;
     height: 100%;
     object-fit: cover;
+    transition: transform 0.5s ease;
+  }
+  .branch-card:hover .branch-card__media :global(img) {
+    transform: scale(1.05);
   }
   .branch-card__art {
     display: grid;
