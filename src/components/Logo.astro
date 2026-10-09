@@ -11,7 +11,7 @@ const logo = image(site.logo);
 ---
 
 <span class:list={['logo', { 'logo--inverted': inverted }]}>
-  <Image src={logo} alt={site.name} width={300} class="logo__img" loading="eager" />
+  <Image src={logo} alt={site.name} width={300} densities={[1, 2, 3]} class="logo__img" loading="eager" />
   <span class="logo__sub">Preschool &amp; Day Care</span>
 </span>
 
@@ -21,9 +21,14 @@ const logo = image(site.logo);
     gap: 3px;
     justify-items: start;
   }
+  /* Fixed height, natural width; if space runs short it shrinks as a whole (never squashed or cut). */
   .logo__img {
+    display: block;
     width: auto;
     height: 34px;
+    max-width: 100%;
+    object-fit: contain;
+    object-position: left center;
   }
   .logo__sub {
     padding-left: 6px;

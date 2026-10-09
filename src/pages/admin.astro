@@ -1,7 +1,13 @@
 ---
 // The admin panel: a client-side app (src/admin/AdminApp.tsx) backed by Firebase.
 // Not indexed by search engines and not in the sitemap.
+import { getImage } from 'astro:assets';
 import AdminApp from '../admin/AdminApp';
+import { image } from '../data/content';
+import { site } from '../data/site';
+
+// The panel shows the site's current logo (as set in the panel itself), not a fixed file.
+const logo = await getImage({ src: image(site.logo), width: 600, format: 'webp' });
 ---
 
 <!doctype html>
@@ -20,6 +26,6 @@ import AdminApp from '../admin/AdminApp';
     />
   </head>
   <body>
-    <AdminApp client:only="react" />
+    <AdminApp client:only="react" logo={logo.src} />
   </body>
 </html>
