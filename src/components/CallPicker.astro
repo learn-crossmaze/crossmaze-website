@@ -1,0 +1,299 @@
+---
+// "Which centre should we call?" Every general call button (marked data-call-picker) opens this
+// list of branches instead of dialling one number, so parents reach their nearest centre.
+// On a branch page that branch is listed first; otherwise the centre the visitor called last is.
+// Without JavaScript the buttons fall back to their own tel: link.
+import Icon from './Icon.astro';
+import { site } from '../data/site';
+import { branches, shortName, telHref } from '../data/branches';
+
+const tones = ['navy', 'green', 'coral', 'sky', 'sun'];
+---
+
+<dialog class="call-picker" id="call-picker" aria-labelledby="call-picker-title">
+  <div class="call-picker__panel">
+    <button type="button" class="call-picker__close" data-call-picker-close aria-label="Close">
+      <Icon name="X" size={22} />
+    </button>
+    <span class="call-picker__icon"><Icon name="Phone" size={26} /></span>
+    <h2 id="call-picker-title">Call your nearest Crossmaze</h2>
+    <p class="muted">Choose the centre closest to you and we’ll connect you straight to them.</p>
+    <ul class="call-picker__list">
+      {
+        branches.map((b, i) => {
+          const phone = b.phone || site.phone;
+          return (
+            <li data-slug={b.slug}>
+              <a class:list={['call-picker__branch', `tone-${tones[i % tones.length]}`]} href={telHref(phone)}>
+                <span class="icon-badge">
+                  <Icon name="MapPin" size={22} />
+                </span>
+                <span class="call-picker__name">
+                  <strong>
+                    {shortName(b)} <span class="call-picker__tag" hidden />
+                  </strong>
+                  <span class="muted">
+                    {b.area}
+                    {b.pincode && ` · ${b.pincode}`}
+                  </span>
+                </span>
+                <span class="call-picker__phone">
+                  <Icon name="Phone" size={18} />
+                  <span>{phone}</span>
+                </span>
+              </a>
+            </li>
+          );
+        })
+      }
+    </ul>
+  </div>
+</dialog>
+
+<script>
+  const dialog = document.querySelector<HTMLDialogElement>('#call-picker');
+  const KEY = 'crossmaze-call-branch';
+
+  const remembered = () => {
+    try {
+      return localStorage.getItem(KEY);
+    } catch {
+      return null;
+    }
+  };
+
+  /** Lists the most likely centre first: the branch page being viewed, else the last one called. */
+  function putPreferredFirst() {
+    if (!dialog) return;
+    const list = dialog.querySelector('.call-picker__list');
+    const onPage = location.pathname.match(/^\/branch\/([^/]+)/)?.[1];
+    const slug = onPage ?? remembered();
+    dialog.querySelectorAll<HTMLElement>('.call-picker__tag').forEach((tag) => (tag.hidden = true));
+    const item = slug ? dialog.querySelector<HTMLElement>(`li[data-slug="${CSS.escape(slug)}"]`) : null;
+    if (!list || !item) return;
+    list.prepend(item);
+    const tag = item.querySelector<HTMLElement>('.call-picker__tag');
+    if (tag) {
+      tag.textContent = onPage ? 'This centre' : 'Called before';
+      tag.hidden = false;
+    }
+  }
+
+  if (dialog && typeof dialog.showModal === 'function') {
+    document.addEventListener('click', (event) => {
+      const trigger = (event.target as Element).closest('[data-call-picker]');
+      if (!trigger) return;
+      event.preventDefault();
+      putPreferredFirst();
+      dialog.showModal();
+    });
+
+    dialog.addEventListener('click', (event) => {
+      const target = event.target as Element;
+      // A click on the dimmed backdrop lands on the <dialog> itself.
+      if (target === dialog || target.closest('[data-call-picker-close]')) {
+        dialog.close();
+        return;
+      }
+      const branch = target.closest<HTMLAnchorElement>('.call-picker__branch');
+      if (branch) {
+        try {
+          localStorage.setItem(KEY, branch.closest('li')?.dataset.slug ?? '');
+        } catch {
+          // Private browsing: nothing to remember, the call still goes through.
+        }
+        setTimeout(() => dialog.close(), 300);
+      }
+    });
+  }
+</script>
+
+<style>
+  .call-picker {
+    width: min(560px, calc(100% - 24px));
+    max-height: calc(100dvh - 24px);
+    margin: auto;
+    padding: 0;
+    border: 0;
+    border-radius: 32px;
+    background: transparent;
+    color: var(--ink);
+    overflow: visible;
+  }
+
+  .call-picker::backdrop {
+    background: rgb(19 26 58 / 38%);
+    backdrop-filter: blur(6px);
+  }
+
+  .call-picker[open] {
+    animation: call-picker-in 0.28s cubic-bezier(0.2, 0.8, 0.2, 1);
+  }
+
+  @keyframes call-picker-in {
+    from {
+      opacity: 0;
+      transform: translateY(16px) scale(0.97);
+    }
+  }
+
+  .call-picker__panel {
+    position: relative;
+    max-height: calc(100dvh - 24px);
+    overflow-y: auto;
+    padding: clamp(24px, 4vw, 36px);
+    border: 1px solid var(--glass-edge);
+    border-radius: 32px;
+    background:
+      radial-gradient(70% 60% at 0% 0%, rgb(255 214 230 / 80%), transparent 70%),
+      radial-gradient(70% 60% at 100% 100%, rgb(200 228 255 / 80%), transparent 70%),
+      linear-gradient(160deg, #fffaf6 0%, #f6f2ff 100%);
+    box-shadow: var(--shadow-lift);
+  }
+
+  .call-picker__close {
+    position: absolute;
+    top: 14px;
+    right: 14px;
+    display: grid;
+    place-items: center;
+    width: 42px;
+    height: 42px;
+    border: 0;
+    border-radius: 50%;
+    background: linear-gradient(135deg, rgb(255 255 255 / 90%) 0%, rgb(234 240 251 / 90%) 100%);
+    color: var(--navy);
+    cursor: pointer;
+  }
+
+  .call-picker__icon {
+    display: inline-grid;
+    place-items: center;
+    width: 56px;
+    height: 56px;
+    margin-bottom: 14px;
+    border-radius: 18px;
+    background: var(--g-navy);
+    color: #fff;
+    box-shadow: 0 12px 24px -12px rgb(20 48 127 / 70%);
+  }
+
+  .call-picker h2 {
+    margin-bottom: 0.25em;
+    padding-right: 40px;
+    font-size: clamp(1.4rem, 3vw, 1.75rem);
+    background: var(--g-heading);
+    -webkit-background-clip: text;
+    background-clip: text;
+    color: transparent;
+  }
+
+  .call-picker__list {
+    display: grid;
+    gap: 10px;
+    margin: 20px 0 0;
+    padding: 0;
+    list-style: none;
+  }
+
+  .call-picker__branch {
+    display: flex;
+    align-items: center;
+    gap: 14px;
+    padding: 14px 16px;
+    border: 1px solid var(--glass-edge);
+    border-radius: 20px;
+    background: var(--g-card);
+    box-shadow: var(--shadow-sm);
+    color: var(--ink);
+    text-decoration: none;
+    transition:
+      transform 0.2s ease,
+      box-shadow 0.2s ease;
+  }
+
+  .call-picker__branch:hover,
+  .call-picker__branch:focus-visible {
+    color: var(--ink);
+    transform: translateY(-2px);
+    box-shadow: var(--shadow);
+  }
+
+  .call-picker__branch .icon-badge {
+    flex: none;
+    width: 44px;
+    height: 44px;
+    margin: 0;
+    border-radius: 14px;
+  }
+
+  .call-picker__name {
+    display: grid;
+    flex: 1;
+    min-width: 0;
+    line-height: 1.35;
+  }
+
+  .call-picker__name strong {
+    font-family: var(--font-display);
+    font-weight: 600;
+    font-size: 1.08rem;
+  }
+
+  .call-picker__name .muted {
+    font-size: 0.9rem;
+  }
+
+  .call-picker__tag {
+    display: inline-block;
+    margin-left: 6px;
+    padding: 2px 8px;
+    border-radius: 999px;
+    background: var(--g-sun);
+    font-family: var(--font-body);
+    font-size: 0.72rem;
+    font-weight: 800;
+    vertical-align: 2px;
+  }
+
+  .call-picker__tag[hidden] {
+    display: none;
+  }
+
+  .call-picker__phone {
+    display: inline-flex;
+    flex: none;
+    align-items: center;
+    gap: 6px;
+    padding: 8px 14px;
+    border-radius: 999px;
+    background: var(--g-navy);
+    color: #fff;
+    font-weight: 800;
+    font-size: 0.9rem;
+    white-space: nowrap;
+  }
+
+  /* Phones: a sheet that rises from the bottom, with the number under the branch name. */
+  @media (max-width: 560px) {
+    .call-picker {
+      width: 100%;
+      max-width: none;
+      margin: auto 0 0;
+    }
+
+    .call-picker__panel {
+      border-radius: 28px 28px 0 0;
+      padding-bottom: max(24px, env(safe-area-inset-bottom));
+    }
+
+    .call-picker__branch {
+      flex-wrap: wrap;
+    }
+
+    .call-picker__phone {
+      flex-basis: 100%;
+      justify-content: center;
+    }
+  }
+</style>

@@ -164,7 +164,7 @@ FIREBASE_STORAGE_BUCKET=demo-crossmaze.appspot.com ADMIN_EMAILS=you@example.com 
 
 ## Please verify before launch
 
-- [ ] **Phone and WhatsApp**: every branch uses +91 72040 21508, the only number on the old site. You can change it per branch in the admin panel.
+- [ ] **Phone and WhatsApp**: every branch uses +91 72040 21508, the only number on the old site. The site's Call buttons ask visitors to pick their nearest centre and then dial that centre's number, so set each branch's own number in the admin panel (Branches → Phone).
 - [ ] **Timings**: preschool 9:00 am – 12:30 pm and day care 9:00 am – 6:00 pm came from public listings, not the old site.
 - [ ] **Street addresses** for Neotown, SNN Greenbay and Neeladri Nagar came from public listings, and Ananth Nagar has none yet.
 - [ ] **Founders and founding year** (About page) came from public sources.
