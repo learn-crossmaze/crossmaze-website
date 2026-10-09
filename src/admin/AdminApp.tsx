@@ -50,7 +50,11 @@ function useRoute() {
   return route;
 }
 
-export default function AdminApp() {
+/** The site's logo as of the last publish (passed in by pages/admin.astro). */
+let brandLogo = '/logo.png';
+
+export default function AdminApp({ logo }: { logo?: string }) {
+  if (logo) brandLogo = logo;
   const { services, error } = useFirebase();
   const user = useUser(services);
 
@@ -74,7 +78,7 @@ function Centered({ children }: { children: React.ReactNode }) {
   return (
     <div className="centered">
       <div className="login-card">
-        <img src="/logo.png" alt="Crossmaze" className="login-logo" />
+        <img src={brandLogo} alt="Crossmaze" className="login-logo" />
         {children}
       </div>
     </div>
@@ -244,7 +248,7 @@ function Shell() {
     <div className={`shell ${menuOpen ? 'menu-open' : ''}`}>
       <aside className="sidebar">
         <a className="brand" href="#/">
-          <img src="/logo.png" alt="Crossmaze" />
+          <img src={brandLogo} alt="Crossmaze" />
           <span>Website admin</span>
         </a>
         <nav aria-label="Admin">
