@@ -27,9 +27,9 @@ import { branches, shortName, telHref } from '../data/branches';
         <EnquiryForm id="contact-enquiry" />
       </div>
       <aside class="contact__direct">
-        <a class="direct tone-navy" href={site.phoneHref}>
+        <a class="direct tone-navy" href={site.phoneHref} data-call-picker>
           <span class="icon-badge"><Icon name="Phone" size={24} /></span>
-          <span><span class="muted">Call admissions</span><strong>{site.phone}</strong></span>
+          <span><span class="muted">Call us</span><strong>Your nearest centre</strong></span>
         </a>
         <a class="direct tone-green" href={site.whatsappHref} target="_blank" rel="noopener">
           <span class="icon-badge"><Icon name="MessageCircle" size={24} /></span>

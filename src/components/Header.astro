@@ -59,9 +59,9 @@ const isActive = (href: string) => (href === '/' ? path === '/' : path === href 
         }
       </ul>
       <div class="site-nav__cta">
-        <a class="btn btn--ghost btn--sm" href={site.phoneHref}>
+        <a class="btn btn--ghost btn--sm" href={site.phoneHref} data-call-picker>
           <Icon name="Phone" size={18} />
-          {site.phone}
+          Call a centre
         </a>
         <a class="btn btn--sm" href="/contact#enquire">Book a visit</a>
       </div>
