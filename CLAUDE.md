@@ -14,6 +14,7 @@ See README.md for how the site, admin panel and LITMUS integration fit together.
 
 - Live content is edited in the admin panel (Firestore). `content/*.json` is only the starting copy that each deploy overwrites from Firestore.
 - A new editable field needs: the JSON in `content/`, its type in `src/data/content.ts`, its form field in `src/admin/schemas.ts` and, for `sections`, its key in `normalize.sections` in `scripts/sync-content.mjs`. Deploys from `main` copy new fields into Firestore.
+- To change existing copy (text, phone numbers, addresses), edit `content/*.json` and run `node scripts/content-update.mjs <id> "<what changed>"` before committing. Without a content update in `content/updates/`, the next deploy overwrites the edit with Firestore's copy.
 - Don't invent facts about the school (fees, timings, staff, results). Add anything that needs checking to "Please verify before launch" in README.md.
 
 ## Checks

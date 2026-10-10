@@ -1,0 +1,1039 @@
+{
+  "id": "2026-10-10-copy-refresh",
+  "description": "Refreshed copy across the site, and corrected branch phone numbers, addresses and map pins from the old www.crossmaze.in branch records",
+  "changes": [
+    {
+      "doc": "content/site",
+      "field": "description",
+      "from": "Crossmaze Preschool and Day Care, Bengaluru: Montessori-based Play Group, Nursery, Junior KG, Senior KG and Day Care at five centres in Electronic City and Begur, with live CCTV, a parent app and in-house transport.",
+      "to": "Crossmaze Preschool and Day Care, Bengaluru: Montessori-based Play Group, Nursery, Junior KG, Senior KG and Day Care at five centres across Electronic City and Begur, with live CCTV, a parents’ app and in-house transport."
+    },
+    {
+      "doc": "content/site",
+      "field": "hero.lead",
+      "from": "A secure, caring and nurturing space where children thrive and learn at their own pace, with a Montessori-based approach at five centres across Electronic City and Begur.",
+      "to": "A warm, secure and caring space where children learn at their own pace. Montessori-based preschool and day care, at five centres across Electronic City and Begur."
+    },
+    {
+      "doc": "content/site",
+      "field": "promise",
+      "from": "Crossmaze offers a secure, caring, and nurturing space for children to thrive and learn at their own pace. Our inclusive learning center is dedicated to fostering positive connections among children, parents, and staff. We are deeply committed to creating a safe and supportive environment where every child is cherished and respected.",
+      "to": "Crossmaze is a secure, caring and nurturing space where children thrive and learn at their own pace. As an inclusive learning centre, we build warm, positive connections between children, parents and staff, and we are deeply committed to a safe, supportive environment where every child is cherished and respected."
+    },
+    {
+      "doc": "content/site",
+      "field": "about",
+      "from": [
+        "Crossmaze is an interactive education place where children learn to excel along with the choice of their preferences. Children under the age of 5 have a strong visual understanding, so a practical approach suits them best, and visual learning is everlasting. We understand that each kid is special, and with a wide range of activities and learning material we lay a strong foundation for each child.",
+        "Our learning and education program is designed to eliminate the achievement gap and encourage every student to become equally successful. Good pre-schooling is the first milestone in the development and growth of children, and a strong, positive self-image is the best possible preparation for success.",
+        "At Crossmaze, activities are designed to give children opportunities to develop confidence and a positive image of themselves. Continuous motivation from teachers helps our students build a positive self-image, which in turn makes them confident individuals."
+      ],
+      "to": [
+        "Crossmaze is an interactive place of learning where children grow and excel while following their own interests. Children under five understand the world best through what they see and do, so we teach in a practical, hands-on way, and what they learn visually stays with them. Every child is special, and our wide range of activities and learning materials helps us lay a strong foundation for each one.",
+        "Good preschooling is the first milestone in a child’s growth. Our learning program is designed to close the achievement gap and help every child succeed, because a strong, positive self-image is the best preparation for success.",
+        "Every activity at Crossmaze gives children a chance to build confidence and feel good about themselves. With steady encouragement from their teachers, our children develop a positive self-image and grow into confident individuals."
+      ]
+    },
+    {
+      "doc": "content/site",
+      "field": "stats",
+      "from": [
+        {
+          "value": "1000+",
+          "label": "happy children"
+        },
+        {
+          "value": "2000+",
+          "label": "happy parents"
+        },
+        {
+          "value": "100+",
+          "label": "passionate individuals"
+        },
+        {
+          "value": "6+ years",
+          "label": "of childcare"
+        }
+      ],
+      "to": [
+        {
+          "value": "1000+",
+          "label": "happy children"
+        },
+        {
+          "value": "2000+",
+          "label": "happy parents"
+        },
+        {
+          "value": "100+",
+          "label": "passionate team members"
+        },
+        {
+          "value": "6+ years",
+          "label": "of childcare"
+        }
+      ]
+    },
+    {
+      "doc": "content/sections",
+      "field": "coreValues",
+      "from": [
+        {
+          "icon": "Users",
+          "title": "Equality",
+          "text": "We promote equality by embracing diversity and ensuring that every child feels valued and included, regardless of background or ability."
+        },
+        {
+          "icon": "ShieldCheck",
+          "title": "Integrity",
+          "text": "We value transparency and ethical behaviour, fostering a culture of integrity in all interactions and communications."
+        },
+        {
+          "icon": "Award",
+          "title": "Excellence",
+          "text": "We are dedicated to a high-quality educational and nurturing environment, continually striving for improvement and innovation."
+        },
+        {
+          "icon": "Puzzle",
+          "title": "Practical way",
+          "text": "Our curriculum emphasises practical life skills such as problem-solving, communication and collaboration, preparing children for future challenges and successes."
+        },
+        {
+          "icon": "Star",
+          "title": "Achieving targets",
+          "text": "We set attainable goals for each child and work together to help them achieve them, celebrating both small and significant milestones."
+        },
+        {
+          "icon": "Lightbulb",
+          "title": "Interactive education",
+          "text": "We focus on interactive, hands-on educational methods that inspire curiosity and a love for learning in every child."
+        }
+      ],
+      "to": [
+        {
+          "icon": "Users",
+          "title": "Equality",
+          "text": "We embrace diversity and make sure every child feels valued and included, whatever their background or ability."
+        },
+        {
+          "icon": "ShieldCheck",
+          "title": "Integrity",
+          "text": "We are open and honest with families, and act with integrity in everything we do and say."
+        },
+        {
+          "icon": "Award",
+          "title": "Excellence",
+          "text": "We are committed to high-quality education and care, and we keep improving and bringing in new ideas."
+        },
+        {
+          "icon": "Puzzle",
+          "title": "Practical learning",
+          "text": "Our activities build real-life skills such as problem-solving, communication and teamwork, preparing children for the challenges and successes ahead."
+        },
+        {
+          "icon": "Star",
+          "title": "Achieving goals",
+          "text": "We set achievable goals for each child, work together to reach them and celebrate every milestone, big or small."
+        },
+        {
+          "icon": "Lightbulb",
+          "title": "Interactive education",
+          "text": "Hands-on, interactive learning that sparks curiosity and a love of learning in every child."
+        }
+      ]
+    },
+    {
+      "doc": "content/sections",
+      "field": "approach",
+      "from": [
+        {
+          "icon": "Brain",
+          "title": "Foundational Development Program",
+          "text": "Goes beyond traditional preschool education, laying the groundwork for essential life skills and equipping children for the challenges of tomorrow’s world."
+        },
+        {
+          "icon": "Shapes",
+          "title": "Montessori-based learning",
+          "text": "A Montessori-based approach with hands-on materials, so children learn through their senses and build independence."
+        },
+        {
+          "icon": "BookOpen",
+          "title": "Thematic curriculum",
+          "text": "Each theme integrates cognitive, language, personal, social, emotional and physical development into one immersive experience."
+        },
+        {
+          "icon": "Eye",
+          "title": "Visual, practical learning",
+          "text": "Children under 5 have a strong visual understanding, so we teach practically. Visual learning is everlasting."
+        }
+      ],
+      "to": [
+        {
+          "icon": "Brain",
+          "title": "Foundational Development Program",
+          "text": "Goes beyond traditional preschool, laying the groundwork for essential life skills and preparing children for the world of tomorrow."
+        },
+        {
+          "icon": "Shapes",
+          "title": "Montessori-based learning",
+          "text": "Hands-on Montessori materials let children learn through their senses, at their own pace, and grow in independence."
+        },
+        {
+          "icon": "BookOpen",
+          "title": "Thematic curriculum",
+          "text": "Each theme brings cognitive, language, personal, social, emotional and physical development together in one immersive experience."
+        },
+        {
+          "icon": "Eye",
+          "title": "Visual, practical learning",
+          "text": "Children under five learn best by seeing and doing, so we teach practically, and what they learn visually stays with them."
+        }
+      ]
+    },
+    {
+      "doc": "content/sections",
+      "field": "daycareHighlights",
+      "from": [
+        "Structured routines",
+        "Designated nap rooms",
+        "Expert and trained caregivers",
+        "Live CCTV monitoring",
+        "Parents communication app",
+        "1:6 adult-to-child ratio"
+      ],
+      "to": [
+        "Structured routines",
+        "Designated nap rooms",
+        "Expert and trained caregivers",
+        "Live CCTV monitoring",
+        "Parents’ communication app",
+        "1:6 adult-to-child ratio"
+      ]
+    },
+    {
+      "doc": "content/sections",
+      "field": "facilities",
+      "from": [
+        {
+          "icon": "Shapes",
+          "title": "Activity-based learning",
+          "text": "A Montessori-based approach to learning."
+        },
+        {
+          "icon": "ShieldCheck",
+          "title": "Child-safe infrastructure",
+          "text": "Designed with child safety as the top priority."
+        },
+        {
+          "icon": "Building2",
+          "title": "Age-appropriate classes",
+          "text": "Vibrant classrooms tailored to children’s needs."
+        },
+        {
+          "icon": "Cctv",
+          "title": "CCTV surveillance",
+          "text": "Live CCTV streams for parents, in real time."
+        },
+        {
+          "icon": "BedDouble",
+          "title": "Dedicated nap rooms",
+          "text": "Air-conditioned sleeping rooms designed for naps."
+        },
+        {
+          "icon": "Smartphone",
+          "title": "Parents communication app",
+          "text": "Daily updates on the Crossmaze Care parents app."
+        },
+        {
+          "icon": "Blocks",
+          "title": "Indoor play area",
+          "text": "Climate-controlled comfort all year round."
+        },
+        {
+          "icon": "GraduationCap",
+          "title": "Expert teachers",
+          "text": "Well-trained staff who prioritise care and safety."
+        },
+        {
+          "icon": "HandHeart",
+          "title": "Trained caregivers",
+          "text": "Vigilant staff for every child’s safety and comfort."
+        },
+        {
+          "icon": "Flame",
+          "title": "Fire safe",
+          "text": "Fire safety measures focused on prevention."
+        },
+        {
+          "icon": "Bus",
+          "title": "In-house transport",
+          "text": "Safe, reliable transport within a 5 km radius."
+        },
+        {
+          "icon": "Music",
+          "title": "Extra-curricular activities",
+          "text": "Physical well-being and growth beyond the curriculum."
+        }
+      ],
+      "to": [
+        {
+          "icon": "Shapes",
+          "title": "Activity-based learning",
+          "text": "A hands-on, Montessori-based approach to learning."
+        },
+        {
+          "icon": "ShieldCheck",
+          "title": "Child-safe infrastructure",
+          "text": "Spaces designed with children’s safety as the top priority."
+        },
+        {
+          "icon": "Building2",
+          "title": "Age-appropriate classes",
+          "text": "Bright classrooms tailored to each age group."
+        },
+        {
+          "icon": "Cctv",
+          "title": "CCTV surveillance",
+          "text": "Live CCTV streams, so parents can see their child in real time."
+        },
+        {
+          "icon": "BedDouble",
+          "title": "Dedicated nap rooms",
+          "text": "Air-conditioned rooms made for little ones’ naps."
+        },
+        {
+          "icon": "Smartphone",
+          "title": "Parents’ communication app",
+          "text": "Daily updates on the Crossmaze Care parents’ app."
+        },
+        {
+          "icon": "Blocks",
+          "title": "Indoor play area",
+          "text": "Climate-controlled play spaces, comfortable all year round."
+        },
+        {
+          "icon": "GraduationCap",
+          "title": "Expert teachers",
+          "text": "Well-trained, dedicated teachers who put care and safety first."
+        },
+        {
+          "icon": "HandHeart",
+          "title": "Trained caregivers",
+          "text": "Watchful, trained staff keep every child safe and comfortable."
+        },
+        {
+          "icon": "Flame",
+          "title": "Fire safe",
+          "text": "Fire safety measures, with the focus on prevention."
+        },
+        {
+          "icon": "Bus",
+          "title": "In-house transport",
+          "text": "Safe, reliable transport within a 5 km radius."
+        },
+        {
+          "icon": "Music",
+          "title": "Extra-curricular activities",
+          "text": "Activities beyond the curriculum for physical well-being and growth."
+        }
+      ]
+    },
+    {
+      "doc": "content/sections",
+      "field": "perks",
+      "from": [
+        {
+          "icon": "Heart",
+          "title": "An ideal workplace for women",
+          "text": "Equal opportunities and a culture of respect and inclusivity."
+        },
+        {
+          "icon": "Award",
+          "title": "Career advancement",
+          "text": "Real support to grow, from facilitator to centre leadership."
+        },
+        {
+          "icon": "Clock",
+          "title": "Work-life balance",
+          "text": "Flexible work arrangements, including full-day and half-day roles."
+        },
+        {
+          "icon": "Baby",
+          "title": "Childcare assistance",
+          "text": "Benefits that support working mothers."
+        }
+      ],
+      "to": [
+        {
+          "icon": "Heart",
+          "title": "An ideal workplace for women",
+          "text": "Equal opportunities and a culture of respect and inclusion, where every woman feels valued."
+        },
+        {
+          "icon": "Award",
+          "title": "Career advancement",
+          "text": "Real support to grow your career with us."
+        },
+        {
+          "icon": "Clock",
+          "title": "Work-life balance",
+          "text": "Flexible working, including full-day and half-day roles."
+        },
+        {
+          "icon": "Baby",
+          "title": "Childcare assistance",
+          "text": "Benefits that support working mothers."
+        }
+      ]
+    },
+    {
+      "doc": "content/sections",
+      "field": "faqs",
+      "from": [
+        {
+          "q": "What age can my child join?",
+          "a": "Play Group is for 2 – 3 years, Nursery for 3 – 4 years, Junior KG for 4 – 5 years and Senior KG for 5 – 6 years. Day care welcomes children from 2 to 8 years."
+        },
+        {
+          "q": "Which curriculum do you follow?",
+          "a": "A Montessori-based, thematic curriculum through our Foundational Development Program. By Senior KG it is aligned with the requirements of State, CBSE and ICSE boards, so children are ready for mainstream schools."
+        },
+        {
+          "q": "What are the timings?",
+          "a": "Preschool runs 9:00 am – 12:30 pm. Day care runs 9:00 am – 6:00 pm, so children can move from class straight into day care."
+        },
+        {
+          "q": "Can children from other schools join day care?",
+          "a": "Yes. Day care is open to both Crossmaze students and children from other schools, and we offer pick-up from the nearby drop point of other schools."
+        },
+        {
+          "q": "Can I see my child during the day?",
+          "a": "Yes. Parents get live CCTV access, and the Crossmaze Care parents app keeps you updated on daily activities."
+        },
+        {
+          "q": "Do you provide transport?",
+          "a": "Yes. In-house transport runs on pre-set routes within a 5 km radius of the centre. Seats are subject to availability, so please check with your nearest branch."
+        }
+      ],
+      "to": [
+        {
+          "q": "What age can my child join?",
+          "a": "Play Group is for 2 – 3 years, Nursery for 3 – 4 years, Junior KG for 4 – 5 years and Senior KG for 5 – 6 years. Day care welcomes children from 2 to 8 years."
+        },
+        {
+          "q": "Which curriculum do you follow?",
+          "a": "A Montessori-based, thematic curriculum through our Foundational Development Program. By Senior KG it is aligned with State, CBSE and ICSE board requirements, so children are ready for mainstream school."
+        },
+        {
+          "q": "What are the timings?",
+          "a": "Preschool runs 9:00 am – 12:30 pm. Day care runs 9:00 am – 6:00 pm, so children can move from class straight into day care."
+        },
+        {
+          "q": "Can children from other schools join day care?",
+          "a": "Yes. Day care is open to Crossmaze children and to children from other schools, and we pick them up from a nearby drop point of their school."
+        },
+        {
+          "q": "Can I see my child during the day?",
+          "a": "Yes. Parents get live CCTV access, and the Crossmaze Care parents’ app keeps you updated on your child’s day."
+        },
+        {
+          "q": "Do you provide transport?",
+          "a": "Yes. Our in-house transport runs on set routes within a 5 km radius of each centre. Seats depend on availability, so please check with your nearest centre."
+        },
+        {
+          "q": "How do I apply for admission?",
+          "a": "Send us an enquiry, call us or message us on WhatsApp. Our admissions team will answer your questions and arrange a visit to your nearest centre, where you can meet the centre head and complete the admission."
+        }
+      ]
+    },
+    {
+      "doc": "branches/crossmaze-the-hub",
+      "field": "intro",
+      "from": "Centrally located in SNN – The Hub, Begur, close to corporate offices and residential projects such as SNN Raj Serenity, Prestige Song of the South and Windsor Troika.",
+      "to": "In the heart of SNN – The Hub, Begur, close to offices and to homes at SNN Raj Serenity, Prestige Song of the South and Windsor Troika."
+    },
+    {
+      "doc": "branches/crossmaze-the-hub",
+      "field": "description",
+      "from": [
+        "Crossmaze Preschool, in the heart of SNN – The Hub, Begur, is the preferred choice for discerning parents in this community. Close to numerous corporate offices and residential projects such as SNN Raj Serenity, Prestige Song of the South and Windsor Troika, it offers a meticulously maintained, secure and enriching environment for your young ones.",
+        "Inside you’ll find well-lit classrooms, a fully equipped indoor play area and impeccably maintained restrooms. Alongside age-appropriate educational programs, we offer day care and after-school care tailored to working parents.",
+        "Our infrastructure, child-centred facilities and stringent safety protocols come together to create a secure haven where children explore, learn, grow and unleash their creativity and imagination."
+      ],
+      "to": [
+        "Crossmaze – The Hub sits in the heart of Begur, close to SNN Raj Serenity, Prestige Song of the South, Windsor Troika and many offices nearby. Parents choose it for its well-kept, secure and enriching spaces.",
+        "Inside are well-lit classrooms, a fully equipped indoor play area and spotless restrooms. Alongside our preschool programs, we offer day care and after-school care built around the needs of working parents.",
+        "Thoughtful infrastructure, child-friendly facilities and strict safety routines make the centre a secure place for children to explore, learn, grow and let their imagination run free."
+      ]
+    },
+    {
+      "doc": "branches/crossmaze-the-hub",
+      "field": "mapQuery",
+      "from": "Crossmaze Preschool and Day Care, The Hub, Begur, Bengaluru 560068",
+      "to": "12.8598706,77.613154"
+    },
+    {
+      "doc": "branches/crossmaze-the-hub",
+      "field": "centerHead.bio",
+      "from": [
+        "Ms. Ruchika brings a strong blend of corporate experience and a deep passion for education to her role as Centre Head of Crossmaze – The Hub. Her leadership brings structure, innovation and a people-centric approach that benefits both students and staff.",
+        "She is a graduate who has completed the Chartered Financial Analyst (CFA) program, with a Diploma in Advertising and Public Relations, a Diploma in Advanced Yoga and Face Yoga, and certification in the Jolly Phonics program.",
+        "With over 8 years of experience across finance and operations at organisations such as Goldman Sachs, JP Morgan, KPMG and Genpact, she has consistently led, managed and mentored teams. Her interest in yoga and mindfulness helps create a calm, balanced and nurturing environment for every child."
+      ],
+      "to": [
+        "Mrs. Ruchika brings a rare mix of corporate experience and a deep passion for education to her role as Centre Head of Crossmaze – The Hub. She leads with structure, fresh ideas and a people-first approach that benefits children and staff alike.",
+        "A graduate who has completed the Chartered Financial Analyst (CFA) program, she also holds a Diploma in Advertising and Public Relations and a Diploma in Advanced Yoga and Face Yoga, and is certified in Jolly Phonics.",
+        "She spent over eight years in finance and operations at organisations including Goldman Sachs, JP Morgan, KPMG and Genpact, leading and mentoring teams. Her love of yoga and mindfulness helps her create a calm, balanced and nurturing environment for every child."
+      ]
+    },
+    {
+      "doc": "branches/crossmaze-neotown",
+      "field": "intro",
+      "from": "Our largest centre, in Neotown, Thirupalya, is the preferred choice for busy parents, close to numerous corporate offices.",
+      "to": "Our largest centre, in Neotown, Thirupalya: a favourite with busy parents who work at the many offices nearby."
+    },
+    {
+      "doc": "branches/crossmaze-neotown",
+      "field": "description",
+      "from": [
+        "Crossmaze Preschool in Neotown, Thirupalya, is the preferred choice for busy parents in the area. Close to numerous corporate offices, the centre offers a clean, secure and vibrant environment, with well-lit classrooms, immaculate washrooms and a fully equipped indoor and outdoor play area.",
+        "Beyond age-appropriate educational programs, we provide day care and after-school care for working parents. The centre is a nurturing home away from home, with brightly lit, well-ventilated classrooms, supervised play zones for each age group and engaging activity centres.",
+        "World-class infrastructure, child-friendly facilities and stringent safety measures make it a safe haven where children explore, learn and grow. Step in with your child and discover the Crossmaze difference."
+      ],
+      "to": [
+        "Crossmaze – Neotown is our largest centre and a favourite with busy parents in the area. Close to many offices, it is clean, secure and full of life, with well-lit classrooms, spotless washrooms and fully equipped indoor and outdoor play areas.",
+        "Alongside our preschool programs, we offer day care and after-school care for working parents. With bright, airy classrooms, supervised play zones for each age group and engaging activity corners, it is a true home away from home.",
+        "Child-friendly facilities and strict safety routines make it a safe place for children to explore, learn and grow. Come and visit with your child to see the Crossmaze difference for yourself."
+      ]
+    },
+    {
+      "doc": "branches/crossmaze-neotown",
+      "field": "address",
+      "from": [
+        "Site No. 3/4, opposite GM Infinite",
+        "Neotown, Thirupalya, Electronic City Phase 1",
+        "Bengaluru, Karnataka"
+      ],
+      "to": [
+        "Site No. 3/4, opposite GM Infinite, Phase 1",
+        "Neotown, Thirupalya",
+        "Bengaluru, Karnataka"
+      ]
+    },
+    {
+      "doc": "branches/crossmaze-neotown",
+      "field": "mapQuery",
+      "from": "Crossmaze Preschool and Day Care, Neotown, Thirupalya, Bengaluru 560099",
+      "to": "12.8187096,77.6641007"
+    },
+    {
+      "doc": "branches/crossmaze-neotown",
+      "field": "phone",
+      "from": "+91 72040 21508",
+      "to": "+91 73380 45201"
+    },
+    {
+      "doc": "branches/crossmaze-neotown",
+      "field": "centerHead.bio",
+      "from": [
+        "Mrs. Aishwarya, Centre Head of Crossmaze – Neotown, brings a wealth of experience in Montessori and child-centred learning, and is deeply passionate about nurturing young minds and fostering a love of learning.",
+        "She holds a Master’s degree in English and Chemistry and a Bachelor of Education, and is certified in Montessori education, with its emphasis on hands-on, personalised learning that sparks curiosity.",
+        "Before leading the branch, she played a key role at Crossmaze, gaining deep insight into our educational philosophy. She is known for designing engaging, multi-level lessons that support each child’s individual academic and developmental journey."
+      ],
+      "to": [
+        "Mrs. Aishwarya, Centre Head of Crossmaze – Neotown, brings rich experience in Montessori and child-centred learning, and a deep passion for nurturing young minds and a love of learning.",
+        "She holds a Master’s degree in English and Chemistry and a Bachelor of Education, and is a certified Montessori educator, with its focus on hands-on, personalised learning that sparks curiosity.",
+        "Before leading the centre, she played a key role at Crossmaze and knows our educational philosophy inside out. She is known for engaging, multi-level lessons that support each child’s own learning and development."
+      ]
+    },
+    {
+      "doc": "branches/crossmaze-snn-greenbay",
+      "field": "intro",
+      "from": "Within SNN Raj Greenbay in Electronic City, a favourite of parents with demanding schedules, close to many corporate offices.",
+      "to": "Inside SNN Raj Greenbay in Electronic City: a favourite with parents who have demanding schedules at the offices nearby."
+    },
+    {
+      "doc": "branches/crossmaze-snn-greenbay",
+      "field": "description",
+      "from": [
+        "Crossmaze Preschool, within SNN Raj Greenbay in Electronic City, is the favoured choice of parents with demanding schedules. Close to many corporate offices, it offers a meticulously maintained, secure and dynamic environment for your child’s holistic development.",
+        "Well-lit classrooms and impeccably maintained restrooms create an ideal learning environment, complemented by a fully equipped indoor and outdoor play area that supports both cognitive and physical development.",
+        "Alongside age-appropriate curricula, we offer day care and after-school care for working parents, all backed by child-centric facilities and uncompromising safety protocols."
+      ],
+      "to": [
+        "Crossmaze – SNN Greenbay, inside SNN Raj Greenbay in Electronic City, is a favourite with parents who have demanding schedules. Close to many offices, it offers a well-kept, secure and lively space for your child’s all-round development.",
+        "Well-lit classrooms and spotless restrooms make it a lovely place to learn, and fully equipped indoor and outdoor play areas support both thinking and physical growth.",
+        "Alongside our preschool programs, we offer day care and after-school care for working parents, all backed by child-friendly facilities and uncompromising safety."
+      ]
+    },
+    {
+      "doc": "branches/crossmaze-snn-greenbay",
+      "field": "address",
+      "from": [
+        "G1, Commercial Complex, SNN Raj Greenbay",
+        "1st Main Road, Electronic City Phase 2",
+        "Bengaluru, Karnataka"
+      ],
+      "to": [
+        "G1, Commercial Complex (Creche), SNN Raj Greenbay",
+        "First Main Road, Electronic City Phase 2",
+        "Bengaluru, Karnataka"
+      ]
+    },
+    {
+      "doc": "branches/crossmaze-snn-greenbay",
+      "field": "mapQuery",
+      "from": "Crossmaze Preschool and Day Care, SNN Raj Greenbay, Electronic City, Bengaluru 560100",
+      "to": "12.8529968,77.6784227"
+    },
+    {
+      "doc": "branches/crossmaze-snn-greenbay",
+      "field": "phone",
+      "from": "+91 72040 21508",
+      "to": "+91 72595 10758"
+    },
+    {
+      "doc": "branches/crossmaze-snn-greenbay",
+      "field": "centerHead.bio",
+      "from": [
+        "Mrs. Sheerin brings experience as a lecturer and preschool teacher, and a deep understanding of educational dynamics and child development, to her role as Centre Head.",
+        "She holds a Master’s degree in Business Administration (MBA), giving her a comprehensive perspective on educational management. Her warm, approachable nature makes her a trusted resource for students and parents alike.",
+        "Driven by collaboration and excellence, she keeps open lines of communication with students, parents and staff. Outside work she loves the culinary arts, and brings that passion into workshops and events for children."
+      ],
+      "to": [
+        "Mrs. Sheerin brings experience as a lecturer and preschool teacher, and a deep understanding of how children learn and grow, to her role as Centre Head.",
+        "Her MBA gives her a broad view of educational management, and her warm, approachable manner makes her a trusted guide for children and parents alike.",
+        "She believes in collaboration and excellence, and keeps communication open with children, parents and staff. A keen cook, she brings her love of food into workshops and events for the children."
+      ]
+    },
+    {
+      "doc": "branches/crossmaze-neeladri",
+      "field": "intro",
+      "from": "In the heart of Electronic City, close to major offices and residential apartments, with the best child-to-adult ratio and a strong focus on transparency.",
+      "to": "In the heart of Electronic City, close to major offices and apartments, with an excellent adult-to-child ratio and a strong focus on transparency."
+    },
+    {
+      "doc": "branches/crossmaze-neeladri",
+      "field": "description",
+      "from": [
+        "Crossmaze Preschool, in the heart of Electronic City at Neeladri Nagar, is the top pick for busy parents in the neighbourhood. Close to major offices and residential apartments, it’s a clean, snug and enchanting place for little ones, with bright classrooms and sparkling play areas.",
+        "We offer specialised programs for every age, with engaging activities and a vibrant curriculum, plus after-school care for busy parents. Play zones are tailored to every age group, with plenty of exciting activities.",
+        "With the best child-to-adult ratio and a strong focus on transparency, your child’s safety is our top priority."
+      ],
+      "to": [
+        "Crossmaze – Neeladri Nagar, in the heart of Electronic City, is a top choice for busy parents in the neighbourhood. Close to major offices and apartment complexes, it is a clean, cosy and magical place for little ones, with bright classrooms and sparkling play areas.",
+        "We run engaging programs for every age group with a lively curriculum, plus after-school care for working parents. Play zones are designed for each age group and full of exciting activities.",
+        "With one of the best adult-to-child ratios and a strong focus on transparency, your child’s safety always comes first."
+      ]
+    },
+    {
+      "doc": "branches/crossmaze-neeladri",
+      "field": "address",
+      "from": [
+        "Malligue Residency, 16th Cross Road",
+        "Neeladri Nagar, Electronic City Phase 1",
+        "Bengaluru, Karnataka"
+      ],
+      "to": [
+        "128, Gargeshwari, 13th Cross Road",
+        "Neeladri Nagar, Electronic City Phase 1",
+        "Bengaluru, Karnataka"
+      ]
+    },
+    {
+      "doc": "branches/crossmaze-neeladri",
+      "field": "mapQuery",
+      "from": "Crossmaze Preschool and Day Care, Neeladri Nagar, Electronic City Phase 1, Bengaluru 560100",
+      "to": "12.8406478,77.6470351"
+    },
+    {
+      "doc": "branches/crossmaze-neeladri",
+      "field": "phone",
+      "from": "+91 72040 21508",
+      "to": "+91 97409 21508"
+    },
+    {
+      "doc": "branches/crossmaze-neeladri",
+      "field": "centerHead.bio",
+      "from": [
+        "Mrs. Pallavi Priya is a dedicated educator with a strong commitment to early childhood development. She holds a Master’s degree and a Diploma in Child Psychology, and has volunteered in UK schools, giving her a global perspective on education.",
+        "Previously an Academic Counsellor at NIIT Computer Institute, Bangalore, she has been an integral part of Crossmaze for over two years, contributing to curriculum development and child development programs, and organising cultural events, extracurricular activities and celebrations.",
+        "Outside work she enjoys painting, travelling, music and dancing, and brings that creativity and enthusiasm into everything she does."
+      ],
+      "to": [
+        "Mrs. Pallavi Priya is a dedicated educator with a strong commitment to early childhood development. She holds a Master’s degree and a Diploma in Child Psychology, and has volunteered in schools in the UK, giving her a global view of education.",
+        "Formerly an Academic Counsellor at NIIT, Bengaluru, she has been part of Crossmaze for over two years, contributing to our curriculum and child development programs and organising cultural events, extracurricular activities and celebrations.",
+        "She loves painting, travelling, music and dance, and brings that creativity and enthusiasm to everything she does."
+      ]
+    },
+    {
+      "doc": "branches/crossmaze-ananth-nagar",
+      "field": "intro",
+      "from": "In the heart of Ananth Nagar, near corporate hubs and residential developments like Concorde Epitome, Daadys Elixir, Prakruthi Solitaire and Mahendra Aarna.",
+      "to": "In the heart of Ananth Nagar, close to offices and to homes at Concorde Epitome, Daadys Elixir, Prakruthi Solitaire and Mahendra Aarna."
+    },
+    {
+      "doc": "branches/crossmaze-ananth-nagar",
+      "field": "description",
+      "from": [
+        "Conveniently situated in the heart of Ananth Nagar, Crossmaze Preschool is a trusted choice for parents seeking quality early education and care. Near major corporate hubs and residential developments like Concorde Epitome, Daadys Elixir Apartments, Prakruthi Solitaire and Mahendra Aarna, it provides a well-maintained, safe and enriching environment.",
+        "Bright, airy classrooms, a dedicated outdoor play area, a fully equipped indoor play area and hygienic, child-friendly restrooms create a comfortable and engaging atmosphere.",
+        "Alongside age-appropriate academic programs, we offer flexible day care and after-school care designed around the needs of working parents."
+      ],
+      "to": [
+        "Crossmaze – Ananth Nagar is a trusted choice for parents looking for quality early education and care. Close to major offices and residential communities such as Concorde Epitome, Daadys Elixir, Prakruthi Solitaire and Mahendra Aarna, it offers a well-kept, safe and enriching environment.",
+        "Bright, airy classrooms, a dedicated outdoor play area, a fully equipped indoor play area and clean, child-friendly restrooms make it a comfortable and engaging place to learn.",
+        "Alongside our preschool programs, we offer flexible day care and after-school care designed around the needs of working parents."
+      ]
+    },
+    {
+      "doc": "branches/crossmaze-ananth-nagar",
+      "field": "address",
+      "from": [
+        "Ananth Nagar, Electronic City",
+        "Bengaluru, Karnataka"
+      ],
+      "to": [
+        "Oleti Homes, 9th Cross Road",
+        "Ananth Nagar Phase 1, Kammasandra, Electronic City",
+        "Bengaluru, Karnataka"
+      ]
+    },
+    {
+      "doc": "branches/crossmaze-ananth-nagar",
+      "field": "mapQuery",
+      "from": "Crossmaze Preschool, Ananth Nagar, Electronic City, Bengaluru 560100",
+      "to": "12.8360501,77.6938421"
+    },
+    {
+      "doc": "branches/crossmaze-ananth-nagar",
+      "field": "phone",
+      "from": "+91 72040 21508",
+      "to": "+91 87225 70895"
+    },
+    {
+      "doc": "branches/crossmaze-ananth-nagar",
+      "field": "centerHead.bio",
+      "from": [
+        "Dr. Megha Anand is an educationist with over 13 years of experience, whose commitment to inspiring a love for learning has earned her a respected place in the academic community.",
+        "She merges deep expertise in educational leadership and child development with innovative approaches to early childhood education, advocating a holistic approach that values cognitive, social, emotional and physical growth.",
+        "Committed to best practices, she fosters teamwork among teachers and actively involves parents in their child’s education, so that every child’s preschool experience is joyful, enriching and impactful."
+      ],
+      "to": [
+        "Dr. Megha Anand is an educationist with over 13 years of experience, respected for her commitment to inspiring a love of learning.",
+        "She combines deep expertise in educational leadership and child development with fresh approaches to early childhood education, and champions a holistic approach that values cognitive, social, emotional and physical growth.",
+        "She builds strong teamwork among teachers and involves parents closely in their child’s education, so that every child’s preschool years are joyful, enriching and meaningful."
+      ]
+    },
+    {
+      "doc": "programs/play-group",
+      "field": "summary",
+      "from": "A joyful first journey of discovery: learning about the world, making friends and building social skills.",
+      "to": "A joyful first step into learning: discovering the world, making friends and building social skills."
+    },
+    {
+      "doc": "programs/play-group",
+      "field": "paragraphs",
+      "from": [
+        "Playgroup is one of the most delightful ways for your child to begin a journey of discovery. It’s a place to learn about the world, cultivate friendships and hone essential social skills, and an enriching experience for parents, grandparents and caregivers too.",
+        "Our Playgroup sessions nurture physical development, stimulate problem-solving, foster effective communication and encourage positive social interaction, with every moment packed with joy. Our qualified staff create a safe space where children aged 2 and above can explore, learn and play together."
+      ],
+      "to": [
+        "Play Group is one of the most delightful ways for your child to begin a journey of discovery. It is a place to learn about the world, make friends and practise essential social skills, and an enriching experience for parents, grandparents and caregivers too.",
+        "Our Play Group sessions support physical development, encourage problem-solving, build communication and nurture positive social interaction, with every moment full of joy. Our qualified staff create a safe space where children aged two and above explore, learn and play together."
+      ]
+    },
+    {
+      "doc": "programs/nursery",
+      "field": "paragraphs",
+      "from": [
+        "Nursery is often a child’s first experience away from their parents, so we have crafted it to be a second home, full of materials that captivate, comfort and keep them secure.",
+        "Here children discover themselves and build self-esteem: they understand the significance of their own name, the value of their belongings and the joy of friendship. Our Nursery program weaves academic foundations together with creativity and thematic exploration, setting the stage for future success. A strong start leads to a triumphant finish."
+      ],
+      "to": [
+        "For many children, Nursery is their first time away from their parents, so we have made it a second home, full of materials that delight, comfort and reassure them.",
+        "Here children discover who they are and build self-esteem: they learn the importance of their own name, the value of their belongings and the joy of friendship. The program weaves early academic foundations together with creativity and thematic exploration, setting the stage for success later on. A strong start leads to a strong finish."
+      ]
+    },
+    {
+      "doc": "programs/junior-kg",
+      "field": "headline",
+      "from": "Nurturing holistic development",
+      "to": "Nurturing all-round development"
+    },
+    {
+      "doc": "programs/junior-kg",
+      "field": "paragraphs",
+      "from": [
+        "Junior KG is a pivotal phase where we embrace each child’s comprehensive development. Our curriculum focuses on the key areas that lay the foundation for a bright future: numeracy, literacy, fine motor skills, logical thinking and problem-solving.",
+        "At this age children are refining their language and cognitive abilities and are eager to explore new languages, while a keen sense of numbers develops. Through engaging group activities our teachers build teamwork, participation, sharing and taking turns."
+      ],
+      "to": [
+        "Junior KG is a pivotal year in which we nurture every side of a child’s development. Our curriculum focuses on the key areas that lay the foundation for a bright future: numeracy, literacy, fine motor skills, logical thinking and problem-solving.",
+        "At this age children are refining their language and thinking skills, are eager to explore new languages and are developing a keen sense of numbers. Through engaging group activities, our teachers encourage teamwork, participation, sharing and taking turns."
+      ]
+    },
+    {
+      "doc": "programs/senior-kg",
+      "field": "summary",
+      "from": "A confident, seamless step into primary school, aligned with State, CBSE and ICSE boards.",
+      "to": "A confident, smooth step into primary school, with a curriculum aligned with State, CBSE and ICSE boards."
+    },
+    {
+      "doc": "programs/senior-kg",
+      "field": "paragraphs",
+      "from": [
+        "At 5 to 6, we prepare your child for a seamless transition into school. A stimulating environment encourages them to explore language, mathematics, science, physical activity, music and art, so they grow competent and confident while staying compassionate and caring.",
+        "Learning goes beyond language and writing: we place strong emphasis on cognitive development, communication and problem-solving, with extracurricular activities that let children express themselves. Our curriculum is aligned with the requirements of State, CBSE and ICSE boards, so children step into mainstream schools well prepared."
+      ],
+      "to": [
+        "Between five and six, we prepare your child for a smooth move into big school. A stimulating environment invites them to explore language, mathematics, science, physical activity, music and art, so they grow capable and confident while staying kind and caring.",
+        "Learning goes beyond reading and writing: we place a strong emphasis on thinking skills, communication and problem-solving, with extracurricular activities that let children express themselves. Our curriculum is aligned with State, CBSE and ICSE board requirements, so children join mainstream schools well prepared."
+      ]
+    },
+    {
+      "doc": "programs/day-care",
+      "field": "headline",
+      "from": "Day care and enrichment centre, where learning meets safety",
+      "to": "Day care and enrichment, where learning meets safety"
+    },
+    {
+      "doc": "programs/day-care",
+      "field": "paragraphs",
+      "from": [
+        "Our Day Care and Activity Centre is a unique haven where learning takes an unconventional yet captivating form. Dedicated, trained caretakers keep children safe at all times, giving working parents peace of mind while they pursue their careers.",
+        "Day care is open to both Crossmaze students and children from other schools, with a smooth transition from preschool to end-of-day activities."
+      ],
+      "to": [
+        "Our Day Care and Activity Centre is a special place where learning takes a fresh, playful and captivating form. Dedicated, trained caregivers keep children safe at all times, so working parents have peace of mind while they are at work.",
+        "Day care is open to Crossmaze children and to children from other schools, with a smooth move from the preschool morning into afternoon activities. Every day, we put your child’s safety, well-being and all-round development first."
+      ]
+    },
+    {
+      "doc": "programs/day-care",
+      "field": "focus",
+      "from": [
+        "Live CCTV access for parents",
+        "Collaborative parenting app",
+        "Air-conditioned resting and indoor play areas",
+        "A hygienic, professional and welcoming atmosphere",
+        "Visiting instructors for art, craft, dance and more (additional charges may apply)",
+        "Pick-up from the nearby drop point of other schools"
+      ],
+      "to": [
+        "Live CCTV access for parents",
+        "The Crossmaze Care parents’ app",
+        "Air-conditioned rest and indoor play areas",
+        "A clean, professional and welcoming atmosphere",
+        "Visiting instructors for art, craft, dance and more (additional charges may apply)",
+        "Pick-up from the nearby drop point of other schools"
+      ]
+    },
+    {
+      "doc": "jobs/teacher-facilitator",
+      "field": "qualification",
+      "from": "Graduation, with specialised certification in early childhood education, such as NTT, Montessori, ECE or CIDTT.",
+      "to": "A graduate with a certification in early childhood education, such as NTT, Montessori, ECE or CIDTT."
+    },
+    {
+      "doc": "jobs/teacher-facilitator",
+      "field": "overview",
+      "from": "We are seeking female graduates with a warm personality, abundant energy, and a passion for nurturing young children in a fast-growing organisation.",
+      "to": "We are looking for women graduates with a warm personality, plenty of energy and a passion for nurturing young children, to join our fast-growing team."
+    },
+    {
+      "doc": "jobs/teacher-facilitator",
+      "field": "responsibilities",
+      "from": [
+        {
+          "text": "Develop and implement engaging, developmentally appropriate lesson plans and activities that support the social, emotional, cognitive and physical growth of preschool children."
+        },
+        {
+          "text": "Create a warm and inclusive classroom where every child feels valued, supported and encouraged to explore and learn."
+        },
+        {
+          "text": "Build positive relationships with students, parents and colleagues through open communication, collaboration and mutual respect."
+        },
+        {
+          "text": "Assess children’s progress and development, and share findings with parents and caregivers in a timely, constructive way."
+        },
+        {
+          "text": "Maintain accurate records of attendance, observations and assessments, and use them to individualise learning."
+        },
+        {
+          "text": "Take part in professional development, staff meetings and parent-teacher conferences."
+        }
+      ],
+      "to": [
+        {
+          "text": "Plan and run engaging, age-appropriate lessons and activities that support children’s social, emotional, cognitive and physical growth."
+        },
+        {
+          "text": "Create a warm, inclusive classroom where every child feels valued, supported and encouraged to explore and learn."
+        },
+        {
+          "text": "Build positive relationships with children, parents and colleagues through open communication, teamwork and mutual respect."
+        },
+        {
+          "text": "Observe and assess each child’s progress, and share it with parents in a timely, constructive way."
+        },
+        {
+          "text": "Keep accurate records of attendance, observations and assessments, and use them to tailor learning to each child."
+        },
+        {
+          "text": "Take part in training, staff meetings and parent-teacher meetings."
+        }
+      ]
+    },
+    {
+      "doc": "jobs/day-care-in-charge",
+      "field": "qualification",
+      "from": "Graduation and training in Early Childhood Education or a related field, with strong knowledge of child development, excellent communication and interpersonal skills, leadership ability, and flexibility.",
+      "to": "A graduate with training in early childhood education or a related field, a good understanding of child development, excellent communication and people skills, leadership ability and flexibility."
+    },
+    {
+      "doc": "jobs/day-care-in-charge",
+      "field": "overview",
+      "from": "We are seeking female graduates with a warm personality, abundant energy, and a passion for nurturing young children in a fast-growing organisation.",
+      "to": "We are looking for women graduates with a warm personality, plenty of energy and a passion for nurturing young children, to join our fast-growing team."
+    },
+    {
+      "doc": "jobs/day-care-in-charge",
+      "field": "responsibilities",
+      "from": [
+        {
+          "title": "Daily operations",
+          "text": "Manage the day care’s daily operations, ensuring a safe, nurturing and stimulating environment for children."
+        },
+        {
+          "title": "Staff supervision",
+          "text": "Lead and guide teachers, assistants and support staff to uphold the highest standards of care and professionalism."
+        },
+        {
+          "title": "Parent communication",
+          "text": "Keep open, transparent communication with parents, with regular updates on their child’s progress."
+        },
+        {
+          "title": "Training and development",
+          "text": "Coordinate staff training sessions, workshops and professional development."
+        },
+        {
+          "title": "Emergency preparedness",
+          "text": "Develop and implement emergency procedures to keep children and staff safe."
+        },
+        {
+          "title": "Quality assurance",
+          "text": "Regularly evaluate operations, programs and staff performance to keep improving the quality of care."
+        },
+        {
+          "title": "Community outreach",
+          "text": "Represent the day care in the community and build relationships with local organisations."
+        }
+      ],
+      "to": [
+        {
+          "title": "Daily operations",
+          "text": "Run the day care day to day, keeping it safe, nurturing and stimulating for children."
+        },
+        {
+          "title": "Staff supervision",
+          "text": "Lead and guide teachers, assistants and support staff to the highest standards of care and professionalism."
+        },
+        {
+          "title": "Parent communication",
+          "text": "Keep parents informed with open, regular updates on their child’s progress, and address their concerns."
+        },
+        {
+          "title": "Training and development",
+          "text": "Organise staff training sessions, workshops and professional development."
+        },
+        {
+          "title": "Emergency preparedness",
+          "text": "Set up and practise emergency procedures that keep children and staff safe."
+        },
+        {
+          "title": "Quality assurance",
+          "text": "Regularly review operations, programs and staff performance to keep raising the quality of care."
+        },
+        {
+          "title": "Community outreach",
+          "text": "Represent the day care in the community and build relationships with local organisations."
+        }
+      ]
+    },
+    {
+      "doc": "jobs/center-head",
+      "field": "qualification",
+      "from": "At least 1 year of administrative experience, strong organisational skills, proficiency in Microsoft Office, excellent communication, problem-solving ability and a commitment to confidentiality. A Master’s degree is preferred but not mandatory.",
+      "to": "At least 1 year of administrative experience, strong organisational skills, good knowledge of Microsoft Office, excellent communication, sound problem-solving and a commitment to confidentiality. A Master’s degree is preferred but not essential."
+    },
+    {
+      "doc": "jobs/center-head",
+      "field": "overview",
+      "from": "We are seeking a meticulous and organised female individual to join our team as Center Head. You will provide comprehensive administrative support for the efficient operation of the centre, with excellent communication, multitasking and attention to detail.",
+      "to": "We are looking for a meticulous, well-organised woman to lead one of our centres. You will keep the centre running smoothly and provide full administrative support, bringing excellent communication, multitasking and attention to detail."
+    },
+    {
+      "doc": "jobs/center-head",
+      "field": "responsibilities",
+      "from": [
+        {
+          "text": "Provide administrative support, including managing calls, emails and correspondence."
+        },
+        {
+          "text": "Maintain accurate, confidential student records in line with data protection rules."
+        },
+        {
+          "text": "Schedule and coordinate meetings, workshops and events, and prepare their materials."
+        },
+        {
+          "text": "Manage inventory and procurement of office supplies."
+        },
+        {
+          "text": "Support recruitment and onboarding of new staff."
+        },
+        {
+          "text": "Liaise with external vendors and service providers."
+        },
+        {
+          "text": "Assist with financial tasks such as processing invoices and monitoring expenses."
+        },
+        {
+          "text": "Help develop and implement administrative policies and procedures."
+        }
+      ],
+      "to": [
+        {
+          "text": "Handle the centre’s administration, including calls, emails and correspondence."
+        },
+        {
+          "text": "Keep student records accurate and confidential, in line with data protection rules."
+        },
+        {
+          "text": "Plan and coordinate meetings, workshops and events, and prepare their materials."
+        },
+        {
+          "text": "Manage inventory and the purchase of supplies."
+        },
+        {
+          "text": "Support the hiring and onboarding of new staff."
+        },
+        {
+          "text": "Work with external vendors and service providers."
+        },
+        {
+          "text": "Help with finance tasks such as processing invoices and tracking expenses."
+        },
+        {
+          "text": "Help shape and put in place administrative policies and procedures."
+        }
+      ]
+    },
+    {
+      "doc": "jobs/center-head",
+      "field": "extra.text",
+      "from": "Setting vision and goals, building and motivating teams, effective communication, problem-solving and decision-making, and continuous improvement.",
+      "to": "Setting a vision and goals, building and motivating a team, clear communication, sound decisions and a habit of continuous improvement."
+    }
+  ]
+}
