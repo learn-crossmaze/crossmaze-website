@@ -4,7 +4,7 @@ import { after, before, beforeEach, test } from 'node:test';
 import fs from 'node:fs';
 import { assertFails, assertSucceeds, initializeTestEnvironment } from '@firebase/rules-unit-testing';
 import { deleteDoc, doc, getDoc, getDocs, collection, setDoc, updateDoc } from 'firebase/firestore';
-import { ref, uploadBytes, getBytes } from 'firebase/storage';
+import { deleteObject, ref, uploadBytes, getBytes } from 'firebase/storage';
 
 const [fsHost, fsPort] = (process.env.FIRESTORE_EMULATOR_HOST ?? '127.0.0.1:8080').split(':');
 const [stHost, stPort] = (process.env.FIREBASE_STORAGE_EMULATOR_HOST ?? '127.0.0.1:9199').split(':');
@@ -87,4 +87,20 @@ test('photos: public can view, only admins can upload images', async () => {
   await assertFails(uploadBytes(ref(stranger().storage(), 'site/uploads/branches/y.jpg'), jpeg, { contentType: 'image/jpeg' }));
   await assertFails(uploadBytes(ref(anon().storage(), 'site/uploads/branches/z.jpg'), jpeg, { contentType: 'image/jpeg' }));
   await assertFails(uploadBytes(ref(admin().storage(), 'other/place.jpg'), jpeg, { contentType: 'image/jpeg' }));
+});
+
+test('resumes: only admins can open or delete them, and nobody uploads them directly', async () => {
+  const path = 'resumes/s1/Meera-CV.pdf';
+  await env.withSecurityRulesDisabled((ctx) =>
+    uploadBytes(ref(ctx.storage(), path), new TextEncoder().encode('%PDF-1.7'), { contentType: 'application/pdf' }),
+  );
+  await assertFails(getBytes(ref(anon().storage(), path)));
+  await assertFails(getBytes(ref(stranger().storage(), path)));
+  await assertFails(getBytes(ref(adminUnverified().storage(), path)));
+  await assertSucceeds(getBytes(ref(admin().storage(), path)));
+  const pdf = new TextEncoder().encode('%PDF-1.7');
+  await assertFails(uploadBytes(ref(anon().storage(), 'resumes/s2/cv.pdf'), pdf, { contentType: 'application/pdf' }));
+  await assertFails(uploadBytes(ref(admin().storage(), 'resumes/s2/cv.pdf'), pdf, { contentType: 'application/pdf' }));
+  await assertFails(deleteObject(ref(stranger().storage(), path)));
+  await assertSucceeds(deleteObject(ref(admin().storage(), path)));
 });

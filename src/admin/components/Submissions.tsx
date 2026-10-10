@@ -1,6 +1,7 @@
 import { useEffect, useMemo, useState } from 'react';
 import { collection, deleteDoc, doc, limit, onSnapshot, orderBy, query, updateDoc } from 'firebase/firestore';
 import { httpsCallable } from 'firebase/functions';
+import { deleteObject, ref as storageRef } from 'firebase/storage';
 import { Icon } from './fields';
 import { ErrorBox, PageHeader, Spinner, errorText, formatDate, useSession, useToast } from './ui';
 
@@ -12,6 +13,8 @@ interface Submission {
   createdAt?: { toDate: () => Date };
   handled?: boolean;
   litmus?: { status: string; attempts?: number; lastError?: string; httpStatus?: number; sentAt?: unknown };
+  /** Uploaded files (the resume), stored privately in Cloud Storage. */
+  files?: { field: string; path: string; name: string }[];
 }
 
 // Field labels; keep in sync with functions/lib/forms.js.
@@ -34,7 +37,7 @@ const FIELDS: Record<Submission['type'], [string, string][]> = {
     ['branch', 'Preferred branch'],
     ['experience', 'Experience'],
     ['qualification', 'Qualification'],
-    ['resume_link', 'Resume link'],
+    ['resume_link', 'Resume'],
     ['about', 'About'],
   ],
 };
@@ -209,9 +212,19 @@ function SubmissionDetail({ s, onResend, busy }: { s: Submission; onResend: () =
             <button
               className="btn btn-light danger"
               onClick={async () => {
-                if (!confirm('Delete this submission? This can’t be undone.')) return;
-                await deleteDoc(ref).catch((e) => toast('error', errorText(e)));
-                window.location.hash = '#/submissions';
+                const what = s.files?.length ? 'this submission and its resume' : 'this submission';
+                if (!confirm(`Delete ${what}? This can’t be undone.`)) return;
+                try {
+                  for (const f of s.files ?? []) {
+                    await deleteObject(storageRef(services.storage, f.path)).catch((e) => {
+                      if (e?.code !== 'storage/object-not-found') throw e;
+                    });
+                  }
+                  await deleteDoc(ref);
+                  window.location.hash = '#/submissions';
+                } catch (e) {
+                  toast('error', errorText(e));
+                }
               }}
             >
               <Icon name="Trash2" /> Delete
@@ -236,7 +249,7 @@ function SubmissionDetail({ s, onResend, busy }: { s: Submission; onResend: () =
                       <a href={`mailto:${s.data[key]}`}>{s.data[key]}</a>
                     ) : key === 'resume_link' ? (
                       <a href={s.data[key]} target="_blank" rel="noopener noreferrer">
-                        {s.data[key]}
+                        {s.data.resume_file ? `Open ${s.data.resume_file}` : s.data[key]}
                       </a>
                     ) : (
                       s.data[key]
