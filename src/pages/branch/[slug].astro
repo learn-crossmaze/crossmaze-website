@@ -6,6 +6,7 @@ import BranchCard from '../../components/BranchCard.astro';
 import EnquiryForm from '../../components/EnquiryForm.astro';
 import Icon from '../../components/Icon.astro';
 import FloatingShapes from '../../components/FloatingShapes.astro';
+import PhotoAlbum from '../../components/PhotoAlbum.astro';
 import {
   branches,
   amenityList,
@@ -31,9 +32,12 @@ const shortName = toShortName(branch);
 const offered = programs.filter((p) => branch.programs.includes(p.slug));
 const others = branches.filter((b) => b.slug !== branch.slug);
 const photos = branchPhotos(branch.slug);
-// The cover photo sits in the hero; the next five fill the gallery's 2×2 + 4 grid.
+// The cover photo sits in the hero; the next five fill the gallery's 2×2 + 4 grid. Every photo opens
+// in the album (components/PhotoAlbum.astro), and the last tile counts the ones the grid leaves out.
 const [cover, ...rest] = photos;
 const gallery = rest.slice(0, 5);
+const notShown = rest.length - gallery.length;
+const photoAlt = (n: number) => (n === 1 ? `Inside ${branch.name}` : `${branch.name} – photo ${n}`);
 const fullSize = await Promise.all(photos.map((p) => getImage({ src: p, width: 1600, format: 'webp' })));
 const head = headPhoto(branch.slug);
 const mapSrc = `https://www.google.com/maps?q=${encodeURIComponent(branch.mapQuery)}&output=embed`;
@@ -96,14 +100,21 @@ const jsonLd = {
       </div>
       {
         cover && (
-          <Image
-            class="branch-hero__photo"
-            src={cover}
-            alt={`Inside ${branch.name}`}
-            widths={[480, 720, 1000]}
-            sizes="(max-width: 900px) 100vw, 560px"
-            loading="eager"
-          />
+          <a class="branch-hero__open" href={fullSize[0]!.src} data-album-open="0" aria-haspopup="dialog">
+            <Image
+              class="branch-hero__photo"
+              src={cover}
+              alt={photoAlt(1)}
+              widths={[480, 720, 1000]}
+              sizes="(max-width: 900px) 100vw, 560px"
+              loading="eager"
+            />
+            {photos.length > 1 && (
+              <span class="branch-hero__count">
+                <Icon name="Images" size={18} /> {photos.length} photos
+              </span>
+            )}
+          </a>
         )
       }
     </div>
@@ -159,13 +170,18 @@ const jsonLd = {
           <ul class="gallery">
             {gallery.map((photo, i) => (
               <li>
-                <a href={fullSize[i + 1]!.src} target="_blank" rel="noopener">
+                <a href={fullSize[i + 1]!.src} data-album-open={i + 1} aria-haspopup="dialog">
                   <Image
                     src={photo}
-                    alt={`${branch.name} – photo ${i + 2}`}
+                    alt={photoAlt(i + 2)}
                     widths={[360, 600, 900]}
                     sizes={i === 0 ? '(max-width: 700px) 100vw, 580px' : '(max-width: 700px) 50vw, 290px'}
                   />
+                  {notShown > 0 && i === gallery.length - 1 && (
+                    <span class="gallery__more" aria-hidden="true">
+                      +{notShown}
+                    </span>
+                  )}
                 </a>
               </li>
             ))}
@@ -284,6 +300,7 @@ const jsonLd = {
       </div>
     </div>
   </section>
+  {photos.length > 0 && <PhotoAlbum photos={photos} title={branch.name} alt={photoAlt} />}
 </BaseLayout>
 
 <style>
@@ -306,6 +323,35 @@ const jsonLd = {
 
   .branch-hero .btn-row {
     margin-top: 28px;
+  }
+
+  .branch-hero__open {
+    position: relative;
+    display: block;
+    border-radius: var(--radius-photo);
+    cursor: zoom-in;
+  }
+
+  .branch-hero__count {
+    position: absolute;
+    right: 18px;
+    bottom: 18px;
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    padding: 8px 14px;
+    border: 1px solid rgb(255 255 255 / 40%);
+    border-radius: 999px;
+    background: linear-gradient(135deg, color-mix(in srgb, var(--ink) 72%, transparent) 0%, color-mix(in srgb, var(--ink) 52%, transparent) 100%);
+    backdrop-filter: blur(6px);
+    color: #fff;
+    font-weight: 800;
+    font-size: 0.9rem;
+    transition: transform 0.2s ease;
+  }
+
+  .branch-hero__open:hover .branch-hero__count {
+    transform: translateY(-2px);
   }
 
   .branch-hero :global(.branch-hero__photo) {
@@ -421,10 +467,26 @@ const jsonLd = {
   }
 
   .gallery a {
+    position: relative;
     display: block;
     height: 100%;
     border-radius: var(--radius);
     overflow: hidden;
+    cursor: zoom-in;
+  }
+
+  /* "+3": photos the grid leaves out, which the album shows. */
+  .gallery__more {
+    position: absolute;
+    inset: 0;
+    display: grid;
+    place-items: center;
+    background: linear-gradient(160deg, color-mix(in srgb, var(--ink) 74%, transparent) 0%, color-mix(in srgb, var(--navy-700) 82%, transparent) 100%);
+    backdrop-filter: blur(2px);
+    color: #fff;
+    font-family: var(--font-display);
+    font-weight: var(--display-weight);
+    font-size: clamp(1.6rem, 3vw, 2.2rem);
   }
 
   .gallery :global(img) {

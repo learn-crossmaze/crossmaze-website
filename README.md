@@ -34,7 +34,7 @@ Go to **www.crossmaze.in/admin** and sign in.
 | Section | What you can change |
 | --- | --- |
 | Site settings | Logo, school name, phone, WhatsApp, emails, address, timings, social links, colour theme, home-page banner, numbers strip, about text, quote, photos |
-| Branches | Add, hide, reorder or delete branches; name, address, map, phone, size, capacity, amenities, programs offered, photos (first = cover), centre head with photo and bio |
+| Branches | Add, hide, reorder or delete branches; name, address, map, phone, size, capacity, amenities, programs offered, photos (first = cover; the page shows six, and all of them open in a swipeable album), centre head with photo and bio |
 | Programs | Add, hide, reorder; name, age group, timing, icon, colour, photo, description, focus list |
 | Jobs | Open positions on the careers page |
 | Testimonials | Parent quotes on the home page |

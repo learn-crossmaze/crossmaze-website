@@ -1,0 +1,524 @@
+---
+// A full-screen photo album. Any link on the page with data-album-open="<index>" opens it at that
+// photo (the link's own href, the full-size photo, is what works without JavaScript). Swipe, scroll,
+// the arrow buttons or keys, or the thumbnails move between photos, which ease in and out as they
+// slide past; where the browser supports it, the photo you tapped zooms into place and back.
+import type { ImageMetadata } from 'astro';
+import { Image } from 'astro:assets';
+import Icon from './Icon.astro';
+
+interface Props {
+  photos: ImageMetadata[];
+  /** Shown at the top and read out by screen readers, e.g. "Crossmaze – Neotown". */
+  title: string;
+  /** Description of photo n (counting from 1). */
+  alt: (n: number) => string;
+}
+
+const { photos, title, alt } = Astro.props;
+---
+
+<dialog class="album" aria-label={`Photos of ${title}`} data-album>
+  <div class="album__bar">
+    <p class="album__title">{title}</p>
+    <p class="album__count"><span data-album-count>1</span> / {photos.length}</p>
+    <button type="button" class="album__btn" data-album-close aria-label="Close photos">
+      <Icon name="X" size={22} />
+    </button>
+  </div>
+
+  <div class="album__stage">
+    <ul class="album__track" data-album-track>
+      {
+        photos.map((photo, i) => (
+          <li class="album__slide" aria-roledescription="slide" aria-label={`Photo ${i + 1} of ${photos.length}`}>
+            <Image
+              src={photo}
+              alt={alt(i + 1)}
+              widths={[640, 960, 1280, 1600]}
+              sizes="(max-width: 900px) 100vw, 82vw"
+              loading="lazy"
+              draggable="false"
+            />
+          </li>
+        ))
+      }
+    </ul>
+    <button type="button" class="album__btn album__nav album__nav--prev" data-album-prev aria-label="Previous photo">
+      <Icon name="ChevronLeft" size={28} />
+    </button>
+    <button type="button" class="album__btn album__nav album__nav--next" data-album-next aria-label="Next photo">
+      <Icon name="ChevronRight" size={28} />
+    </button>
+  </div>
+
+  <ul class="album__thumbs" aria-label="All photos" data-album-strip>
+    {
+      photos.map((photo, i) => (
+        <li>
+          <button type="button" class="album__thumb" data-album-thumb={i} aria-label={`Show photo ${i + 1}`}>
+            <Image src={photo} alt="" width={160} loading="lazy" />
+          </button>
+        </li>
+      ))
+    }
+  </ul>
+</dialog>
+
+<script>
+  type ViewTransitionDocument = Document & { startViewTransition?: (update: () => void) => { finished: Promise<void> } };
+
+  const album = document.querySelector<HTMLDialogElement>('[data-album]');
+
+  if (album && typeof album.showModal === 'function') {
+    const doc = document as ViewTransitionDocument;
+    const track = album.querySelector<HTMLElement>('[data-album-track]')!;
+    const strip = album.querySelector<HTMLElement>('[data-album-strip]')!;
+    const slides = [...track.children] as HTMLElement[];
+    const thumbs = [...album.querySelectorAll<HTMLButtonElement>('[data-album-thumb]')];
+    const count = album.querySelector<HTMLElement>('[data-album-count]')!;
+    const prev = album.querySelector<HTMLButtonElement>('[data-album-prev]')!;
+    const next = album.querySelector<HTMLButtonElement>('[data-album-next]')!;
+    const reduced = matchMedia('(prefers-reduced-motion: reduce)');
+    const photoAt = (i: number) => slides[i]?.querySelector('img') ?? null;
+    const openerFor = (i: number) => document.querySelector<HTMLElement>(`[data-album-open="${i}"]`);
+    const canMorph = () => typeof doc.startViewTransition === 'function' && !reduced.matches;
+
+    let current = -1;
+    // While a button or thumbnail scrolls the album, the counter waits for the photo it is heading to.
+    let heading: number | null = null;
+    let headingTimer = 0;
+
+    function mark(i: number) {
+      if (i === current) return;
+      current = i;
+      count.textContent = String(i + 1);
+      slides.forEach((slide, j) => slide.classList.toggle('is-active', j === i));
+      thumbs.forEach((thumb, j) => (j === i ? thumb.setAttribute('aria-current', 'true') : thumb.removeAttribute('aria-current')));
+      prev.disabled = i === 0;
+      next.disabled = i === slides.length - 1;
+      const thumb = thumbs[i];
+      if (thumb) {
+        const left = thumb.offsetLeft - (strip.clientWidth - thumb.offsetWidth) / 2;
+        strip.scrollTo({ left, behavior: reduced.matches ? 'auto' : 'smooth' });
+      }
+      // Load the neighbours too, so the next swipe shows a photo straight away.
+      [i - 1, i, i + 1].forEach((j) => {
+        const img = photoAt(j);
+        if (img) img.loading = 'eager';
+      });
+    }
+
+    function show(i: number, smooth = true) {
+      const target = Math.max(0, Math.min(slides.length - 1, i));
+      const animate = smooth && !reduced.matches && target !== current;
+      if (animate) {
+        heading = target;
+        clearTimeout(headingTimer);
+        headingTimer = window.setTimeout(() => (heading = null), 900);
+      }
+      track.scrollTo({ left: slides[target]!.offsetLeft, behavior: animate ? 'smooth' : 'auto' });
+      mark(target);
+    }
+
+    let ticking = false;
+    track.addEventListener(
+      'scroll',
+      () => {
+        if (ticking) return;
+        ticking = true;
+        requestAnimationFrame(() => {
+          ticking = false;
+          const i = Math.round(track.scrollLeft / track.clientWidth);
+          if (heading !== null) {
+            if (i !== heading) return;
+            heading = null;
+          }
+          mark(i);
+        });
+      },
+      { passive: true },
+    );
+
+    /** Waits (briefly) for a photo to be ready, so the zoom never lands on an empty frame. */
+    async function ready(img: HTMLImageElement | null) {
+      if (!img) return;
+      img.loading = 'eager';
+      await Promise.race([img.decode().catch(() => undefined), new Promise((r) => setTimeout(r, 400))]);
+    }
+
+    async function open(i: number, from: HTMLElement) {
+      const fromImg = from.querySelector('img');
+      const toImg = photoAt(i);
+      if (!canMorph() || !fromImg || !toImg) {
+        album!.classList.remove('album--morph');
+        album!.showModal();
+        show(i, false);
+        return;
+      }
+      await ready(toImg);
+      album!.classList.add('album--morph');
+      fromImg.style.viewTransitionName = 'album-photo';
+      const transition = doc.startViewTransition!(() => {
+        fromImg.style.viewTransitionName = '';
+        album!.showModal();
+        show(i, false);
+        toImg.style.viewTransitionName = 'album-photo';
+      });
+      transition.finished.finally(() => (toImg.style.viewTransitionName = ''));
+    }
+
+    function close() {
+      const img = photoAt(current);
+      const tileImg = openerFor(current)?.querySelector('img');
+      const box = tileImg?.getBoundingClientRect();
+      const onScreen = box && box.bottom > 0 && box.top < innerHeight && box.width > 0;
+      if (!canMorph() || !img || !tileImg || !onScreen) {
+        album!.close();
+        return;
+      }
+      img.style.viewTransitionName = 'album-photo';
+      const transition = doc.startViewTransition!(() => {
+        img.style.viewTransitionName = '';
+        album!.close();
+        tileImg.style.viewTransitionName = 'album-photo';
+      });
+      transition.finished.finally(() => (tileImg.style.viewTransitionName = ''));
+    }
+
+    document.addEventListener('click', (event) => {
+      const link = (event.target as Element).closest<HTMLElement>('[data-album-open]');
+      if (!link || event.ctrlKey || event.metaKey || event.shiftKey) return;
+      event.preventDefault();
+      open(Number(link.dataset.albumOpen) || 0, link);
+    });
+
+    prev.addEventListener('click', () => show(current - 1));
+    next.addEventListener('click', () => show(current + 1));
+    thumbs.forEach((thumb, i) => thumb.addEventListener('click', () => show(i)));
+    album.querySelector('[data-album-close]')!.addEventListener('click', close);
+
+    // A click on the dark space around a photo closes the album, like the close button.
+    album.addEventListener('click', (event) => {
+      const target = event.target as Element;
+      if (target === album || target.classList.contains('album__slide') || target.classList.contains('album__stage')) close();
+    });
+
+    // Esc: close with the same zoom back to the page.
+    album.addEventListener('cancel', (event) => {
+      event.preventDefault();
+      close();
+    });
+
+    album.addEventListener('keydown', (event) => {
+      const moves: Record<string, number> = { ArrowLeft: current - 1, ArrowRight: current + 1, Home: 0, End: slides.length - 1 };
+      if (!(event.key in moves)) return;
+      event.preventDefault();
+      show(moves[event.key]!);
+    });
+
+    // A mouse wheel (or a vertical trackpad swipe) turns one page at a time.
+    let wheelPause = 0;
+    album.addEventListener(
+      'wheel',
+      (event) => {
+        if (Math.abs(event.deltaX) > Math.abs(event.deltaY)) return; // sideways swipes scroll natively
+        if ((event.target as Element).closest('[data-album-strip]')) return;
+        event.preventDefault();
+        const now = performance.now();
+        if (now < wheelPause || Math.abs(event.deltaY) < 4) return;
+        wheelPause = now + 480;
+        show(current + (event.deltaY > 0 ? 1 : -1));
+      },
+      { passive: false },
+    );
+
+    // Keep the current photo in place when the window (or phone) is resized or rotated.
+    addEventListener('resize', () => {
+      if (album.open && current >= 0) track.scrollTo({ left: slides[current]!.offsetLeft, behavior: 'auto' });
+    });
+  }
+</script>
+
+<style>
+  .album {
+    position: fixed;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+    max-width: none;
+    max-height: none;
+    margin: 0;
+    padding: 0;
+    border: 0;
+    overflow: hidden;
+    color: #fff;
+    /* A deep, softly glowing backdrop in the theme's own colours, so the photos stand out. */
+    background:
+      radial-gradient(55% 45% at 12% 8%, color-mix(in srgb, var(--tint-1, #ffd6e6) 24%, transparent), transparent 70%),
+      radial-gradient(55% 45% at 88% 92%, color-mix(in srgb, var(--tint-5, #cfe2ff) 24%, transparent), transparent 70%),
+      linear-gradient(160deg, color-mix(in srgb, var(--ink, #131a3a) 92%, #000) 0%, color-mix(in srgb, var(--navy-700, #0b1d5e) 88%, #000) 100%);
+  }
+
+  .album[open] {
+    display: grid;
+    grid-template-rows: auto minmax(0, 1fr) auto;
+  }
+
+  .album::backdrop {
+    background: transparent;
+  }
+
+  /* Without the zoom (older browsers), the album fades and settles in instead. */
+  .album[open]:not(.album--morph) {
+    animation: album-in 0.32s cubic-bezier(0.2, 0.8, 0.2, 1);
+  }
+
+  @keyframes album-in {
+    from {
+      opacity: 0;
+      transform: scale(1.03);
+    }
+  }
+
+  :global(html:has(.album[open])) {
+    overflow: hidden;
+  }
+
+  .album__bar {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    padding: max(12px, env(safe-area-inset-top)) clamp(16px, 3vw, 28px) 6px;
+  }
+
+  .album__title {
+    flex: 1;
+    min-width: 0;
+    margin: 0;
+    overflow: hidden;
+    font-family: var(--font-display);
+    font-weight: var(--display-weight);
+    font-size: clamp(1.05rem, 2.2vw, 1.3rem);
+    white-space: nowrap;
+    text-overflow: ellipsis;
+  }
+
+  .album__count {
+    margin: 0;
+    padding: 6px 14px;
+    border: 1px solid rgb(255 255 255 / 22%);
+    border-radius: 999px;
+    background: linear-gradient(135deg, rgb(255 255 255 / 16%) 0%, rgb(255 255 255 / 6%) 100%);
+    font-weight: 800;
+    font-size: 0.92rem;
+    font-variant-numeric: tabular-nums;
+  }
+
+  .album__btn {
+    display: grid;
+    place-items: center;
+    flex: none;
+    width: 48px;
+    height: 48px;
+    border: 1px solid rgb(255 255 255 / 28%);
+    border-radius: 50%;
+    background: linear-gradient(135deg, rgb(255 255 255 / 22%) 0%, rgb(255 255 255 / 8%) 100%);
+    backdrop-filter: blur(8px);
+    color: #fff;
+    cursor: pointer;
+    transition:
+      transform 0.2s ease,
+      background 0.2s ease,
+      opacity 0.2s ease;
+  }
+
+  .album__btn:hover {
+    transform: scale(1.06);
+    background: linear-gradient(135deg, rgb(255 255 255 / 32%) 0%, rgb(255 255 255 / 14%) 100%);
+  }
+
+  .album__btn:disabled {
+    opacity: 0.3;
+    cursor: default;
+    transform: none;
+  }
+
+  .album__stage {
+    position: relative;
+    min-height: 0;
+  }
+
+  .album__track {
+    display: grid;
+    grid-auto-flow: column;
+    grid-auto-columns: 100%;
+    height: 100%;
+    margin: 0;
+    padding: 0;
+    list-style: none;
+    overflow-x: auto;
+    overflow-y: hidden;
+    overscroll-behavior-x: contain;
+    scroll-snap-type: x mandatory;
+    scrollbar-width: none;
+  }
+
+  .album__track::-webkit-scrollbar {
+    display: none;
+  }
+
+  .album__slide {
+    display: grid;
+    place-items: center;
+    min-height: 0;
+    padding: 10px clamp(16px, 8vw, 110px);
+    scroll-snap-align: center;
+    scroll-snap-stop: always;
+  }
+
+  .album__slide :global(img) {
+    max-width: 100%;
+    max-height: 100%;
+    width: auto;
+    height: auto;
+    object-fit: contain;
+    padding: 5px;
+    border-radius: var(--radius-photo-sm, 22px);
+    background: var(--g-ring);
+    box-shadow: 0 34px 80px -30px rgb(0 0 0 / 70%);
+    user-select: none;
+    -webkit-user-drag: none;
+  }
+
+  /* As a photo slides in it grows, sharpens and brightens; as it leaves it tilts away and fades. */
+  @supports (animation-timeline: view()) {
+    .album__slide :global(img) {
+      animation: album-slide linear both;
+      animation-timeline: view(inline);
+    }
+  }
+
+  @keyframes album-slide {
+    0% {
+      opacity: 0.15;
+      transform: perspective(1200px) translateX(-6%) rotateY(-16deg) scale(0.84);
+      filter: blur(3px) saturate(0.6);
+    }
+    50% {
+      opacity: 1;
+      transform: none;
+      filter: none;
+    }
+    100% {
+      opacity: 0.15;
+      transform: perspective(1200px) translateX(6%) rotateY(16deg) scale(0.84);
+      filter: blur(3px) saturate(0.6);
+    }
+  }
+
+  /* Browsers without scroll-linked animation still ease between photos. */
+  @supports not (animation-timeline: view()) {
+    .album__slide :global(img) {
+      opacity: 0.35;
+      transform: scale(0.92);
+      transition:
+        opacity 0.45s ease,
+        transform 0.45s cubic-bezier(0.2, 0.8, 0.2, 1);
+    }
+    .album__slide.is-active :global(img) {
+      opacity: 1;
+      transform: none;
+    }
+  }
+
+  .album__nav {
+    position: absolute;
+    top: 50%;
+    width: 56px;
+    height: 56px;
+    margin-top: -28px;
+  }
+
+  .album__nav--prev {
+    left: clamp(10px, 2.5vw, 32px);
+  }
+
+  .album__nav--next {
+    right: clamp(10px, 2.5vw, 32px);
+  }
+
+  .album__thumbs {
+    position: relative;
+    display: flex;
+    gap: 10px;
+    margin: 0;
+    padding: 10px clamp(16px, 3vw, 28px) max(16px, env(safe-area-inset-bottom));
+    list-style: none;
+    overflow-x: auto;
+    scrollbar-width: none;
+    justify-content: safe center;
+  }
+
+  .album__thumbs::-webkit-scrollbar {
+    display: none;
+  }
+
+  .album__thumb {
+    display: block;
+    flex: none;
+    width: 76px;
+    height: 56px;
+    padding: 3px;
+    border: 0;
+    border-radius: 14px;
+    background: linear-gradient(135deg, rgb(255 255 255 / 14%) 0%, rgb(255 255 255 / 6%) 100%);
+    cursor: pointer;
+    opacity: 0.55;
+    transition:
+      opacity 0.25s ease,
+      transform 0.25s ease;
+  }
+
+  .album__thumb :global(img) {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    border-radius: 11px;
+  }
+
+  .album__thumb:hover {
+    opacity: 0.85;
+  }
+
+  .album__thumb[aria-current='true'] {
+    background: var(--g-ring);
+    opacity: 1;
+    transform: translateY(-3px);
+  }
+
+  /* Phones: swipe instead of the side arrows, and a little less padding around photos. */
+  @media (max-width: 640px) {
+    .album__nav {
+      display: none;
+    }
+    .album__slide {
+      padding-inline: 12px;
+    }
+    .album__thumb {
+      width: 62px;
+      height: 46px;
+    }
+  }
+
+  /* The zoom between the page and the album. */
+  :global(::view-transition-group(album-photo)) {
+    animation-duration: 0.48s;
+    animation-timing-function: cubic-bezier(0.2, 0.8, 0.2, 1);
+  }
+
+  :global(::view-transition-old(root)),
+  :global(::view-transition-new(root)) {
+    animation-duration: 0.36s;
+  }
+</style>
