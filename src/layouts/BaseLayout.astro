@@ -1,6 +1,7 @@
 ---
 import { getImage } from 'astro:assets';
 import '../styles/global.css';
+import '../styles/themes.css';
 import Header from '../components/Header.astro';
 import Footer from '../components/Footer.astro';
 import CallPicker from '../components/CallPicker.astro';
@@ -9,6 +10,7 @@ import { site } from '../data/site';
 import { image } from '../data/content';
 import { cleanPath } from '../utils';
 import { sectionDoodleCss } from '../components/doodles';
+import { themes, themeSettings, fontsHref } from '../data/themes';
 
 interface Props {
   title?: string;
@@ -45,6 +47,13 @@ const organization = {
   sameAs: site.social.map((s) => s.href),
 };
 const structuredData = [organization, ...(jsonLd ? (Array.isArray(jsonLd) ? jsonLd : [jsonLd]) : [])];
+
+// Which colour theme to show (admin panel: Site settings → Look and feel). The browser picks it
+// before the page is drawn, by the script in <head> below.
+const themeConfig = {
+  ...themeSettings(site.theme),
+  all: themes.map((t) => ({ id: t.id, fonts: fontsHref(t.fonts), color: t.color })),
+};
 ---
 
 <!doctype html>
@@ -71,10 +80,81 @@ const structuredData = [organization, ...(jsonLd ? (Array.isArray(jsonLd) ? json
 
     <link rel="preconnect" href="https://fonts.googleapis.com" />
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-    <link
-      rel="stylesheet"
-      href="https://fonts.googleapis.com/css2?family=Fredoka:wght@500;600&family=Nunito:wght@400;600;700;800&display=swap"
-    />
+    <script is:inline define:vars={{ themeConfig }}>
+      (function () {
+        var c = themeConfig;
+        var byId = {};
+        c.all.forEach(function (t) {
+          byId[t.id] = t;
+        });
+        var storage = function (name) {
+          try {
+            return window[name];
+          } catch (e) {
+            return null;
+          }
+        };
+        var session = storage('sessionStorage');
+        var local = storage('localStorage');
+        var get = function (store, key) {
+          try {
+            return store ? store.getItem(key) : null;
+          } catch (e) {
+            return null;
+          }
+        };
+        var put = function (store, key, value) {
+          try {
+            if (store) store.setItem(key, value);
+          } catch (e) {
+            // Private browsing: the theme just isn't remembered.
+          }
+        };
+        var list = c.rotation;
+
+        // ?theme=meadow previews a theme for the rest of the visit; ?theme=auto returns to the setting.
+        var asked = new URLSearchParams(location.search).get('theme');
+        if (asked === 'auto') put(session, 'cm-theme-preview', '');
+        else if (byId[asked]) put(session, 'cm-theme-preview', asked);
+
+        var theme = get(session, 'cm-theme-preview');
+        if (!byId[theme]) {
+          var now = new Date();
+          var day = Math.floor((now.getTime() - now.getTimezoneOffset() * 60000) / 86400000);
+          if (c.mode === 'weekday') {
+            theme = c.weekdays[['sun', 'mon', 'tue', 'wed', 'thu', 'fri', 'sat'][now.getDay()]];
+          } else if (c.mode === 'daily') {
+            theme = list[day % list.length];
+          } else if (c.mode === 'visit' || c.mode === 'returning') {
+            // One theme per visit (browser session), so it doesn't change from page to page.
+            theme = get(session, 'cm-theme');
+            if (list.indexOf(theme) < 0) {
+              var last = get(local, 'cm-theme-last');
+              if (c.mode === 'returning' && list.indexOf(last) >= 0) {
+                theme = last;
+              } else {
+                var pool = list.length > 1 ? list.filter(function (t) { return t !== last; }) : list;
+                theme = pool[Math.floor(Math.random() * pool.length)];
+              }
+              put(session, 'cm-theme', theme);
+              put(local, 'cm-theme-last', theme);
+            }
+          } else {
+            theme = c.fixed;
+          }
+        }
+        if (!byId[theme]) theme = c.fixed;
+
+        document.documentElement.dataset.theme = theme;
+        var fonts = document.createElement('link');
+        fonts.rel = 'stylesheet';
+        fonts.href = byId[theme].fonts;
+        document.head.appendChild(fonts);
+        var meta = document.querySelector('meta[name="theme-color"]');
+        if (meta) meta.setAttribute('content', byId[theme].color);
+      })();
+    </script>
+    <noscript><link rel="stylesheet" href={fontsHref(themes[0].fonts)} /></noscript>
 
     {structuredData.map((data) => <script type="application/ld+json" set:html={JSON.stringify(data)} />)}
     <style is:inline set:html={sectionDoodleCss}></style>

@@ -119,5 +119,25 @@
       "label": "LinkedIn",
       "href": "https://www.linkedin.com/company/crossmaze-education/"
     }
-  ]
+  ],
+  "theme": {
+    "mode": "daily",
+    "fixed": "pastel",
+    "rotation": [
+      "pastel",
+      "meadow",
+      "ocean",
+      "crayon",
+      "calm"
+    ],
+    "weekdays": {
+      "mon": "pastel",
+      "tue": "meadow",
+      "wed": "ocean",
+      "thu": "crayon",
+      "fri": "calm",
+      "sat": "pastel",
+      "sun": "meadow"
+    }
+  }
 }

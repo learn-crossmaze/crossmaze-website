@@ -5,16 +5,28 @@
   --navy: #14307f;
   --navy-700: #0b1d5e;
   --navy-50: #eaf0fb;
+  --navy-100: #d3def7;
   --sun: #ffc93c;
   --sun-50: #fff4d6;
+  --sun-100: #ffe6a3;
+  --sun-fg: #9a6500;
   --coral: #ee4035;
   --coral-50: #fde8e6;
+  --coral-100: #fbd0cb;
+  --coral-fg: #c42b22;
   --green: #2f9a46;
   --green-50: #e2f4e3;
+  --green-100: #c6eacc;
+  --green-fg: #2f9a46;
   --sky: #2f7ff0;
   --sky-50: #e2eefe;
+  --sky-100: #c7dcfd;
+  --sky-fg: #2f7ff0;
   --paper: #ffffff;
   --line: #ece3d4;
+
+  /* Colour themes (src/styles/themes.css) override the tokens in this block and nothing else, so
+     use tokens rather than colour values anywhere a theme should show. */
 
   /* Gradients: every background on the site is one of these (no flat fills). */
   /* The page background: one pastel gradient that flows down the whole page (pink, peach,
@@ -26,6 +38,17 @@
   --flow-5: #e9f3ff;
   --flow-6: #f3eeff;
   --flow-length: 3600px;
+  /* Pastel tints for soft glows and panels. */
+  --tint-1: #ffd6e6;
+  --tint-2: #e4dbff;
+  --tint-3: #d6f3e4;
+  --tint-4: #fff1c2;
+  --tint-5: #cfe2ff;
+  /* The glows that drift behind the page (body::before). */
+  --glow-1: rgb(255 190 214 / 34%);
+  --glow-2: rgb(186 208 255 / 36%);
+  --glow-3: rgb(178 236 206 / 30%);
+  --glow-4: rgb(255 226 150 / 30%);
   --g-flow: repeating-linear-gradient(
     180deg,
     var(--flow-1) 0,
@@ -39,25 +62,41 @@
   /* Frosted-glass surfaces: white gradients that let the flowing page colour show through. */
   --g-card: linear-gradient(160deg, rgb(255 255 255 / 92%) 0%, rgb(255 255 255 / 76%) 100%);
   --g-glass: linear-gradient(160deg, rgb(255 255 255 / 86%) 0%, rgb(255 255 255 / 60%) 100%);
-  --g-soft: linear-gradient(150deg, rgb(255 255 255 / 90%) 0%, rgb(255 246 250 / 82%) 55%, rgb(240 246 255 / 82%) 100%);
+  --g-soft: linear-gradient(150deg, rgb(255 255 255 / 90%) 0%, color-mix(in srgb, var(--flow-1) 82%, transparent) 55%, color-mix(in srgb, var(--flow-5) 82%, transparent) 100%);
   --g-ring: linear-gradient(135deg, #ffc9dc 0%, #d9cbff 50%, #bfdcff 100%);
   --g-heading: linear-gradient(100deg, #14307f 0%, #263d9e 50%, #5b3fc2 100%);
   --g-highlight: linear-gradient(90deg, #e2456f 0%, #b346c8 55%, #7a4fe0 100%);
   --glass-edge: rgb(255 255 255 / 85%);
   --g-navy: linear-gradient(135deg, #2a4fb3 0%, #14307f 55%, #0b1d5e 100%);
   --g-sun: linear-gradient(135deg, #ffde75 0%, #ffc93c 50%, #ffb224 100%);
+  --sun-btn-fg: #131a3a;
+  --sun-btn-glow: rgb(255 170 30 / 75%);
+  --g-panel:
+    radial-gradient(60% 90% at 0% 0%, color-mix(in srgb, var(--tint-1) 75%, transparent), transparent 70%),
+    radial-gradient(60% 90% at 100% 100%, color-mix(in srgb, var(--tint-3) 75%, transparent), transparent 70%),
+    linear-gradient(120deg, color-mix(in srgb, var(--tint-2) 45%, #fff) 0%, color-mix(in srgb, var(--tint-5) 45%, #fff) 50%, color-mix(in srgb, var(--tint-4) 45%, #fff) 100%);
+  --eyebrow-fg: #c2362c;
+  --eyebrow-bg: linear-gradient(135deg, rgb(255 255 255 / 92%) 0%, rgb(255 236 243 / 88%) 100%);
+  --squiggle: #ffc23d;
   --g-ink: linear-gradient(135deg, #2a3366 0%, #131a3a 100%);
   --g-whatsapp: linear-gradient(135deg, #4be27f 0%, #25d366 50%, #12a84b 100%);
 
   --font-display: 'Fredoka', 'Nunito', system-ui, sans-serif;
   --font-body: 'Nunito', system-ui, -apple-system, 'Segoe UI', sans-serif;
+  --display-weight: 600;
 
   --radius-sm: 10px;
   --radius: 18px;
   --radius-lg: 28px;
-  --shadow-sm: 0 1px 2px rgb(60 40 120 / 6%), 0 8px 22px -10px rgb(60 40 120 / 18%);
-  --shadow: 0 2px 6px rgb(60 40 120 / 6%), 0 22px 48px -20px rgb(60 40 120 / 28%);
-  --shadow-lift: 0 4px 10px rgb(60 40 120 / 7%), 0 30px 60px -22px rgb(60 40 120 / 34%);
+  --radius-card: 22px;
+  --radius-btn: 999px;
+  --radius-photo: 32px;
+  --radius-photo-sm: 22px;
+  /* Shadows are tinted (violet here); a theme changes the tint. */
+  --shadow-tint: 60 40 120;
+  --shadow-sm: 0 1px 2px rgb(var(--shadow-tint) / 6%), 0 8px 22px -10px rgb(var(--shadow-tint) / 18%);
+  --shadow: 0 2px 6px rgb(var(--shadow-tint) / 6%), 0 22px 48px -20px rgb(var(--shadow-tint) / 28%);
+  --shadow-lift: 0 4px 10px rgb(var(--shadow-tint) / 7%), 0 30px 60px -22px rgb(var(--shadow-tint) / 34%);
 
   --container: 1180px;
   --gutter: 20px;
@@ -115,7 +154,7 @@ h2,
 h3,
 h4 {
   font-family: var(--font-display);
-  font-weight: 600;
+  font-weight: var(--display-weight);
   line-height: 1.15;
   margin: 0 0 0.5em;
   letter-spacing: -0.01em;
@@ -192,10 +231,10 @@ body::before {
   z-index: -1;
   pointer-events: none;
   background:
-    radial-gradient(38vmax 34vmax at 12% 18%, rgb(255 190 214 / 34%), transparent 70%),
-    radial-gradient(40vmax 36vmax at 88% 26%, rgb(186 208 255 / 36%), transparent 70%),
-    radial-gradient(36vmax 32vmax at 24% 86%, rgb(178 236 206 / 30%), transparent 70%),
-    radial-gradient(34vmax 30vmax at 82% 84%, rgb(255 226 150 / 30%), transparent 70%);
+    radial-gradient(38vmax 34vmax at 12% 18%, var(--glow-1), transparent 70%),
+    radial-gradient(40vmax 36vmax at 88% 26%, var(--glow-2), transparent 70%),
+    radial-gradient(36vmax 32vmax at 24% 86%, var(--glow-3), transparent 70%),
+    radial-gradient(34vmax 30vmax at 82% 84%, var(--glow-4), transparent 70%);
   animation: glow-drift 36s ease-in-out infinite alternate;
 }
 
@@ -352,10 +391,7 @@ main > section.section--feature > .container::before {
   inset: calc(-1 * var(--panel-pad)) calc(var(--gutter) - min(var(--panel-pad), var(--gutter) - 8px));
   border: 1px solid var(--glass-edge);
   border-radius: 36px;
-  background:
-    radial-gradient(60% 90% at 0% 0%, rgb(255 214 230 / 70%), transparent 70%),
-    radial-gradient(60% 90% at 100% 100%, rgb(200 236 216 / 70%), transparent 70%),
-    linear-gradient(120deg, rgb(243 239 255 / 92%) 0%, rgb(235 244 255 / 92%) 50%, rgb(255 248 222 / 92%) 100%);
+  background: var(--g-panel);
   box-shadow: var(--shadow);
 }
 
@@ -397,14 +433,14 @@ main > section.section--tight.section--feature {
   padding: 6px 14px 6px 12px;
   border: 1px solid var(--glass-edge);
   border-radius: 999px;
-  background: linear-gradient(135deg, rgb(255 255 255 / 92%) 0%, rgb(255 236 243 / 88%) 100%);
-  box-shadow: 0 6px 16px -10px rgb(194 54 44 / 45%);
+  background: var(--eyebrow-bg);
+  box-shadow: 0 6px 16px -10px color-mix(in srgb, var(--eyebrow-fg) 45%, transparent);
   font-family: var(--font-display);
   font-weight: 600;
   font-size: 0.82rem;
   letter-spacing: 0.08em;
   text-transform: uppercase;
-  color: #c2362c;
+  color: var(--eyebrow-fg);
 }
 
 .eyebrow::before {
@@ -442,7 +478,7 @@ main > section.section--tight.section--feature {
   min-height: 48px;
   padding: 12px 24px;
   border: 2px solid transparent;
-  border-radius: 999px;
+  border-radius: var(--radius-btn);
   background: var(--btn-grad) border-box;
   color: var(--btn-fg);
   font-family: var(--font-display);
@@ -451,7 +487,7 @@ main > section.section--tight.section--feature {
   line-height: 1;
   text-decoration: none;
   cursor: pointer;
-  box-shadow: 0 10px 22px -12px var(--btn-glow, rgb(20 48 127 / 60%));
+  box-shadow: 0 10px 22px -12px var(--btn-glow, color-mix(in srgb, var(--navy) 60%, transparent));
   transition:
     transform 0.2s ease,
     box-shadow 0.2s ease,
@@ -461,19 +497,19 @@ main > section.section--tight.section--feature {
 .btn:hover {
   color: var(--btn-fg);
   transform: translateY(-2px);
-  box-shadow: 0 16px 30px -14px var(--btn-glow, rgb(20 48 127 / 70%));
+  box-shadow: 0 16px 30px -14px var(--btn-glow, color-mix(in srgb, var(--navy) 70%, transparent));
   filter: saturate(1.08) brightness(1.04);
 }
 
 .btn--sun {
   --btn-bg: var(--sun);
-  --btn-fg: var(--ink);
+  --btn-fg: var(--sun-btn-fg);
   --btn-grad: var(--g-sun);
-  --btn-glow: rgb(255 170 30 / 75%);
+  --btn-glow: var(--sun-btn-glow);
 }
 
 .btn--ghost {
-  --btn-glow: rgb(20 48 127 / 28%);
+  --btn-glow: color-mix(in srgb, var(--navy) 28%, transparent);
   border-color: var(--btn-bg);
   background: var(--g-glass) padding-box;
   color: var(--btn-bg);
@@ -486,7 +522,7 @@ main > section.section--tight.section--feature {
 .btn--white {
   --btn-bg: #fff;
   --btn-fg: var(--navy);
-  --btn-grad: linear-gradient(135deg, #ffffff 0%, #eef3ff 100%);
+  --btn-grad: linear-gradient(135deg, #ffffff 0%, var(--navy-50) 100%);
 }
 
 .btn--sm {
@@ -509,7 +545,7 @@ main > section.section--tight.section--feature {
     radial-gradient(120% 90% at 100% 100%, color-mix(in srgb, var(--badge-bg, #fff1e6) 75%, transparent) 0%, transparent 60%),
     linear-gradient(160deg, rgb(255 255 255 / 94%) 0%, rgb(255 255 255 / 80%) 100%);
   border: 1px solid var(--glass-edge);
-  border-radius: 22px;
+  border-radius: var(--radius-card);
   padding: 28px;
   box-shadow: var(--shadow-sm);
 }
@@ -543,7 +579,7 @@ main > section.section--tight.section--feature {
   height: 52px;
   margin-bottom: 18px;
   border-radius: 16px;
-  background: linear-gradient(135deg, var(--badge-bg, var(--navy-50)) 0%, var(--badge-bg-2, #d3def7) 100%);
+  background: linear-gradient(135deg, var(--badge-bg, var(--navy-50)) 0%, var(--badge-bg-2, var(--navy-100)) 100%);
   box-shadow:
     inset 0 0 0 1px rgb(255 255 255 / 70%),
     0 8px 18px -10px color-mix(in srgb, var(--badge-fg, var(--navy)) 45%, transparent);
@@ -552,31 +588,31 @@ main > section.section--tight.section--feature {
 
 .tone-sun {
   --badge-bg: var(--sun-50);
-  --badge-bg-2: #ffe6a3;
-  --badge-fg: #9a6500;
+  --badge-bg-2: var(--sun-100);
+  --badge-fg: var(--sun-fg);
   --tone: var(--sun);
 }
 .tone-coral {
   --badge-bg: var(--coral-50);
-  --badge-bg-2: #fbd0cb;
-  --badge-fg: #c42b22;
+  --badge-bg-2: var(--coral-100);
+  --badge-fg: var(--coral-fg);
   --tone: var(--coral);
 }
 .tone-green {
   --badge-bg: var(--green-50);
-  --badge-bg-2: #c6eacc;
-  --badge-fg: var(--green);
+  --badge-bg-2: var(--green-100);
+  --badge-fg: var(--green-fg);
   --tone: var(--green);
 }
 .tone-sky {
   --badge-bg: var(--sky-50);
-  --badge-bg-2: #c7dcfd;
-  --badge-fg: var(--sky);
+  --badge-bg-2: var(--sky-100);
+  --badge-fg: var(--sky-fg);
   --tone: var(--sky);
 }
 .tone-navy {
   --badge-bg: var(--navy-50);
-  --badge-bg-2: #d3def7;
+  --badge-bg-2: var(--navy-100);
   --badge-fg: var(--navy);
   --tone: var(--navy);
 }
@@ -587,7 +623,7 @@ main > section.section--tight.section--feature {
   gap: 6px;
   padding: 4px 12px;
   border-radius: 999px;
-  background: linear-gradient(135deg, var(--badge-bg, var(--navy-50)) 0%, var(--badge-bg-2, #d3def7) 100%);
+  background: linear-gradient(135deg, var(--badge-bg, var(--navy-50)) 0%, var(--badge-bg-2, var(--navy-100)) 100%);
   color: var(--badge-fg, var(--navy));
   font-weight: 700;
   font-size: 0.85rem;
@@ -698,8 +734,8 @@ main > section.section--tight.section--feature {
 .field input[type='file'] {
   padding: 14px;
   border-style: dashed;
-  border-color: #c9c2e6;
-  background: linear-gradient(135deg, rgb(255 255 255 / 92%) 0%, rgb(243 238 255 / 90%) 100%);
+  border-color: color-mix(in srgb, var(--navy) 28%, #fff);
+  background: linear-gradient(135deg, rgb(255 255 255 / 92%) 0%, color-mix(in srgb, var(--tint-2) 50%, #fff) 100%);
   color: var(--muted);
   cursor: pointer;
 }
@@ -722,7 +758,7 @@ main > section.section--tight.section--feature {
 .field textarea:focus {
   outline: none;
   border-color: var(--navy);
-  box-shadow: 0 0 0 4px rgb(20 48 127 / 14%);
+  box-shadow: 0 0 0 4px color-mix(in srgb, var(--navy) 14%, transparent);
 }
 
 .form-status {
@@ -770,7 +806,10 @@ main > section.section--tight.section--feature {
   right: 0;
   bottom: -0.12em;
   height: 0.32em;
-  background: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 120 12' preserveAspectRatio='none'%3E%3Cpath d='M2 8 C 20 2, 40 2, 60 7 S 100 12, 118 4' fill='none' stroke='%23ffc23d' stroke-width='5' stroke-linecap='round'/%3E%3C/svg%3E")
+  background: var(--squiggle);
+  -webkit-mask: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 120 12' preserveAspectRatio='none'%3E%3Cpath d='M2 8 C 20 2, 40 2, 60 7 S 100 12, 118 4' fill='none' stroke='%23000' stroke-width='5' stroke-linecap='round'/%3E%3C/svg%3E")
+    no-repeat center / 100% 100%;
+  mask: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 120 12' preserveAspectRatio='none'%3E%3Cpath d='M2 8 C 20 2, 40 2, 60 7 S 100 12, 118 4' fill='none' stroke='%23000' stroke-width='5' stroke-linecap='round'/%3E%3C/svg%3E")
     no-repeat center / 100% 100%;
   z-index: -1;
 }
