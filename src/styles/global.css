@@ -694,6 +694,29 @@ main > section.section--tight.section--feature {
   resize: vertical;
 }
 
+/* File upload (resume): a dashed drop area with a pill "Choose file" button. */
+.field input[type='file'] {
+  padding: 14px;
+  border-style: dashed;
+  border-color: #c9c2e6;
+  background: linear-gradient(135deg, rgb(255 255 255 / 92%) 0%, rgb(243 238 255 / 90%) 100%);
+  color: var(--muted);
+  cursor: pointer;
+}
+
+.field input[type='file']::file-selector-button {
+  margin-right: 14px;
+  padding: 9px 18px;
+  border: 0;
+  border-radius: 999px;
+  background: var(--g-navy);
+  color: #fff;
+  font: inherit;
+  font-weight: 700;
+  font-size: 0.95rem;
+  cursor: pointer;
+}
+
 .field input:focus,
 .field select:focus,
 .field textarea:focus {

@@ -22,7 +22,7 @@ The URLs match the old site, so existing links and Google results keep working.
 | `/about` | Who we are, core values, approach, annual-day photos, founders |
 | `/our-programs` | Play Group, Nursery, Junior KG, Senior KG, Day Care, how we teach, a day at Crossmaze, extra-curriculars, FAQs |
 | `/branch` and `/branch/<slug>` | All branches, then one page per branch: photos, facts, amenities, gallery, centre head, map, enquiry form |
-| `/careers` | Why work with us, open roles, application form |
+| `/careers` | Why work with us, open roles, application form with resume upload |
 | `/contact` | Admission enquiry, phone / WhatsApp / email, how admission works, all branch addresses |
 | `/privacy-policy`, `/terms` | Carried over from the old site (`src/pages/*.md`) |
 | `/admin` | The admin panel (not indexed by search engines) |
@@ -126,7 +126,7 @@ X-Crossmaze-Submission-Id: 9fQx2kL…        ← same on retries; use it to igno
 }
 ```
 
-Job applications send `name, phone, email, position, branch, experience, qualification, resume_link, about`. LITMUS should reply with any 2xx status. Failed deliveries are retried every 30 minutes (up to 6 times), shown as “LITMUS failed” in Submissions, and can be resent by hand. Submissions that arrive before LITMUS is set up are kept, and **Send unsent to LITMUS** delivers them later.
+Job applications send `name, phone, email, position, branch, experience, qualification, resume_link, resume_file, about`. `resume_link` is a private link to the resume the applicant uploaded (PDF, Word or a photo, up to 5 MB) and `resume_file` is its file name. The file is stored in Cloud Storage under `resumes/`; only admins can open it in the panel, and anyone given the link can download it, so treat the link like the resume itself. Deleting an application in Submissions also deletes its resume. LITMUS should reply with any 2xx status. Failed deliveries are retried every 30 minutes (up to 6 times), shown as “LITMUS failed” in Submissions, and can be resent by hand. Submissions that arrive before LITMUS is set up are kept, and **Send unsent to LITMUS** delivers them later.
 
 The form fields and validation live in `functions/lib/forms.js`; the delivery code is `functions/lib/litmus.js`.
 

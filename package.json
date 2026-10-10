@@ -12,7 +12,7 @@
     "content:pull": "node scripts/sync-content.mjs",
     "content:seed": "node scripts/sync-content.mjs --seed",
     "test": "npm --prefix functions test",
-    "test:rules": "npx firebase-tools emulators:exec --only firestore,storage --project demo-crossmaze \"node --test tests/rules.test.mjs\""
+    "test:rules": "npx firebase-tools emulators:exec --only firestore,storage --project demo-crossmaze-rules \"node --test tests/rules.test.mjs\""
   },
   "dependencies": {
     "@astrojs/react": "^7.0.1",

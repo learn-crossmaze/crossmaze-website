@@ -17,5 +17,12 @@ service firebase.storage {
         && request.resource.size < 15 * 1024 * 1024
         && request.resource.contentType.matches('image/(jpeg|png|webp|gif|avif)');
     }
+
+    // Resumes attached to job applications. The submit function saves them (bypassing these
+    // rules); admins can open them and delete them along with the application. Nobody else can
+    // read them here, and LITMUS gets a private download link instead.
+    match /resumes/{allPaths=**} {
+      allow read, delete: if isAdmin();
+    }
   }
 }

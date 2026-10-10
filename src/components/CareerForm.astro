@@ -62,8 +62,15 @@ import { site } from '../data/site';
     <input id="job-qual" name="qualification" placeholder="e.g. B.Com, Diploma in ECCE" required />
   </div>
   <div class="field">
-    <label for="job-resume">Link to your resume <span class="hint">(Google Drive, Dropbox, LinkedIn…)</span></label>
-    <input id="job-resume" name="resume_link" type="url" inputmode="url" placeholder="https://" />
+    <label for="job-resume">Upload your resume <span class="hint">(PDF, Word or a photo, up to 5 MB)</span></label>
+    <input
+      id="job-resume"
+      name="resume"
+      type="file"
+      accept=".pdf,.doc,.docx,.jpg,.jpeg,.png,application/pdf,application/msword,application/vnd.openxmlformats-officedocument.wordprocessingml.document,image/jpeg,image/png"
+      data-max-mb="5"
+      required
+    />
   </div>
   <div class="field">
     <label for="job-about">Tell us a little about yourself <span class="hint">(optional)</span></label>

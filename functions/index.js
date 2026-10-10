@@ -1,15 +1,17 @@
 // Cloud Functions for www.crossmaze.in
 //
 //   submit             POST /api/submit (Hosting rewrite). Saves a website form submission
-//                      in Firestore, then forwards it to LITMUS.
+//                      in Firestore (and an attached resume in Cloud Storage), then forwards it
+//                      to LITMUS.
 //   resendSubmissions  Admin panel: send selected (or all unsent) submissions to LITMUS again.
 //   testLitmus         Admin panel: send a test payload with the saved LITMUS settings.
 //   publishSite        Admin panel "Publish": starts the GitHub Actions deploy, which pulls the
 //                      latest content from Firestore and rebuilds the site.
 //   retryLitmus        Every 30 minutes, retries submissions that failed to reach LITMUS.
-import { createHash } from 'node:crypto';
+import { createHash, randomUUID } from 'node:crypto';
 import { initializeApp } from 'firebase-admin/app';
 import { FieldValue, getFirestore } from 'firebase-admin/firestore';
+import { getStorage } from 'firebase-admin/storage';
 import { onCall, onRequest, HttpsError } from 'firebase-functions/https';
 import { onSchedule } from 'firebase-functions/scheduler';
 import { setGlobalOptions } from 'firebase-functions/options';
@@ -101,10 +103,21 @@ export const submit = onRequest({ cors: true, memory: '256MiB', timeoutSeconds: 
     return;
   }
 
-  const ref = await db.collection('submissions').add({
+  const ref = db.collection('submissions').doc();
+  let files;
+  try {
+    files = await storeFiles(ref.id, result.files, result.data);
+  } catch (err) {
+    // The website then offers to send the application by email instead.
+    logger.error('Saving an uploaded file failed', { id: ref.id, err });
+    res.status(500).json({ ok: false, error: 'Could not save the file' });
+    return;
+  }
+  await ref.set({
     type: result.type,
     data: result.data,
     page: result.page,
+    files,
     userAgent: String(req.get('user-agent') ?? '').slice(0, 300),
     createdAt: FieldValue.serverTimestamp(),
     handled: false,
@@ -117,8 +130,39 @@ export const submit = onRequest({ cors: true, memory: '256MiB', timeoutSeconds: 
     // The submission is saved; the scheduled retry or the admin panel can resend it.
     logger.error('Forwarding to LITMUS crashed', { id: ref.id, err });
   }
-  res.json({ ok: true, id: ref.id });
+  // `files` tells the website which uploads were saved (older versions of this function ignored them).
+  res.json({ ok: true, id: ref.id, files: files.map((f) => f.field) });
 });
+
+/**
+ * Saves uploaded files under <folder>/<submission id>/ (readable only by admins and by whoever has
+ * the link), and adds "<field>_link" and "<field>_file" to the submission data for LITMUS.
+ * @param {string} id submission id
+ * @param {Record<string, { name: string, contentType: string, buffer: Buffer, folder: string }>} uploads
+ * @param {Record<string, string>} data
+ */
+async function storeFiles(id, uploads, data) {
+  const files = [];
+  for (const [field, upload] of Object.entries(uploads)) {
+    const path = `${upload.folder}/${id}/${upload.name}`;
+    const bucket = getStorage().bucket();
+    const token = randomUUID();
+    await bucket.file(path).save(upload.buffer, {
+      resumable: false,
+      contentType: upload.contentType,
+      metadata: {
+        contentDisposition: `inline; filename="${upload.name}"`,
+        cacheControl: 'private, max-age=0',
+        metadata: { firebaseStorageDownloadTokens: token, submissionId: id },
+      },
+    });
+    // A Firebase download link: works with its secret token, without signing in.
+    data[`${field}_link`] = `${storageOrigin()}/v0/b/${bucket.name}/o/${encodeURIComponent(path)}?alt=media&token=${token}`;
+    data[`${field}_file`] = upload.name;
+    files.push({ field, path, name: upload.name, contentType: upload.contentType, size: upload.buffer.length });
+  }
+  return files;
+}
 
 export const resendSubmissions = onCall({ timeoutSeconds: 300 }, async (request) => {
   await assertAdmin(db, request);
@@ -194,6 +238,11 @@ export const retryLitmus = onSchedule({ schedule: 'every 30 minutes', timeoutSec
     if ((snap.get('litmus.attempts') ?? 0) < MAX_LITMUS_ATTEMPTS) await forward(snap, config);
   }
 });
+
+function storageOrigin() {
+  const emulator = process.env.FIREBASE_STORAGE_EMULATOR_HOST;
+  return emulator ? `http://${emulator.replace(/^https?:\/\//, '')}` : 'https://firebasestorage.googleapis.com';
+}
 
 function safeJson(text) {
   try {
