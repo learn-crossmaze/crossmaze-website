@@ -3,7 +3,7 @@
   "fullName": "Crossmaze Preschool and Day Care",
   "legalName": "Crossmaze Education India Pvt. Ltd.",
   "tagline": "A safe place to grow and learn",
-  "description": "Crossmaze Preschool and Day Care, Bengaluru: Montessori-based Play Group, Nursery, Junior KG, Senior KG and Day Care at five centres in Electronic City and Begur, with live CCTV, a parent app and in-house transport.",
+  "description": "Crossmaze Preschool and Day Care, Bengaluru: Montessori-based Play Group, Nursery, Junior KG, Senior KG and Day Care at five centres across Electronic City and Begur, with live CCTV, a parents’ app and in-house transport.",
   "url": "https://www.crossmaze.in",
   "logo": "brand/logo.png",
   "mascot": "brand/mascot.png",
@@ -25,7 +25,7 @@
   "hero": {
     "titleStart": "A safe place to",
     "titleHighlight": "grow and learn",
-    "lead": "A secure, caring and nurturing space where children thrive and learn at their own pace, with a Montessori-based approach at five centres across Electronic City and Begur.",
+    "lead": "A warm, secure and caring space where children learn at their own pace. Montessori-based preschool and day care, at five centres across Electronic City and Begur.",
     "photos": [
       {
         "image": "branches/crossmaze-neotown/02.jpg",
@@ -43,11 +43,11 @@
     "badgeValue": "1000+",
     "badgeLabel": "happy children"
   },
-  "promise": "Crossmaze offers a secure, caring, and nurturing space for children to thrive and learn at their own pace. Our inclusive learning center is dedicated to fostering positive connections among children, parents, and staff. We are deeply committed to creating a safe and supportive environment where every child is cherished and respected.",
+  "promise": "Crossmaze is a secure, caring and nurturing space where children thrive and learn at their own pace. As an inclusive learning centre, we build warm, positive connections between children, parents and staff, and we are deeply committed to a safe, supportive environment where every child is cherished and respected.",
   "about": [
-    "Crossmaze is an interactive education place where children learn to excel along with the choice of their preferences. Children under the age of 5 have a strong visual understanding, so a practical approach suits them best, and visual learning is everlasting. We understand that each kid is special, and with a wide range of activities and learning material we lay a strong foundation for each child.",
-    "Our learning and education program is designed to eliminate the achievement gap and encourage every student to become equally successful. Good pre-schooling is the first milestone in the development and growth of children, and a strong, positive self-image is the best possible preparation for success.",
-    "At Crossmaze, activities are designed to give children opportunities to develop confidence and a positive image of themselves. Continuous motivation from teachers helps our students build a positive self-image, which in turn makes them confident individuals."
+    "Crossmaze is an interactive place of learning where children grow and excel while following their own interests. Children under five understand the world best through what they see and do, so we teach in a practical, hands-on way, and what they learn visually stays with them. Every child is special, and our wide range of activities and learning materials helps us lay a strong foundation for each one.",
+    "Good preschooling is the first milestone in a child’s growth. Our learning program is designed to close the achievement gap and help every child succeed, because a strong, positive self-image is the best preparation for success.",
+    "Every activity at Crossmaze gives children a chance to build confidence and feel good about themselves. With steady encouragement from their teachers, our children develop a positive self-image and grow into confident individuals."
   ],
   "aboutPhoto": {
     "image": "photos/teacher-flashcards.jpg",
@@ -68,7 +68,7 @@
     },
     {
       "value": "100+",
-      "label": "passionate individuals"
+      "label": "passionate team members"
     },
     {
       "value": "6+ years",

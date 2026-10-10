@@ -203,7 +203,7 @@ export const branchSchema: Field[] = [
   { type: 'heading', label: 'Contact and location' },
   { key: 'address', label: 'Address', type: 'list', itemLabel: 'Line' },
   { key: 'pincode', label: 'PIN code', type: 'text' },
-  { key: 'mapQuery', label: 'Google Maps search', type: 'text', help: 'What to search on Google Maps to find this centre.' },
+  { key: 'mapQuery', label: 'Google Maps search', type: 'text', help: 'Where the map points: the centre’s coordinates (latitude,longitude, e.g. 12.8598,77.6131) or what to search on Google Maps.' },
   { key: 'phone', label: 'Phone', type: 'tel' },
   { key: 'email', label: 'Email', type: 'email' },
 

@@ -5,7 +5,8 @@
 //   node scripts/sync-content.mjs --seed-if-empty first copy the repo content into Firestore if it's empty, then pull
 //   node scripts/sync-content.mjs --seed          only copy the repo content into Firestore (overwrites!)
 //   … --add-missing                               also store content fields that are new in the repo (e.g. a new
-//                                                 page section) in Firestore, so the admin panel can edit them
+//                                                 page section) in Firestore, so the admin panel can edit them,
+//                                                 and save pending content updates (content/updates/, see below)
 //   ADMIN_EMAILS=a@x.com,b@y.com …                also makes sure these people can sign in to /admin
 //
 // Photos: Firestore stores Cloud Storage paths ("site/…"). When pulling, a photo that is unchanged from the
@@ -30,6 +31,8 @@ const COLLECTIONS = ['branches', 'programs', 'jobs', 'testimonials'];
 const SINGLETONS = ['site', 'sections'];
 
 const args = new Set(process.argv.slice(2));
+
+const updatesDir = path.join(contentDir, 'updates');
 
 const readJson = (name) => JSON.parse(fs.readFileSync(path.join(contentDir, `${name}.json`), 'utf8'));
 const writeJson = (name, data) =>
@@ -164,6 +167,92 @@ async function withNewFields(db, name, data) {
   return { ...data, ...added };
 }
 
+// ---------------------------------------------------------------- content updates
+// content/updates/*.json carry copy changes made in the repository after Firestore was seeded (e.g. a
+// rewrite of the page text or corrected branch details), written by scripts/content-update.mjs. Each change
+// names a document, a field (dotted for nested ones) and its old and new value. A field is only updated
+// while Firestore still holds the old value, so anything an editor changed in the admin panel is kept.
+// Previews apply updates in memory only; deploys from main (--add-missing) also save them to Firestore and
+// record each update in meta/contentUpdates so it is applied once.
+
+const canonical = (v) =>
+  Array.isArray(v)
+    ? v.map(canonical)
+    : v && typeof v === 'object'
+      ? Object.fromEntries(Object.keys(v).sort().map((k) => [k, canonical(v[k])]))
+      : v;
+const same = (a, b) => JSON.stringify(canonical(a)) === JSON.stringify(canonical(b));
+const getPath = (obj, dotted) => dotted.split('.').reduce((o, k) => (o == null ? undefined : o[k]), obj);
+function setPath(obj, dotted, value) {
+  const keys = dotted.split('.');
+  const last = keys.pop();
+  let o = obj;
+  for (const k of keys) o = o[k] && typeof o[k] === 'object' ? o[k] : (o[k] = {});
+  o[last] = value;
+}
+
+class ContentUpdates {
+  constructor(list, applied) {
+    this.pending = list.filter((u) => !applied[u.id]);
+    /** @type {Map<string, Record<string, unknown>>} document path -> fields to save */
+    this.writes = new Map();
+    this.report = Object.fromEntries(this.pending.map((u) => [u.id, { changed: 0, current: 0, kept: [], seen: new Set() }]));
+  }
+
+  static async load(db) {
+    const list = fs.existsSync(updatesDir)
+      ? fs
+          .readdirSync(updatesDir)
+          .filter((f) => f.endsWith('.json'))
+          .sort()
+          .map((f) => JSON.parse(fs.readFileSync(path.join(updatesDir, f), 'utf8')))
+      : [];
+    const applied = list.length ? ((await db.doc('meta/contentUpdates').get()).data()?.applied ?? {}) : {};
+    return new ContentUpdates(list, applied);
+  }
+
+  /** Applies the pending changes for one document to its data (in place). */
+  apply(docPath, data) {
+    for (const update of this.pending) {
+      const report = this.report[update.id];
+      update.changes.forEach((change, i) => {
+        if (change.doc !== docPath) return;
+        report.seen.add(i);
+        const now = getPath(data, change.field) ?? null;
+        if (same(now, change.to)) report.current += 1;
+        else if (same(now, change.from)) {
+          setPath(data, change.field, change.to);
+          const fields = this.writes.get(docPath) ?? {};
+          fields[change.field] = change.to;
+          this.writes.set(docPath, fields);
+          report.changed += 1;
+        } else report.kept.push(`${docPath} ${change.field}`);
+      });
+    }
+    return data;
+  }
+
+  /** Logs what happened and, when `save` is set, writes the changes and marks the updates as applied. */
+  async finish(db, save) {
+    for (const update of this.pending) {
+      const r = this.report[update.id];
+      const missing = update.changes.filter((_, i) => !r.seen.has(i)).map((c) => c.doc);
+      console.log(
+        `Content update ${update.id}: ${r.changed} field(s) ${save ? 'updated' : 'updated for this preview only'}` +
+          `${r.current ? `, ${r.current} already up to date` : ''}` +
+          `${r.kept.length ? `, ${r.kept.length} kept as edited in the admin panel (${r.kept.join('; ')})` : ''}` +
+          `${missing.length ? `, ${missing.length} skipped because the item no longer exists (${[...new Set(missing)].join(', ')})` : ''}.`,
+      );
+    }
+    if (!save || !this.pending.length) return;
+    for (const [docPath, fields] of this.writes) await db.doc(docPath).update(fields);
+    const applied = Object.fromEntries(
+      this.pending.map((u) => [u.id, { appliedAt: FieldValue.serverTimestamp(), changed: this.report[u.id].changed, kept: this.report[u.id].kept }]),
+    );
+    await db.doc('meta/contentUpdates').set({ applied }, { merge: true });
+  }
+}
+
 async function pull(db, bucket) {
   const download = async (storagePath) => {
     if (!storagePath) return '';
@@ -181,18 +270,19 @@ async function pull(db, bucket) {
 
   fs.rmSync(cmsDir, { recursive: true, force: true });
   const out = {};
+  const updates = await ContentUpdates.load(db);
 
   for (const name of SINGLETONS) {
     const snap = await db.doc(`content/${name}`).get();
     if (!snap.exists) throw new Error(`Firestore has no content/${name}. Run with --seed-if-empty first.`);
-    const data = normalize[name](await withNewFields(db, name, snap.data()));
+    const data = normalize[name](updates.apply(`content/${name}`, await withNewFields(db, name, snap.data())));
     check(name, data, name === 'site' ? 'Site settings' : 'Page sections');
     out[name] = await mapImages(name, data, download);
   }
   for (const name of COLLECTIONS) {
     const snap = await db.collection(name).get();
     const docs = snap.docs
-      .map((d) => ({ id: d.id, ...d.data() }))
+      .map((d) => ({ id: d.id, ...updates.apply(`${name}/${d.id}`, d.data()) }))
       .filter((d) => d.hidden !== true)
       .sort((a, b) => (a.order ?? 0) - (b.order ?? 0));
     out[name] = [];
@@ -205,6 +295,7 @@ async function pull(db, bucket) {
   }
 
   for (const [name, data] of Object.entries(out)) writeJson(name, data);
+  await updates.finish(db, args.has('--add-missing'));
   const downloaded = fs.existsSync(cmsDir) ? fs.readdirSync(cmsDir, { recursive: true }).filter((f) => /\.\w+$/.test(f)).length : 0;
   console.log(
     `Pulled content from Firestore: ${out.branches.length} branches, ${out.programs.length} programs, ${out.jobs.length} jobs, ${out.testimonials.length} testimonials; ${downloaded} new photos downloaded.`,

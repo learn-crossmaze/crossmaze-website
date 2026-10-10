@@ -3,54 +3,54 @@
     {
       "icon": "Users",
       "title": "Equality",
-      "text": "We promote equality by embracing diversity and ensuring that every child feels valued and included, regardless of background or ability."
+      "text": "We embrace diversity and make sure every child feels valued and included, whatever their background or ability."
     },
     {
       "icon": "ShieldCheck",
       "title": "Integrity",
-      "text": "We value transparency and ethical behaviour, fostering a culture of integrity in all interactions and communications."
+      "text": "We are open and honest with families, and act with integrity in everything we do and say."
     },
     {
       "icon": "Award",
       "title": "Excellence",
-      "text": "We are dedicated to a high-quality educational and nurturing environment, continually striving for improvement and innovation."
+      "text": "We are committed to high-quality education and care, and we keep improving and bringing in new ideas."
     },
     {
       "icon": "Puzzle",
-      "title": "Practical way",
-      "text": "Our curriculum emphasises practical life skills such as problem-solving, communication and collaboration, preparing children for future challenges and successes."
+      "title": "Practical learning",
+      "text": "Our activities build real-life skills such as problem-solving, communication and teamwork, preparing children for the challenges and successes ahead."
     },
     {
       "icon": "Star",
-      "title": "Achieving targets",
-      "text": "We set attainable goals for each child and work together to help them achieve them, celebrating both small and significant milestones."
+      "title": "Achieving goals",
+      "text": "We set achievable goals for each child, work together to reach them and celebrate every milestone, big or small."
     },
     {
       "icon": "Lightbulb",
       "title": "Interactive education",
-      "text": "We focus on interactive, hands-on educational methods that inspire curiosity and a love for learning in every child."
+      "text": "Hands-on, interactive learning that sparks curiosity and a love of learning in every child."
     }
   ],
   "approach": [
     {
       "icon": "Brain",
       "title": "Foundational Development Program",
-      "text": "Goes beyond traditional preschool education, laying the groundwork for essential life skills and equipping children for the challenges of tomorrow’s world."
+      "text": "Goes beyond traditional preschool, laying the groundwork for essential life skills and preparing children for the world of tomorrow."
     },
     {
       "icon": "Shapes",
       "title": "Montessori-based learning",
-      "text": "A Montessori-based approach with hands-on materials, so children learn through their senses and build independence."
+      "text": "Hands-on Montessori materials let children learn through their senses, at their own pace, and grow in independence."
     },
     {
       "icon": "BookOpen",
       "title": "Thematic curriculum",
-      "text": "Each theme integrates cognitive, language, personal, social, emotional and physical development into one immersive experience."
+      "text": "Each theme brings cognitive, language, personal, social, emotional and physical development together in one immersive experience."
     },
     {
       "icon": "Eye",
       "title": "Visual, practical learning",
-      "text": "Children under 5 have a strong visual understanding, so we teach practically. Visual learning is everlasting."
+      "text": "Children under five learn best by seeing and doing, so we teach practically, and what they learn visually stays with them."
     }
   ],
   "daycareHighlights": [
@@ -58,7 +58,7 @@
     "Designated nap rooms",
     "Expert and trained caregivers",
     "Live CCTV monitoring",
-    "Parents communication app",
+    "Parents’ communication app",
     "1:6 adult-to-child ratio"
   ],
   "extracurricular": [
@@ -91,52 +91,52 @@
     {
       "icon": "Shapes",
       "title": "Activity-based learning",
-      "text": "A Montessori-based approach to learning."
+      "text": "A hands-on, Montessori-based approach to learning."
     },
     {
       "icon": "ShieldCheck",
       "title": "Child-safe infrastructure",
-      "text": "Designed with child safety as the top priority."
+      "text": "Spaces designed with children’s safety as the top priority."
     },
     {
       "icon": "Building2",
       "title": "Age-appropriate classes",
-      "text": "Vibrant classrooms tailored to children’s needs."
+      "text": "Bright classrooms tailored to each age group."
     },
     {
       "icon": "Cctv",
       "title": "CCTV surveillance",
-      "text": "Live CCTV streams for parents, in real time."
+      "text": "Live CCTV streams, so parents can see their child in real time."
     },
     {
       "icon": "BedDouble",
       "title": "Dedicated nap rooms",
-      "text": "Air-conditioned sleeping rooms designed for naps."
+      "text": "Air-conditioned rooms made for little ones’ naps."
     },
     {
       "icon": "Smartphone",
-      "title": "Parents communication app",
-      "text": "Daily updates on the Crossmaze Care parents app."
+      "title": "Parents’ communication app",
+      "text": "Daily updates on the Crossmaze Care parents’ app."
     },
     {
       "icon": "Blocks",
       "title": "Indoor play area",
-      "text": "Climate-controlled comfort all year round."
+      "text": "Climate-controlled play spaces, comfortable all year round."
     },
     {
       "icon": "GraduationCap",
       "title": "Expert teachers",
-      "text": "Well-trained staff who prioritise care and safety."
+      "text": "Well-trained, dedicated teachers who put care and safety first."
     },
     {
       "icon": "HandHeart",
       "title": "Trained caregivers",
-      "text": "Vigilant staff for every child’s safety and comfort."
+      "text": "Watchful, trained staff keep every child safe and comfortable."
     },
     {
       "icon": "Flame",
       "title": "Fire safe",
-      "text": "Fire safety measures focused on prevention."
+      "text": "Fire safety measures, with the focus on prevention."
     },
     {
       "icon": "Bus",
@@ -146,24 +146,24 @@
     {
       "icon": "Music",
       "title": "Extra-curricular activities",
-      "text": "Physical well-being and growth beyond the curriculum."
+      "text": "Activities beyond the curriculum for physical well-being and growth."
     }
   ],
   "perks": [
     {
       "icon": "Heart",
       "title": "An ideal workplace for women",
-      "text": "Equal opportunities and a culture of respect and inclusivity."
+      "text": "Equal opportunities and a culture of respect and inclusion, where every woman feels valued."
     },
     {
       "icon": "Award",
       "title": "Career advancement",
-      "text": "Real support to grow, from facilitator to centre leadership."
+      "text": "Real support to grow your career with us."
     },
     {
       "icon": "Clock",
       "title": "Work-life balance",
-      "text": "Flexible work arrangements, including full-day and half-day roles."
+      "text": "Flexible working, including full-day and half-day roles."
     },
     {
       "icon": "Baby",
@@ -178,7 +178,7 @@
     },
     {
       "q": "Which curriculum do you follow?",
-      "a": "A Montessori-based, thematic curriculum through our Foundational Development Program. By Senior KG it is aligned with the requirements of State, CBSE and ICSE boards, so children are ready for mainstream schools."
+      "a": "A Montessori-based, thematic curriculum through our Foundational Development Program. By Senior KG it is aligned with State, CBSE and ICSE board requirements, so children are ready for mainstream school."
     },
     {
       "q": "What are the timings?",
@@ -186,15 +186,19 @@
     },
     {
       "q": "Can children from other schools join day care?",
-      "a": "Yes. Day care is open to both Crossmaze students and children from other schools, and we offer pick-up from the nearby drop point of other schools."
+      "a": "Yes. Day care is open to Crossmaze children and to children from other schools, and we pick them up from a nearby drop point of their school."
     },
     {
       "q": "Can I see my child during the day?",
-      "a": "Yes. Parents get live CCTV access, and the Crossmaze Care parents app keeps you updated on daily activities."
+      "a": "Yes. Parents get live CCTV access, and the Crossmaze Care parents’ app keeps you updated on your child’s day."
     },
     {
       "q": "Do you provide transport?",
-      "a": "Yes. In-house transport runs on pre-set routes within a 5 km radius of the centre. Seats are subject to availability, so please check with your nearest branch."
+      "a": "Yes. Our in-house transport runs on set routes within a 5 km radius of each centre. Seats depend on availability, so please check with your nearest centre."
+    },
+    {
+      "q": "How do I apply for admission?",
+      "a": "Send us an enquiry, call us or message us on WhatsApp. Our admissions team will answer your questions and arrange a visit to your nearest centre, where you can meet the centre head and complete the admission."
     }
   ],
   "dayRoutine": [
