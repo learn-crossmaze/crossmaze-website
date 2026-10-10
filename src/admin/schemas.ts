@@ -1,6 +1,7 @@
 // Describes every editable piece of content. The admin panel builds its forms from these schemas,
 // and the field keys match content/*.json (which the website is built from).
 import { amenityList, iconChoices } from '../data/amenities';
+import { themes, themeModes, weekdays } from '../data/themes';
 
 export interface Option {
   value: string;
@@ -38,6 +39,7 @@ const colorOptions: Option[] = [
   { value: 'sky', label: 'Blue' },
 ];
 const amenityOptions: Option[] = Object.entries(amenityList).map(([value, a]) => ({ value, label: a.label }));
+const themeOptions: Option[] = themes.map((t) => ({ value: t.id, label: t.label }));
 
 const photoFields = (folder: string): Field[] => [
   { key: 'image', label: 'Photo', type: 'image', folder, required: true },
@@ -97,6 +99,32 @@ export const siteSchema: Field[] = [
     fields: [
       { key: 'label', label: 'Name', type: 'text', required: true },
       { key: 'href', label: 'Link', type: 'url', required: true },
+    ],
+  },
+
+  { type: 'heading', label: 'Look and feel' },
+  {
+    key: 'theme',
+    label: 'Colour theme',
+    type: 'group',
+    help: 'Preview any theme on the website by adding ?theme=meadow (or pastel, ocean, crayon, calm) to the address; ?theme=auto goes back to this setting. Changes show after you publish.',
+    fields: [
+      { key: 'mode', label: 'Which theme visitors see', type: 'select', options: themeModes.map((m) => ({ value: m.value, label: m.label })) },
+      { key: 'fixed', label: 'Theme', type: 'select', options: themeOptions, help: 'For “The same theme every day”, and the fallback for the other choices.' },
+      {
+        key: 'rotation',
+        label: 'Themes to rotate',
+        type: 'checkboxes',
+        options: themeOptions,
+        help: 'For “A different theme each day” and the random choices. A visit keeps one theme from page to page.',
+      },
+      {
+        key: 'weekdays',
+        label: 'Theme for each day of the week',
+        type: 'group',
+        help: 'For “A set theme for each day of the week”.',
+        fields: weekdays.map(([key, label]) => ({ key, label, type: 'select', options: themeOptions }) as Field),
+      },
     ],
   },
 

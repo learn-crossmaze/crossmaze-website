@@ -1,0 +1,280 @@
+/* ---------- Colour themes ----------
+   Pastel Glass is the default (the tokens in global.css). Each theme below overrides those tokens
+   when <html data-theme="…"> is set; the theme is chosen in the admin panel (Site settings → Look
+   and feel) and picked in the browser by the script in layouts/BaseLayout.astro. Fonts and the
+   browser colour for each theme are listed in src/data/themes.ts. Every theme keeps the school's
+   rules: gradient backgrounds, one flowing page gradient, frosted-glass surfaces. */
+
+/* Sunny Meadow: butter, peach and leaf green, with leaf-shaped corners. */
+:root[data-theme='meadow'] {
+  --ink: #1f3326;
+  --muted: #4f5d50;
+  --navy: #236b34;
+  --navy-700: #1b5a2b;
+  --navy-50: #e9f5e3;
+  --navy-100: #cfe6c4;
+  --sun: #ffcd3c;
+  --sun-50: #fff3c4;
+  --sun-100: #ffe08a;
+  --sun-fg: #8a5a00;
+  --coral: #e5600c;
+  --coral-50: #ffe6d2;
+  --coral-100: #ffcfa8;
+  --coral-fg: #b04f08;
+  --green: #2b7a3d;
+  --green-50: #e3f5dc;
+  --green-100: #c5e9b8;
+  --green-fg: #2b7a3d;
+  --sky: #1d6f8f;
+  --sky-50: #dff1fb;
+  --sky-100: #bfe3f6;
+  --sky-fg: #1d6f8f;
+
+  --flow-1: #fff9df;
+  --flow-2: #fff1dc;
+  --flow-3: #fffbe8;
+  --flow-4: #ecf8e3;
+  --flow-5: #e4f4fb;
+  --flow-6: #fff6e3;
+  --tint-1: #ffe1c2;
+  --tint-2: #fff0b3;
+  --tint-3: #d4efc8;
+  --tint-4: #ffe9a8;
+  --tint-5: #d6eef9;
+  --glow-1: rgb(255 214 102 / 34%);
+  --glow-2: rgb(255 200 150 / 30%);
+  --glow-3: rgb(178 226 160 / 34%);
+  --glow-4: rgb(170 216 240 / 30%);
+
+  --g-ring: linear-gradient(135deg, #ffd86b 0%, #a8e0a0 55%, #9fd4f2 100%);
+  --g-heading: linear-gradient(100deg, #1f5a30 0%, #2b7a3d 50%, #1c5f4a 100%);
+  --g-highlight: linear-gradient(90deg, #f28c0f 0%, #e5600c 100%);
+  --g-navy: linear-gradient(135deg, #2b8540 0%, #236f36 55%, #1b5a2b 100%);
+  --g-sun: linear-gradient(135deg, #ffe58a 0%, #ffcd3c 100%);
+  --g-ink: linear-gradient(135deg, #2c4a35 0%, #1f3326 100%);
+  --sun-btn-fg: #3a2a00;
+  --sun-btn-glow: rgb(200 140 0 / 60%);
+  --eyebrow-fg: #8a4f00;
+  --eyebrow-bg: linear-gradient(135deg, #fffdf3 0%, #fff1c9 100%);
+  --squiggle: #ffcd3c;
+
+  --font-display: 'Baloo 2', 'Nunito', system-ui, sans-serif;
+  --display-weight: 700;
+  --radius-card: 30px 8px 30px 8px;
+  --radius-photo: 44px 12px 44px 12px;
+  --radius-photo-sm: 30px 8px 30px 8px;
+  --shadow-tint: 110 80 10;
+}
+
+/* Ocean Breeze: aqua, periwinkle and coral, with round bubbles. */
+:root[data-theme='ocean'] {
+  --ink: #0d2b45;
+  --muted: #46607a;
+  --navy: #0b5f84;
+  --navy-700: #0a4f70;
+  --navy-50: #e3f4fb;
+  --navy-100: #c3e6f4;
+  --sun: #ff9a7a;
+  --sun-50: #dcf7fb;
+  --sun-100: #b5ecf5;
+  --sun-fg: #0b6a8f;
+  --coral: #e0503a;
+  --coral-50: #ffe4dc;
+  --coral-100: #ffc9b8;
+  --coral-fg: #b0341d;
+  --green: #0f7a62;
+  --green-50: #dcf8ee;
+  --green-100: #b7efd9;
+  --green-fg: #0f7a62;
+  --sky: #2a55c4;
+  --sky-50: #e6e9ff;
+  --sky-100: #ccd3ff;
+  --sky-fg: #3546b0;
+
+  --flow-1: #e8fbff;
+  --flow-2: #e6f3ff;
+  --flow-3: #f0efff;
+  --flow-4: #e4fbf5;
+  --flow-5: #eaf6ff;
+  --flow-6: #fff0ec;
+  --tint-1: #c9f1f8;
+  --tint-2: #dde2ff;
+  --tint-3: #c9f3e2;
+  --tint-4: #ffd9cd;
+  --tint-5: #cfe6ff;
+  --glow-1: rgb(143 227 240 / 34%);
+  --glow-2: rgb(255 193 176 / 30%);
+  --glow-3: rgb(169 196 255 / 32%);
+  --glow-4: rgb(160 236 210 / 30%);
+
+  --g-ring: linear-gradient(135deg, #8fe3f0 0%, #a9c4ff 50%, #ffc1b0 100%);
+  --g-heading: linear-gradient(100deg, #0a4f70 0%, #0a6a8f 50%, #1f4fbf 100%);
+  --g-highlight: linear-gradient(90deg, #f2603f 0%, #e03a63 100%);
+  --g-navy: linear-gradient(135deg, #12739a 0%, #0d5f84 55%, #0a4f70 100%);
+  --g-sun: linear-gradient(135deg, #ffd2c4 0%, #ffb4a2 100%);
+  --g-ink: linear-gradient(135deg, #1a3f5e 0%, #0d2b45 100%);
+  --sun-btn-fg: #5a1a0e;
+  --sun-btn-glow: rgb(240 110 90 / 55%);
+  --eyebrow-fg: #0a5d80;
+  --eyebrow-bg: linear-gradient(135deg, #ffffff 0%, #dff6fd 100%);
+  --squiggle: #ffb4a2;
+
+  --font-display: 'Quicksand', 'Nunito', system-ui, sans-serif;
+  --display-weight: 700;
+  --radius-card: 30px;
+  --radius-photo: 40px;
+  --radius-photo-sm: 30px;
+  --shadow-tint: 10 80 120;
+}
+
+/* Crayon Box: the bright colours of the logo's letters, with chunky "stitched" cards. */
+:root[data-theme='crayon'] {
+  --ink: #1c1c3c;
+  --muted: #4d4d6b;
+  --navy: #1a4fb0;
+  --navy-700: #143e8c;
+  --navy-50: #e8f0ff;
+  --navy-100: #c9dafe;
+  --sun: #ffc93c;
+  --sun-50: #fff3c4;
+  --sun-100: #ffe07a;
+  --sun-fg: #8a5a00;
+  --coral: #e8432f;
+  --coral-50: #ffe3de;
+  --coral-100: #ffc2b8;
+  --coral-fg: #c93020;
+  --green: #23793a;
+  --green-50: #e1f5e5;
+  --green-100: #bfe8c8;
+  --green-fg: #23793a;
+  --sky: #1d5fc4;
+  --sky-50: #efe6ff;
+  --sky-100: #dcc9ff;
+  --sky-fg: #6c3bc0;
+
+  --flow-1: #fffaf0;
+  --flow-2: #fff3f0;
+  --flow-3: #fffbe6;
+  --flow-4: #f0fbf1;
+  --flow-5: #eef5ff;
+  --flow-6: #f7f0ff;
+  --tint-1: #ffd9d2;
+  --tint-2: #ecdfff;
+  --tint-3: #d4f0d9;
+  --tint-4: #fff0a8;
+  --tint-5: #d8e6ff;
+  --glow-1: rgb(255 201 60 / 26%);
+  --glow-2: rgb(47 127 240 / 16%);
+  --glow-3: rgb(47 154 70 / 16%);
+  --glow-4: rgb(232 67 47 / 13%);
+
+  --g-ring: linear-gradient(120deg, #e8432f 0%, #f7941d 22%, #ffc93c 42%, #2f9a46 62%, #2f7ff0 82%, #8a4fd8 100%);
+  --g-heading: linear-gradient(100deg, #1c1c3c 0%, #1a4fb0 100%);
+  --g-highlight: linear-gradient(90deg, #23793a 0%, #d2600a 50%, #1d5fc4 100%);
+  --g-navy: linear-gradient(135deg, #d93a26 0%, #b8261a 100%);
+  --g-sun: linear-gradient(135deg, #ffe07a 0%, #ffc93c 100%);
+  --g-ink: linear-gradient(135deg, #2e2e5c 0%, #1c1c3c 100%);
+  --sun-btn-fg: #3a2a00;
+  --sun-btn-glow: rgb(217 154 16 / 60%);
+  --eyebrow-fg: #6b4200;
+  --eyebrow-bg: linear-gradient(135deg, #fff6d1 0%, #ffe48a 100%);
+  --squiggle: #ffc93c;
+
+  --font-display: 'Grandstander', 'Nunito', system-ui, sans-serif;
+  --display-weight: 700;
+  --radius-card: 24px;
+  --radius-btn: 16px;
+  --radius-photo: 26px;
+  --radius-photo-sm: 20px;
+  --shadow-tint: 60 40 120;
+}
+
+/* Cards and panels look hand-stitched with a dashed crayon edge in the card's own colour. */
+:root[data-theme='crayon'] .card {
+  border: 3px dashed color-mix(in srgb, var(--badge-fg, var(--navy)) 34%, transparent);
+}
+
+:root[data-theme='crayon'] .eyebrow {
+  border-radius: 12px;
+  rotate: -2deg;
+}
+
+/* Montessori Calm: natural sage, oat, clay and dusty blue, with arched photos. */
+:root[data-theme='calm'] {
+  --ink: #2f2a24;
+  --muted: #625a50;
+  --navy: #4d6b48;
+  --navy-700: #3b5537;
+  --navy-50: #eef3e8;
+  --navy-100: #d6e2cc;
+  --sun: #e3b45e;
+  --sun-50: #f7ecd4;
+  --sun-100: #ecd6a6;
+  --sun-fg: #7a5a1a;
+  --coral: #c46b4b;
+  --coral-50: #f6e3d6;
+  --coral-100: #ecc6ae;
+  --coral-fg: #a5502f;
+  --green: #4d6b48;
+  --green-50: #e7efe0;
+  --green-100: #cddcc1;
+  --green-fg: #4d6b48;
+  --sky: #3f6584;
+  --sky-50: #e2eaf0;
+  --sky-100: #c6d5e1;
+  --sky-fg: #3f6584;
+
+  --flow-1: #fbf7ef;
+  --flow-2: #f4f1e4;
+  --flow-3: #eef3e6;
+  --flow-4: #f7efe3;
+  --flow-5: #eef2f3;
+  --flow-6: #f8ede6;
+  --tint-1: #f0d9c4;
+  --tint-2: #e8e0cc;
+  --tint-3: #d5e2c9;
+  --tint-4: #f2e2bd;
+  --tint-5: #d3dee6;
+  --glow-1: rgb(233 201 168 / 30%);
+  --glow-2: rgb(201 216 185 / 34%);
+  --glow-3: rgb(185 202 214 / 30%);
+  --glow-4: rgb(240 214 160 / 24%);
+
+  --g-ring: linear-gradient(160deg, #e9c9a8 0%, #c9d8b9 55%, #b9cad6 100%);
+  --g-heading: linear-gradient(100deg, #2f2a24 0%, #45402f 100%);
+  --g-highlight: linear-gradient(90deg, #5f7f5a 0%, #3f6a5a 100%);
+  --g-navy: linear-gradient(135deg, #577a51 0%, #4d6b48 50%, #3b5537 100%);
+  --g-sun: linear-gradient(135deg, #f6e3cf 0%, #eccbaa 100%);
+  --g-ink: linear-gradient(135deg, #45402f 0%, #2f2a24 100%);
+  --sun-btn-fg: #5a3418;
+  --sun-btn-glow: rgb(180 120 70 / 45%);
+  --eyebrow-fg: #7a5a2a;
+  --eyebrow-bg: linear-gradient(135deg, #fffdf8 0%, #efe7d6 100%);
+  --squiggle: #e3b45e;
+
+  --font-display: 'Lexend', system-ui, sans-serif;
+  --font-body: 'Lexend', system-ui, -apple-system, 'Segoe UI', sans-serif;
+  --display-weight: 600;
+  --radius-card: 20px;
+  --radius-btn: 14px;
+  --radius-photo: 160px 160px 26px 26px;
+  --radius-photo-sm: 22px;
+  --shadow-tint: 90 70 40;
+}
+
+/* Softer, earthier doodles so they sit with the natural palette. */
+:root[data-theme='calm'] main > section::before,
+:root[data-theme='calm'] main > section::after,
+:root[data-theme='calm'] .fx {
+  filter: saturate(0.55) sepia(0.2);
+}
+
+:root[data-theme='calm'] body {
+  font-size: 1.03rem;
+}
+
+/* Lexend runs wider: keep the small labels compact so they stay clear of the banner doodles. */
+:root[data-theme='calm'] .eyebrow {
+  letter-spacing: 0.05em;
+  font-size: 0.78rem;
+}

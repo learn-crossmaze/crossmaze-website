@@ -33,7 +33,7 @@ Go to **www.crossmaze.in/admin** and sign in.
 
 | Section | What you can change |
 | --- | --- |
-| Site settings | Logo, school name, phone, WhatsApp, emails, address, timings, social links, home-page banner, numbers strip, about text, quote, photos |
+| Site settings | Logo, school name, phone, WhatsApp, emails, address, timings, social links, colour theme, home-page banner, numbers strip, about text, quote, photos |
 | Branches | Add, hide, reorder or delete branches; name, address, map, phone, size, capacity, amenities, programs offered, photos (first = cover), centre head with photo and bio |
 | Programs | Add, hide, reorder; name, age group, timing, icon, colour, photo, description, focus list |
 | Jobs | Open positions on the careers page |
@@ -44,6 +44,20 @@ Go to **www.crossmaze.in/admin** and sign in.
 | Admins | Who can sign in |
 
 **Save** stores a change; it goes live when someone presses **Publish** (top right). Publishing rebuilds the whole site in about 3 minutes, and the Dashboard shows when it's done or if it failed. New branches, programs and jobs start hidden, so you can finish them before unticking “Hide from website”.
+
+### Colour themes
+
+The site has five colour themes: **Pastel Glass**, **Sunny Meadow**, **Ocean Breeze**, **Crayon Box** and **Montessori Calm**. In **Site settings → Look and feel**, choose which one visitors see:
+
+| Setting | What visitors see |
+| --- | --- |
+| The same theme every day | The theme you pick under **Theme** |
+| A set theme for each day of the week | The theme you pick for that weekday |
+| A different theme each day, in turn | Everyone sees the same theme on a given day; it moves to the next ticked theme each day |
+| A random theme on every visit | A random ticked theme each visit, never the same as that visitor's last one |
+| A random theme for each new visitor, kept on their repeat visits | A random ticked theme on someone's first visit, then the same one whenever they come back |
+
+A visit keeps one theme from page to page. To look at a theme yourself, add `?theme=meadow` (or `pastel`, `ocean`, `crayon`, `calm`) to any page address; `?theme=auto` goes back to the setting. Like other changes, a new setting goes live when you press **Publish**.
 
 ## One-time setup
 
@@ -161,6 +175,7 @@ FIREBASE_STORAGE_BUCKET=demo-crossmaze.appspot.com ADMIN_EMAILS=you@example.com 
 - A field that's new in `content/site.json` or `content/sections.json` (such as a new page section) is copied into Firestore on the next deploy from `main`, so it appears in the admin panel. Pull-request previews use the repository's copy without writing to Firestore.
 - **Changing existing copy from the repository** (reworded text, a corrected phone number) needs a content update, because the live text is in Firestore and each deploy overwrites `content/*.json` with it. Edit the JSON, then run `node scripts/content-update.mjs <id> "<what changed>"` before committing (it compares with the last commit; pass another git ref as a third argument, e.g. `origin/main`). It writes `content/updates/<id>.json`, one entry per changed field. Pull-request previews show the change without saving it. The next deploy from `main` saves it to Firestore once, and only where Firestore still has the old text, so anything edited in the admin panel is kept. The deploy log lists what was updated and what was kept. New items, such as a branch or a job, are added in the admin panel.
 - `scripts/report-publish.mjs` tells the admin panel whether a deploy succeeded.
+- Colour themes: the tokens in `src/styles/global.css` are Pastel Glass; `src/styles/themes.css` overrides them for the other themes, and `src/data/themes.ts` lists each theme's fonts. A script at the top of `layouts/BaseLayout.astro` picks the theme in the browser before the page is drawn.
 - The admin panel lives in `src/admin/`. Its forms are generated from `src/admin/schemas.ts`, so adding a field there and in `src/data/content.ts` is all it takes.
 
 ## Please verify before launch

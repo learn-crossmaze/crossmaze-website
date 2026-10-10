@@ -78,11 +78,11 @@ const shapes = variant === 'home' ? home : page;
     position: absolute;
     inset: -25%;
     background:
-      radial-gradient(32% 40% at 18% 28%, #ffe1ec 0%, transparent 70%),
-      radial-gradient(30% 38% at 78% 22%, #e4dbff 0%, transparent 70%),
-      radial-gradient(34% 40% at 70% 78%, #d6f3e4 0%, transparent 70%),
-      radial-gradient(30% 36% at 28% 82%, #fff1c2 0%, transparent 70%),
-      radial-gradient(26% 30% at 50% 50%, #e1efff 0%, transparent 70%);
+      radial-gradient(32% 40% at 18% 28%, color-mix(in srgb, var(--tint-1) 70%, #fff) 0%, transparent 70%),
+      radial-gradient(30% 38% at 78% 22%, var(--tint-2) 0%, transparent 70%),
+      radial-gradient(34% 40% at 70% 78%, var(--tint-3) 0%, transparent 70%),
+      radial-gradient(30% 36% at 28% 82%, var(--tint-4) 0%, transparent 70%),
+      radial-gradient(26% 30% at 50% 50%, color-mix(in srgb, var(--tint-5) 60%, #fff) 0%, transparent 70%);
     /* Fade out well before the banner's bottom edge so it melts into the page gradient. */
     -webkit-mask-image: linear-gradient(180deg, #000 0%, #000 40%, transparent 70%);
     mask-image: linear-gradient(180deg, #000 0%, #000 40%, transparent 70%);

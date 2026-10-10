@@ -6,6 +6,7 @@
 //
 // Image fields hold a path relative to src/assets/, e.g. "branches/crossmaze-neotown/01.jpg".
 import type { ImageMetadata } from 'astro';
+import type { ThemeSettings } from './themes';
 
 const images = import.meta.glob<{ default: ImageMetadata }>('../assets/**/*.{jpg,jpeg,png,webp,gif,avif}', {
   eager: true,
@@ -61,6 +62,8 @@ export interface SiteContent {
   founders: string[];
   foundedYear: number;
   social: { label: string; href: string }[];
+  /** Colour theme settings; see src/data/themes.ts. */
+  theme?: Partial<ThemeSettings>;
 }
 
 export interface IconItem {
