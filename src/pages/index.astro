@@ -8,6 +8,7 @@ import BranchCard from '../components/BranchCard.astro';
 import EnquiryForm from '../components/EnquiryForm.astro';
 import FloatingShapes from '../components/FloatingShapes.astro';
 import Steps from '../components/Steps.astro';
+import FacilityStrip from '../components/FacilityStrip.astro';
 import { site, coreValues, dayRoutine, admissionSteps } from '../data/site';
 import { programs, daycareHighlights } from '../data/programs';
 import { branches, facilities } from '../data/branches';
@@ -198,21 +199,7 @@ const tones = ['navy', 'green', 'coral', 'sky', 'sun', 'navy'];
         lead="Every centre is designed around children, with live CCTV and a parents’ app that keep you connected all day."
         align="center"
       />
-      <ul class="facilities">
-        {
-          facilities.map((f, i) => (
-            <li class:list={[`tone-${tones[i % tones.length]}`]}>
-              <span class="icon-badge">
-                <Icon name={f.icon} size={24} />
-              </span>
-              <span>
-                <strong>{f.title}</strong>
-                <span class="muted">{f.text}</span>
-              </span>
-            </li>
-          ))
-        }
-      </ul>
+      <FacilityStrip items={facilities} />
     </div>
   </section>
 
@@ -579,51 +566,6 @@ const tones = ['navy', 'green', 'coral', 'sky', 'sun', 'navy'];
     border-radius: var(--radius-photo);
     background: var(--g-ring);
     box-shadow: var(--shadow);
-  }
-
-  .facilities {
-    display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(min(100%, 260px), 1fr));
-    gap: 16px;
-    margin: 0;
-    padding: 0;
-    list-style: none;
-  }
-
-  .facilities li {
-    display: flex;
-    gap: 14px;
-    align-items: flex-start;
-    padding: 18px;
-    border: 1px solid var(--glass-edge);
-    border-radius: 20px;
-    background: var(--g-glass);
-    box-shadow: var(--shadow-sm);
-    transition:
-      transform 0.25s ease,
-      box-shadow 0.25s ease;
-  }
-
-  .facilities li:hover {
-    transform: translateY(-3px);
-    box-shadow: var(--shadow);
-  }
-
-  .facilities .icon-badge {
-    flex: none;
-    margin: 0;
-    width: 46px;
-    height: 46px;
-    border-radius: 14px;
-  }
-
-  .facilities li > span:last-child {
-    display: grid;
-    line-height: 1.4;
-  }
-
-  .facilities .muted {
-    font-size: 0.93rem;
   }
 
   .testimonials {

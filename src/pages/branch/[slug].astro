@@ -100,7 +100,7 @@ const jsonLd = {
       </div>
       {
         cover && (
-          <a class="branch-hero__open" href={fullSize[0]!.src} data-album-open="0" aria-haspopup="dialog">
+          <a class="branch-hero__open" href={fullSize[0]!.src} data-album-for="branch" data-album-open="0" aria-haspopup="dialog">
             <Image
               class="branch-hero__photo"
               src={cover}
@@ -170,7 +170,7 @@ const jsonLd = {
           <ul class="gallery">
             {gallery.map((photo, i) => (
               <li>
-                <a href={fullSize[i + 1]!.src} data-album-open={i + 1} aria-haspopup="dialog">
+                <a href={fullSize[i + 1]!.src} data-album-for="branch" data-album-open={i + 1} aria-haspopup="dialog">
                   <Image
                     src={photo}
                     alt={photoAlt(i + 2)}
@@ -300,7 +300,7 @@ const jsonLd = {
       </div>
     </div>
   </section>
-  {photos.length > 0 && <PhotoAlbum photos={photos} title={branch.name} alt={photoAlt} />}
+  {photos.length > 0 && <PhotoAlbum id="branch" photos={photos} title={branch.name} alt={photoAlt} />}
 </BaseLayout>
 
 <style>

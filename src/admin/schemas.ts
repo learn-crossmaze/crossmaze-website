@@ -190,7 +190,13 @@ export const sectionsSchema: Field[] = [
       { key: 'label', label: 'Activity', type: 'text', required: true },
     ],
   },
-  { ...iconItem('Facility'), key: 'facilities', label: 'Facilities', help: 'Home and Branches pages.' },
+  {
+    ...iconItem('Facility'),
+    key: 'facilities',
+    label: 'Facilities',
+    help: 'Home and Branches pages. The photos fill the scrolling strip on the home page; a facility without one shows its icon.',
+    fields: [...iconItem('Facility').fields, { key: 'image', label: 'Photo', type: 'image', folder: 'facilities', help: 'A landscape photo works best.' }],
+  },
   { ...iconItem('Perk'), key: 'perks', label: 'Why work with us', help: 'Careers page.' },
   {
     ...iconItem('Part of the day'),
