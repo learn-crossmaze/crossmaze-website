@@ -4,8 +4,10 @@
 //
 //   node scripts/content-update.mjs <id> "<what changed>" [git ref to compare with, default HEAD]
 //
-// Every changed text field becomes { doc, field, from, to }. Photos are left out (the admin panel stores
-// them differently), and so are new or removed items, which belong in the admin panel.
+// Every changed field becomes { doc, field, from, to }. Photo fields of their own (a logo, a branch's
+// photos) are left out, and so are new or removed items, which belong in the admin panel. Photos inside
+// a list that changes as a whole (such as each facility's photo) are included; the deploy that saves
+// the update copies them to Cloud Storage first.
 import { execFileSync } from 'node:child_process';
 import fs from 'node:fs';
 import path from 'node:path';

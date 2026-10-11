@@ -77,7 +77,7 @@ export interface SectionsContent {
   approach: IconItem[];
   daycareHighlights: string[];
   extracurricular: { icon: string; label: string }[];
-  facilities: IconItem[];
+  facilities: (IconItem & { /** Photo for the home page strip; the icon shows when there is none. */ image?: string })[];
   perks: IconItem[];
   faqs: { q: string; a: string }[];
   dayRoutine: IconItem[];

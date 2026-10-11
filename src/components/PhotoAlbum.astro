@@ -1,24 +1,29 @@
 ---
-// A full-screen photo album. Any link on the page with data-album-open="<index>" opens it at that
-// photo (the link's own href, the full-size photo, is what works without JavaScript). Swipe, scroll,
-// the arrow buttons or keys, or the thumbnails move between photos, which ease in and out as they
-// slide past; where the browser supports it, the photo you tapped zooms into place and back.
+// A full-screen photo album. A link with data-album-for="<id>" and data-album-open="<index>" opens
+// the album with that id at that photo (the link's own href, the full-size photo, is what works
+// without JavaScript). Swipe, scroll, the arrow buttons or keys, or the thumbnails move between
+// photos, which ease in and out as they slide past; where the browser supports it, the photo you
+// tapped zooms into place and back. A page can hold several albums.
 import type { ImageMetadata } from 'astro';
 import { Image } from 'astro:assets';
 import Icon from './Icon.astro';
 
 interface Props {
+  /** Matches the data-album-for of the links that open it. */
+  id: string;
   photos: ImageMetadata[];
   /** Shown at the top and read out by screen readers, e.g. "Crossmaze – Neotown". */
   title: string;
   /** Description of photo n (counting from 1). */
   alt: (n: number) => string;
+  /** Optional words under each photo. */
+  captions?: { title: string; text?: string }[];
 }
 
-const { photos, title, alt } = Astro.props;
+const { id, photos, title, alt, captions } = Astro.props;
 ---
 
-<dialog class="album" aria-label={`Photos of ${title}`} data-album>
+<dialog class="album" aria-label={`Photos: ${title}`} data-album={id}>
   <div class="album__bar">
     <p class="album__title">{title}</p>
     <p class="album__count"><span data-album-count>1</span> / {photos.length}</p>
@@ -32,14 +37,22 @@ const { photos, title, alt } = Astro.props;
       {
         photos.map((photo, i) => (
           <li class="album__slide" aria-roledescription="slide" aria-label={`Photo ${i + 1} of ${photos.length}`}>
-            <Image
-              src={photo}
-              alt={alt(i + 1)}
-              widths={[640, 960, 1280, 1600]}
-              sizes="(max-width: 900px) 100vw, 82vw"
-              loading="lazy"
-              draggable="false"
-            />
+            <figure class="album__figure">
+              <Image
+                src={photo}
+                alt={alt(i + 1)}
+                widths={[640, 960, 1280, 1600]}
+                sizes="(max-width: 900px) 100vw, 82vw"
+                loading="lazy"
+                draggable="false"
+              />
+              {captions?.[i] && (
+                <figcaption class="album__caption">
+                  <strong>{captions[i].title}</strong>
+                  {captions[i].text && <span>{captions[i].text}</span>}
+                </figcaption>
+              )}
+            </figure>
           </li>
         ))
       }
@@ -68,10 +81,15 @@ const { photos, title, alt } = Astro.props;
 <script>
   type ViewTransitionDocument = Document & { startViewTransition?: (update: () => void) => { finished: Promise<void> } };
 
-  const album = document.querySelector<HTMLDialogElement>('[data-album]');
+  const doc = document as ViewTransitionDocument;
+  const reduced = matchMedia('(prefers-reduced-motion: reduce)');
+  const canMorph = () => typeof doc.startViewTransition === 'function' && !reduced.matches;
+  /** Album id -> opens that album at a photo, zooming from the link that was tapped. */
+  const openers = new Map<string, (i: number, from: HTMLElement) => void>();
 
-  if (album && typeof album.showModal === 'function') {
-    const doc = document as ViewTransitionDocument;
+  document.querySelectorAll<HTMLDialogElement>('[data-album]').forEach((album) => {
+    if (typeof album.showModal !== 'function') return;
+    const id = album.dataset.album!;
     const track = album.querySelector<HTMLElement>('[data-album-track]')!;
     const strip = album.querySelector<HTMLElement>('[data-album-strip]')!;
     const slides = [...track.children] as HTMLElement[];
@@ -79,10 +97,8 @@ const { photos, title, alt } = Astro.props;
     const count = album.querySelector<HTMLElement>('[data-album-count]')!;
     const prev = album.querySelector<HTMLButtonElement>('[data-album-prev]')!;
     const next = album.querySelector<HTMLButtonElement>('[data-album-next]')!;
-    const reduced = matchMedia('(prefers-reduced-motion: reduce)');
     const photoAt = (i: number) => slides[i]?.querySelector('img') ?? null;
-    const openerFor = (i: number) => document.querySelector<HTMLElement>(`[data-album-open="${i}"]`);
-    const canMorph = () => typeof doc.startViewTransition === 'function' && !reduced.matches;
+    const openerFor = (i: number) => document.querySelector<HTMLElement>(`[data-album-for="${id}"][data-album-open="${i}"]`);
 
     let current = -1;
     // While a button or thumbnail scrolls the album, the counter waits for the photo it is heading to.
@@ -151,17 +167,17 @@ const { photos, title, alt } = Astro.props;
       const fromImg = from.querySelector('img');
       const toImg = photoAt(i);
       if (!canMorph() || !fromImg || !toImg) {
-        album!.classList.remove('album--morph');
-        album!.showModal();
+        album.classList.remove('album--morph');
+        album.showModal();
         show(i, false);
         return;
       }
       await ready(toImg);
-      album!.classList.add('album--morph');
+      album.classList.add('album--morph');
       fromImg.style.viewTransitionName = 'album-photo';
       const transition = doc.startViewTransition!(() => {
         fromImg.style.viewTransitionName = '';
-        album!.showModal();
+        album.showModal();
         show(i, false);
         toImg.style.viewTransitionName = 'album-photo';
       });
@@ -174,24 +190,19 @@ const { photos, title, alt } = Astro.props;
       const box = tileImg?.getBoundingClientRect();
       const onScreen = box && box.bottom > 0 && box.top < innerHeight && box.width > 0;
       if (!canMorph() || !img || !tileImg || !onScreen) {
-        album!.close();
+        album.close();
         return;
       }
       img.style.viewTransitionName = 'album-photo';
       const transition = doc.startViewTransition!(() => {
         img.style.viewTransitionName = '';
-        album!.close();
+        album.close();
         tileImg.style.viewTransitionName = 'album-photo';
       });
       transition.finished.finally(() => (tileImg.style.viewTransitionName = ''));
     }
 
-    document.addEventListener('click', (event) => {
-      const link = (event.target as Element).closest<HTMLElement>('[data-album-open]');
-      if (!link || event.ctrlKey || event.metaKey || event.shiftKey) return;
-      event.preventDefault();
-      open(Number(link.dataset.albumOpen) || 0, link);
-    });
+    openers.set(id, open);
 
     prev.addEventListener('click', () => show(current - 1));
     next.addEventListener('click', () => show(current + 1));
@@ -201,7 +212,7 @@ const { photos, title, alt } = Astro.props;
     // A click on the dark space around a photo closes the album, like the close button.
     album.addEventListener('click', (event) => {
       const target = event.target as Element;
-      if (target === album || target.classList.contains('album__slide') || target.classList.contains('album__stage')) close();
+      if (target === album || target.matches('.album__slide, .album__stage, .album__figure')) close();
     });
 
     // Esc: close with the same zoom back to the page.
@@ -237,6 +248,17 @@ const { photos, title, alt } = Astro.props;
     addEventListener('resize', () => {
       if (album.open && current >= 0) track.scrollTo({ left: slides[current]!.offsetLeft, behavior: 'auto' });
     });
+  });
+
+  if (openers.size) {
+    document.addEventListener('click', (event) => {
+      const link = (event.target as Element).closest<HTMLElement>('[data-album-open]');
+      if (!link || event.ctrlKey || event.metaKey || event.shiftKey) return;
+      const open = openers.get(link.dataset.albumFor ?? '');
+      if (!open) return;
+      event.preventDefault();
+      open(Number(link.dataset.albumOpen) || 0, link);
+    });
   }
 </script>
 
@@ -262,7 +284,16 @@ const { photos, title, alt } = Astro.props;
 
   .album[open] {
     display: grid;
+    /* One column exactly as wide as the window: without minmax(0, …) the row of photos asks for room
+       for every photo side by side, and a large album pushed the close button off-screen. */
+    grid-template-columns: minmax(0, 1fr);
     grid-template-rows: auto minmax(0, 1fr) auto;
+  }
+
+  .album__bar,
+  .album__stage,
+  .album__thumbs {
+    min-width: 0;
   }
 
   .album::backdrop {
@@ -370,11 +401,42 @@ const { photos, title, alt } = Astro.props;
 
   .album__slide {
     display: grid;
-    place-items: center;
+    /* One cell the size of the slide, which the photo (and caption) must fit inside. */
+    grid-template: minmax(0, 1fr) / minmax(0, 1fr);
     min-height: 0;
     padding: 10px clamp(16px, 8vw, 110px);
     scroll-snap-align: center;
     scroll-snap-stop: always;
+  }
+
+  .album__figure {
+    display: grid;
+    /* The photo takes the room it needs (shrinking to fit), and the caption stays right under it. */
+    grid-template-rows: minmax(0, max-content) auto;
+    align-content: center;
+    justify-items: center;
+    gap: 14px;
+    min-height: 0;
+    margin: 0;
+  }
+
+  .album__caption {
+    display: grid;
+    gap: 2px;
+    max-width: 60ch;
+    text-align: center;
+    line-height: 1.45;
+  }
+
+  .album__caption strong {
+    font-family: var(--font-display);
+    font-weight: var(--display-weight);
+    font-size: clamp(1.1rem, 2vw, 1.35rem);
+  }
+
+  .album__caption span {
+    color: rgb(255 255 255 / 78%);
+    font-size: 0.98rem;
   }
 
   .album__slide :global(img) {

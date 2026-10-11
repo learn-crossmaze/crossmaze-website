@@ -56,6 +56,8 @@ async function mapImages(kind, item, fn) {
     copy.aboutPhoto = await photo(copy.aboutPhoto);
     copy.daycarePhoto = await photo(copy.daycarePhoto);
     copy.moments = await each(copy.moments, photo);
+  } else if (kind === 'sections') {
+    copy.facilities = await each(copy.facilities, async (f) => (f?.image ? { ...f, image: await fn(f.image) } : f));
   } else if (kind === 'programs') {
     copy.photo = await fn(copy.photo);
   } else if (kind === 'branches') {
@@ -67,19 +69,22 @@ async function mapImages(kind, item, fn) {
 
 // ---------------------------------------------------------------- seed: repo -> Firestore
 
+/** Copies a photo from src/assets/ to Cloud Storage (once) and returns its Storage path, "site/…". */
+async function uploadPhoto(bucket, localPath) {
+  if (!localPath) return '';
+  const file = path.join(assetsDir, localPath);
+  const dest = `site/${localPath.replace(/^cms\//, '')}`;
+  const [exists] = await bucket.file(dest).exists();
+  if (!exists) await bucket.upload(file, { destination: dest, metadata: { cacheControl: 'public, max-age=3600' } });
+  return dest;
+}
+
 async function seed(db, bucket) {
-  const upload = async (localPath) => {
-    if (!localPath) return '';
-    const file = path.join(assetsDir, localPath);
-    const dest = `site/${localPath.replace(/^cms\//, '')}`;
-    const [exists] = await bucket.file(dest).exists();
-    if (!exists) await bucket.upload(file, { destination: dest, metadata: { cacheControl: 'public, max-age=3600' } });
-    return dest;
-  };
+  const upload = (localPath) => uploadPhoto(bucket, localPath);
 
   const batch = db.batch();
   for (const name of SINGLETONS) {
-    const data = name === 'site' ? await mapImages('site', readJson(name), upload) : readJson(name);
+    const data = await mapImages(name, readJson(name), upload);
     batch.set(db.doc(`content/${name}`), data);
   }
   for (const name of COLLECTIONS) {
@@ -91,6 +96,9 @@ async function seed(db, bucket) {
     }
   }
   batch.set(db.doc('meta/content'), { seededAt: FieldValue.serverTimestamp(), updatedAt: FieldValue.serverTimestamp() });
+  // The repository copy just written already contains every content update.
+  const included = ContentUpdates.files().map((u) => [u.id, { appliedAt: FieldValue.serverTimestamp(), changed: 0, seeded: true }]);
+  if (included.length) batch.set(db.doc('meta/contentUpdates'), { applied: Object.fromEntries(included) }, { merge: true });
   await batch.commit();
   console.log('Seeded Firestore and Storage from the content in this repository.');
 }
@@ -175,6 +183,7 @@ async function withNewFields(db, name, data) {
 // Previews apply updates in memory only; deploys from main (--add-missing) also save them to Firestore and
 // record each update in meta/contentUpdates so it is applied once.
 
+const PHOTO = /\.(jpe?g|png|webp|gif|avif)$/i;
 const canonical = (v) =>
   Array.isArray(v)
     ? v.map(canonical)
@@ -182,6 +191,16 @@ const canonical = (v) =>
       ? Object.fromEntries(Object.keys(v).sort().map((k) => [k, canonical(v[k])]))
       : v;
 const same = (a, b) => JSON.stringify(canonical(a)) === JSON.stringify(canonical(b));
+/** Like `same`, but a photo counts as unchanged whether it is a repo path or its Storage copy ("site/…"). */
+const unstored = (v) =>
+  typeof v === 'string' && v.startsWith('site/') && PHOTO.test(v)
+    ? v.slice('site/'.length)
+    : Array.isArray(v)
+      ? v.map(unstored)
+      : v && typeof v === 'object'
+        ? Object.fromEntries(Object.entries(v).map(([k, x]) => [k, unstored(x)]))
+        : v;
+const samePhotos = (a, b) => same(unstored(a), unstored(b));
 const getPath = (obj, dotted) => dotted.split('.').reduce((o, k) => (o == null ? undefined : o[k]), obj);
 function setPath(obj, dotted, value) {
   const keys = dotted.split('.');
@@ -189,6 +208,18 @@ function setPath(obj, dotted, value) {
   let o = obj;
   for (const k of keys) o = o[k] && typeof o[k] === 'object' ? o[k] : (o[k] = {});
   o[last] = value;
+}
+
+/** Replaces every repo photo path inside a value (however deeply nested) with what `store` returns. */
+async function withStoredPhotos(value, store) {
+  if (typeof value === 'string') {
+    return PHOTO.test(value) && !value.startsWith('site/') && fs.existsSync(path.join(assetsDir, value)) ? store(value) : value;
+  }
+  if (Array.isArray(value)) return Promise.all(value.map((v) => withStoredPhotos(v, store)));
+  if (value && typeof value === 'object') {
+    return Object.fromEntries(await Promise.all(Object.entries(value).map(async ([k, v]) => [k, await withStoredPhotos(v, store)])));
+  }
+  return value;
 }
 
 class ContentUpdates {
@@ -199,14 +230,19 @@ class ContentUpdates {
     this.report = Object.fromEntries(this.pending.map((u) => [u.id, { changed: 0, current: 0, kept: [], seen: new Set() }]));
   }
 
-  static async load(db) {
-    const list = fs.existsSync(updatesDir)
+  /** The content updates in content/updates/, oldest first. */
+  static files() {
+    return fs.existsSync(updatesDir)
       ? fs
           .readdirSync(updatesDir)
           .filter((f) => f.endsWith('.json'))
           .sort()
           .map((f) => JSON.parse(fs.readFileSync(path.join(updatesDir, f), 'utf8')))
       : [];
+  }
+
+  static async load(db) {
+    const list = ContentUpdates.files();
     const applied = list.length ? ((await db.doc('meta/contentUpdates').get()).data()?.applied ?? {}) : {};
     return new ContentUpdates(list, applied);
   }
@@ -219,8 +255,8 @@ class ContentUpdates {
         if (change.doc !== docPath) return;
         report.seen.add(i);
         const now = getPath(data, change.field) ?? null;
-        if (same(now, change.to)) report.current += 1;
-        else if (same(now, change.from)) {
+        if (samePhotos(now, change.to)) report.current += 1;
+        else if (samePhotos(now, change.from)) {
           setPath(data, change.field, change.to);
           const fields = this.writes.get(docPath) ?? {};
           fields[change.field] = change.to;
@@ -232,8 +268,12 @@ class ContentUpdates {
     return data;
   }
 
-  /** Logs what happened and, when `save` is set, writes the changes and marks the updates as applied. */
-  async finish(db, save) {
+  /**
+   * Logs what happened and, when `save` is set, writes the changes and marks the updates as applied.
+   * Photos in the new values (repo paths such as "facilities/fire-safe.jpg") are first copied to
+   * Cloud Storage, so the admin panel can show and replace them, just as seeding does.
+   */
+  async finish(db, save, bucket) {
     for (const update of this.pending) {
       const r = this.report[update.id];
       const missing = update.changes.filter((_, i) => !r.seen.has(i)).map((c) => c.doc);
@@ -245,7 +285,10 @@ class ContentUpdates {
       );
     }
     if (!save || !this.pending.length) return;
-    for (const [docPath, fields] of this.writes) await db.doc(docPath).update(fields);
+    for (const [docPath, fields] of this.writes) {
+      for (const [field, value] of Object.entries(fields)) fields[field] = await withStoredPhotos(value, (p) => uploadPhoto(bucket, p));
+      await db.doc(docPath).update(fields);
+    }
     const applied = Object.fromEntries(
       this.pending.map((u) => [u.id, { appliedAt: FieldValue.serverTimestamp(), changed: this.report[u.id].changed, kept: this.report[u.id].kept }]),
     );
@@ -295,7 +338,7 @@ async function pull(db, bucket) {
   }
 
   for (const [name, data] of Object.entries(out)) writeJson(name, data);
-  await updates.finish(db, args.has('--add-missing'));
+  await updates.finish(db, args.has('--add-missing'), bucket);
   const downloaded = fs.existsSync(cmsDir) ? fs.readdirSync(cmsDir, { recursive: true }).filter((f) => /\.\w+$/.test(f)).length : 0;
   console.log(
     `Pulled content from Firestore: ${out.branches.length} branches, ${out.programs.length} programs, ${out.jobs.length} jobs, ${out.testimonials.length} testimonials; ${downloaded} new photos downloaded.`,

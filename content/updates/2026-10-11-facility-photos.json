@@ -1,0 +1,146 @@
+{
+  "id": "2026-10-11-facility-photos",
+  "description": "Photos for the facilities strip on the home page, from the old www.crossmaze.in",
+  "changes": [
+    {
+      "doc": "content/sections",
+      "field": "facilities",
+      "from": [
+        {
+          "icon": "Shapes",
+          "title": "Activity-based learning",
+          "text": "A hands-on, Montessori-based approach to learning."
+        },
+        {
+          "icon": "ShieldCheck",
+          "title": "Child-safe infrastructure",
+          "text": "Spaces designed with children’s safety as the top priority."
+        },
+        {
+          "icon": "Building2",
+          "title": "Age-appropriate classes",
+          "text": "Bright classrooms tailored to each age group."
+        },
+        {
+          "icon": "Cctv",
+          "title": "CCTV surveillance",
+          "text": "Live CCTV streams, so parents can see their child in real time."
+        },
+        {
+          "icon": "BedDouble",
+          "title": "Dedicated nap rooms",
+          "text": "Air-conditioned rooms made for little ones’ naps."
+        },
+        {
+          "icon": "Smartphone",
+          "title": "Parents’ communication app",
+          "text": "Daily updates on the Crossmaze Care parents’ app."
+        },
+        {
+          "icon": "Blocks",
+          "title": "Indoor play area",
+          "text": "Climate-controlled play spaces, comfortable all year round."
+        },
+        {
+          "icon": "GraduationCap",
+          "title": "Expert teachers",
+          "text": "Well-trained, dedicated teachers who put care and safety first."
+        },
+        {
+          "icon": "HandHeart",
+          "title": "Trained caregivers",
+          "text": "Watchful, trained staff keep every child safe and comfortable."
+        },
+        {
+          "icon": "Flame",
+          "title": "Fire safe",
+          "text": "Fire safety measures, with the focus on prevention."
+        },
+        {
+          "icon": "Bus",
+          "title": "In-house transport",
+          "text": "Safe, reliable transport within a 5 km radius."
+        },
+        {
+          "icon": "Music",
+          "title": "Extra-curricular activities",
+          "text": "Activities beyond the curriculum for physical well-being and growth."
+        }
+      ],
+      "to": [
+        {
+          "icon": "Shapes",
+          "title": "Activity-based learning",
+          "text": "A hands-on, Montessori-based approach to learning.",
+          "image": "facilities/activity-based-learning.jpg"
+        },
+        {
+          "icon": "ShieldCheck",
+          "title": "Child-safe infrastructure",
+          "text": "Spaces designed with children’s safety as the top priority.",
+          "image": "facilities/child-safe-infra.jpg"
+        },
+        {
+          "icon": "Building2",
+          "title": "Age-appropriate classes",
+          "text": "Bright classrooms tailored to each age group.",
+          "image": "facilities/age-appropriate-classes.jpg"
+        },
+        {
+          "icon": "Cctv",
+          "title": "CCTV surveillance",
+          "text": "Live CCTV streams, so parents can see their child in real time.",
+          "image": "facilities/cctv-surveillance.jpg"
+        },
+        {
+          "icon": "BedDouble",
+          "title": "Dedicated nap rooms",
+          "text": "Air-conditioned rooms made for little ones’ naps.",
+          "image": "facilities/dedicated-nap-rooms.jpg"
+        },
+        {
+          "icon": "Smartphone",
+          "title": "Parents’ communication app",
+          "text": "Daily updates on the Crossmaze Care parents’ app.",
+          "image": "facilities/parents-communication-app.jpg"
+        },
+        {
+          "icon": "Blocks",
+          "title": "Indoor play area",
+          "text": "Climate-controlled play spaces, comfortable all year round.",
+          "image": "facilities/indoor-play-area.jpg"
+        },
+        {
+          "icon": "GraduationCap",
+          "title": "Expert teachers",
+          "text": "Well-trained, dedicated teachers who put care and safety first.",
+          "image": "facilities/expert-teachers.jpg"
+        },
+        {
+          "icon": "HandHeart",
+          "title": "Trained caregivers",
+          "text": "Watchful, trained staff keep every child safe and comfortable.",
+          "image": "facilities/trained-care-giver.jpg"
+        },
+        {
+          "icon": "Flame",
+          "title": "Fire safe",
+          "text": "Fire safety measures, with the focus on prevention.",
+          "image": "facilities/fire-safe.jpg"
+        },
+        {
+          "icon": "Bus",
+          "title": "In-house transport",
+          "text": "Safe, reliable transport within a 5 km radius.",
+          "image": "facilities/in-house-transport.jpg"
+        },
+        {
+          "icon": "Music",
+          "title": "Extra-curricular activities",
+          "text": "Activities beyond the curriculum for physical well-being and growth.",
+          "image": "facilities/extra-curricular-activities.jpg"
+        }
+      ]
+    }
+  ]
+}
