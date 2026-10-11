@@ -2,7 +2,6 @@
 import { Image } from 'astro:assets';
 import BaseLayout from '../layouts/BaseLayout.astro';
 import PageHero from '../components/PageHero.astro';
-import ProgramsArt from '../components/art/ProgramsArt.astro';
 import SectionHeading from '../components/SectionHeading.astro';
 import Icon from '../components/Icon.astro';
 import Steps from '../components/Steps.astro';
@@ -30,7 +29,6 @@ import { site, faqs, dayRoutine } from '../data/site';
         ))
       }
     </nav>
-    <ProgramsArt slot="art" />
   </PageHero>
 
   <section class="section section--white">
