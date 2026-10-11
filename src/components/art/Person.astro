@@ -1,0 +1,107 @@
+---
+// A friendly figure for the illustrations (components/art/): a child, or a grown-up such as a
+// teacher. Drawn standing with its feet at (x, y), about 120 units tall for a child at scale 1.
+// Clothes take theme colours (e.g. "var(--coral)"), so every illustration follows the site's theme.
+interface Props {
+  x: number;
+  y: number;
+  scale?: number;
+  adult?: boolean;
+  skin?: string;
+  hair?: 'short' | 'bob' | 'pigtails' | 'curly' | 'bun';
+  top: string;
+  /** Trousers, leggings or salwar. */
+  legs?: string;
+  dress?: boolean;
+  arms?: 'down' | 'out' | 'up' | 'wave' | 'hold' | 'raise';
+  /** Bows, hair clips. */
+  accent?: string;
+}
+
+const {
+  x,
+  y,
+  scale = 1,
+  adult = false,
+  skin = '#c68642',
+  hair = 'short',
+  top,
+  legs = 'color-mix(in srgb, var(--ink) 80%, #4b4f7a)',
+  dress = false,
+  arms = 'down',
+  accent = 'var(--coral)',
+} = Astro.props;
+
+const ink = '#2a1a12';
+const lift = adult ? 30 : 0; // a grown-up's longer legs lift the upper body
+const up = (n: number) => n - lift;
+const shoulderY = up(-63);
+const hands: Record<string, [[number, number], [number, number]]> = {
+  down: [[-22, up(-36)], [22, up(-36)]],
+  out: [[-36, up(-50)], [36, up(-50)]],
+  up: [[-25, up(-104)], [25, up(-104)]],
+  wave: [[-22, up(-36)], [29, up(-100)]],
+  hold: [[-15, up(-50)], [15, up(-50)]],
+  raise: [[-22, up(-36)], [20, up(-108)]],
+};
+const [left, right] = hands[arms]!;
+const arm = ([hx, hy]: [number, number], side: number) =>
+  `M${13 * side} ${shoulderY} Q${(13 * side + hx) / 2 + 6 * side} ${(shoulderY + hy) / 2 + 4} ${hx} ${hy}`;
+
+const bodyBottom = adult ? -12 : -26;
+const body = dress
+  ? `M-25 ${bodyBottom + 4} L-14 ${up(-66)} Q0 ${up(-73)} 14 ${up(-66)} L25 ${bodyBottom + 4} Q0 ${bodyBottom + 10} -25 ${bodyBottom + 4}Z`
+  : `M-19 ${bodyBottom} C-21 ${up(-48)} -19 ${up(-62)} -12 ${up(-68)} Q0 ${up(-73)} 12 ${up(-68)} C19 ${up(-62)} 21 ${up(-48)} 19 ${bodyBottom}Z`;
+const hy = up(-92); // head centre
+---
+
+<g transform={`translate(${x} ${y}) scale(${scale})`}>
+  <ellipse cx="-9" cy="-2" rx="8.5" ry="4.5" fill="#3b3550"></ellipse>
+  <ellipse cx="9" cy="-2" rx="8.5" ry="4.5" fill="#3b3550"></ellipse>
+  <path d={`M-8 ${bodyBottom - 4}V-6M8 ${bodyBottom - 4}V-6`} style={`stroke:${dress ? skin : legs}`} stroke-width="9" stroke-linecap="round"></path>
+  <path d={arm(left, -1)} style={`stroke:${skin}`} stroke-width="7.5" stroke-linecap="round" fill="none"></path>
+  <path d={arm(right, 1)} style={`stroke:${skin}`} stroke-width="7.5" stroke-linecap="round" fill="none"></path>
+  <path d={body} style={`fill:${top}`}></path>
+  <path d={`M-12 ${up(-68)}Q0 ${up(-62)} 12 ${up(-68)}`} stroke="#fff" stroke-opacity=".55" stroke-width="2.5" fill="none" stroke-linecap="round"></path>
+  <rect x="-4" y={up(-75)} width="8" height="7" style={`fill:${skin}`}></rect>
+  {hair === 'bun' && <circle cx="0" cy={hy - 25} r="10" fill={ink}></circle>}
+  {
+    hair === 'pigtails' && (
+      <>
+        <circle cx="-25" cy={hy - 3} r="8.5" fill={ink} />
+        <circle cx="25" cy={hy - 3} r="8.5" fill={ink} />
+        <path d={`M-30 ${hy - 14}l6 5-6 5zM-22 ${hy - 14}l-6 5 6 5z`} style={`fill:${accent}`} />
+        <path d={`M30 ${hy - 14}l-6 5 6 5zM22 ${hy - 14}l6 5-6 5z`} style={`fill:${accent}`} />
+      </>
+    )
+  }
+  {hair === 'bob' && <path d={`M-23 ${hy + 12}C-27 ${hy - 20} -10 ${hy - 27} 1 ${hy - 26}C15 ${hy - 25} 27 ${hy - 18} 23 ${hy + 12}Z`} fill={ink}></path>}
+  <circle cx="-19.5" cy={hy + 1} r="4" style={`fill:${skin}`}></circle>
+  <circle cx="19.5" cy={hy + 1} r="4" style={`fill:${skin}`}></circle>
+  <circle cx="0" cy={hy} r="20" style={`fill:${skin}`}></circle>
+  {
+    (hair === 'short' || hair === 'pigtails' || hair === 'bun' || hair === 'bob') && (
+      <path
+        d={`M-21 ${hy - 1}C-22 ${hy - 20} -8 ${hy - 26} 2 ${hy - 24}C14 ${hy - 23} 23 ${hy - 14} 21 ${hy}C16 ${hy - 8} 8 ${hy - 12} -2 ${hy - 11}C-10 ${hy - 11} -17 ${hy - 7} -21 ${hy - 1}Z`}
+        fill={ink}
+      />
+    )
+  }
+  {
+    hair === 'curly' && (
+      <g fill={ink}>
+        <circle cx="-14" cy={hy - 12} r="9" />
+        <circle cx="-3" cy={hy - 18} r="10" />
+        <circle cx="10" cy={hy - 16} r="10" />
+        <circle cx="19" cy={hy - 7} r="8" />
+        <circle cx="-20" cy={hy - 4} r="7" />
+      </g>
+    )
+  }
+  {hair === 'bun' && <path d={`M-7 ${hy - 20}h14`} style={`stroke:${accent}`} stroke-width="4" stroke-linecap="round"></path>}
+  <circle cx="-7" cy={hy + 1} r="2.4" fill={ink}></circle>
+  <circle cx="7" cy={hy + 1} r="2.4" fill={ink}></circle>
+  <path d={`M-6 ${hy + 9}Q0 ${hy + 14} 6 ${hy + 9}`} stroke={ink} stroke-width="2.2" stroke-linecap="round" fill="none"></path>
+  <circle cx="-12.5" cy={hy + 7} r="3.6" fill="#ff7f99" fill-opacity=".4"></circle>
+  <circle cx="12.5" cy={hy + 7} r="3.6" fill="#ff7f99" fill-opacity=".4"></circle>
+</g>

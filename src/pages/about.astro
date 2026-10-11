@@ -2,6 +2,7 @@
 import { Image } from 'astro:assets';
 import BaseLayout from '../layouts/BaseLayout.astro';
 import PageHero from '../components/PageHero.astro';
+import AboutArt from '../components/art/AboutArt.astro';
 import SectionHeading from '../components/SectionHeading.astro';
 import Icon from '../components/Icon.astro';
 import { site, coreValues } from '../data/site';
@@ -21,7 +22,9 @@ const tones = ['navy', 'green', 'coral', 'sky', 'sun', 'navy'];
     title="An interactive place where every child can excel"
     lead={site.promise}
     crumbs={[{ label: 'About' }]}
-  />
+  >
+    <AboutArt slot="art" />
+  </PageHero>
 
   <section class="section section--white">
     <div class="container story">

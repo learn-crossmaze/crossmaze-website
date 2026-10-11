@@ -1,0 +1,79 @@
+---
+// Branches page banner: a little Crossmaze school on a winding road, with five map pins bobbing
+// around it (one for each centre).
+const pins = [
+  { x: 64, y: 168, color: 'var(--coral)', delay: 0 },
+  { x: 120, y: 92, color: 'var(--sun)', delay: -1.2 },
+  { x: 362, y: 84, color: 'var(--green)', delay: -2.4 },
+  { x: 424, y: 160, color: 'var(--sky)', delay: -0.6 },
+  { x: 410, y: 262, color: 'var(--navy)', delay: -1.8 },
+];
+const logoDots = ['var(--coral)', 'var(--sun)', 'var(--green)', 'var(--sky)', 'var(--navy)'];
+---
+
+<svg class="art" viewBox="0 0 480 400" aria-hidden="true" focusable="false">
+  <defs>
+    <linearGradient id="branches-bg" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0" style="stop-color:var(--tint-5)"></stop>
+      <stop offset="1" style="stop-color:var(--tint-4)"></stop>
+    </linearGradient>
+    <linearGradient id="branches-wall" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0" stop-color="#fff"></stop>
+      <stop offset="1" style="stop-color:color-mix(in srgb, var(--tint-4) 60%, #fff)"></stop>
+    </linearGradient>
+    <clipPath id="branches-clip">
+      <path d="M236 20c102-2 190 52 208 144 18 94-36 186-136 212-96 24-212 10-264-72C-8 226 6 120 72 68 116 34 176 22 236 20z"></path>
+    </clipPath>
+  </defs>
+  <path d="M236 20c102-2 190 52 208 144 18 94-36 186-136 212-96 24-212 10-264-72C-8 226 6 120 72 68 116 34 176 22 236 20z" fill="url(#branches-bg)"></path>
+
+  <g clip-path="url(#branches-clip)">
+    <path d="M-10 318Q240 280 490 318V420H-10Z" style="fill:var(--tint-3)"></path>
+    <path d="M-10 380C110 340 190 392 290 356S430 330 490 346" fill="none" style="stroke:color-mix(in srgb, var(--navy-50) 70%, #fff)" stroke-width="30" stroke-linecap="round"></path>
+    <path d="M-10 380C110 340 190 392 290 356S430 330 490 346" fill="none" stroke="#fff" stroke-width="3" stroke-dasharray="12 12"></path>
+  </g>
+
+  <!-- trees -->
+  <rect x="96" y="262" width="10" height="56" rx="4" fill="#a0673a"></rect>
+  <circle cx="101" cy="246" r="30" style="fill:var(--green)" fill-opacity=".85"></circle>
+  <circle cx="86" cy="262" r="18" style="fill:var(--green)"></circle>
+  <rect x="374" y="270" width="9" height="48" rx="4" fill="#a0673a"></rect>
+  <circle cx="378" cy="256" r="24" style="fill:var(--green)" fill-opacity=".85"></circle>
+  <circle cx="392" cy="270" r="15" style="fill:var(--green)"></circle>
+
+  <!-- the school -->
+  <g>
+    <path d="M240 64V112" style="stroke:var(--navy)" stroke-width="4" stroke-linecap="round"></path>
+    <path class="art__flag" d="M242 66l30 9-30 10z" style="fill:var(--sun)"></path>
+    <rect x="160" y="168" width="160" height="152" rx="12" fill="url(#branches-wall)"></rect>
+    <path d="M150 176L240 110 330 176Z" style="fill:var(--coral);stroke:var(--coral)" stroke-width="12" stroke-linejoin="round"></path>
+    <circle cx="240" cy="152" r="15" fill="#fff"></circle>
+    <circle cx="240" cy="152" r="11" style="fill:var(--sky)"></circle>
+    <path d="M240 141v22M229 152h22" stroke="#fff" stroke-width="2.5"></path>
+    <rect x="178" y="196" width="40" height="38" rx="7" style="fill:var(--tint-5);stroke:var(--navy)" stroke-width="3"></rect>
+    <rect x="262" y="196" width="40" height="38" rx="7" style="fill:var(--tint-5);stroke:var(--navy)" stroke-width="3"></rect>
+    <path d="M198 196v38M178 215h40M282 196v38M262 215h40" style="stroke:var(--navy)" stroke-width="2.5"></path>
+    <rect x="194" y="244" width="92" height="20" rx="10" fill="#fff" style="stroke:color-mix(in srgb, var(--navy) 30%, #fff)" stroke-width="2"></rect>
+    {logoDots.map((c, i) => <circle cx={208 + i * 16} cy="254" r="6" style={`fill:${c}`} />)}
+    <path d="M218 320v-36a22 22 0 0 1 44 0v36z" style="fill:var(--navy)"></path>
+    <circle cx="254" cy="302" r="3" style="fill:var(--sun)"></circle>
+    <path d="M206 320h68" style="stroke:color-mix(in srgb, var(--navy) 40%, #fff)" stroke-width="4" stroke-linecap="round"></path>
+  </g>
+
+  <!-- one pin per centre -->
+  {
+    pins.map((p) => (
+      <g class="art__pin" style={`animation-delay:${p.delay}s`}>
+        <ellipse cx={p.x} cy={p.y + 6} rx="9" ry="3" fill="#000" fill-opacity=".12" />
+        <path d={`M${p.x} ${p.y}c-12-14-20-24-20-34a20 20 0 0 1 40 0c0 10-8 20-20 34z`} style={`fill:${p.color}`} />
+        <circle cx={p.x} cy={p.y - 34} r="7.5" fill="#fff" />
+      </g>
+    ))
+  }
+
+  <g fill="#fff" class="art__float">
+    <circle cx="300" cy="52" r="12"></circle>
+    <circle cx="316" cy="46" r="16"></circle>
+    <circle cx="334" cy="54" r="11"></circle>
+  </g>
+</svg>
