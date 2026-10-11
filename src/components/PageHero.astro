@@ -8,11 +8,14 @@ interface Props {
   crumbs?: { label: string; href?: string }[];
 }
 const { eyebrow, title, lead, crumbs = [] } = Astro.props;
+// An illustration (components/art/) passed as <Fragment slot="art"> sits beside the text.
+const hasArt = Astro.slots.has('art');
 ---
 
-<section class="page-hero">
-  <FloatingShapes />
-  <div class="container">
+<section class:list={['page-hero', { 'page-hero--art': hasArt }]}>
+  <FloatingShapes variant={hasArt ? 'art' : 'page'} />
+  <div class="container page-hero__inner">
+    <div class="page-hero__text">
     {
       crumbs.length > 0 && (
         <nav aria-label="Breadcrumb">
@@ -31,5 +34,13 @@ const { eyebrow, title, lead, crumbs = [] } = Astro.props;
     <h1 set:html={title} />
     {lead && <p class="lead">{lead}</p>}
     <slot />
+    </div>
+    {
+      hasArt && (
+        <div class="page-hero__art">
+          <slot name="art" />
+        </div>
+      )
+    }
   </div>
 </section>

@@ -5,7 +5,7 @@
 import { doodle, pastel, type Colors, type DoodleKind } from './doodles';
 
 interface Props {
-  variant?: 'home' | 'page';
+  variant?: 'home' | 'page' | 'art';
 }
 const { variant = 'page' } = Astro.props;
 
@@ -48,7 +48,14 @@ const page: Shape[] = [
   { kind: 'rainbow', colors: pastel.pink, size: 66, top: '62%', left: '68%', motion: 'bob', dur: 12, delay: -7, hideOnMobile: true },
 ];
 
-const shapes = variant === 'home' ? home : page;
+// Banners with an illustration on the right (components/art/) keep their doodles to the edges.
+const art: Shape[] = [
+  { kind: 'star', colors: pastel.butter, size: 30, top: '7%', left: '50%', motion: 'spin', dur: 20, delay: -2, hideOnMobile: true },
+  { kind: 'cloud', colors: pastel.sky, size: 86, top: '3%', left: '88%', motion: 'drift', dur: 26, delay: -3, hideOnMobile: true },
+  { kind: 'crayon', colors: pastel.peach, size: 38, top: '80%', left: '1.5%', motion: 'bob', dur: 9, delay: -4, hideOnMobile: true },
+];
+
+const shapes = variant === 'home' ? home : variant === 'art' ? art : page;
 ---
 
 <div class:list={['fx', `fx--${variant}`]} aria-hidden="true">

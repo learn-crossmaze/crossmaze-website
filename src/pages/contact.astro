@@ -1,6 +1,7 @@
 ---
 import BaseLayout from '../layouts/BaseLayout.astro';
 import PageHero from '../components/PageHero.astro';
+import ContactArt from '../components/art/ContactArt.astro';
 import EnquiryForm from '../components/EnquiryForm.astro';
 import Icon from '../components/Icon.astro';
 import SectionHeading from '../components/SectionHeading.astro';
@@ -18,7 +19,9 @@ import { branches, shortName, telHref } from '../data/branches';
     title="We’d love to meet you"
     lead="Have a question or ready to visit? Send us a message, call or WhatsApp, and our admissions team will get back to you quickly."
     crumbs={[{ label: 'Contact' }]}
-  />
+  >
+    <ContactArt slot="art" />
+  </PageHero>
 
   <section class="section section--white" id="enquire">
     <div class="container contact">

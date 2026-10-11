@@ -1,6 +1,7 @@
 ---
 import BaseLayout from '../../layouts/BaseLayout.astro';
 import PageHero from '../../components/PageHero.astro';
+import BranchesArt from '../../components/art/BranchesArt.astro';
 import BranchCard from '../../components/BranchCard.astro';
 import Icon from '../../components/Icon.astro';
 import { branches, facilities } from '../../data/branches';
@@ -15,7 +16,9 @@ import { branches, facilities } from '../../data/branches';
     title="Five centres, one Crossmaze family"
     lead="Every centre follows the same curriculum, safety standards and caring approach, so your child gets the Crossmaze experience wherever you are."
     crumbs={[{ label: 'Branches' }]}
-  />
+  >
+    <BranchesArt slot="art" />
+  </PageHero>
 
   <section class="section section--white">
     <div class="container">
