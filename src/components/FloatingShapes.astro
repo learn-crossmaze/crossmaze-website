@@ -44,16 +44,18 @@ const shapes = variant === 'home' ? home : page;
 
 <div class:list={['fx', `fx--${variant}`]} aria-hidden="true">
   <div class="fx__aurora"></div>
-  {
-    shapes.map((s) => (
-      <span
-        class:list={['fx__shape', `fx__shape--${s.motion}`, { 'fx__shape--desktop': s.hideOnMobile }]}
-        style={`--size:${s.size}px;--top:${s.top};--left:${s.left};--dur:${s.dur}s;--delay:${s.delay}s${s.mobile ? `;--top-m:${s.mobile.top};--left-m:${s.mobile.left}` : ''}`}
-      >
-        <svg viewBox="0 0 100 100" set:html={doodle(s.kind, s.colors, s.letter)} />
-      </span>
-    ))
-  }
+  <div class="fx__shapes">
+    {
+      shapes.map((s) => (
+        <span
+          class:list={['fx__shape', `fx__shape--${s.motion}`, { 'fx__shape--desktop': s.hideOnMobile }]}
+          style={`--size:${s.size}px;--top:${s.top};--left:${s.left};--dur:${s.dur}s;--delay:${s.delay}s${s.mobile ? `;--top-m:${s.mobile.top};--left-m:${s.mobile.left}` : ''}`}
+        >
+          <svg viewBox="0 0 100 100" set:html={doodle(s.kind, s.colors, s.letter)} />
+        </span>
+      ))
+    }
+  </div>
 </div>
 
 <style>
@@ -78,6 +80,12 @@ const shapes = variant === 'home' ? home : page;
     -webkit-mask-image: linear-gradient(180deg, #000 0%, #000 40%, transparent 70%);
     mask-image: linear-gradient(180deg, #000 0%, #000 40%, transparent 70%);
     animation: fx-aurora 26s ease-in-out infinite alternate;
+  }
+
+  /* The doodles stay below the header when the banner reaches up behind it (global.css). */
+  .fx__shapes {
+    position: absolute;
+    inset: var(--under-header, 0px) 0 0;
   }
 
   @keyframes fx-aurora {
