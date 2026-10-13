@@ -297,9 +297,10 @@ const tones = ['navy', 'green', 'coral', 'sky', 'sun', 'navy'];
   }
 
   .hero {
+    --banner-pad-top: clamp(40px, 6vw, 80px);
     position: relative;
     overflow: hidden;
-    padding-block: clamp(40px, 6vw, 80px) clamp(48px, 7vw, 96px);
+    padding-block: var(--banner-pad-top) clamp(48px, 7vw, 96px);
   }
 
   .hero__inner {

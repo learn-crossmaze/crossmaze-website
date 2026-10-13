@@ -647,9 +647,19 @@ main > section.section--tight.section--feature {
 
 /* ---------- Page hero (inner pages) ---------- */
 .page-hero {
+  --banner-pad-top: clamp(48px, 7vw, 88px);
   position: relative;
   overflow: hidden;
-  padding-block: clamp(48px, 7vw, 88px) clamp(40px, 6vw, 72px);
+  padding-block: var(--banner-pad-top) clamp(40px, 6vw, 72px);
+}
+
+/* The banner at the top of a page reaches up behind the floating header, so its colour wash
+   (components/FloatingShapes.astro) runs to the top of the window with no edge where the header
+   ends. The extra padding keeps the content where it was. */
+main > :is(.hero, .page-hero):first-child {
+  --under-header: calc(var(--header-gap) + var(--header-h));
+  margin-top: calc(-1 * var(--under-header));
+  padding-top: calc(var(--banner-pad-top) + var(--under-header));
 }
 
 .page-hero h1 {
