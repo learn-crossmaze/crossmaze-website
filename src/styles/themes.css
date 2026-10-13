@@ -3,7 +3,7 @@
    when <html data-theme="…"> is set; the theme is chosen in the admin panel (Site settings → Look
    and feel) and picked in the browser by the script in layouts/BaseLayout.astro. Fonts and the
    browser colour for each theme are listed in src/data/themes.ts. Every theme keeps the school's
-   rules: gradient backgrounds, one flowing page gradient, frosted-glass surfaces. */
+   rules: one flowing gradient page background, with plain white boxes on top. */
 
 /* Sunny Meadow: butter, peach and leaf green, with leaf-shaped corners. */
 :root[data-theme='meadow'] {
@@ -55,7 +55,6 @@
   --sun-btn-fg: #3a2a00;
   --sun-btn-glow: rgb(200 140 0 / 60%);
   --eyebrow-fg: #8a4f00;
-  --eyebrow-bg: linear-gradient(135deg, #fffdf3 0%, #fff1c9 100%);
   --squiggle: #ffcd3c;
 
   --font-display: 'Baloo 2', 'Nunito', system-ui, sans-serif;
@@ -116,7 +115,6 @@
   --sun-btn-fg: #5a1a0e;
   --sun-btn-glow: rgb(240 110 90 / 55%);
   --eyebrow-fg: #0a5d80;
-  --eyebrow-bg: linear-gradient(135deg, #ffffff 0%, #dff6fd 100%);
   --squiggle: #ffb4a2;
 
   --font-display: 'Quicksand', 'Nunito', system-ui, sans-serif;
@@ -177,7 +175,6 @@
   --sun-btn-fg: #3a2a00;
   --sun-btn-glow: rgb(217 154 16 / 60%);
   --eyebrow-fg: #6b4200;
-  --eyebrow-bg: linear-gradient(135deg, #fff6d1 0%, #ffe48a 100%);
   --squiggle: #ffc93c;
 
   --font-display: 'Grandstander', 'Nunito', system-ui, sans-serif;
@@ -249,7 +246,6 @@
   --sun-btn-fg: #5a3418;
   --sun-btn-glow: rgb(180 120 70 / 45%);
   --eyebrow-fg: #7a5a2a;
-  --eyebrow-bg: linear-gradient(135deg, #fffdf8 0%, #efe7d6 100%);
   --squiggle: #e3b45e;
 
   --font-display: 'Lexend', system-ui, sans-serif;
@@ -329,7 +325,6 @@
   --sun-btn-fg: #3a2400;
   --sun-btn-glow: rgb(255 183 3 / 65%);
   --eyebrow-fg: #a3127a;
-  --eyebrow-bg: linear-gradient(135deg, #ffffff 0%, #ffd9ec 100%);
   --squiggle: #ffd60a;
 
   --font-display: 'Sniglet', 'Nunito', system-ui, sans-serif;
@@ -420,7 +415,6 @@
   --sun-btn-fg: #3a2000;
   --sun-btn-glow: rgb(255 143 0 / 60%);
   --eyebrow-fg: #a33f00;
-  --eyebrow-bg: linear-gradient(135deg, #ffffff 0%, #fff0c2 100%);
   --squiggle: #ff5a4e;
 
   --font-display: 'Lilita One', 'Nunito', system-ui, sans-serif;
