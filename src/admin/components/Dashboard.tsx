@@ -1,5 +1,5 @@
 import { useEffect, useState } from 'react';
-import { collection, onSnapshot, query, where } from 'firebase/firestore';
+import { Timestamp, collection, getCountFromServer, onSnapshot, query, where } from 'firebase/firestore';
 import { httpsCallable } from 'firebase/functions';
 import { useDoc } from '../data';
 import { Icon } from './fields';
@@ -71,6 +71,19 @@ function useCount(field: string, op: '==' | 'in', value: unknown) {
   return count;
 }
 
+/** Taps on the website's call and WhatsApp buttons in the last 7 days. */
+function useRecentCalls() {
+  const { services } = useSession();
+  const [count, setCount] = useState<number>();
+  useEffect(() => {
+    const since = Timestamp.fromMillis(Date.now() - 7 * 24 * 60 * 60 * 1000);
+    getCountFromServer(query(collection(services.db, 'calls'), where('createdAt', '>=', since)))
+      .then((snap) => setCount(snap.data().count))
+      .catch(() => setCount(undefined));
+  }, [services]);
+  return count;
+}
+
 const links = [
   { href: '#/site', icon: 'Settings', title: 'Site settings', text: 'Logo, phone, emails, address, home page text' },
   { href: '#/branches', icon: 'Building', title: 'Branches', text: 'Addresses, photos, centre heads, amenities' },
@@ -85,6 +98,7 @@ export function Dashboard() {
   const { publish, content, unpublished } = usePublishState();
   const newCount = useCount('handled', '==', false);
   const problems = useCount('litmus.status', 'in', ['failed', 'not_configured']);
+  const calls = useRecentCalls();
 
   const status =
     publish?.status === 'building'
@@ -124,6 +138,10 @@ export function Dashboard() {
         <a className="card stat" href="#/litmus">
           <span className={`stat-value ${problems ? 'warn' : ''}`}>{problems ?? '–'}</span>
           <span>submissions not delivered to LITMUS</span>
+        </a>
+        <a className="card stat" href="#/calls">
+          <span className="stat-value">{calls ?? '–'}</span>
+          <span>taps on call and WhatsApp buttons this week</span>
         </a>
       </div>
       <h2 className="section-title">Edit the website</h2>

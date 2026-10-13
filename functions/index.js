@@ -2,7 +2,8 @@
 //
 //   submit             POST /api/submit (Hosting rewrite). Saves a website form submission
 //                      in Firestore (and an attached resume in Cloud Storage), then forwards it
-//                      to LITMUS.
+//                      to LITMUS. Also records taps on the website's call and WhatsApp buttons
+//                      (body.event "contact") for the admin panel's Calls page.
 //   resendSubmissions  Admin panel: send selected (or all unsent) submissions to LITMUS again.
 //   testLitmus         Admin panel: send a test payload with the saved LITMUS settings.
 //   publishSite        Admin panel "Publish": starts the GitHub Actions deploy, which pulls the
@@ -18,6 +19,7 @@ import { setGlobalOptions } from 'firebase-functions/options';
 import { defineSecret, defineString } from 'firebase-functions/params';
 import { logger } from 'firebase-functions';
 import { assertAdmin } from './lib/admin.js';
+import { deviceOf, validateCall } from './lib/calls.js';
 import { isSpam, validateSubmission } from './lib/forms.js';
 import { buildPayload, sendToLitmus } from './lib/litmus.js';
 
@@ -34,6 +36,7 @@ const githubWorkflow = defineString('GITHUB_WORKFLOW', { default: 'firebase-host
 const githubRef = defineString('GITHUB_REF', { default: 'main' });
 
 const RATE_LIMIT = { max: 8, windowMs: 60 * 60 * 1000 };
+const CALL_RATE_LIMIT = { max: 30, windowMs: 60 * 60 * 1000 };
 const MAX_LITMUS_ATTEMPTS = 6;
 
 const litmusConfig = async () => (await db.doc('private/litmus').get()).data();
@@ -65,21 +68,24 @@ async function forward(snap, config) {
   return result.status;
 }
 
-/** Allows at most RATE_LIMIT.max submissions per IP address per hour. */
-async function withinRateLimit(ip) {
+/**
+ * Allows at most `limit.max` requests per IP address per window.
+ * @param {string} ip the visitor's IP address, prefixed with a scope for limits other than forms
+ */
+async function withinRateLimit(ip, limit = RATE_LIMIT) {
   const key = createHash('sha256').update(`crossmaze:${ip}`).digest('hex').slice(0, 32);
   const ref = db.doc(`ratelimits/${key}`);
   return db.runTransaction(async (tx) => {
     const now = Date.now();
     const current = (await tx.get(ref)).data();
-    const fresh = !current || now - current.windowStart > RATE_LIMIT.windowMs;
+    const fresh = !current || now - current.windowStart > limit.windowMs;
     const count = fresh ? 1 : current.count + 1;
     tx.set(ref, {
       windowStart: fresh ? now : current.windowStart,
       count,
-      expireAt: new Date(now + 2 * RATE_LIMIT.windowMs),
+      expireAt: new Date(now + 2 * limit.windowMs),
     });
-    return count <= RATE_LIMIT.max;
+    return count <= limit.max;
   });
 }
 
@@ -89,6 +95,10 @@ export const submit = onRequest({ cors: true, memory: '256MiB', timeoutSeconds: 
     return;
   }
   const body = typeof req.body === 'string' ? safeJson(req.body) : req.body;
+  if (body?.event === 'contact') {
+    await logCall(req, res, body);
+    return;
+  }
   if (isSpam(body)) {
     res.json({ ok: true });
     return;
@@ -133,6 +143,32 @@ export const submit = onRequest({ cors: true, memory: '256MiB', timeoutSeconds: 
   // `files` tells the website which uploads were saved (older versions of this function ignored them).
   res.json({ ok: true, id: ref.id, files: files.map((f) => f.field) });
 });
+
+/**
+ * Records a tap on a call or WhatsApp button (sent by src/scripts/call-log.ts with sendBeacon,
+ * which ignores the answer).
+ * @param {import('firebase-functions/https').Request} req
+ * @param {import('express').Response} res
+ * @param {unknown} body
+ */
+async function logCall(req, res, body) {
+  const result = validateCall(body);
+  if (!result.ok) {
+    res.status(400).json({ ok: false });
+    return;
+  }
+  if (!(await withinRateLimit(`calls:${req.ip ?? 'unknown'}`, CALL_RATE_LIMIT))) {
+    res.status(429).json({ ok: false });
+    return;
+  }
+  const { call } = result;
+  await db.collection('calls').add({
+    ...call,
+    device: call.device || deviceOf(req.get('user-agent')),
+    createdAt: FieldValue.serverTimestamp(),
+  });
+  res.status(204).end();
+}
 
 /**
  * Saves uploaded files under <folder>/<submission id>/ (readable only by admins and by whoever has

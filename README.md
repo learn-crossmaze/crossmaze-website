@@ -40,10 +40,23 @@ Go to **www.crossmaze.in/admin** and sign in.
 | Testimonials | Parent quotes on the home page |
 | Page sections | Core values, teaching approach, a day at Crossmaze, how admission works, day care highlights, extra-curriculars, facilities (with the photos for the scrolling strip on the home page), careers perks, FAQs |
 | Submissions | Every enquiry and application; mark as handled, resend to LITMUS, export to CSV |
+| Calls | Every tap on a call or WhatsApp button: which centre, page, device and how the visitor found the site; totals by centre; export to CSV (see below) |
 | LITMUS | Where submissions are sent, its API key, and a **Send test** button |
 | Admins | Who can sign in |
 
 **Save** stores a change; it goes live when someone presses **Publish** (top right). Publishing rebuilds the whole site in about 3 minutes, and the Dashboard shows when it's done or if it failed. New branches, programs and jobs start hidden, so you can finish them before unticking “Hide from website”.
+
+### Calls
+
+A website can't see who phoned or whether the call got through: tapping a call button just hands the number to the phone's dialler. What the **Calls** page shows is every tap on a call or WhatsApp button, with:
+
+- the centre whose number was tapped, and where (the page, and the spot on it, such as a branch card or the “Call a centre” pop-up);
+- the kind of device (phone, tablet or computer);
+- how the visit started: a search (google.com), a social site, an ad (`utm_` tags or Google Ads), or “Direct”.
+
+Several taps in one visit count as one person. Nothing that identifies the visitor is stored (no phone number, name or IP address), and taps from preview links aren't counted. Compare the counts with the centres' own call logs to see how many website visitors got through. The Dashboard shows the number of taps in the last 7 days.
+
+To know who called (their number) you'd need call-tracking numbers from a telephony provider, shown on the website in place of the centres' own numbers.
 
 ### Colour themes
 
