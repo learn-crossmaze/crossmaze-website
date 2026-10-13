@@ -14,10 +14,9 @@ const { program } = Astro.props;
     <span class="program-card__photo">
       <Image src={program.photo} alt={program.photoAlt} widths={[360, 560]} sizes="(max-width: 700px) 100vw, 360px" />
     </span>
-    <span class="icon-badge"><Icon name={program.icon} size={24} /></span>
+    <span class="program-card__ages">{program.ages}</span>
   </span>
   <span class="program-card__body">
-    <span class="pill">{program.ages}</span>
     <h3>{program.name}</h3>
     <p>{program.summary}</p>
     <span class="program-card__more">Learn more <Icon name="ArrowRight" size={18} /></span>
@@ -38,8 +37,8 @@ const { program } = Astro.props;
   }
   .program-card:hover {
     color: inherit;
-    transform: translateY(-4px);
-    box-shadow: var(--shadow-lift);
+    transform: translateY(-3px);
+    box-shadow: var(--glass-rim), var(--shadow-lift);
   }
   .program-card__media {
     position: relative;
@@ -47,7 +46,7 @@ const { program } = Astro.props;
     aspect-ratio: 16 / 9;
     background: linear-gradient(135deg, var(--badge-bg) 0%, var(--badge-bg-2, var(--badge-bg)) 100%);
   }
-  /* Clips the photo's hover zoom; the icon badge overlaps the edge, so it sits outside this. */
+  /* Clips the photo's hover zoom. */
   .program-card__photo {
     display: block;
     height: 100%;
@@ -62,23 +61,28 @@ const { program } = Astro.props;
   .program-card:hover .program-card__media :global(img) {
     transform: scale(1.05);
   }
-  .program-card__media .icon-badge {
+  /* The age range on a glass label over the photo, in the program's colour. */
+  .program-card__ages {
     position: absolute;
-    left: 20px;
-    bottom: -24px;
-    margin: 0;
-    border: 4px solid var(--paper);
-    box-sizing: content-box;
+    left: 14px;
+    bottom: 14px;
+    padding: 5px 12px;
+    border: 1px solid var(--glass-edge);
+    border-radius: 999px;
+    background: var(--glass-thick);
+    -webkit-backdrop-filter: var(--glass-blur);
+    backdrop-filter: var(--glass-blur);
+    box-shadow: var(--glass-rim), var(--shadow-sm);
+    color: var(--badge-fg);
+    font-weight: 800;
+    font-size: 0.85rem;
+    line-height: 1.3;
   }
   .program-card__body {
     display: flex;
     flex-direction: column;
     flex: 1;
-    padding: 40px 24px 24px;
-  }
-  .program-card .pill {
-    align-self: flex-start;
-    margin-bottom: 10px;
+    padding: 22px 24px 24px;
   }
   .program-card p {
     color: var(--muted);

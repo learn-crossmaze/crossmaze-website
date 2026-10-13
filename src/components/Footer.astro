@@ -102,7 +102,7 @@ const mascot = image(site.mascot);
 
 <style>
   /* No background of its own: the flowing page gradient continues underneath, and the footer
-     content sits on a frosted-glass panel, so there is no hard colour change. */
+     content sits on a liquid-glass panel, so there is no hard colour change. */
   .site-footer {
     position: relative;
     padding-block: 24px 28px;
@@ -122,8 +122,10 @@ const mascot = image(site.mascot);
     inset: 0 calc(var(--gutter) - min(40px, var(--gutter) - 8px));
     border: 1px solid var(--glass-edge);
     border-radius: 36px;
-    background: #ffffff;
-    box-shadow: var(--shadow);
+    background: var(--glass);
+    -webkit-backdrop-filter: var(--glass-blur);
+    backdrop-filter: var(--glass-blur);
+    box-shadow: var(--glass-rim), var(--shadow);
   }
 
   .site-footer__grid {

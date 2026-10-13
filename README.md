@@ -47,7 +47,7 @@ Go to **www.crossmaze.in/admin** and sign in.
 
 ### Colour themes
 
-The site has seven colour themes: **Pastel Glass**, **Sunny Meadow**, **Ocean Breeze**, **Crayon Box**, **Montessori Calm**, and two bright ones, **Candy Pop** and **Tropical Splash**. In **Site settings → Look and feel**, choose which one visitors see:
+The site has seven colour themes: **Pastel Glass**, **Sunny Meadow**, **Ocean Breeze**, **Crayon Box**, **Montessori Calm**, and two bright ones, **Candy Pop** and **Tropical Splash**. Each theme changes the page background, colours and fonts; the boxes on top (cards, the floating header, the footer, forms and pop-ups) are white frosted glass in every theme. In **Site settings → Look and feel**, choose which one visitors see:
 
 | Setting | What visitors see |
 | --- | --- |

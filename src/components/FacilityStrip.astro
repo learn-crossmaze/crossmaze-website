@@ -259,9 +259,10 @@ const albumIndex = new Map(withPhotos.map((c, i) => [c, i]));
     margin-top: -26px;
     border: 1px solid var(--glass-edge);
     border-radius: 50%;
-    background: var(--g-glass);
-    backdrop-filter: blur(8px);
-    box-shadow: var(--shadow);
+    background: var(--glass-thick);
+    -webkit-backdrop-filter: var(--glass-blur);
+    backdrop-filter: var(--glass-blur);
+    box-shadow: var(--glass-rim), var(--shadow);
     color: var(--navy);
     cursor: pointer;
     transition:

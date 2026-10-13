@@ -211,7 +211,6 @@ const tones = ['navy', 'green', 'coral', 'sky', 'sun', 'navy'];
           <div class="testimonials">
             {testimonials.map((t) => (
               <figure class="card testimonial">
-                <Icon name="Heart" size={22} class="testimonial__icon" />
                 <blockquote>{t.quote}</blockquote>
                 <figcaption>
                   <strong>{t.name}</strong>
@@ -365,24 +364,28 @@ const tones = ['navy', 'green', 'coral', 'sky', 'sun', 'navy'];
     aspect-ratio: 16 / 9;
   }
 
+  /* A liquid-glass label floating over the big photo. */
   .hero__badge {
     position: absolute;
     left: -18px;
     top: 42%;
     display: grid;
     padding: 12px 18px;
+    border: 1px solid var(--glass-edge);
     border-radius: var(--radius);
-    background: var(--g-sun);
+    background: var(--glass-thick);
+    -webkit-backdrop-filter: var(--glass-blur);
+    backdrop-filter: var(--glass-blur);
     color: var(--ink);
-    box-shadow: var(--shadow);
-    transform: rotate(-4deg);
+    box-shadow: var(--glass-rim), var(--shadow);
     line-height: 1.15;
   }
 
   .hero__badge strong {
     font-family: var(--font-display);
     font-size: 1.6rem;
-    font-weight: 600;
+    font-weight: var(--display-weight);
+    color: var(--navy);
   }
 
   .hero__badge span {
@@ -413,7 +416,9 @@ const tones = ['navy', 'green', 'coral', 'sky', 'sun', 'navy'];
     border: 1px solid var(--glass-edge);
     border-radius: 28px;
     background: var(--g-card);
-    box-shadow: var(--shadow);
+    -webkit-backdrop-filter: var(--glass-blur);
+    backdrop-filter: var(--glass-blur);
+    box-shadow: var(--glass-rim), var(--shadow);
   }
 
   @media (max-width: 700px) {
@@ -483,18 +488,21 @@ const tones = ['navy', 'green', 'coral', 'sky', 'sun', 'navy'];
     box-shadow: var(--shadow);
   }
 
+  /* Liquid glass over the bottom of the photo. */
   .about__quote {
     margin: -48px 24px 0;
     position: relative;
     padding: 20px 24px;
+    border: 1px solid var(--glass-edge);
     border-radius: var(--radius);
-    background: #ffffff;
-    border: 2px solid #fff;
+    background: var(--glass-thick);
+    -webkit-backdrop-filter: var(--glass-blur);
+    backdrop-filter: var(--glass-blur);
     color: var(--ink);
     font-family: var(--font-display);
     font-size: 1.15rem;
     line-height: 1.4;
-    box-shadow: var(--shadow);
+    box-shadow: var(--glass-rim), var(--shadow);
   }
 
   .about__quote cite {
@@ -551,7 +559,7 @@ const tones = ['navy', 'green', 'coral', 'sky', 'sun', 'navy'];
     flex: none;
     padding: 3px;
     border-radius: 50%;
-    background: linear-gradient(135deg, #ffffff 0%, var(--green-50) 100%);
+    background: linear-gradient(135deg, var(--green-50) 0%, var(--green-100) 100%);
     color: var(--green);
     width: 26px;
     height: 26px;
@@ -578,14 +586,16 @@ const tones = ['navy', 'green', 'coral', 'sky', 'sun', 'navy'];
     margin: 0 0 20px;
   }
 
-  .testimonial :global(.testimonial__icon) {
-    box-sizing: content-box;
-    margin-bottom: 14px;
-    padding: 9px;
-    border-radius: 50%;
-    background: linear-gradient(135deg, var(--coral-50) 0%, var(--coral-100) 100%);
-    box-shadow: 0 8px 18px -10px color-mix(in srgb, var(--coral-fg) 60%, transparent);
-    color: var(--coral-fg);
+  /* A large, soft opening quote mark instead of an icon. */
+  .testimonial::before {
+    content: '\201C';
+    display: block;
+    height: 0.5em;
+    margin-bottom: 10px;
+    font-family: Georgia, 'Times New Roman', serif;
+    font-size: 3.4rem;
+    line-height: 1;
+    color: color-mix(in srgb, var(--coral) 55%, transparent);
   }
 
   .testimonial blockquote {
