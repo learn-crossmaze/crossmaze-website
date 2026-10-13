@@ -300,9 +300,12 @@ import { site, faqs, dayRoutine } from '../data/site';
   }
 
   .faq__item {
-    background: var(--g-card);
-    border: 1px solid var(--line);
+    border: 1px solid var(--glass-edge);
     border-radius: var(--radius);
+    background: var(--g-card);
+    -webkit-backdrop-filter: var(--glass-blur);
+    backdrop-filter: var(--glass-blur);
+    box-shadow: var(--glass-rim), var(--shadow-sm);
   }
 
   .faq__item summary {

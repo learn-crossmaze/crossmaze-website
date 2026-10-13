@@ -29,7 +29,7 @@
      use tokens rather than colour values anywhere a theme should show. */
 
   /* Only the page background is a gradient; boxes on top of it (cards, panels, the header, the
-     footer, forms, labels and pop-ups) are plain white, as the school asked. */
+     footer, forms, labels and pop-ups) are white "liquid glass", as the school asked. */
   /* The page background: one pastel gradient that flows down the whole page (pink, peach,
      butter, mint, sky, lavender and round again), so sections blend with no hard edges. */
   --flow-1: #fff0f6;
@@ -60,21 +60,29 @@
     var(--flow-6) calc(var(--flow-length) * 5 / 6),
     var(--flow-1) var(--flow-length)
   );
-  /* Boxes (cards, panels, the header and footer, forms, labels, pop-ups): plain white. */
-  --g-card: #ffffff;
-  --g-glass: #ffffff;
-  --g-soft: #ffffff;
-  --g-ring: linear-gradient(135deg, #ffc9dc 0%, #d9cbff 50%, #bfdcff 100%);
+  /* Boxes are white liquid glass, like Apple's: translucent white that blurs and brightens what
+     is behind it, with a bright rim of light along the edges. --glass-thick is for boxes that
+     float over busy content (the header, menus, pop-ups, labels on photos) so text stays crisp. */
+  --glass: rgb(255 255 255 / 74%);
+  --glass-thick: rgb(255 255 255 / 86%);
+  --glass-blur: blur(22px) saturate(150%);
+  --glass-edge: rgb(255 255 255 / 80%);
+  --glass-rim:
+    inset 0 1px 0 rgb(255 255 255 / 95%), inset 0 -1px 0 rgb(255 255 255 / 40%),
+    0 0 0 1px rgb(var(--shadow-tint) / 5%);
+  --g-card: var(--glass);
+  --g-glass: var(--glass);
+  --g-soft: var(--glass);
+  /* Photos sit in a thin glass frame. */
+  --g-ring: linear-gradient(150deg, rgb(255 255 255 / 96%) 0%, rgb(255 255 255 / 58%) 100%);
   --g-heading: linear-gradient(100deg, #14307f 0%, #263d9e 50%, #5b3fc2 100%);
   --g-highlight: linear-gradient(90deg, #e2456f 0%, #b346c8 55%, #7a4fe0 100%);
-  --glass-edge: rgb(255 255 255 / 85%);
   --g-navy: linear-gradient(135deg, #2a4fb3 0%, #14307f 55%, #0b1d5e 100%);
   --g-sun: linear-gradient(135deg, #ffde75 0%, #ffc93c 50%, #ffb224 100%);
   --sun-btn-fg: #131a3a;
   --sun-btn-glow: rgb(255 170 30 / 75%);
-  --g-panel: #ffffff;
-  --eyebrow-fg: #c2362c;
-  --eyebrow-bg: #ffffff;
+  --g-panel: var(--glass);
+  --eyebrow-fg: #b02e25;
   --squiggle: #ffc23d;
   --g-ink: linear-gradient(135deg, #2a3366 0%, #131a3a 100%);
   --g-whatsapp: linear-gradient(135deg, #4be27f 0%, #25d366 50%, #12a84b 100%);
@@ -92,13 +100,15 @@
   --radius-photo-sm: 22px;
   /* Shadows are tinted (violet here); a theme changes the tint. */
   --shadow-tint: 60 40 120;
-  --shadow-sm: 0 1px 2px rgb(var(--shadow-tint) / 6%), 0 8px 22px -10px rgb(var(--shadow-tint) / 18%);
-  --shadow: 0 2px 6px rgb(var(--shadow-tint) / 6%), 0 22px 48px -20px rgb(var(--shadow-tint) / 28%);
-  --shadow-lift: 0 4px 10px rgb(var(--shadow-tint) / 7%), 0 30px 60px -22px rgb(var(--shadow-tint) / 34%);
+  --shadow-sm: 0 1px 2px rgb(var(--shadow-tint) / 4%), 0 10px 30px -14px rgb(var(--shadow-tint) / 18%);
+  --shadow: 0 2px 4px rgb(var(--shadow-tint) / 4%), 0 24px 56px -24px rgb(var(--shadow-tint) / 26%);
+  --shadow-lift: 0 4px 8px rgb(var(--shadow-tint) / 5%), 0 32px 70px -26px rgb(var(--shadow-tint) / 32%);
 
   --container: 1180px;
   --gutter: 20px;
   --header-h: 72px;
+  /* The header floats this far below the top of the window. */
+  --header-gap: 10px;
 }
 
 @media (max-width: 640px) {
@@ -118,7 +128,7 @@
 html {
   -webkit-text-size-adjust: 100%;
   scroll-behavior: smooth;
-  scroll-padding-top: calc(var(--header-h) + 16px);
+  scroll-padding-top: calc(var(--header-gap) + var(--header-h) + 16px);
 }
 
 body {
@@ -276,11 +286,13 @@ body::before {
 
 /* ---------- Sections with preschool doodles ----------
    Sections have no background of their own: the flowing page gradient (body) runs behind all
-   of them, so colours change smoothly with no hard edges. Each section gets two softly drifting
-   doodles (crayons, ABC blocks, kites…; drawn in components/doodles.ts), in the page margin on
-   wide screens and peeking in from the edge on narrow ones. */
+   of them, so colours change smoothly with no hard edges. Each section gets one softly drifting
+   doodle (a kite, ABC block, rainbow…; drawn in components/doodles.ts), sized to fit in the
+   page margin beside the content. Screens without room in the margin leave them out. */
 main > section {
-  --doodle-edge: max(-30px, calc(50vw - var(--container) / 2 - 170px));
+  --doodle-room: calc(50vw - var(--container) / 2);
+  --doodle-size: clamp(52px, calc(var(--doodle-room) - 36px), 104px);
+  --doodle-edge: calc((var(--doodle-room) - var(--doodle-size)) / 2);
   position: relative;
   isolation: isolate;
   overflow: hidden;
@@ -291,57 +303,38 @@ main > section > :not(.fx) {
   z-index: 1;
 }
 
-main > section::before,
-main > section::after {
+main > section::before {
   content: '';
   position: absolute;
   z-index: 0;
+  inset: var(--shape-1-at);
+  width: var(--doodle-size);
   aspect-ratio: 1;
   pointer-events: none;
-  background: no-repeat center / contain;
+  background: var(--shape-1) no-repeat center / contain;
+  opacity: 0.75;
   animation: cm-drift-a 19s ease-in-out infinite alternate;
 }
 
-main > section::before {
-  inset: var(--shape-1-at);
-  width: clamp(76px, 9.5vw, 132px);
-  background-image: var(--shape-1);
-}
-
-main > section::after {
-  inset: var(--shape-2-at);
-  width: clamp(64px, 8vw, 112px);
-  background-image: var(--shape-2);
-  animation-name: cm-drift-b;
-  animation-duration: 25s;
-  animation-delay: -6s;
-}
-
-/* Odd steps: doodles top-left and bottom-right; even steps: the mirror image. */
+/* Odd sections: the doodle sits top-left; even sections: top-right. */
 main > section:nth-of-type(odd) {
   --shape-1-at: 22px auto auto var(--doodle-edge);
-  --shape-2-at: auto var(--doodle-edge) 22px auto;
 }
 
 main > section:nth-of-type(even) {
   --shape-1-at: 22px var(--doodle-edge) auto auto;
-  --shape-2-at: auto auto 22px var(--doodle-edge);
 }
 
-@media (max-width: 640px) {
-  main > section::before,
-  main > section::after {
-    opacity: 0.7;
+@media (max-width: 1359px) {
+  main > section::before {
+    content: none;
   }
 }
 
 /* Banners have their own animated background (components/FloatingShapes.astro). */
 main > section.hero::before,
-main > section.hero::after,
 main > section.page-hero::before,
-main > section.page-hero::after,
-main > section.no-shapes::before,
-main > section.no-shapes::after {
+main > section.no-shapes::before {
   content: none;
 }
 
@@ -350,16 +343,7 @@ main > section.no-shapes::after {
     transform: translate3d(0, 0, 0) rotate(0deg);
   }
   to {
-    transform: translate3d(28px, -22px, 0) rotate(14deg);
-  }
-}
-
-@keyframes cm-drift-b {
-  from {
-    transform: translate3d(0, 0, 0) rotate(0deg) scale(1);
-  }
-  to {
-    transform: translate3d(-26px, 18px, 0) rotate(-12deg) scale(1.08);
+    transform: translate3d(10px, -14px, 0) rotate(10deg);
   }
 }
 
@@ -379,7 +363,7 @@ main > section.no-shapes::after {
   padding-block: clamp(40px, 6vw, 72px);
 }
 
-/* Call-outs (day care, calls to action) sit on a floating rainbow-glass panel rather than a
+/* Call-outs (day care, calls to action) sit on a floating glass panel rather than a
    full-width band, so the page gradient still flows around them without hard edges. */
 main > section.section--feature > .container::before {
   --panel-pad: clamp(24px, 4vw, 48px);
@@ -390,7 +374,9 @@ main > section.section--feature > .container::before {
   border: 1px solid var(--glass-edge);
   border-radius: 36px;
   background: var(--g-panel);
-  box-shadow: var(--shadow);
+  -webkit-backdrop-filter: var(--glass-blur);
+  backdrop-filter: var(--glass-blur);
+  box-shadow: var(--glass-rim), var(--shadow);
 }
 
 main > section.section--feature {
@@ -423,20 +409,16 @@ main > section.section--tight.section--feature {
 }
 
 /* ---------- Type helpers ---------- */
+/* The small label above a heading: plain coloured text with a dot, no box, to keep pages calm. */
 .eyebrow {
   display: inline-flex;
   align-items: center;
   gap: 8px;
-  margin-bottom: 16px;
-  padding: 6px 14px 6px 12px;
-  border: 1px solid var(--glass-edge);
-  border-radius: 999px;
-  background: var(--eyebrow-bg);
-  box-shadow: 0 6px 16px -10px color-mix(in srgb, var(--eyebrow-fg) 45%, transparent);
+  margin-bottom: 12px;
   font-family: var(--font-display);
   font-weight: 600;
   font-size: 0.82rem;
-  letter-spacing: 0.08em;
+  letter-spacing: 0.1em;
   text-transform: uppercase;
   color: var(--eyebrow-fg);
 }
@@ -485,7 +467,11 @@ main > section.section--tight.section--feature {
   line-height: 1;
   text-decoration: none;
   cursor: pointer;
-  box-shadow: 0 10px 22px -12px var(--btn-glow, color-mix(in srgb, var(--navy) 60%, transparent));
+  /* A soft glow underneath and a glassy highlight along the top edge. */
+  box-shadow:
+    inset 0 1px 0 rgb(255 255 255 / 38%),
+    inset 0 -1px 0 rgb(0 0 0 / 6%),
+    0 10px 22px -14px var(--btn-glow, color-mix(in srgb, var(--navy) 60%, transparent));
   transition:
     transform 0.2s ease,
     box-shadow 0.2s ease,
@@ -494,8 +480,11 @@ main > section.section--tight.section--feature {
 
 .btn:hover {
   color: var(--btn-fg);
-  transform: translateY(-2px);
-  box-shadow: 0 16px 30px -14px var(--btn-glow, color-mix(in srgb, var(--navy) 70%, transparent));
+  transform: translateY(-1px);
+  box-shadow:
+    inset 0 1px 0 rgb(255 255 255 / 38%),
+    inset 0 -1px 0 rgb(0 0 0 / 6%),
+    0 14px 28px -14px var(--btn-glow, color-mix(in srgb, var(--navy) 70%, transparent));
   filter: saturate(1.08) brightness(1.04);
 }
 
@@ -506,15 +495,27 @@ main > section.section--tight.section--feature {
   --btn-glow: var(--sun-btn-glow);
 }
 
+/* A clear glass button: a white rim with a faint coloured outline. */
 .btn--ghost {
-  --btn-glow: color-mix(in srgb, var(--navy) 28%, transparent);
-  border-color: var(--btn-bg);
-  background: var(--g-glass) padding-box;
+  --btn-glow: color-mix(in srgb, var(--navy) 22%, transparent);
+  border-color: var(--glass-edge);
+  background: var(--glass);
+  -webkit-backdrop-filter: var(--glass-blur);
+  backdrop-filter: var(--glass-blur);
   color: var(--btn-bg);
+  box-shadow:
+    inset 0 1px 0 #fff,
+    0 0 0 1px color-mix(in srgb, var(--btn-bg) 26%, transparent),
+    0 10px 22px -14px var(--btn-glow);
 }
 
 .btn--ghost:hover {
   color: var(--btn-bg);
+  background: var(--glass-thick);
+  box-shadow:
+    inset 0 1px 0 #fff,
+    0 0 0 1px color-mix(in srgb, var(--btn-bg) 40%, transparent),
+    0 14px 28px -14px var(--btn-glow);
 }
 
 .btn--white {
@@ -538,11 +539,13 @@ main > section.section--tight.section--feature {
 /* ---------- Cards ---------- */
 .card {
   position: relative;
-  background: #ffffff;
+  background: var(--g-card);
+  -webkit-backdrop-filter: var(--glass-blur);
+  backdrop-filter: var(--glass-blur);
   border: 1px solid var(--glass-edge);
   border-radius: var(--radius-card);
   padding: 28px;
-  box-shadow: var(--shadow-sm);
+  box-shadow: var(--glass-rim), var(--shadow-sm);
 }
 
 /* Cards in a grid (values, programs, branches, testimonials) lift gently on hover. */
@@ -555,8 +558,8 @@ main > section.section--tight.section--feature {
 
 .grid > .card:hover,
 .testimonial:hover {
-  transform: translateY(-4px);
-  box-shadow: var(--shadow-lift);
+  transform: translateY(-3px);
+  box-shadow: var(--glass-rim), var(--shadow-lift);
 }
 
 .card h3 {
@@ -575,9 +578,7 @@ main > section.section--tight.section--feature {
   margin-bottom: 18px;
   border-radius: 16px;
   background: linear-gradient(135deg, var(--badge-bg, var(--navy-50)) 0%, var(--badge-bg-2, var(--navy-100)) 100%);
-  box-shadow:
-    inset 0 0 0 1px rgb(255 255 255 / 70%),
-    0 8px 18px -10px color-mix(in srgb, var(--badge-fg, var(--navy)) 45%, transparent);
+  box-shadow: inset 0 1px 0 rgb(255 255 255 / 80%), inset 0 0 0 1px rgb(255 255 255 / 50%);
   color: var(--badge-fg, var(--navy));
 }
 
@@ -709,9 +710,9 @@ main > section.section--tight.section--feature {
   width: 100%;
   min-height: 48px;
   padding: 12px 14px;
-  border: 1.5px solid var(--line);
-  border-radius: 12px;
-  background: #ffffff;
+  border: 1.5px solid color-mix(in srgb, var(--navy) 12%, transparent);
+  border-radius: 14px;
+  background: var(--glass-thick);
   color: var(--ink);
   font: inherit;
   font-size: 1rem;
@@ -730,7 +731,7 @@ main > section.section--tight.section--feature {
   padding: 14px;
   border-style: dashed;
   border-color: color-mix(in srgb, var(--navy) 28%, #fff);
-  background: #ffffff;
+  background: var(--glass-thick);
   color: var(--muted);
   cursor: pointer;
 }

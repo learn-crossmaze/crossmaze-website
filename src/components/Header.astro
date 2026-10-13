@@ -83,22 +83,28 @@ const isActive = (href: string) => (href === '/' ? path === '/' : path === href 
 </script>
 
 <style>
+  /* A floating bar of liquid glass, a little below the top of the window, that the page
+     scrolls underneath. */
   .site-header {
     position: sticky;
-    top: 0;
+    top: var(--header-gap);
     z-index: 50;
-    border-bottom: 1px solid var(--line);
+    margin-top: var(--header-gap);
   }
 
-  /* The blur lives on a pseudo-element: backdrop-filter on the header itself
+  /* The glass lives on a pseudo-element: backdrop-filter on the header itself
      would become the containing block for the fixed mobile menu panel. */
   .site-header::before {
     content: '';
     position: absolute;
-    inset: 0;
+    inset: 0 max(8px, calc((100% - var(--container)) / 2 - 22px));
     z-index: -1;
-    background: #ffffff;
-    backdrop-filter: saturate(1.4) blur(12px);
+    border: 1px solid var(--glass-edge);
+    border-radius: 999px;
+    background: var(--glass-thick);
+    -webkit-backdrop-filter: var(--glass-blur);
+    backdrop-filter: var(--glass-blur);
+    box-shadow: var(--glass-rim), var(--shadow-sm);
   }
 
   .site-header__inner {
@@ -107,6 +113,7 @@ const isActive = (href: string) => (href === '/' ? path === '/' : path === href 
     justify-content: space-between;
     gap: 24px;
     min-height: var(--header-h);
+    padding-inline: max(var(--gutter), 24px);
   }
 
   .site-header__brand {
@@ -158,10 +165,12 @@ const isActive = (href: string) => (href === '/' ? path === '/' : path === href 
     margin: 0;
     padding: 8px;
     list-style: none;
-    background: var(--g-card);
-    border: 1px solid var(--line);
-    border-radius: var(--radius);
-    box-shadow: var(--shadow);
+    border: 1px solid var(--glass-edge);
+    border-radius: 22px;
+    background: var(--glass-thick);
+    -webkit-backdrop-filter: var(--glass-blur);
+    backdrop-filter: var(--glass-blur);
+    box-shadow: var(--glass-rim), var(--shadow);
     opacity: 0;
     visibility: hidden;
     transform: translate(-50%, 6px);
@@ -209,13 +218,27 @@ const isActive = (href: string) => (href === '/' ? path === '/' : path === href 
     gap: 8px;
   }
 
+  .site-nav__cta .btn {
+    white-space: nowrap;
+  }
+
+  /* Narrower desktops: tighter links so the bar stays on one line in every theme's font. */
+  @media (max-width: 1260px) {
+    .site-nav {
+      gap: 12px;
+    }
+    .site-nav__item > a {
+      padding-inline: 9px;
+    }
+  }
+
   .menu-toggle {
     display: none;
     place-items: center;
     width: 46px;
     height: 46px;
     border: 0;
-    border-radius: 14px;
+    border-radius: 50%;
     background: linear-gradient(135deg, var(--navy-50) 0%, var(--navy-100) 100%);
     color: var(--navy);
     cursor: pointer;
@@ -244,15 +267,22 @@ const isActive = (href: string) => (href === '/' ? path === '/' : path === href 
       display: block;
     }
 
+    /* The menu opens as a glass sheet under the floating bar. */
     .site-nav {
       position: fixed;
-      inset: var(--header-h) 0 0;
+      inset: calc(var(--header-gap) + var(--header-h) + 8px) 8px 8px;
       display: none;
       flex-direction: column;
       align-items: stretch;
       gap: 24px;
-      padding: 16px var(--gutter) 32px;
-      background: #ffffff;
+      padding: 16px 16px 24px;
+      border: 1px solid var(--glass-edge);
+      border-radius: 28px;
+      /* Nearly opaque, so the page behind does not show through the links. */
+      background: rgb(255 255 255 / 94%);
+      -webkit-backdrop-filter: var(--glass-blur);
+      backdrop-filter: var(--glass-blur);
+      box-shadow: var(--glass-rim), var(--shadow-lift);
       overflow-y: auto;
     }
 
@@ -284,6 +314,8 @@ const isActive = (href: string) => (href === '/' ? path === '/' : path === href 
       background: none;
       border: 0;
       box-shadow: none;
+      -webkit-backdrop-filter: none;
+      backdrop-filter: none;
       opacity: 1;
       visibility: visible;
       transform: none;

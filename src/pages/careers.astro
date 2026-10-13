@@ -166,10 +166,12 @@ import { site } from '../data/site';
   }
 
   .job {
-    background: var(--g-card);
-    border: 1px solid var(--line);
+    border: 1px solid var(--glass-edge);
     border-radius: var(--radius);
-    box-shadow: var(--shadow-sm);
+    background: var(--g-card);
+    -webkit-backdrop-filter: var(--glass-blur);
+    backdrop-filter: var(--glass-blur);
+    box-shadow: var(--glass-rim), var(--shadow-sm);
   }
 
   .job summary {
@@ -219,7 +221,7 @@ import { site } from '../data/site';
 
   .job__body {
     padding: 0 24px 28px;
-    border-top: 1px solid var(--line);
+    border-top: 1px solid color-mix(in srgb, var(--navy) 10%, transparent);
     padding-top: 24px;
   }
 

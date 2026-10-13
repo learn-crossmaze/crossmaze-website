@@ -25,27 +25,18 @@ type Shape = {
   mobile?: { top: string; left: string };
 };
 
+// A few doodles only, so the banners stay calm and the text has room.
 const home: Shape[] = [
-  { kind: 'cloud', colors: pastel.sky, size: 130, top: '6%', left: '34%', motion: 'drift', dur: 28, delay: -4, hideOnMobile: true },
-  { kind: 'star', colors: pastel.butter, size: 40, top: '14%', left: '4%', motion: 'spin', dur: 22, delay: 0, hideOnMobile: true },
-  { kind: 'balloon', colors: pastel.pink, size: 54, top: '58%', left: '2%', motion: 'bob', dur: 7, delay: -2, mobile: { top: '47%', left: '86%' } },
-  { kind: 'plane', colors: pastel.lavender, size: 48, top: '80%', left: '28%', motion: 'drift', dur: 16, delay: -5 },
-  { kind: 'block', colors: pastel.mint, size: 50, top: '84%', left: '46%', motion: 'bob', dur: 8, delay: -1, letter: 'A', hideOnMobile: true },
-  { kind: 'sun', colors: pastel.butter, size: 60, top: '6%', left: '87%', motion: 'bob', dur: 9, delay: -8 },
-  { kind: 'crayon', colors: pastel.peach, size: 44, top: '24%', left: '46%', motion: 'bob', dur: 6, delay: -3, hideOnMobile: true },
-  { kind: 'block', colors: pastel.pink, size: 46, top: '88%', left: '92%', motion: 'bob', dur: 9, delay: -4, letter: 'B', hideOnMobile: true },
-  { kind: 'kite', colors: pastel.sky, size: 58, top: '30%', left: '94%', motion: 'bob', dur: 10, delay: -6, hideOnMobile: true },
-  { kind: 'rainbow', colors: pastel.pink, size: 70, top: '86%', left: '64%', motion: 'bob', dur: 11, delay: -5, hideOnMobile: true },
+  { kind: 'cloud', colors: pastel.sky, size: 120, top: '6%', left: '34%', motion: 'drift', dur: 28, delay: -4, hideOnMobile: true },
+  { kind: 'sun', colors: pastel.butter, size: 58, top: '6%', left: '87%', motion: 'bob', dur: 9, delay: -8 },
+  { kind: 'balloon', colors: pastel.pink, size: 50, top: '58%', left: '2%', motion: 'bob', dur: 7, delay: -2, mobile: { top: '47%', left: '86%' } },
+  { kind: 'plane', colors: pastel.lavender, size: 46, top: '80%', left: '28%', motion: 'drift', dur: 16, delay: -5 },
 ];
 
 const page: Shape[] = [
-  { kind: 'cloud', colors: pastel.sky, size: 110, top: '10%', left: '62%', motion: 'drift', dur: 26, delay: -3, mobile: { top: '1%', left: '66%' } },
-  { kind: 'star', colors: pastel.butter, size: 34, top: '18%', left: '90%', motion: 'spin', dur: 20, delay: -2 },
-  { kind: 'balloon', colors: pastel.pink, size: 48, top: '56%', left: '84%', motion: 'bob', dur: 7, delay: -1, hideOnMobile: true },
-  { kind: 'plane', colors: pastel.lavender, size: 40, top: '30%', left: '53%', motion: 'drift', dur: 15, delay: -6, hideOnMobile: true },
-  { kind: 'crayon', colors: pastel.peach, size: 42, top: '80%', left: '1.5%', motion: 'bob', dur: 9, delay: -4, hideOnMobile: true },
-  { kind: 'block', colors: pastel.mint, size: 40, top: '12%', left: '46%', motion: 'bob', dur: 9, delay: -2, letter: 'C', hideOnMobile: true },
-  { kind: 'rainbow', colors: pastel.pink, size: 66, top: '62%', left: '68%', motion: 'bob', dur: 12, delay: -7, hideOnMobile: true },
+  { kind: 'cloud', colors: pastel.sky, size: 104, top: '10%', left: '62%', motion: 'drift', dur: 26, delay: -3, mobile: { top: '1%', left: '66%' } },
+  { kind: 'star', colors: pastel.butter, size: 32, top: '18%', left: '90%', motion: 'spin', dur: 20, delay: -2 },
+  { kind: 'balloon', colors: pastel.pink, size: 46, top: '56%', left: '84%', motion: 'bob', dur: 7, delay: -1, hideOnMobile: true },
 ];
 
 const shapes = variant === 'home' ? home : page;
@@ -110,7 +101,7 @@ const shapes = variant === 'home' ? home : page;
     animation-delay: var(--delay);
     animation-iteration-count: infinite;
     animation-timing-function: ease-in-out;
-    opacity: 0.95;
+    opacity: 0.85;
   }
 
   .fx__shape svg {

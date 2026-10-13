@@ -122,8 +122,9 @@ const tones = ['navy', 'green', 'coral', 'sky', 'sun'];
   }
 
   .call-picker::backdrop {
-    background: color-mix(in srgb, var(--ink, #131a3a) 38%, transparent);
-    backdrop-filter: blur(6px);
+    background: color-mix(in srgb, var(--ink, #131a3a) 30%, transparent);
+    -webkit-backdrop-filter: blur(10px);
+    backdrop-filter: blur(10px);
   }
 
   .call-picker[open] {
@@ -144,8 +145,10 @@ const tones = ['navy', 'green', 'coral', 'sky', 'sun'];
     padding: clamp(24px, 4vw, 36px);
     border: 1px solid var(--glass-edge);
     border-radius: 32px;
-    background: #ffffff;
-    box-shadow: var(--shadow-lift);
+    background: var(--glass-thick);
+    -webkit-backdrop-filter: var(--glass-blur);
+    backdrop-filter: var(--glass-blur);
+    box-shadow: var(--glass-rim), var(--shadow-lift);
   }
 
   .call-picker__close {
@@ -156,9 +159,10 @@ const tones = ['navy', 'green', 'coral', 'sky', 'sun'];
     place-items: center;
     width: 42px;
     height: 42px;
-    border: 0;
+    border: 1px solid var(--glass-edge);
     border-radius: 50%;
-    background: linear-gradient(135deg, rgb(255 255 255 / 90%) 0%, color-mix(in srgb, var(--navy-50) 90%, transparent) 100%);
+    background: var(--glass);
+    box-shadow: var(--glass-rim);
     color: var(--navy);
     cursor: pointer;
   }
@@ -201,7 +205,7 @@ const tones = ['navy', 'green', 'coral', 'sky', 'sun'];
     border: 1px solid var(--glass-edge);
     border-radius: 20px;
     background: var(--g-card);
-    box-shadow: var(--shadow-sm);
+    box-shadow: var(--glass-rim), var(--shadow-sm);
     color: var(--ink);
     text-decoration: none;
     transition:
@@ -213,7 +217,7 @@ const tones = ['navy', 'green', 'coral', 'sky', 'sun'];
   .call-picker__branch:focus-visible {
     color: var(--ink);
     transform: translateY(-2px);
-    box-shadow: var(--shadow);
+    box-shadow: var(--glass-rim), var(--shadow);
   }
 
   .call-picker__branch .icon-badge {

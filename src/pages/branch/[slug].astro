@@ -340,11 +340,13 @@ const jsonLd = {
     align-items: center;
     gap: 8px;
     padding: 8px 14px;
-    border: 1px solid rgb(255 255 255 / 40%);
+    border: 1px solid var(--glass-edge);
     border-radius: 999px;
-    background: linear-gradient(135deg, color-mix(in srgb, var(--ink) 72%, transparent) 0%, color-mix(in srgb, var(--ink) 52%, transparent) 100%);
-    backdrop-filter: blur(6px);
-    color: #fff;
+    background: var(--glass-thick);
+    -webkit-backdrop-filter: var(--glass-blur);
+    backdrop-filter: var(--glass-blur);
+    box-shadow: var(--glass-rim), var(--shadow-sm);
+    color: var(--ink);
     font-weight: 800;
     font-size: 0.9rem;
     transition: transform 0.2s ease;
@@ -605,7 +607,8 @@ const jsonLd = {
     min-height: 340px;
     border-radius: var(--radius);
     overflow: hidden;
-    border: 1px solid var(--line);
+    border: 6px solid var(--glass-edge);
+    box-shadow: var(--glass-rim), var(--shadow-sm);
     background: linear-gradient(135deg, var(--navy-50) 0%, var(--green-50) 100%);
   }
 

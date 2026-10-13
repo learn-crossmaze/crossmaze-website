@@ -134,19 +134,19 @@ export function doodle(kind: DoodleKind, [main, shade]: Colors, letter = 'A'): s
 const dataUri = (inner: string) =>
   `url("data:image/svg+xml,${encodeURIComponent(`<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100">${inner}</svg>`)}")`;
 
-/** The two doodles behind each section, in the same six-step cycle as the section colours. */
-const sectionDoodles: [string, string][] = [
-  [doodle('crayon', pastel.sky), doodle('block', pastel.butter, 'A')], // pink
-  [doodle('rainbow', pastel.pink), doodle('puzzle', pastel.mint)], // lavender
-  [doodle('plane', pastel.lavender), doodle('sun', pastel.butter)], // mint
-  [doodle('kite', pastel.sky), doodle('pencil', pastel.butter)], // peach
-  [doodle('book', pastel.peach), doodle('block', pastel.pink, 'B')], // sky
-  [doodle('abacus', pastel.lavender), doodle('star', pastel.pink)], // butter
+/** The doodle beside each section, in a six-step cycle down the page. */
+const sectionDoodles: string[] = [
+  doodle('kite', pastel.sky),
+  doodle('rainbow', pastel.pink),
+  doodle('block', pastel.butter, 'A'),
+  doodle('plane', pastel.lavender),
+  doodle('book', pastel.peach),
+  doodle('star', pastel.pink),
 ];
 
 export const sectionDoodleCss = sectionDoodles
-  .map(([a, b], i) => {
+  .map((d, i) => {
     const nth = i === 5 ? '6n' : `6n+${i + 1}`;
-    return `main > section:nth-of-type(${nth}){--shape-1:${dataUri(a)};--shape-2:${dataUri(b)}}`;
+    return `main > section:nth-of-type(${nth}){--shape-1:${dataUri(d)}}`;
   })
   .join('\n');
