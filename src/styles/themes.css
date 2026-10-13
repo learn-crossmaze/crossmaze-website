@@ -278,3 +278,172 @@
   letter-spacing: 0.05em;
   font-size: 0.78rem;
 }
+
+/* Candy Pop: bright bubblegum pink, electric purple, turquoise and lemon, with bubbly shapes. */
+:root[data-theme='candy'] {
+  --ink: #2a1036;
+  --muted: #5a4766;
+  --navy: #a3127a;
+  --navy-700: #7a0d5c;
+  --navy-50: #ffe3f3;
+  --navy-100: #ffc2e5;
+  --sun: #ffd60a;
+  --sun-50: #fff6bf;
+  --sun-100: #ffe766;
+  --sun-fg: #8a5a00;
+  --coral: #ff3d7f;
+  --coral-50: #ffe0ec;
+  --coral-100: #ffb8d2;
+  --coral-fg: #c2185b;
+  --green: #0fa58a;
+  --green-50: #d6fbf1;
+  --green-100: #a6f1dd;
+  --green-fg: #0b7d68;
+  --sky: #7b2ff7;
+  --sky-50: #efe3ff;
+  --sky-100: #d9c2ff;
+  --sky-fg: #6a1fd6;
+
+  --flow-1: #ffd3ea;
+  --flow-2: #ffe1c2;
+  --flow-3: #fff4a8;
+  --flow-4: #c8f7e8;
+  --flow-5: #cfe6ff;
+  --flow-6: #e6d3ff;
+  --tint-1: #ffb3d9;
+  --tint-2: #dcc2ff;
+  --tint-3: #a8f0d8;
+  --tint-4: #ffe680;
+  --tint-5: #b3d9ff;
+  --glow-1: rgb(255 61 127 / 30%);
+  --glow-2: rgb(123 47 247 / 22%);
+  --glow-3: rgb(15 200 160 / 22%);
+  --glow-4: rgb(255 214 10 / 30%);
+
+  --g-ring: linear-gradient(135deg, #ff3d7f 0%, #ffd60a 35%, #19d3b0 65%, #7b2ff7 100%);
+  --g-heading: linear-gradient(100deg, #c2185b 0%, #8e24aa 55%, #5e2bd6 100%);
+  --g-highlight: linear-gradient(90deg, #c43c0a 0%, #c81d64 50%, #7b2ff7 100%);
+  --g-navy: linear-gradient(135deg, #c81d64 0%, #a3127a 55%, #7a0d5c 100%);
+  --g-sun: linear-gradient(135deg, #ffe94d 0%, #ffd60a 50%, #ffb703 100%);
+  --g-ink: linear-gradient(135deg, #4a1d5e 0%, #2a1036 100%);
+  --sun-btn-fg: #3a2400;
+  --sun-btn-glow: rgb(255 183 3 / 65%);
+  --eyebrow-fg: #a3127a;
+  --eyebrow-bg: linear-gradient(135deg, #ffffff 0%, #ffd9ec 100%);
+  --squiggle: #ffd60a;
+
+  --font-display: 'Sniglet', 'Nunito', system-ui, sans-serif;
+  --display-weight: 800;
+  --radius-card: 28px;
+  --radius-photo: 36px;
+  --radius-photo-sm: 26px;
+  --shadow-tint: 160 30 120;
+}
+
+/* Sniglet runs wide: page titles are a little smaller, so they wrap like the other themes'. */
+:root[data-theme='candy'] h1 {
+  font-size: clamp(2.1rem, 4.9vw, 3.35rem);
+}
+
+/* The home banner title is capped in "ch", which is narrow in Sniglet; allow a little more. */
+:root[data-theme='candy'] main .hero h1 {
+  max-width: 17ch;
+}
+
+/* Sniglet runs wide: buttons use the bold body font so they stay on one line. */
+:root[data-theme='candy'] .btn {
+  font-family: var(--font-body);
+  font-weight: 800;
+}
+
+/* Each card wears a bright outline in its own colour. */
+:root[data-theme='candy'] .card,
+:root[data-theme='candy'] .grid > .card:hover {
+  box-shadow:
+    0 0 0 2px color-mix(in srgb, var(--badge-fg, var(--navy)) 24%, transparent),
+    var(--shadow-sm);
+}
+
+:root[data-theme='candy'] .grid > .card:hover {
+  box-shadow:
+    0 0 0 2px color-mix(in srgb, var(--badge-fg, var(--navy)) 40%, transparent),
+    var(--shadow-lift);
+}
+
+/* Tropical Splash: sunny mango, lime, aqua and hibiscus, with leaf-drop corners. */
+:root[data-theme='tropical'] {
+  --ink: #10302e;
+  --muted: #3f5b58;
+  --navy: #00665a;
+  --navy-700: #004d44;
+  --navy-50: #d9f7f1;
+  --navy-100: #a9ebdf;
+  --sun: #ffb000;
+  --sun-50: #fff0c2;
+  --sun-100: #ffd666;
+  --sun-fg: #8a4b00;
+  --coral: #ff5a4e;
+  --coral-50: #ffe1dc;
+  --coral-100: #ffb9ae;
+  --coral-fg: #c62f22;
+  --green: #43a01a;
+  --green-50: #e6f9cf;
+  --green-100: #c5ef94;
+  --green-fg: #3d7f12;
+  --sky: #0096c7;
+  --sky-50: #d6f3ff;
+  --sky-100: #a3e2fb;
+  --sky-fg: #0077a3;
+
+  --flow-1: #fff1b8;
+  --flow-2: #ffd9b8;
+  --flow-3: #e3f9a8;
+  --flow-4: #b8f5e6;
+  --flow-5: #b8e8ff;
+  --flow-6: #ffd1cc;
+  --tint-1: #ffe08a;
+  --tint-2: #ffc9a8;
+  --tint-3: #c9f28f;
+  --tint-4: #9fefe0;
+  --tint-5: #9fdcff;
+  --glow-1: rgb(255 176 0 / 30%);
+  --glow-2: rgb(0 200 170 / 24%);
+  --glow-3: rgb(130 210 40 / 24%);
+  --glow-4: rgb(255 90 78 / 20%);
+
+  --g-ring: linear-gradient(135deg, #ffb000 0%, #ff5a4e 35%, #00c2a8 70%, #0096c7 100%);
+  --g-heading: linear-gradient(100deg, #004d44 0%, #00665a 50%, #0077a3 100%);
+  --g-highlight: linear-gradient(90deg, #b84a00 0%, #b3281c 100%);
+  --g-navy: linear-gradient(135deg, #00806f 0%, #00665a 55%, #004d44 100%);
+  --g-sun: linear-gradient(135deg, #ffd23f 0%, #ffb000 55%, #ff8f00 100%);
+  --g-ink: linear-gradient(135deg, #1d4a46 0%, #10302e 100%);
+  --sun-btn-fg: #3a2000;
+  --sun-btn-glow: rgb(255 143 0 / 60%);
+  --eyebrow-fg: #a33f00;
+  --eyebrow-bg: linear-gradient(135deg, #ffffff 0%, #fff0c2 100%);
+  --squiggle: #ff5a4e;
+
+  --font-display: 'Lilita One', 'Nunito', system-ui, sans-serif;
+  --display-weight: 400;
+  --radius-card: 26px 26px 26px 8px;
+  --radius-photo: 44px 44px 44px 12px;
+  --radius-photo-sm: 30px 30px 30px 8px;
+  --shadow-tint: 0 90 80;
+}
+
+/* Lilita One runs narrow: page titles are a little larger, so they wrap like the other themes'
+   (and stay clear of the banner doodles on phones). */
+:root[data-theme='tropical'] h1 {
+  font-size: clamp(2.6rem, 6vw, 3.9rem);
+}
+
+/* Lilita One has one (bold) weight, so headings get a touch more letter spacing to breathe. */
+:root[data-theme='tropical'] :is(h1, h2, h3) {
+  letter-spacing: 0.01em;
+}
+
+/* Small labels in Sniglet stay on one line on phones. */
+:root[data-theme='candy'] .eyebrow {
+  letter-spacing: 0.04em;
+  font-size: 0.76rem;
+}

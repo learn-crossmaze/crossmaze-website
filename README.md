@@ -47,7 +47,7 @@ Go to **www.crossmaze.in/admin** and sign in.
 
 ### Colour themes
 
-The site has five colour themes: **Pastel Glass**, **Sunny Meadow**, **Ocean Breeze**, **Crayon Box** and **Montessori Calm**. In **Site settings → Look and feel**, choose which one visitors see:
+The site has seven colour themes: **Pastel Glass**, **Sunny Meadow**, **Ocean Breeze**, **Crayon Box**, **Montessori Calm**, and two bright ones, **Candy Pop** and **Tropical Splash**. In **Site settings → Look and feel**, choose which one visitors see:
 
 | Setting | What visitors see |
 | --- | --- |
@@ -57,7 +57,7 @@ The site has five colour themes: **Pastel Glass**, **Sunny Meadow**, **Ocean Bre
 | A random theme on every visit | A random ticked theme each visit, never the same as that visitor's last one |
 | A random theme for each new visitor, kept on their repeat visits | A random ticked theme on someone's first visit, then the same one whenever they come back |
 
-A visit keeps one theme from page to page. To look at a theme yourself, add `?theme=meadow` (or `pastel`, `ocean`, `crayon`, `calm`) to any page address; `?theme=auto` goes back to the setting. Like other changes, a new setting goes live when you press **Publish**.
+A visit keeps one theme from page to page. To look at a theme yourself, add `?theme=meadow` (or `pastel`, `ocean`, `crayon`, `calm`, `candy`, `tropical`) to any page address; `?theme=auto` goes back to the setting. Like other changes, a new setting goes live when you press **Publish**.
 
 ## One-time setup
 

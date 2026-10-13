@@ -8,6 +8,8 @@ export const themes = [
   { id: 'ocean', label: 'Ocean Breeze', fonts: 'family=Quicksand:wght@600;700&family=Nunito:wght@400;600;700;800', color: '#0a4f70' },
   { id: 'crayon', label: 'Crayon Box', fonts: 'family=Grandstander:wght@600;700&family=Nunito:wght@400;600;700;800', color: '#b8261a' },
   { id: 'calm', label: 'Montessori Calm', fonts: 'family=Lexend:wght@400;500;600;700', color: '#3b5537' },
+  { id: 'candy', label: 'Candy Pop', fonts: 'family=Sniglet:wght@400;800&family=Nunito:wght@400;600;700;800', color: '#7a0d5c' },
+  { id: 'tropical', label: 'Tropical Splash', fonts: 'family=Lilita+One&family=Nunito:wght@400;600;700;800', color: '#004d44' },
 ] as const;
 
 export type ThemeId = (typeof themes)[number]['id'];

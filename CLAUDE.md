@@ -9,7 +9,7 @@ See README.md for how the site, admin panel and LITMUS integration fit together.
 - Surfaces are frosted glass (`--g-card`, `--g-glass`, `--g-soft`) with soft violet-tinted shadows (`--shadow-sm`, `--shadow`, `--shadow-lift`). Page headings use `--g-heading`; photos get a gradient ring (`--g-ring`).
 - Decorations are preschool doodles (crayons, ABC blocks, kites, rainbows…) from `src/components/doodles.ts`. They must not cover text: check banners at 1366, 900 and 390px wide.
 - Anything that moves must stop for `prefers-reduced-motion`.
-- **Five colour themes** rotate on the live site (admin: Site settings → Look and feel). Style with the tokens in `src/styles/global.css` (never a colour value where a theme should show), and give a new token a value in each theme in `src/styles/themes.css`. Check changes in every theme with `?theme=pastel|meadow|ocean|crayon|calm`.
+- **Seven colour themes** rotate on the live site (admin: Site settings → Look and feel). Style with the tokens in `src/styles/global.css` (never a colour value where a theme should show), and give a new token a value in each theme in `src/styles/themes.css`. Check changes in every theme with `?theme=pastel|meadow|ocean|crayon|calm|candy|tropical`.
 
 ## Content
 
