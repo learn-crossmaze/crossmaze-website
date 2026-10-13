@@ -28,6 +28,7 @@ beforeEach(async () => {
     await setDoc(doc(db, 'admins/other@crossmaze.test'), { email: 'other@crossmaze.test' });
     await setDoc(doc(db, 'content/site'), { name: 'Crossmaze' });
     await setDoc(doc(db, 'submissions/s1'), { type: 'admission_enquiry', data: { phone: '1' } });
+    await setDoc(doc(db, 'calls/c1'), { channel: 'phone', number: '7338045201', branch: 'Neotown' });
     await setDoc(doc(db, 'private/litmus'), { url: 'https://x', headerValue: 'secret' });
     await setDoc(doc(db, 'meta/publish'), { status: 'live' });
   });
@@ -44,16 +45,25 @@ test('visitors and strangers cannot read or change anything', async () => {
     await assertFails(getDoc(doc(db, 'content/site')));
     await assertFails(setDoc(doc(db, 'content/site'), { name: 'Hacked' }));
     await assertFails(getDoc(doc(db, 'submissions/s1')));
+    await assertFails(getDoc(doc(db, 'calls/c1')));
     await assertFails(getDoc(doc(db, 'private/litmus')));
     await assertFails(getDocs(collection(db, 'admins')));
     await assertFails(setDoc(doc(db, 'admins/parent@example.test'), { email: 'x' }));
   }
 });
 
-test('nobody can create submissions directly (only the submit function can)', async () => {
+test('nobody can create submissions or calls directly (only the submit function can)', async () => {
   for (const ctx of [anon(), stranger(), admin()]) {
     await assertFails(setDoc(doc(ctx.firestore(), 'submissions/new'), { type: 'admission_enquiry' }));
+    await assertFails(setDoc(doc(ctx.firestore(), 'calls/new'), { channel: 'phone', number: '1234567890' }));
   }
+});
+
+test('admins can read and delete the call log but not change it', async () => {
+  const db = admin().firestore();
+  await assertSucceeds(getDocs(collection(db, 'calls')));
+  await assertFails(updateDoc(doc(db, 'calls/c1'), { branch: 'Somewhere else' }));
+  await assertSucceeds(deleteDoc(doc(db, 'calls/c1')));
 });
 
 test('admins can edit content, submissions and LITMUS settings', async () => {

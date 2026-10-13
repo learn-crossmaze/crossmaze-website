@@ -1111,7 +1111,7 @@ a.item-main:hover strong {
 /* ---------- dashboard ---------- */
 .stat-grid {
   display: grid;
-  grid-template-columns: 1.6fr 1fr 1fr;
+  grid-template-columns: 1.6fr 1fr 1fr 1fr;
   gap: 16px;
 }
 
@@ -1207,4 +1207,87 @@ a.item-main:hover strong {
 .toast-error {
   background: var(--a-red-50);
   color: #8f2018;
+}
+
+/* ---------- calls ---------- */
+.stat-row {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(170px, 1fr));
+  gap: 16px;
+  margin-bottom: 16px;
+}
+
+.calls-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(min(100%, 340px), 1fr));
+  gap: 16px;
+}
+
+.calls-grid h3 {
+  margin: 0 0 14px;
+}
+
+.muted.small {
+  margin: 12px 0 0;
+  font-size: 0.85rem;
+}
+
+.breakdown {
+  display: grid;
+  gap: 12px;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.breakdown li {
+  display: grid;
+  grid-template-columns: minmax(120px, 1fr) 1.4fr auto;
+  align-items: center;
+  gap: 12px;
+}
+
+.breakdown-name {
+  display: grid;
+  font-weight: 700;
+  line-height: 1.25;
+}
+
+.breakdown-name small {
+  color: var(--a-muted);
+  font-weight: 600;
+}
+
+.breakdown-track {
+  height: 10px;
+  border-radius: 999px;
+  background: var(--a-bg);
+}
+
+.breakdown-bar {
+  display: block;
+  height: 100%;
+  border-radius: inherit;
+  background: var(--a-navy);
+}
+
+.breakdown-count {
+  min-width: 2ch;
+  font-weight: 800;
+  text-align: right;
+}
+
+.table.plain tbody tr {
+  cursor: default;
+}
+
+/* The spot on the page, with the page underneath. */
+.table td.where {
+  min-width: 220px;
+  white-space: normal;
+}
+
+.table td.where small {
+  display: block;
+  color: var(--a-muted);
 }

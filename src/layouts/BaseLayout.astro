@@ -7,6 +7,7 @@ import Footer from '../components/Footer.astro';
 import CallPicker from '../components/CallPicker.astro';
 import Icon from '../components/Icon.astro';
 import { site } from '../data/site';
+import { branches, shortName } from '../data/branches';
 import { image } from '../data/content';
 import { cleanPath } from '../utils';
 import { sectionDoodleCss } from '../components/doodles';
@@ -19,6 +20,15 @@ interface Props {
 }
 
 const { title, description = site.description, jsonLd } = Astro.props;
+
+// Which centre each phone number on the site belongs to (last 10 digits), so the call log
+// (scripts/call-log.ts) can say which centre a visitor tried to call.
+const last10 = (phone: string) => phone.replace(/\D/g, '').slice(-10);
+const callNumbers = Object.fromEntries([
+  [last10(site.phone), 'Main number'],
+  ...(site.whatsapp ? [[last10(site.whatsapp), 'Main number']] : []),
+  ...branches.filter((b) => b.phone).map((b) => [last10(b.phone), shortName(b)]),
+]);
 const pageTitle = title ? `${title} | ${site.fullName}` : `${site.fullName} | Bengaluru`;
 const canonical = new URL(cleanPath(Astro.url.pathname), Astro.site ?? site.url).href;
 const ogImage = new URL('/og-image.jpg', Astro.site ?? site.url).href;
@@ -172,8 +182,10 @@ const themeConfig = {
       <Icon name="MessageCircle" size={26} />
     </a>
 
+    <script type="application/json" id="cm-call-numbers" set:html={JSON.stringify(callNumbers)} />
     <script>
       import '../scripts/motion';
+      import '../scripts/call-log';
     </script>
 
     <style>

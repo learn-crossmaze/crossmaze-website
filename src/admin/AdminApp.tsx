@@ -20,6 +20,7 @@ import { CollectionPage } from './components/CollectionEditor';
 import { DocEditor } from './components/DocEditor';
 import { Dashboard, PublishButton } from './components/Dashboard';
 import { SubmissionsPage } from './components/Submissions';
+import { CallsPage } from './components/Calls';
 import { LitmusPage } from './components/Litmus';
 import { AdminsPage } from './components/Admins';
 
@@ -32,6 +33,7 @@ const NAV = [
   { href: '#/testimonials', icon: 'Quote', label: 'Testimonials' },
   { href: '#/sections', icon: 'LayoutList', label: 'Page sections' },
   { href: '#/submissions', icon: 'Inbox', label: 'Submissions' },
+  { href: '#/calls', icon: 'Phone', label: 'Calls' },
   { href: '#/litmus', icon: 'Plug', label: 'LITMUS' },
   { href: '#/admins', icon: 'UserCog', label: 'Admins' },
 ];
@@ -235,6 +237,8 @@ function Shell() {
         return <CollectionPage key={section} config={collections[section]} id={id} />;
       case 'submissions':
         return <SubmissionsPage id={id} />;
+      case 'calls':
+        return <CallsPage />;
       case 'litmus':
         return <LitmusPage />;
       case 'admins':
