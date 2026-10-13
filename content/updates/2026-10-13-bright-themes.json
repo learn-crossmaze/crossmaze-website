@@ -1,0 +1,38 @@
+{
+  "id": "2026-10-13-bright-themes",
+  "description": "Two bright colour themes, Candy Pop and Tropical Splash, join the rotation and the weekend days",
+  "changes": [
+    {
+      "doc": "content/site",
+      "field": "theme.rotation",
+      "from": [
+        "pastel",
+        "meadow",
+        "ocean",
+        "crayon",
+        "calm"
+      ],
+      "to": [
+        "pastel",
+        "meadow",
+        "ocean",
+        "crayon",
+        "calm",
+        "candy",
+        "tropical"
+      ]
+    },
+    {
+      "doc": "content/site",
+      "field": "theme.weekdays.sat",
+      "from": "pastel",
+      "to": "candy"
+    },
+    {
+      "doc": "content/site",
+      "field": "theme.weekdays.sun",
+      "from": "meadow",
+      "to": "tropical"
+    }
+  ]
+}

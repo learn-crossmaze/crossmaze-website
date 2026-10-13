@@ -128,7 +128,9 @@
       "meadow",
       "ocean",
       "crayon",
-      "calm"
+      "calm",
+      "candy",
+      "tropical"
     ],
     "weekdays": {
       "mon": "pastel",
@@ -136,8 +138,8 @@
       "wed": "ocean",
       "thu": "crayon",
       "fri": "calm",
-      "sat": "pastel",
-      "sun": "meadow"
+      "sat": "candy",
+      "sun": "tropical"
     }
   }
 }
