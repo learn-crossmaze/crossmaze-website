@@ -2,6 +2,7 @@ rules_version = '2';
 
 // Photos and the logo uploaded from the admin panel live under /site.
 // Anyone can view them (they appear on the public website); only admins can upload or delete.
+// Branch admins can add new photos for blog posts and centre heads, and nothing else.
 service firebase.storage {
   match /b/{bucket}/o {
     function isAdmin() {
@@ -10,12 +11,26 @@ service firebase.storage {
         && firestore.exists(/databases/(default)/documents/admins/$(request.auth.token.email.lower()));
     }
 
+    function isBranchAdmin() {
+      return request.auth != null
+        && request.auth.token.email_verified == true
+        && firestore.exists(/databases/(default)/documents/branchAdmins/$(request.auth.token.email.lower()));
+    }
+
+    function isImage() {
+      return request.resource.size < 15 * 1024 * 1024
+        && request.resource.contentType.matches('image/(jpeg|png|webp|gif|avif)');
+    }
+
     match /site/{allPaths=**} {
       allow read: if true;
       allow delete: if isAdmin();
-      allow create, update: if isAdmin()
-        && request.resource.size < 15 * 1024 * 1024
-        && request.resource.contentType.matches('image/(jpeg|png|webp|gif|avif)');
+      allow create, update: if isAdmin() && isImage();
+    }
+
+    // New files only (resource == null): a branch admin can't replace a photo that's already in use.
+    match /site/uploads/{folder}/{file} {
+      allow create: if folder in ['blog', 'heads'] && resource == null && isBranchAdmin() && isImage();
     }
 
     // Resumes attached to job applications. The submit function saves them (bypassing these

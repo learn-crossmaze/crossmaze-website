@@ -6,8 +6,8 @@
 //                      (body.event "contact") for the admin panel's Calls page.
 //   resendSubmissions  Admin panel: send selected (or all unsent) submissions to LITMUS again.
 //   testLitmus         Admin panel: send a test payload with the saved LITMUS settings.
-//   publishSite        Admin panel "Publish": starts the GitHub Actions deploy, which pulls the
-//                      latest content from Firestore and rebuilds the site.
+//   publishSite        Admin panel "Publish" (admins and branch admins): starts the GitHub Actions
+//                      deploy, which pulls the latest content from Firestore and rebuilds the site.
 //   retryLitmus        Every 30 minutes, retries submissions that failed to reach LITMUS.
 import { createHash, randomUUID } from 'node:crypto';
 import { initializeApp } from 'firebase-admin/app';
@@ -233,7 +233,8 @@ export const testLitmus = onCall(async (request) => {
 });
 
 export const publishSite = onCall({ secrets: [githubToken] }, async (request) => {
-  const email = await assertAdmin(db, request);
+  // Branch admins publish too, so their blog posts and centre head changes reach the website.
+  const email = await assertAdmin(db, request, { branchAdmins: true });
   const repo = githubRepo.value();
   const res = await fetch(
     `https://api.github.com/repos/${repo}/actions/workflows/${githubWorkflow.value()}/dispatches`,

@@ -5,8 +5,10 @@ import {
   collection,
   doc,
   onSnapshot,
+  query,
   serverTimestamp,
   setDoc,
+  where,
   type DocumentData,
   type Firestore,
 } from 'firebase/firestore';
@@ -44,21 +46,28 @@ export function useDoc<T = DocumentData>(db: Firestore, path: string) {
 
 export type WithId<T> = T & { id: string };
 
-export function useCollection<T = DocumentData>(db: Firestore, name: string) {
+/**
+ * Live list of a collection. `only` keeps the items whose field equals a value (branch admins may
+ * only list their own blog posts); a null name loads nothing.
+ */
+export function useCollection<T = DocumentData>(db: Firestore, name: string | null, only?: { field: string; value: string }) {
   const [state, setState] = useState<{ items: WithId<T>[]; loading: boolean; error?: string }>({ items: [], loading: true });
-  useEffect(
-    () =>
-      onSnapshot(
-        collection(db, name),
-        (snap) => {
-          const items = snap.docs.map((d) => ({ ...(d.data() as T), id: d.id }));
-          items.sort((a, b) => (Number((a as { order?: number }).order) || 0) - (Number((b as { order?: number }).order) || 0));
-          setState({ items, loading: false });
-        },
-        (e) => setState({ items: [], loading: false, error: e.message }),
-      ),
-    [db, name],
-  );
+  const { field, value } = only ?? {};
+  useEffect(() => {
+    if (!name) {
+      setState({ items: [], loading: false });
+      return;
+    }
+    return onSnapshot(
+      field ? query(collection(db, name), where(field, '==', value)) : collection(db, name),
+      (snap) => {
+        const items = snap.docs.map((d) => ({ ...(d.data() as T), id: d.id }));
+        items.sort((a, b) => (Number((a as { order?: number }).order) || 0) - (Number((b as { order?: number }).order) || 0));
+        setState({ items, loading: false });
+      },
+      (e) => setState({ items: [], loading: false, error: e.message }),
+    );
+  }, [db, name, field, value]);
   return state;
 }
 

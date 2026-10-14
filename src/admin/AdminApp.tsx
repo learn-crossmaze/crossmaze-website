@@ -15,7 +15,7 @@ import { useCollection, useFirebase, useUser } from './data';
 import type { FirebaseServices } from './firebase';
 import { collections, siteSchema, sectionsSchema } from './schemas';
 import { FormContext, Icon } from './components/fields';
-import { ErrorBox, SessionContext, Spinner, ToastProvider, errorText, useSession } from './components/ui';
+import { ErrorBox, SessionContext, Spinner, ToastProvider, errorText, useSession, type Session } from './components/ui';
 import { CollectionPage } from './components/CollectionEditor';
 import { DocEditor } from './components/DocEditor';
 import { Dashboard, PublishButton } from './components/Dashboard';
@@ -23,15 +23,21 @@ import { SubmissionsPage } from './components/Submissions';
 import { CallsPage } from './components/Calls';
 import { LitmusPage } from './components/Litmus';
 import { AdminsPage } from './components/Admins';
+import { CentreHeadPage } from './components/CentreHead';
 
-const NAV = [
-  { href: '#/', icon: 'LayoutDashboard', label: 'Dashboard' },
+type Role = Session['role'];
+const BOTH: Role[] = ['admin', 'branch'];
+
+/** The panel's pages. `roles` says who sees each one (full admins only, unless listed). */
+const NAV: { href: string; icon: string; label: string; roles?: Role[] }[] = [
+  { href: '#/', icon: 'LayoutDashboard', label: 'Dashboard', roles: BOTH },
   { href: '#/site', icon: 'Settings', label: 'Site settings' },
   { href: '#/branches', icon: 'Building', label: 'Branches' },
   { href: '#/programs', icon: 'BookMarked', label: 'Programs' },
   { href: '#/jobs', icon: 'Briefcase', label: 'Jobs' },
   { href: '#/testimonials', icon: 'Quote', label: 'Testimonials' },
-  { href: '#/posts', icon: 'Newspaper', label: 'Blog' },
+  { href: '#/posts', icon: 'Newspaper', label: 'Blog', roles: BOTH },
+  { href: '#/centre', icon: 'UserRound', label: 'Centre head', roles: ['branch'] },
   { href: '#/sections', icon: 'LayoutList', label: 'Page sections' },
   { href: '#/submissions', icon: 'Inbox', label: 'Submissions' },
   { href: '#/calls', icon: 'Phone', label: 'Calls' },
@@ -88,9 +94,13 @@ function Centered({ children }: { children: React.ReactNode }) {
   );
 }
 
-/** Checks that the signed-in person has a verified email that is on the admin list. */
+/**
+ * Checks that the signed-in person has a verified email that is on the admin list, or on the
+ * branch admin list (blog posts and their centre head only).
+ */
 function Gate({ services, user }: { services: FirebaseServices; user: User }) {
-  const [state, setState] = useState<'checking' | 'admin' | 'denied' | 'unverified'>('checking');
+  const [state, setState] = useState<'checking' | Role | 'denied' | 'unverified'>('checking');
+  const [branches, setBranches] = useState<string[]>([]);
   const email = (user.email ?? '').toLowerCase();
 
   const check = async () => {
@@ -99,8 +109,12 @@ function Gate({ services, user }: { services: FirebaseServices; user: User }) {
     if (!user.emailVerified) return setState('unverified');
     await user.getIdToken(true);
     try {
-      const snap = await getDoc(doc(services.db, 'admins', email));
-      setState(snap.exists() ? 'admin' : 'denied');
+      if ((await getDoc(doc(services.db, 'admins', email))).exists()) return setState('admin');
+      const branch = await getDoc(doc(services.db, 'branchAdmins', email));
+      if (!branch.exists()) return setState('denied');
+      const list: unknown = branch.data().branches;
+      setBranches(Array.isArray(list) ? list.filter((b): b is string => typeof b === 'string') : []);
+      setState('branch');
     } catch {
       setState('denied');
     }
@@ -157,7 +171,7 @@ function Gate({ services, user }: { services: FirebaseServices; user: User }) {
     );
 
   return (
-    <SessionContext.Provider value={{ services, user, email }}>
+    <SessionContext.Provider value={{ services, user, email, role: state, branches: state === 'branch' ? branches : [] }}>
       <ToastProvider>
         <FormProvider>
           <Shell />
@@ -169,8 +183,9 @@ function Gate({ services, user }: { services: FirebaseServices; user: User }) {
 
 /** Shared data for the editors: Firebase services and the program list for "programs offered". */
 function FormProvider({ children }: { children: ReactNode }) {
-  const { services } = useSession();
-  const programs = useCollection<{ slug?: string; name?: string }>(services.db, 'programs');
+  const { services, role } = useSession();
+  // Only the branch editor uses the program list, and branch admins can't read it.
+  const programs = useCollection<{ slug?: string; name?: string }>(services.db, role === 'admin' ? 'programs' : null);
   const value = useMemo(
     () => ({
       services,
@@ -203,13 +218,16 @@ class PageBoundary extends Component<{ children: ReactNode; resetKey: string }, 
 }
 
 function Shell() {
-  const { services, email } = useSession();
+  const { services, email, role } = useSession();
   const route = useRoute();
   const [menuOpen, setMenuOpen] = useState(false);
   const [section = '', id] = route;
   useEffect(() => setMenuOpen(false), [section, id]);
+  const nav = NAV.filter((n) => (n.roles ?? ['admin']).includes(role));
 
   const page = (() => {
+    if (role === 'branch' && !nav.some((n) => n.href === `#/${section}`))
+      return <ErrorBox>Branch admins can write blog posts and update their centre head. Ask an admin for anything else.</ErrorBox>;
     switch (section) {
       case '':
         return <Dashboard />;
@@ -245,6 +263,8 @@ function Shell() {
         return <LitmusPage />;
       case 'admins':
         return <AdminsPage />;
+      case 'centre':
+        return role === 'branch' ? <CentreHeadPage id={id} /> : <ErrorBox>Full admins edit centre heads under Branches.</ErrorBox>;
       default:
         return <ErrorBox>Page not found.</ErrorBox>;
     }
@@ -258,7 +278,7 @@ function Shell() {
           <span>Website admin</span>
         </a>
         <nav aria-label="Admin">
-          {NAV.map((n) => {
+          {nav.map((n) => {
             const active = n.href === '#/' ? section === '' : `#/${section}` === n.href;
             return (
               <a key={n.href} href={n.href} className={active ? 'active' : ''} aria-current={active ? 'page' : undefined}>
@@ -275,7 +295,10 @@ function Shell() {
           <button onClick={() => signOut(services.auth)}>
             <Icon name="LogOut" /> Sign out
           </button>
-          <span className="who">{email}</span>
+          <span className="who">
+            {email}
+            {role === 'branch' && <> · Branch admin</>}
+          </span>
         </div>
       </aside>
       <div className="main">

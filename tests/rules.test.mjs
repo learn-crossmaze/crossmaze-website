@@ -3,7 +3,7 @@
 import { after, before, beforeEach, test } from 'node:test';
 import fs from 'node:fs';
 import { assertFails, assertSucceeds, initializeTestEnvironment } from '@firebase/rules-unit-testing';
-import { deleteDoc, doc, getDoc, getDocs, collection, setDoc, updateDoc } from 'firebase/firestore';
+import { deleteDoc, doc, getDoc, getDocs, collection, query, serverTimestamp, setDoc, updateDoc, where } from 'firebase/firestore';
 import { deleteObject, ref, uploadBytes, getBytes } from 'firebase/storage';
 
 const [fsHost, fsPort] = (process.env.FIRESTORE_EMULATOR_HOST ?? '127.0.0.1:8080').split(':');
@@ -11,6 +11,7 @@ const [stHost, stPort] = (process.env.FIREBASE_STORAGE_EMULATOR_HOST ?? '127.0.0
 
 let env;
 const ADMIN = 'admin@crossmaze.test';
+const HEAD = 'neotown@crossmaze.test';
 
 before(async () => {
   env = await initializeTestEnvironment({
@@ -31,6 +32,12 @@ beforeEach(async () => {
     await setDoc(doc(db, 'calls/c1'), { channel: 'phone', number: '7338045201', branch: 'Neotown' });
     await setDoc(doc(db, 'private/litmus'), { url: 'https://x', headerValue: 'secret' });
     await setDoc(doc(db, 'meta/publish'), { status: 'live' });
+    await setDoc(doc(db, 'meta/content'), { seededCollections: ['branches'] });
+    await setDoc(doc(db, `branchAdmins/${HEAD}`), { email: HEAD, branches: ['crossmaze-neotown'] });
+    await setDoc(doc(db, 'branches/crossmaze-neotown'), { name: 'Neotown', phone: '1', centerHead: { name: 'A', bio: [], photo: '' } });
+    await setDoc(doc(db, 'branches/crossmaze-the-hub'), { name: 'The Hub', centerHead: { name: 'B', bio: [], photo: '' } });
+    await setDoc(doc(db, 'posts/school-post'), { title: 'By the school', hidden: false });
+    await setDoc(doc(db, 'posts/neotown-post'), { title: 'By Neotown', hidden: true, createdBy: HEAD });
   });
 });
 
@@ -38,6 +45,8 @@ const admin = () => env.authenticatedContext('admin-uid', { email: ADMIN, email_
 const adminUnverified = () => env.authenticatedContext('admin-uid2', { email: ADMIN, email_verified: false });
 const stranger = () => env.authenticatedContext('stranger', { email: 'parent@example.test', email_verified: true });
 const anon = () => env.unauthenticatedContext();
+const head = () => env.authenticatedContext('head-uid', { email: HEAD, email_verified: true });
+const headUnverified = () => env.authenticatedContext('head-uid2', { email: HEAD, email_verified: false });
 
 test('visitors and strangers cannot read or change anything', async () => {
   for (const ctx of [anon(), stranger(), adminUnverified()]) {
@@ -90,6 +99,78 @@ test('people can check their own admin entry; only admins manage the list', asyn
   await assertFails(deleteDoc(doc(db, `admins/${ADMIN}`)));
 });
 
+test('branch admins change only their own centre head', async () => {
+  const db = head().firestore();
+  await assertSucceeds(getDoc(doc(db, 'branches/crossmaze-neotown')));
+  await assertSucceeds(updateDoc(doc(db, 'branches/crossmaze-neotown'), { centerHead: { name: 'New head', bio: ['Hello'], photo: 'site/uploads/heads/x.jpg' } }));
+  await assertFails(updateDoc(doc(db, 'branches/crossmaze-neotown'), { phone: '999' }));
+  await assertFails(updateDoc(doc(db, 'branches/crossmaze-neotown'), { centerHead: { name: 'X', bio: [], photo: '', extra: 1 } }));
+  await assertFails(updateDoc(doc(db, 'branches/crossmaze-neotown'), { centerHead: 'X' }));
+  await assertFails(setDoc(doc(db, 'branches/crossmaze-neotown'), { name: 'Neotown', centerHead: { name: 'X', bio: [], photo: '' } }));
+  await assertFails(deleteDoc(doc(db, 'branches/crossmaze-neotown')));
+  await assertFails(getDoc(doc(db, 'branches/crossmaze-the-hub')));
+  await assertFails(updateDoc(doc(db, 'branches/crossmaze-the-hub'), { centerHead: { name: 'X', bio: [], photo: '' } }));
+  await assertFails(getDocs(collection(db, 'branches')));
+  await assertFails(setDoc(doc(db, 'branches/crossmaze-new'), { name: 'New' }));
+  await assertFails(getDoc(doc(headUnverified().firestore(), 'branches/crossmaze-neotown')));
+});
+
+test('branch admins write and publish only their own blog posts', async () => {
+  const db = head().firestore();
+  await assertSucceeds(getDoc(doc(db, 'posts/neotown-post')));
+  await assertSucceeds(getDoc(doc(db, 'posts/unused-address')));
+  await assertFails(getDoc(doc(db, 'posts/school-post')));
+  await assertSucceeds(getDocs(query(collection(db, 'posts'), where('createdBy', '==', HEAD))));
+  await assertFails(getDocs(collection(db, 'posts')));
+  await assertSucceeds(setDoc(doc(db, 'posts/sports-day'), { title: 'Sports day', hidden: true, createdBy: HEAD }));
+  await assertFails(setDoc(doc(db, 'posts/as-someone-else'), { title: 'X', hidden: true, createdBy: ADMIN }));
+  await assertFails(setDoc(doc(db, 'posts/no-owner'), { title: 'X', hidden: true }));
+  await assertFails(setDoc(doc(db, 'posts/Bad Address'), { title: 'X', hidden: true, createdBy: HEAD }));
+  await assertSucceeds(setDoc(doc(db, 'posts/neotown-post'), { title: 'By Neotown', hidden: false, createdBy: HEAD }));
+  await assertFails(updateDoc(doc(db, 'posts/neotown-post'), { createdBy: ADMIN }));
+  await assertFails(updateDoc(doc(db, 'posts/school-post'), { title: 'Changed' }));
+  await assertFails(setDoc(doc(db, 'posts/school-post'), { title: 'Taken over', createdBy: HEAD }));
+  await assertFails(deleteDoc(doc(db, 'posts/school-post')));
+  await assertSucceeds(deleteDoc(doc(db, 'posts/neotown-post')));
+  for (const ctx of [headUnverified(), stranger()]) {
+    await assertFails(setDoc(doc(ctx.firestore(), 'posts/sneaky'), { title: 'X', hidden: true, createdBy: 'parent@example.test' }));
+  }
+});
+
+test('branch admins can see publish status and mark a change, and nothing else', async () => {
+  const db = head().firestore();
+  await assertSucceeds(getDoc(doc(db, 'meta/publish')));
+  await assertSucceeds(getDoc(doc(db, 'meta/content')));
+  await assertSucceeds(setDoc(doc(db, 'meta/content'), { updatedAt: serverTimestamp(), updatedBy: HEAD }, { merge: true }));
+  await assertFails(setDoc(doc(db, 'meta/content'), { updatedAt: serverTimestamp(), updatedBy: ADMIN }, { merge: true }));
+  await assertFails(setDoc(doc(db, 'meta/content'), { seededCollections: [] }, { merge: true }));
+  await assertFails(setDoc(doc(db, 'meta/content'), { updatedAt: serverTimestamp(), updatedBy: HEAD }));
+  await assertFails(setDoc(doc(db, 'meta/publish'), { status: 'live' }));
+  await assertFails(getDoc(doc(db, 'content/site')));
+  await assertFails(setDoc(doc(db, 'content/site'), { name: 'X' }));
+  for (const name of ['programs', 'jobs', 'testimonials', 'submissions', 'calls', 'private', 'admins', 'branchAdmins']) {
+    await assertFails(getDocs(collection(db, name)));
+  }
+  await assertFails(getDoc(doc(db, 'submissions/s1')));
+  await assertFails(getDoc(doc(db, 'private/litmus')));
+  await assertFails(setDoc(doc(db, 'programs/x'), { name: 'X' }));
+  await assertFails(setDoc(doc(db, 'testimonials/x'), { quote: 'X' }));
+  await assertFails(updateDoc(doc(db, 'submissions/s1'), { handled: true }));
+});
+
+test('branch admins can check their own entry but not change the list', async () => {
+  const db = head().firestore();
+  await assertSucceeds(getDoc(doc(db, `branchAdmins/${HEAD}`)));
+  await assertFails(updateDoc(doc(db, `branchAdmins/${HEAD}`), { branches: ['crossmaze-neotown', 'crossmaze-the-hub'] }));
+  await assertFails(setDoc(doc(db, 'branchAdmins/friend@crossmaze.test'), { email: 'friend@crossmaze.test', branches: [] }));
+  await assertFails(setDoc(doc(db, `admins/${HEAD}`), { email: HEAD }));
+  await assertFails(getDoc(doc(stranger().firestore(), `branchAdmins/${HEAD}`)));
+  const adminDb = admin().firestore();
+  await assertSucceeds(getDocs(collection(adminDb, 'branchAdmins')));
+  await assertSucceeds(setDoc(doc(adminDb, 'branchAdmins/friend@crossmaze.test'), { email: 'friend@crossmaze.test', branches: [] }));
+  await assertSucceeds(deleteDoc(doc(adminDb, `branchAdmins/${HEAD}`)));
+});
+
 test('photos: public can view, only admins can upload images', async () => {
   const jpeg = new Uint8Array(5000);
   const path = 'site/uploads/branches/test.jpg';
@@ -99,6 +180,22 @@ test('photos: public can view, only admins can upload images', async () => {
   await assertFails(uploadBytes(ref(stranger().storage(), 'site/uploads/branches/y.jpg'), jpeg, { contentType: 'image/jpeg' }));
   await assertFails(uploadBytes(ref(anon().storage(), 'site/uploads/branches/z.jpg'), jpeg, { contentType: 'image/jpeg' }));
   await assertFails(uploadBytes(ref(admin().storage(), 'other/place.jpg'), jpeg, { contentType: 'image/jpeg' }));
+});
+
+test('photos: branch admins add new blog and centre head photos only', async () => {
+  const jpeg = new Uint8Array(5000);
+  const st = head().storage();
+  await assertSucceeds(uploadBytes(ref(st, 'site/uploads/blog/1-sports.jpg'), jpeg, { contentType: 'image/jpeg' }));
+  await assertSucceeds(uploadBytes(ref(st, 'site/uploads/heads/1-portrait.jpg'), jpeg, { contentType: 'image/jpeg' }));
+  await assertFails(uploadBytes(ref(st, 'site/uploads/blog/1-sports.jpg'), jpeg, { contentType: 'image/jpeg' }));
+  await assertFails(uploadBytes(ref(st, 'site/uploads/blog/x.html'), jpeg, { contentType: 'text/html' }));
+  await assertFails(uploadBytes(ref(st, 'site/uploads/branches/x.jpg'), jpeg, { contentType: 'image/jpeg' }));
+  await assertFails(uploadBytes(ref(st, 'site/uploads/brand/logo.png'), jpeg, { contentType: 'image/png' }));
+  await assertFails(uploadBytes(ref(st, 'site/logo.png'), jpeg, { contentType: 'image/png' }));
+  await assertFails(uploadBytes(ref(st, 'site/uploads/blog/deep/x.jpg'), jpeg, { contentType: 'image/jpeg' }));
+  await assertFails(deleteObject(ref(st, 'site/uploads/blog/1-sports.jpg')));
+  await assertFails(uploadBytes(ref(headUnverified().storage(), 'site/uploads/blog/2.jpg'), jpeg, { contentType: 'image/jpeg' }));
+  await assertFails(getBytes(ref(st, 'resumes/s1/cv.pdf')));
 });
 
 test('resumes: only admins can open or delete them, and nobody uploads them directly', async () => {

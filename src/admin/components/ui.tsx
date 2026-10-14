@@ -7,8 +7,16 @@ export interface Session {
   services: FirebaseServices;
   user: User;
   email: string;
+  /** "admin": everything. "branch": a branch admin, who writes blog posts and edits the centre head of `branches`. */
+  role: 'admin' | 'branch';
+  /** The branches (slugs) a branch admin looks after; empty for full admins. */
+  branches: string[];
 }
 export const SessionContext = createContext<Session | null>(null);
+
+// The admin panel lives on the same site as the pages, so links work before and after the
+// domain moves (crossmaze-website.web.app, www.crossmaze.in).
+export const SITE_URL = typeof window === 'undefined' ? 'https://www.crossmaze.in' : window.location.origin;
 export function useSession() {
   const s = useContext(SessionContext);
   if (!s) throw new Error('SessionContext missing');

@@ -864,6 +864,43 @@ textarea:focus {
   font-weight: 800;
 }
 
+.add-admin .check {
+  font-weight: 600;
+}
+
+.add-admin-sub {
+  margin-top: 6px;
+  font-weight: 700;
+  font-size: 0.92rem;
+}
+
+.add-admin > .btn {
+  justify-self: start;
+  margin-top: 6px;
+}
+
+.section-title.first {
+  margin-top: 8px;
+}
+
+.item-list li.editing {
+  flex-wrap: wrap;
+}
+
+.branch-edit {
+  display: grid;
+  flex-basis: 100%;
+  gap: 12px;
+  padding-top: 12px;
+  border-top: 1px solid var(--a-line);
+}
+
+.stack-row {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
 .savebar {
   position: fixed;
   right: 24px;

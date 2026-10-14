@@ -230,6 +230,13 @@ export const sectionsSchema: Field[] = [
 
 // ------------------------------------------------------------------- collections
 
+/** The centre head's profile on a branch page. Branch admins edit only this (Centre head page). */
+export const centerHeadFields: Field[] = [
+  { key: 'name', label: 'Name', type: 'text' },
+  { key: 'photo', label: 'Photo', type: 'image', folder: 'heads', help: 'A square portrait works best.' },
+  { key: 'bio', label: 'Biography', type: 'list', itemLabel: 'Paragraph', multiline: true },
+];
+
 export const branchSchema: Field[] = [
   { type: 'heading', label: 'Branch' },
   { key: 'name', label: 'Branch name', type: 'text', required: true, placeholder: 'Crossmaze – Neotown' },
@@ -252,16 +259,7 @@ export const branchSchema: Field[] = [
   { key: 'programs', label: 'Programs offered', type: 'checkboxes', optionsFrom: 'programs' },
 
   { type: 'heading', label: 'Centre head' },
-  {
-    key: 'centerHead',
-    label: '',
-    type: 'group',
-    fields: [
-      { key: 'name', label: 'Name', type: 'text' },
-      { key: 'photo', label: 'Photo', type: 'image', folder: 'heads', help: 'A square portrait works best.' },
-      { key: 'bio', label: 'Biography', type: 'list', itemLabel: 'Paragraph', multiline: true },
-    ],
-  },
+  { key: 'centerHead', label: '', type: 'group', fields: centerHeadFields },
 ];
 
 export const programSchema: Field[] = [
@@ -420,6 +418,8 @@ export interface CollectionConfig {
   slug?: { prefix: string; urlPrefix?: string };
   /** The private address where a hidden item can be checked (blog drafts). */
   previewPath?: (item: Record<string, unknown>) => string | undefined;
+  /** Items record who created them (createdBy); branch admins see and edit only their own. */
+  owned?: boolean;
   blank: () => Record<string, unknown>;
 }
 
@@ -489,6 +489,7 @@ export const collections: Record<CollectionConfig['name'], CollectionConfig> = {
     sort: 'date',
     slug: { prefix: '', urlPrefix: '/blog/' },
     previewPath: (p) => (typeof p.previewKey === 'string' && p.previewKey ? `/blog/preview/${p.previewKey}` : undefined),
+    owned: true,
     blank: () => ({
       title: '',
       date: today(),

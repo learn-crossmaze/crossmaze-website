@@ -3,14 +3,10 @@ import { addDoc, collection, deleteDoc, doc, getDoc, setDoc, writeBatch } from '
 import { clean, markChanged, same, useCollection, useImageUrl, type WithId } from '../data';
 import { slugify, type CollectionConfig } from '../schemas';
 import { Icon, SchemaForm, missingRequired } from './fields';
-import { ErrorBox, PageHeader, Spinner, errorText, useSession, useToast, useUnsavedWarning } from './ui';
+import { ErrorBox, PageHeader, SITE_URL, Spinner, errorText, useSession, useToast, useUnsavedWarning } from './ui';
 
 type Obj = Record<string, unknown>;
 type Item = WithId<Obj>;
-
-// The admin panel lives on the same site as the pages, so links work before and after the
-// domain moves (crossmaze-website.web.app, www.crossmaze.in).
-const SITE_URL = typeof window === 'undefined' ? 'https://www.crossmaze.in' : window.location.origin;
 
 function coverOf(item: Obj): string | undefined {
   if (Array.isArray(item.photos) && typeof item.photos[0] === 'string') return item.photos[0];
@@ -29,22 +25,25 @@ function ListThumb({ path }: { path?: string }) {
 }
 
 export function CollectionPage({ config, id }: { config: CollectionConfig; id?: string }) {
-  const { services } = useSession();
-  const { items, loading, error } = useCollection<Obj>(services.db, config.name);
+  const { services, email, role } = useSession();
+  // Branch admins can only list their own blog posts.
+  const own = role === 'branch' && config.owned ? { field: 'createdBy', value: email } : undefined;
+  const { items, loading, error } = useCollection<Obj>(services.db, config.name, own);
 
   if (error) return <ErrorBox>{errorText(error)}</ErrorBox>;
   if (loading) return <Spinner />;
   if (id === 'new') return <CreateItem config={config} items={items} />;
   if (id) {
     const item = items.find((i) => i.id === id);
-    if (!item) return <ErrorBox>That {config.singular} doesn’t exist any more.</ErrorBox>;
+    if (!item)
+      return <ErrorBox>{own ? `That ${config.singular} doesn’t exist, or someone else wrote it.` : `That ${config.singular} doesn’t exist any more.`}</ErrorBox>;
     return <ItemEditor key={item.id} config={config} item={item} />;
   }
   return <ItemList config={config} items={items} />;
 }
 
 function ItemList({ config, items: stored }: { config: CollectionConfig; items: Item[] }) {
-  const { services, email } = useSession();
+  const { services, email, role } = useSession();
   const toast = useToast();
   const byHand = config.sort !== 'date';
   const items = byHand ? stored : [...stored].sort(byDate);
@@ -68,7 +67,10 @@ function ItemList({ config, items: stored }: { config: CollectionConfig; items: 
     <>
       <PageHeader
         title={config.title}
-        intro={config.listIntro ?? `The order here is the order on the website. Hidden ${config.title.toLowerCase()} are kept but not shown.`}
+        intro={
+          (role === 'branch' && config.owned ? `Only your own ${config.title.toLowerCase()} posts are listed here. ` : '') +
+          (config.listIntro ?? `The order here is the order on the website. Hidden ${config.title.toLowerCase()} are kept but not shown.`)
+        }
         actions={
           <a className="btn" href={`#/${config.name}/new`}>
             <Icon name="Plus" /> Add {config.singular}
@@ -76,7 +78,9 @@ function ItemList({ config, items: stored }: { config: CollectionConfig; items: 
         }
       />
       {items.length === 0 ? (
-        <div className="card empty">No {config.title.toLowerCase()} yet.</div>
+        <div className="card empty">
+          {role === 'branch' && config.owned ? `You haven’t written any ${config.singular}s yet.` : `No ${config.title.toLowerCase()} yet.`}
+        </div>
       ) : (
         <ul className="item-list">
           {items.map((item, i) => (
@@ -85,7 +89,10 @@ function ItemList({ config, items: stored }: { config: CollectionConfig; items: 
               <a className="item-main" href={`#/${config.name}/${item.id}`}>
                 <strong>{String(item[config.titleField] || '(untitled)')}</strong>
                 {config.subtitle ? (
-                  <span>{config.subtitle(item)}</span>
+                  <span>
+                    {config.subtitle(item)}
+                    {typeof item.createdBy === 'string' && item.createdBy !== email && ` · by ${item.createdBy}`}
+                  </span>
                 ) : (
                   config.subtitleField && <span>{String(item[config.subtitleField] ?? '')}</span>
                 )}
@@ -115,7 +122,7 @@ function ItemList({ config, items: stored }: { config: CollectionConfig; items: 
 }
 
 function CreateItem({ config, items }: { config: CollectionConfig; items: Item[] }) {
-  const { services, email } = useSession();
+  const { services, email, role } = useSession();
   const toast = useToast();
   const [title, setTitle] = useState('');
   const [slug, setSlug] = useState('');
@@ -136,11 +143,19 @@ function CreateItem({ config, items }: { config: CollectionConfig; items: Item[]
     setBusy(true);
     try {
       const order = items.reduce((max, i) => Math.max(max, Number(i.order) || 0), -1) + 1;
-      const data = { ...config.blank(), [config.titleField]: title.trim(), order };
+      const data = { ...config.blank(), [config.titleField]: title.trim(), order, ...(config.owned ? { createdBy: email } : {}) };
       let id: string;
       if (config.slug) {
         if (!/^[a-z0-9]+(-[a-z0-9]+)*$/.test(slug)) throw new Error('The web address can only use lower-case letters, numbers and dashes.');
-        if ((await getDoc(doc(services.db, config.name, slug))).exists()) throw new Error('That web address is already used.');
+        const taken = await getDoc(doc(services.db, config.name, slug)).then(
+          (d) => d.exists(),
+          (err: { code?: string }) => {
+            // Branch admins can't open other people's posts, so an address they can't check is taken.
+            if (role === 'branch' && err.code === 'permission-denied') return true;
+            throw err;
+          },
+        );
+        if (taken) throw new Error('That web address is already used.');
         await setDoc(doc(services.db, config.name, slug), { ...data, slug, hidden: true });
         id = slug;
       } else {
