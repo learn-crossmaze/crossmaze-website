@@ -31,6 +31,7 @@ const NAV = [
   { href: '#/programs', icon: 'BookMarked', label: 'Programs' },
   { href: '#/jobs', icon: 'Briefcase', label: 'Jobs' },
   { href: '#/testimonials', icon: 'Quote', label: 'Testimonials' },
+  { href: '#/posts', icon: 'Newspaper', label: 'Blog' },
   { href: '#/sections', icon: 'LayoutList', label: 'Page sections' },
   { href: '#/submissions', icon: 'Inbox', label: 'Submissions' },
   { href: '#/calls', icon: 'Phone', label: 'Calls' },
@@ -234,6 +235,7 @@ function Shell() {
       case 'programs':
       case 'jobs':
       case 'testimonials':
+      case 'posts':
         return <CollectionPage key={section} config={collections[section]} id={id} />;
       case 'submissions':
         return <SubmissionsPage id={id} />;

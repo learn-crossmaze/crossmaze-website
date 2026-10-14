@@ -139,12 +139,36 @@ export interface TestimonialContent {
   detail: string;
 }
 
+/** A blog post (src/data/blog.ts). Text fields use the light formatting in src/data/richText.ts. */
+export interface PostContent {
+  slug: string;
+  title: string;
+  /** YYYY-MM-DD */
+  date: string;
+  category: string;
+  /** Which of the six designs the post uses; see src/data/blog.ts. */
+  template: string;
+  summary: string;
+  cover: string;
+  coverAlt: string;
+  intro: string;
+  sections: { heading: string; text: string; photo: string; caption: string }[];
+  quote: { text: string; by: string };
+  takeaways: string[];
+  author: { name: string; role: string; photo: string };
+  cta: { label: string; link: string };
+  /** Drafts are only built at /blog/preview/<previewKey>, for checking before they go live. */
+  hidden?: boolean;
+  previewKey?: string;
+}
+
 import siteJson from '../../content/site.json';
 import sectionsJson from '../../content/sections.json';
 import programsJson from '../../content/programs.json';
 import branchesJson from '../../content/branches.json';
 import jobsJson from '../../content/jobs.json';
 import testimonialsJson from '../../content/testimonials.json';
+import postsJson from '../../content/posts.json';
 
 export const siteContent = siteJson as SiteContent;
 export const sectionsContent = sectionsJson as SectionsContent;
@@ -152,3 +176,4 @@ export const programsContent = programsJson as ProgramContent[];
 export const branchesContent = branchesJson as BranchContent[];
 export const jobsContent = jobsJson as JobContent[];
 export const testimonialsContent = testimonialsJson as TestimonialContent[];
+export const postsContent = postsJson as PostContent[];

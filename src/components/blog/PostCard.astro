@@ -1,0 +1,177 @@
+---
+// A post in a list: the blog page, the home page and "More from the blog".
+import { Image } from 'astro:assets';
+import Icon from '../Icon.astro';
+import PostMeta from './PostMeta.astro';
+import { categoryLabel, cover, postUrl, type Post } from '../../data/blog';
+
+interface Props {
+  post: Post;
+  /** The wide card at the top of the blog page. */
+  featured?: boolean;
+  headingLevel?: 'h2' | 'h3';
+}
+const { post, featured = false, headingLevel = 'h3' } = Astro.props;
+const photo = cover(post);
+const Heading = headingLevel;
+---
+
+<article class:list={['post-card', 'card', { 'post-card--featured': featured }]} data-category={post.category}>
+  <a class="post-card__media" href={postUrl(post)} tabindex="-1" aria-hidden="true">
+    {
+      photo ? (
+        <Image
+          src={photo}
+          alt=""
+          widths={featured ? [480, 720, 960] : [360, 560, 720]}
+          sizes={featured ? '(max-width: 900px) 100vw, 600px' : '(max-width: 700px) 100vw, 380px'}
+        />
+      ) : (
+        <span class="post-card__placeholder">
+          <Icon name="BookOpen" size={44} />
+        </span>
+      )
+    }
+    <span class="post-card__category">{categoryLabel(post.category)}</span>
+  </a>
+  <div class="post-card__body">
+    <Heading class="post-card__title"><a href={postUrl(post)}>{post.title}</a></Heading>
+    <p class="post-card__summary">{post.summary}</p>
+    <PostMeta post={post} noAuthor />
+    {
+      featured && (
+        <a class="btn btn--sm post-card__more" href={postUrl(post)} tabindex="-1" aria-hidden="true">
+          Read the story <Icon name="ArrowRight" size={16} />
+        </a>
+      )
+    }
+  </div>
+</article>
+
+<style>
+  .post-card {
+    display: flex;
+    flex-direction: column;
+    padding: 12px;
+    overflow: hidden;
+  }
+
+  .post-card__media {
+    position: relative;
+    display: block;
+    aspect-ratio: 16 / 10;
+    overflow: hidden;
+    border-radius: calc(var(--radius) - 4px);
+    background: linear-gradient(135deg, var(--navy-50) 0%, var(--navy-100) 100%);
+  }
+
+  .post-card__media :global(img) {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    transition: transform 0.5s ease;
+  }
+
+  .post-card:hover .post-card__media :global(img) {
+    transform: scale(1.05);
+  }
+
+  .post-card__placeholder {
+    display: grid;
+    place-items: center;
+    height: 100%;
+    color: var(--navy);
+  }
+
+  /* A liquid-glass label over the photo. */
+  .post-card__category {
+    position: absolute;
+    left: 12px;
+    top: 12px;
+    padding: 4px 12px;
+    border: 1px solid var(--glass-edge);
+    border-radius: 999px;
+    background: var(--glass-thick);
+    -webkit-backdrop-filter: var(--glass-blur);
+    backdrop-filter: var(--glass-blur);
+    box-shadow: var(--glass-rim);
+    color: var(--eyebrow-fg);
+    font-size: 0.8rem;
+    font-weight: 800;
+  }
+
+  .post-card__body {
+    display: flex;
+    flex-direction: column;
+    flex: 1;
+    gap: 10px;
+    padding: 16px 10px 10px;
+  }
+
+  .post-card__title {
+    margin: 0;
+    font-size: 1.22rem;
+  }
+
+  .post-card__title a {
+    color: var(--ink);
+    text-decoration: none;
+  }
+
+  .post-card__title a:hover {
+    color: var(--navy);
+  }
+
+  /* The whole card is clickable through the title link. */
+  .post-card__title a::after {
+    content: '';
+    position: absolute;
+    inset: 0;
+    z-index: 1;
+  }
+
+  .post-card__summary {
+    flex: 1;
+    margin: 0;
+    color: var(--muted);
+    display: -webkit-box;
+    -webkit-box-orient: vertical;
+    -webkit-line-clamp: 3;
+    line-clamp: 3;
+    overflow: hidden;
+  }
+
+  .post-card--featured {
+    display: grid;
+    grid-template-columns: 1.1fr 1fr;
+    align-items: center;
+    gap: 8px;
+  }
+
+  .post-card--featured .post-card__media {
+    aspect-ratio: 4 / 3;
+    height: 100%;
+  }
+
+  .post-card--featured .post-card__body {
+    padding: clamp(14px, 3vw, 32px);
+  }
+
+  .post-card--featured .post-card__title {
+    font-size: clamp(1.5rem, 2.6vw, 2.1rem);
+  }
+
+  .post-card__more {
+    align-self: flex-start;
+    margin-top: 6px;
+  }
+
+  @media (max-width: 760px) {
+    .post-card--featured {
+      grid-template-columns: 1fr;
+    }
+    .post-card--featured .post-card__media {
+      aspect-ratio: 16 / 10;
+    }
+  }
+</style>

@@ -1291,3 +1291,89 @@ a.item-main:hover strong {
   display: block;
   color: var(--a-muted);
 }
+
+/* ---------- blog design picker ---------- */
+.template-picker {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(min(100%, 200px), 1fr));
+  gap: 12px;
+  max-width: 720px;
+}
+
+.template-option {
+  position: relative;
+  display: grid;
+  gap: 4px;
+  padding: 10px 12px 12px;
+  border: 2px solid var(--a-line);
+  border-radius: 14px;
+  background: #fff;
+  cursor: pointer;
+}
+
+.template-option:hover {
+  border-color: color-mix(in srgb, var(--a-navy) 35%, #fff);
+}
+
+.template-option.on {
+  border-color: var(--a-navy);
+  box-shadow: 0 0 0 3px var(--a-navy-50);
+}
+
+.template-option input {
+  position: absolute;
+  opacity: 0;
+  pointer-events: none;
+}
+
+.template-option:has(input:focus-visible) {
+  outline: 3px solid var(--a-sun);
+  outline-offset: 2px;
+}
+
+.template-option span {
+  color: var(--a-muted);
+  font-size: 0.85rem;
+  line-height: 1.35;
+}
+
+.template-sketch {
+  width: 100%;
+  height: auto;
+  margin-bottom: 6px;
+  border-radius: 8px;
+  background: var(--a-bg);
+}
+
+.sk-photo {
+  fill: #c7d3f0;
+}
+
+.template-option.on .sk-photo {
+  fill: #9fb6ec;
+}
+
+.sk-line {
+  fill: #c3c8d8;
+}
+
+.sk-card {
+  fill: #fff;
+  stroke: #d6dbe8;
+}
+
+.sk-button {
+  fill: var(--a-sun);
+}
+
+.sk-num {
+  fill: var(--a-red);
+  font: 800 8px sans-serif;
+}
+
+.sk-sign {
+  fill: none;
+  stroke: var(--a-navy);
+  stroke-width: 1.6;
+  stroke-linecap: round;
+}

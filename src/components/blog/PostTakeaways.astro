@@ -1,0 +1,57 @@
+---
+// "Key points": the post's takeaways as a check list in a glass card.
+import Icon from '../Icon.astro';
+
+interface Props {
+  items: string[];
+  title?: string;
+}
+const { items, title = 'Key points' } = Astro.props;
+const list = items.filter((i) => i && i.trim());
+---
+
+{
+  list.length > 0 && (
+    <aside class="card post-takeaways tone-green" aria-label={title}>
+      <h2 class="post-takeaways__title">
+        <span class="icon-badge">
+          <Icon name="ListChecks" size={22} />
+        </span>
+        {title}
+      </h2>
+      <ul class="check-list">
+        {list.map((item) => (
+          <li>
+            <Icon name="Check" size={20} />
+            <span>{item}</span>
+          </li>
+        ))}
+      </ul>
+    </aside>
+  )
+}
+
+<style>
+  .post-takeaways {
+    margin: 36px 0;
+  }
+
+  .post-takeaways__title {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    margin-bottom: 16px;
+    font-size: 1.3rem;
+  }
+
+  .post-takeaways .icon-badge {
+    width: 44px;
+    height: 44px;
+    margin: 0;
+    border-radius: 14px;
+  }
+
+  .post-takeaways li {
+    font-weight: 700;
+  }
+</style>

@@ -1,0 +1,95 @@
+---
+// A pull quote. Templates pick a look with `variant`.
+interface Props {
+  text: string;
+  by?: string;
+  variant?: 'card' | 'big' | 'note';
+}
+const { text, by, variant = 'card' } = Astro.props;
+---
+
+{
+  text && (
+    <blockquote class:list={['post-quote', `post-quote--${variant}`]}>
+      <p>{text}</p>
+      {by && <cite>{by}</cite>}
+    </blockquote>
+  )
+}
+
+<style>
+  .post-quote {
+    position: relative;
+    margin: 36px 0;
+  }
+
+  .post-quote p {
+    margin: 0;
+    font-family: var(--font-display);
+    font-weight: var(--display-weight);
+    line-height: 1.3;
+  }
+
+  .post-quote cite {
+    display: block;
+    margin-top: 10px;
+    color: var(--muted);
+    font-style: normal;
+    font-weight: 700;
+    font-size: 0.95rem;
+  }
+
+  /* A glass card with a large soft quote mark. */
+  .post-quote--card {
+    padding: 28px 28px 28px 30px;
+    border: 1px solid var(--glass-edge);
+    border-radius: var(--radius-card);
+    background: var(--glass);
+    -webkit-backdrop-filter: var(--glass-blur);
+    backdrop-filter: var(--glass-blur);
+    box-shadow: var(--glass-rim), var(--shadow-sm);
+  }
+
+  .post-quote--card::before {
+    content: '\201C';
+    position: absolute;
+    top: -6px;
+    left: 18px;
+    font-family: Georgia, 'Times New Roman', serif;
+    font-size: 4.5rem;
+    line-height: 1;
+    color: color-mix(in srgb, var(--coral) 45%, transparent);
+  }
+
+  .post-quote--card p {
+    padding-top: 18px;
+    font-size: 1.35rem;
+    color: var(--ink);
+  }
+
+  /* Large, centred words in the highlight colours, between two hairlines. */
+  .post-quote--big {
+    padding: 26px 0;
+    border-block: 1px solid color-mix(in srgb, var(--navy) 14%, transparent);
+    text-align: center;
+  }
+
+  .post-quote--big p {
+    font-size: clamp(1.6rem, 3.2vw, 2.3rem);
+    background: var(--g-highlight);
+    -webkit-background-clip: text;
+    background-clip: text;
+    color: transparent;
+  }
+
+  /* A quiet line, as in a letter. */
+  .post-quote--note {
+    padding-left: 18px;
+    border-left: 3px solid var(--squiggle);
+  }
+
+  .post-quote--note p {
+    font-size: 1.25rem;
+    color: var(--navy);
+  }
+</style>

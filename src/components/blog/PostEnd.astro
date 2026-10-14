@@ -1,0 +1,97 @@
+---
+// The end of every post: share buttons, a visit-us panel and more posts.
+import Icon from '../Icon.astro';
+import PostShare from './PostShare.astro';
+import PostCard from './PostCard.astro';
+import { site } from '../../data/site';
+import { related, type Post } from '../../data/blog';
+
+interface Props {
+  post: Post;
+  /** Leave out the share row (the template shows it already). */
+  noShare?: boolean;
+  /** Leave out the visit-us panel (the Notice has its own button). */
+  noCta?: boolean;
+}
+const { post, noShare = false, noCta = false } = Astro.props;
+const more = related(post);
+---
+
+{
+  !noShare && (
+    <section class="post-end no-shapes">
+      <div class="container post-end__inner">
+        <PostShare post={post} />
+      </div>
+    </section>
+  )
+}
+
+{
+  !noCta && (
+    <section class="section section--tight section--feature post-visit">
+      <div class="container post-visit__inner">
+        <div>
+          <span class="eyebrow">Visit us</span>
+          <h2>See Crossmaze for yourself</h2>
+          <p class="lead">Tour the classrooms, meet the teachers and find the right program for your child.</p>
+        </div>
+        <div class="btn-row">
+          <a class="btn btn--sun" href="/contact#enquire">
+            Book a school visit <Icon name="ArrowRight" size={18} />
+          </a>
+          <a class="btn btn--ghost" href={site.phoneHref} data-call-picker>
+            <Icon name="Phone" size={18} /> Call a centre
+          </a>
+        </div>
+      </div>
+    </section>
+  )
+}
+
+{
+  more.length > 0 && (
+    <section class="section">
+      <div class="container">
+        <h2 class="post-more__title">More from our blog</h2>
+        <div class="grid grid--3">
+          {more.map((p) => (
+            <PostCard post={p} />
+          ))}
+        </div>
+      </div>
+    </section>
+  )
+}
+
+<style>
+  .post-end {
+    padding-block: 8px 24px;
+  }
+
+  .post-end__inner {
+    display: flex;
+    justify-content: center;
+  }
+
+  .post-visit__inner {
+    display: grid;
+    grid-template-columns: 1.3fr auto;
+    align-items: center;
+    gap: 24px 48px;
+  }
+
+  .post-visit__inner .lead {
+    margin-bottom: 0;
+  }
+
+  @media (max-width: 860px) {
+    .post-visit__inner {
+      grid-template-columns: 1fr;
+    }
+  }
+
+  .post-more__title {
+    margin-bottom: 28px;
+  }
+</style>

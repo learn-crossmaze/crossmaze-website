@@ -8,13 +8,19 @@ import { ErrorBox, PageHeader, Spinner, errorText, useSession, useToast, useUnsa
 type Obj = Record<string, unknown>;
 type Item = WithId<Obj>;
 
-const SITE_URL = 'https://www.crossmaze.in';
+// The admin panel lives on the same site as the pages, so links work before and after the
+// domain moves (crossmaze-website.web.app, www.crossmaze.in).
+const SITE_URL = typeof window === 'undefined' ? 'https://www.crossmaze.in' : window.location.origin;
 
 function coverOf(item: Obj): string | undefined {
   if (Array.isArray(item.photos) && typeof item.photos[0] === 'string') return item.photos[0];
   if (typeof item.photo === 'string') return item.photo;
+  if (typeof item.cover === 'string') return item.cover;
   return undefined;
 }
+
+/** Newest first by the "date" field (YYYY-MM-DD), for collections sorted by date. */
+const byDate = (a: Item, b: Item) => String(b.date ?? '').localeCompare(String(a.date ?? ''));
 
 function ListThumb({ path }: { path?: string }) {
   const { services } = useSession();
@@ -37,9 +43,11 @@ export function CollectionPage({ config, id }: { config: CollectionConfig; id?: 
   return <ItemList config={config} items={items} />;
 }
 
-function ItemList({ config, items }: { config: CollectionConfig; items: Item[] }) {
+function ItemList({ config, items: stored }: { config: CollectionConfig; items: Item[] }) {
   const { services, email } = useSession();
   const toast = useToast();
+  const byHand = config.sort !== 'date';
+  const items = byHand ? stored : [...stored].sort(byDate);
 
   const reorder = async (from: number, to: number) => {
     if (to < 0 || to >= items.length) return;
@@ -60,7 +68,7 @@ function ItemList({ config, items }: { config: CollectionConfig; items: Item[] }
     <>
       <PageHeader
         title={config.title}
-        intro={`The order here is the order on the website. Hidden ${config.title.toLowerCase()} are kept but not shown.`}
+        intro={config.listIntro ?? `The order here is the order on the website. Hidden ${config.title.toLowerCase()} are kept but not shown.`}
         actions={
           <a className="btn" href={`#/${config.name}/new`}>
             <Icon name="Plus" /> Add {config.singular}
@@ -76,16 +84,24 @@ function ItemList({ config, items }: { config: CollectionConfig; items: Item[] }
               {config.name !== 'testimonials' && config.name !== 'jobs' && <ListThumb path={coverOf(item)} />}
               <a className="item-main" href={`#/${config.name}/${item.id}`}>
                 <strong>{String(item[config.titleField] || '(untitled)')}</strong>
-                {config.subtitleField && <span>{String(item[config.subtitleField] ?? '')}</span>}
+                {config.subtitle ? (
+                  <span>{config.subtitle(item)}</span>
+                ) : (
+                  config.subtitleField && <span>{String(item[config.subtitleField] ?? '')}</span>
+                )}
               </a>
               {item.hidden === true && <span className="chip">Hidden</span>}
               <span className="row-actions">
-                <button className="icon-btn" title="Move up" aria-label="Move up" disabled={i === 0} onClick={() => reorder(i, i - 1)}>
-                  <Icon name="ArrowUp" size={16} />
-                </button>
-                <button className="icon-btn" title="Move down" aria-label="Move down" disabled={i === items.length - 1} onClick={() => reorder(i, i + 1)}>
-                  <Icon name="ArrowDown" size={16} />
-                </button>
+                {byHand && (
+                  <>
+                    <button className="icon-btn" title="Move up" aria-label="Move up" disabled={i === 0} onClick={() => reorder(i, i - 1)}>
+                      <Icon name="ArrowUp" size={16} />
+                    </button>
+                    <button className="icon-btn" title="Move down" aria-label="Move down" disabled={i === items.length - 1} onClick={() => reorder(i, i + 1)}>
+                      <Icon name="ArrowDown" size={16} />
+                    </button>
+                  </>
+                )}
                 <a className="btn btn-light btn-sm" href={`#/${config.name}/${item.id}`}>
                   Edit
                 </a>
@@ -108,7 +124,8 @@ function CreateItem({ config, items }: { config: CollectionConfig; items: Item[]
 
   useEffect(() => {
     if (!slugEdited && config.slug) {
-      const base = slugify(title.replace(/^crossmaze\s*[–-]?\s*/i, ''));
+      // Branch addresses already start with "crossmaze-", so don't repeat it.
+      const base = slugify(config.slug.prefix.startsWith('crossmaze') ? title.replace(/^crossmaze\s*[–-]?\s*/i, '') : title);
       setSlug(base ? `${config.slug.prefix}${base}` : '');
     }
   }, [title, slugEdited, config.slug]);
@@ -214,6 +231,7 @@ function ItemEditor({ config, item }: { config: CollectionConfig; item: Item }) 
   };
 
   const liveUrl = config.slug?.urlPrefix ? `${SITE_URL}${config.slug.urlPrefix}${id}` : undefined;
+  const previewPath = stored.hidden === true ? config.previewPath?.(stored) : undefined;
 
   return (
     <>
@@ -221,10 +239,19 @@ function ItemEditor({ config, item }: { config: CollectionConfig; item: Item }) 
         title={String(draft[config.titleField] || `Untitled ${config.singular}`)}
         back={{ href: `#/${config.name}`, label: config.title }}
         intro={
-          liveUrl && (
-            <a href={liveUrl} target="_blank" rel="noopener">
-              {liveUrl.replace('https://', '')} <Icon name="ExternalLink" size={14} />
-            </a>
+          previewPath ? (
+            <>
+              Hidden. Private preview (shows the version from your last Publish):{' '}
+              <a href={`${SITE_URL}${previewPath}`} target="_blank" rel="noopener">
+                Open preview <Icon name="ExternalLink" size={14} />
+              </a>
+            </>
+          ) : (
+            liveUrl && (
+              <a href={liveUrl} target="_blank" rel="noopener">
+                {liveUrl.replace(/^https?:\/\//, '')} <Icon name="ExternalLink" size={14} />
+              </a>
+            )
           )
         }
         actions={

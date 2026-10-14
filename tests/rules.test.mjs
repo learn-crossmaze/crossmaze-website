@@ -44,6 +44,7 @@ test('visitors and strangers cannot read or change anything', async () => {
     const db = ctx.firestore();
     await assertFails(getDoc(doc(db, 'content/site')));
     await assertFails(setDoc(doc(db, 'content/site'), { name: 'Hacked' }));
+    await assertFails(setDoc(doc(db, 'posts/hacked'), { title: 'Hacked' }));
     await assertFails(getDoc(doc(db, 'submissions/s1')));
     await assertFails(getDoc(doc(db, 'calls/c1')));
     await assertFails(getDoc(doc(db, 'private/litmus')));
@@ -70,6 +71,7 @@ test('admins can edit content, submissions and LITMUS settings', async () => {
   const db = admin().firestore();
   await assertSucceeds(setDoc(doc(db, 'content/site'), { name: 'Crossmaze' }));
   await assertSucceeds(setDoc(doc(db, 'branches/crossmaze-test'), { name: 'Test' }));
+  await assertSucceeds(setDoc(doc(db, 'posts/test-post'), { title: 'Test', hidden: true }));
   await assertSucceeds(updateDoc(doc(db, 'submissions/s1'), { handled: true }));
   await assertSucceeds(getDoc(doc(db, 'private/litmus')));
   await assertSucceeds(setDoc(doc(db, 'meta/content'), { updatedBy: ADMIN }));

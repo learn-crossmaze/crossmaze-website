@@ -2,6 +2,7 @@
 // and the field keys match content/*.json (which the website is built from).
 import { amenityList, iconChoices } from '../data/amenities';
 import { themes, themeModes, weekdays } from '../data/themes';
+import { categories, templates } from '../data/blogOptions';
 
 export interface Option {
   value: string;
@@ -19,6 +20,9 @@ export type Field =
   | (Base & { type: 'text' | 'email' | 'tel' | 'url'; placeholder?: string })
   | (Base & { type: 'textarea'; rows?: number })
   | (Base & { type: 'number' })
+  | (Base & { type: 'date' })
+  /** The blog post design picker (src/data/blogOptions.ts). */
+  | (Base & { type: 'template' })
   | (Base & { type: 'boolean' })
   | (Base & { type: 'select'; options: Option[] })
   | (Base & { type: 'icon' })
@@ -310,15 +314,112 @@ export const testimonialSchema: Field[] = [
   { key: 'detail', label: 'Detail', type: 'text', placeholder: 'Parents of …' },
 ];
 
+// ------------------------------------------------------------------- blog
+
+const TEXT_HELP =
+  'Leave a blank line between paragraphs. Start a line with “- ” for a bullet point or “1. ” for a numbered list. ' +
+  'Use **double stars** for bold, _underscores_ for italic and [link text](https://… or /page) for a link.';
+
+export const categoryOptions: Option[] = Object.entries(categories).map(([value, label]) => ({ value, label }));
+
+export const postSchema: Field[] = [
+  { key: 'title', label: 'Title', type: 'text', required: true },
+  { key: 'date', label: 'Date', type: 'date', required: true, help: 'The blog lists posts newest first.' },
+  { key: 'category', label: 'Category', type: 'select', options: categoryOptions, required: true },
+  { key: 'summary', label: 'Summary', type: 'textarea', rows: 2, required: true, help: 'One or two sentences, shown on the blog page and in Google.' },
+  { key: 'template', label: 'Design', type: 'template', required: true, help: 'Every design uses the same text and photos, so you can switch at any time.' },
+
+  { type: 'heading', label: 'Cover photo' },
+  { key: 'cover', label: 'Cover photo', type: 'image', folder: 'blog', help: 'Shown at the top of the post, on the blog page and when the post is shared. Landscape photos work best.' },
+  { key: 'coverAlt', label: 'Photo description', type: 'text', help: 'Describes the photo for screen readers and Google.' },
+
+  { type: 'heading', label: 'Text', help: TEXT_HELP },
+  { key: 'intro', label: 'Opening paragraph', type: 'textarea', rows: 4 },
+  {
+    key: 'sections',
+    label: 'Sections',
+    type: 'objects',
+    itemLabel: 'Section',
+    summary: 'heading',
+    help: 'Each section has a heading, text and an optional photo. In Tips each section becomes a numbered card; in a Photo story each sits beside its photo.',
+    fields: [
+      { key: 'heading', label: 'Heading', type: 'text' },
+      { key: 'text', label: 'Text', type: 'textarea', rows: 6 },
+      { key: 'photo', label: 'Photo', type: 'image', folder: 'blog' },
+      { key: 'caption', label: 'Photo caption', type: 'text' },
+    ],
+  },
+  {
+    key: 'quote',
+    label: 'Highlighted quote',
+    type: 'group',
+    help: 'Optional: a sentence to make stand out. In Tips it becomes “Good to know”.',
+    fields: [
+      { key: 'text', label: 'Quote', type: 'textarea', rows: 2 },
+      { key: 'by', label: 'Said by', type: 'text' },
+    ],
+  },
+  { key: 'takeaways', label: 'Key points', type: 'list', itemLabel: 'Point', help: 'Optional: a short check list at the end.' },
+
+  { type: 'heading', label: 'Author and button' },
+  {
+    key: 'author',
+    label: 'Author',
+    type: 'group',
+    help: 'Optional. A Letter is signed with this name.',
+    fields: [
+      { key: 'name', label: 'Name', type: 'text' },
+      { key: 'role', label: 'Role', type: 'text', placeholder: 'Centre head, Crossmaze Neotown' },
+      { key: 'photo', label: 'Photo', type: 'image', folder: 'blog' },
+    ],
+  },
+  {
+    key: 'cta',
+    label: 'Button',
+    type: 'group',
+    help: 'Used by the Notice design. Leave empty for “Book a school visit”.',
+    fields: [
+      { key: 'label', label: 'Button text', type: 'text', placeholder: 'Book a school visit' },
+      { key: 'link', label: 'Link', type: 'text', placeholder: '/contact#enquire' },
+    ],
+  },
+];
+
+export const templateOptions = templates;
+
+/** A random code for a draft's private preview address. */
+function previewKey() {
+  const bytes = crypto.getRandomValues(new Uint8Array(8));
+  return Array.from(bytes, (b) => b.toString(16).padStart(2, '0')).join('');
+}
+
+const today = () => {
+  const d = new Date();
+  return `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}-${String(d.getDate()).padStart(2, '0')}`;
+};
+
+const postDate = (value: unknown) => {
+  const d = typeof value === 'string' ? new Date(`${value}T00:00:00`) : null;
+  return d && !Number.isNaN(d.getTime()) ? d.toLocaleDateString('en-IN', { day: 'numeric', month: 'short', year: 'numeric' }) : 'No date';
+};
+
 export interface CollectionConfig {
-  name: 'branches' | 'programs' | 'jobs' | 'testimonials';
+  name: 'branches' | 'programs' | 'jobs' | 'testimonials' | 'posts';
   title: string;
   singular: string;
   schema: Field[];
   titleField: string;
   subtitleField?: string;
+  /** A line under each item's name in the list (instead of subtitleField). */
+  subtitle?: (item: Record<string, unknown>) => string;
+  /** Explains the list page. */
+  listIntro?: string;
+  /** "date": newest first, by the date field, instead of a hand-made order. */
+  sort?: 'date';
   /** Collections whose items have a web address (slug) that becomes the document id. */
   slug?: { prefix: string; urlPrefix?: string };
+  /** The private address where a hidden item can be checked (blog drafts). */
+  previewPath?: (item: Record<string, unknown>) => string | undefined;
   blank: () => Record<string, unknown>;
 }
 
@@ -375,6 +476,35 @@ export const collections: Record<CollectionConfig['name'], CollectionConfig> = {
     titleField: 'name',
     subtitleField: 'detail',
     blank: () => ({ quote: '', name: '', detail: '' }),
+  },
+  posts: {
+    name: 'posts',
+    title: 'Blog',
+    singular: 'blog post',
+    schema: postSchema,
+    titleField: 'title',
+    subtitle: (p) => `${postDate(p.date)} · ${categories[String(p.category)] ?? 'News'} · ${templates.find((t) => t.id === p.template)?.label ?? 'Classic'}`,
+    listIntro:
+      'Newest first. New posts stay hidden until you untick “Hide from website” and press Publish; until then each has a private preview link.',
+    sort: 'date',
+    slug: { prefix: '', urlPrefix: '/blog/' },
+    previewPath: (p) => (typeof p.previewKey === 'string' && p.previewKey ? `/blog/preview/${p.previewKey}` : undefined),
+    blank: () => ({
+      title: '',
+      date: today(),
+      category: 'news',
+      template: 'classic',
+      summary: '',
+      cover: '',
+      coverAlt: '',
+      intro: '',
+      sections: [],
+      quote: { text: '', by: '' },
+      takeaways: [],
+      author: { name: '', role: '', photo: '' },
+      cta: { label: '', link: '' },
+      previewKey: previewKey(),
+    }),
   },
 };
 

@@ -1,0 +1,161 @@
+---
+// Notice: a short announcement in a single glass card, with the date as a calendar tile and a big
+// button. For admissions, holidays and news.
+import Icon from '../Icon.astro';
+import PostCrumbs from './PostCrumbs.astro';
+import PostFigure from './PostFigure.astro';
+import PostShare from './PostShare.astro';
+import PostQuote from './PostQuote.astro';
+import PostTakeaways from './PostTakeaways.astro';
+import PostEnd from './PostEnd.astro';
+import RichText from './RichText.astro';
+import { site } from '../../data/site';
+import { categoryLabel, type Post } from '../../data/blog';
+
+interface Props {
+  post: Post;
+}
+const { post } = Astro.props;
+const date = post.date ? new Date(`${post.date}T00:00:00`) : null;
+const valid = date && !Number.isNaN(date.getTime());
+const button = { label: post.cta?.label || 'Book a school visit', link: post.cta?.link || '/contact#enquire' };
+---
+
+<section class="page-hero notice-hero">
+  <div class="container notice-wrap">
+    <PostCrumbs post={post} />
+    <article class="card notice">
+      <header class="notice__top">
+        <span class="icon-badge tone-coral">
+          <Icon name="Megaphone" size={26} />
+        </span>
+        <span class="eyebrow">{categoryLabel(post.category)}</span>
+        {
+          valid && (
+            <time class="notice__date" datetime={post.date}>
+              <span class="notice__day">{date!.getDate()}</span>
+              <span class="notice__month">{date!.toLocaleDateString('en-IN', { month: 'short', year: 'numeric' })}</span>
+            </time>
+          )
+        }
+      </header>
+      <h1>{post.title}</h1>
+      {post.summary && <p class="lead">{post.summary}</p>}
+      <PostFigure photo={post.cover} alt={post.coverAlt || post.title} eager />
+      <RichText text={post.intro} />
+      {
+        post.sections.length > 0 && (
+          <div class="notice__sections">
+            {post.sections.map((s) => (
+              <div class="notice__part">
+                {s.heading && <h2>{s.heading}</h2>}
+                <RichText text={s.text} />
+                <PostFigure photo={s.photo} alt={s.caption || s.heading || post.title} caption={s.caption} />
+              </div>
+            ))}
+          </div>
+        )
+      }
+      <PostQuote text={post.quote.text} by={post.quote.by} variant="note" />
+      <PostTakeaways items={post.takeaways} />
+      <div class="notice__actions">
+        <a class="btn btn--sun" href={button.link}>
+          {button.label} <Icon name="ArrowRight" size={18} />
+        </a>
+        <a class="btn btn--ghost" href={site.phoneHref} data-call-picker>
+          <Icon name="Phone" size={18} /> Call a centre
+        </a>
+      </div>
+      <PostShare post={post} class="notice__share" />
+    </article>
+  </div>
+</section>
+
+<PostEnd post={post} noShare noCta />
+
+<style>
+  .notice-wrap {
+    max-width: calc(820px + var(--gutter) * 2);
+  }
+
+  .notice {
+    padding: clamp(24px, 4vw, 44px);
+    border-radius: calc(var(--radius-card) + 6px);
+    box-shadow: var(--glass-rim), var(--shadow-lift);
+  }
+
+  .notice__top {
+    display: flex;
+    align-items: center;
+    gap: 14px;
+    margin-bottom: 18px;
+  }
+
+  .notice__top .icon-badge {
+    flex: none;
+    margin: 0;
+  }
+
+  .notice__top .eyebrow {
+    margin: 0;
+  }
+
+  /* The date as a little calendar tile. */
+  .notice__date {
+    display: grid;
+    justify-items: center;
+    flex: none;
+    margin-left: auto;
+    min-width: 76px;
+    padding: 8px 12px;
+    border: 1px solid var(--glass-edge);
+    border-radius: 16px;
+    background: var(--glass-thick);
+    box-shadow: var(--glass-rim), var(--shadow-sm);
+    line-height: 1.1;
+  }
+
+  .notice__day {
+    font-family: var(--font-display);
+    font-weight: var(--display-weight);
+    font-size: 1.8rem;
+    color: var(--coral-fg);
+  }
+
+  .notice__month {
+    color: var(--muted);
+    font-weight: 800;
+    font-size: 0.78rem;
+    text-transform: uppercase;
+    letter-spacing: 0.06em;
+  }
+
+  .notice h1 {
+    font-size: clamp(1.9rem, 4.4vw, 2.9rem);
+  }
+
+  .notice__sections {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(min(100%, 260px), 1fr));
+    gap: 8px 32px;
+    margin-top: 24px;
+  }
+
+  .notice__part h2 {
+    margin-bottom: 0.4em;
+    font-size: 1.2rem;
+  }
+
+  .notice__actions {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 12px;
+    margin-top: 28px;
+  }
+
+  .notice :global(.notice__share) {
+    margin-top: 24px;
+    padding-top: 20px;
+    border-top: 1px solid color-mix(in srgb, var(--navy) 10%, transparent);
+  }
+</style>

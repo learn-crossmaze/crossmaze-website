@@ -1,0 +1,58 @@
+---
+// Text written in the admin panel, with its light formatting (see src/data/richText.ts).
+import { blocks } from '../../data/richText';
+
+interface Props {
+  text: string | undefined;
+  class?: string;
+}
+const { text, class: className } = Astro.props;
+const parts = blocks(text);
+---
+
+{
+  parts.length > 0 && (
+    <div class:list={['rich', className]}>
+      {parts.map((b) =>
+        b.type === 'p' ? (
+          <p set:html={b.html} />
+        ) : b.type === 'ul' ? (
+          <ul>
+            {b.items.map((item) => (
+              <li set:html={item} />
+            ))}
+          </ul>
+        ) : (
+          <ol>
+            {b.items.map((item) => (
+              <li set:html={item} />
+            ))}
+          </ol>
+        ),
+      )}
+    </div>
+  )
+}
+
+<style>
+  .rich :global(p) {
+    margin: 0 0 1em;
+  }
+  .rich :global(:is(ul, ol)) {
+    display: grid;
+    gap: 6px;
+    margin: 0 0 1em;
+    padding-left: 1.3em;
+  }
+  .rich :global(li::marker) {
+    color: var(--coral);
+    font-weight: 800;
+  }
+  .rich > :global(:last-child) {
+    margin-bottom: 0;
+  }
+  /* Paragraph blocks that follow each other (e.g. the intro, then a section without a heading). */
+  .rich + .rich {
+    margin-top: 1em;
+  }
+</style>

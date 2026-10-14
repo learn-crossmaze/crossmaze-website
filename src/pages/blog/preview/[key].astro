@@ -1,0 +1,14 @@
+---
+// Drafts (posts ticked "Hide from website"), at a private address only the admin panel links to, so
+// they can be checked before going live. Kept out of search results and the sitemap.
+import PostPage from '../../../components/blog/PostPage.astro';
+import { drafts, type Post } from '../../../data/blog';
+
+export function getStaticPaths() {
+  return drafts.map((post) => ({ params: { key: post.previewKey! }, props: { post } }));
+}
+
+const { post } = Astro.props as { post: Post };
+---
+
+<PostPage post={post} />

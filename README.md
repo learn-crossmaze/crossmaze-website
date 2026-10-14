@@ -40,11 +40,29 @@ Go to **www.crossmaze.in/admin** and sign in.
 | Testimonials | Parent quotes on the home page |
 | Page sections | Core values, teaching approach, a day at Crossmaze, how admission works, day care highlights, extra-curriculars, facilities (with the photos for the scrolling strip on the home page), careers perks, FAQs |
 | Submissions | Every enquiry and application; mark as handled, resend to LITMUS, export to CSV |
+| Blog | Write posts with photos in six designs, keep them as drafts with a private preview link, then publish (see below) |
 | Calls | Every tap on a call or WhatsApp button: which centre, page, device and how the visitor found the site; totals by centre; export to CSV (see below) |
 | LITMUS | Where submissions are sent, its API key, and a **Send test** button |
 | Admins | Who can sign in |
 
 **Save** stores a change; it goes live when someone presses **Publish** (top right). Publishing rebuilds the whole site in about 3 minutes, and the Dashboard shows when it's done or if it failed. New branches, programs and jobs start hidden, so you can finish them before unticking “Hide from website”.
+
+### Blog
+
+**Blog → Add blog post**, give it a title, then fill in the post and choose one of six **designs**. Every design uses the same text and photos, so you can switch at any time:
+
+| Design | Best for |
+| --- | --- |
+| Classic | Most posts: the cover photo on top, then the text |
+| Magazine | Longer reads: a big cover photo with the title on it, and a contents list |
+| Photo story | Events and trips: large photos beside short text; every photo opens in an album |
+| Tips | “5 ways to…” posts: each section becomes a numbered card |
+| Notice | Admissions, holidays and news: one card with a big button |
+| Letter | Messages from the principal or the team, signed by the author |
+
+A post has an opening paragraph, then **sections** (a heading, text and an optional photo each), an optional highlighted quote, key points, author and button. In the text, leave a blank line between paragraphs, start lines with “- ” for bullet points, and use `**bold**`, `_italic_` and `[link text](/contact)`.
+
+New posts start **hidden**. Each hidden post has a private **preview link** (at the top of the post in the admin panel) that shows it after you press **Publish**, so you can check it before anyone else sees it. When it's ready, untick “Hide from website” and press **Publish**. The blog is at /blog, the newest three posts show on the home page, and “Blog” appears in the menu once a post is published.
 
 ### Calls
 
@@ -201,4 +219,5 @@ FIREBASE_STORAGE_BUCKET=demo-crossmaze.appspot.com ADMIN_EMAILS=you@example.com 
 - [ ] **Facility photos** on the home page came from the old www.crossmaze.in. CCTV surveillance, Fire safe, Parents’ communication app and Trained caregivers are stock photos from Wix’s free media library, which may only be licensed for use on Wix sites: replace them with your own (admin panel → Page sections → Facilities). The school’s own facility photos on the old site were small (555 px wide), so larger originals will look sharper, especially when opened full screen.
 - [ ] **Reworded copy** (October 2026): text across the site was rewritten for clarity without changing any facts. The FAQ "How do I apply for admission?" is new.
 - [ ] **A day at Crossmaze** and **How admission works** were written for the new site from what the old site says. Check they match how your centres work (admin panel → Page sections).
+- [ ] **Sample blog posts**: six example posts (one in each design) start as hidden drafts, written from what the site already says plus general parenting tips. Edit and publish the ones you like, and delete the rest (admin panel → Blog).
 - [ ] **Firebase project ID**: `.firebaserc` and the workflow use `crossmaze-website`. If the console shows a different ID, update both.
