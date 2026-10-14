@@ -43,7 +43,7 @@ Go to **www.crossmaze.in/admin** and sign in.
 | Blog | Write posts with photos in six designs, keep them as drafts with a private preview link, then publish (see below) |
 | Calls | Every tap on a call or WhatsApp button: which centre, page, device and how the visitor found the site; totals by centre; export to CSV (see below) |
 | LITMUS | Where submissions are sent, its API key, and a **Send test** button |
-| Admins | Who can sign in |
+| Admins | Who can sign in: full admins, and branch admins (see below) |
 
 **Save** stores a change; it goes live when someone presses **Publish** (top right). Publishing rebuilds the whole site in about 3 minutes, and the Dashboard shows when it's done or if it failed. New branches, programs and jobs start hidden, so you can finish them before unticking “Hide from website”.
 
@@ -63,6 +63,14 @@ Go to **www.crossmaze.in/admin** and sign in.
 A post has an opening paragraph, then **sections** (a heading, text and an optional photo each), an optional highlighted quote, key points, author and button. In the text, leave a blank line between paragraphs, start lines with “- ” for bullet points, and use `**bold**`, `_italic_` and `[link text](/contact)`.
 
 New posts start **hidden**. Each hidden post has a private **preview link** (at the top of the post in the admin panel) that shows it after you press **Publish**, so you can check it before anyone else sees it. When it's ready, untick “Hide from website” and press **Publish**. The blog is at /blog, the newest three posts show on the home page, and “Blog” appears in the menu once a post is published.
+
+### Branch admins
+
+A **branch admin** gets a small part of the panel: **Blog** and **Centre head**, plus the **Publish** button. They can write, edit, publish and delete their own blog posts (not other people's), and change the centre head's name, photo and biography for the branches ticked for them. They can't see enquiries, calls, LITMUS, the admin list or any other content, and the security rules enforce this, not just the menu.
+
+Add one on **Admins → Branch admins**: their email and the branches they look after (none means blog only). They sign in at /admin the same way as other admins. **Branches** on their row changes their branches; they see the change the next time they sign in. Removing a branch admin keeps their posts, and full admins can edit those posts like any other. Full admins see who wrote each post in the Blog list.
+
+Branch admins need the database rules and functions from step 3 below (`npx firebase-tools deploy --only firestore,storage,functions`). Until those are deployed, a branch admin who signs in sees “No access yet”.
 
 ### Calls
 
@@ -208,6 +216,7 @@ FIREBASE_STORAGE_BUCKET=demo-crossmaze.appspot.com ADMIN_EMAILS=you@example.com 
 - `scripts/report-publish.mjs` tells the admin panel whether a deploy succeeded.
 - Colour themes: the tokens in `src/styles/global.css` are Pastel Glass; `src/styles/themes.css` overrides them for the other themes, and `src/data/themes.ts` lists each theme's fonts. A script at the top of `layouts/BaseLayout.astro` picks the theme in the browser before the page is drawn.
 - The admin panel lives in `src/admin/`. Its forms are generated from `src/admin/schemas.ts`, so adding a field there and in `src/data/content.ts` is all it takes.
+- Who can do what is decided by `firestore.rules` and `storage.rules`: full admins are listed in `admins/{email}`, branch admins in `branchAdmins/{email}` (`branches`: the branch slugs whose `centerHead` they may change). Blog posts record their writer in `createdBy`. The panel's menu (`NAV` in `src/admin/AdminApp.tsx`) only hides pages; the rules are what stop a branch admin, so test them with `npm run test:rules`.
 
 ## Please verify before launch
 

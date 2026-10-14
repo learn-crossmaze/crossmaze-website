@@ -94,13 +94,19 @@ const links = [
   { href: '#/sections', icon: 'LayoutList', title: 'Page sections', text: 'Values, facilities, FAQs and more' },
 ];
 
-export function Dashboard() {
-  const { email } = useSession();
-  const { publish, content, unpublished } = usePublishState();
-  const newCount = useCount('handled', '==', false);
-  const problems = useCount('litmus.status', 'in', ['failed', 'not_configured']);
-  const calls = useRecentCalls();
+const branchLinks = [
+  { href: '#/posts', icon: 'Newspaper', title: 'Blog', text: 'Write posts in six designs and publish them' },
+  { href: '#/centre', icon: 'UserRound', title: 'Centre head', text: 'Name, photo and biography on your branch page' },
+];
 
+export function Dashboard() {
+  const { role } = useSession();
+  return role === 'branch' ? <BranchDashboard /> : <AdminDashboard />;
+}
+
+/** Whether the website is up to date, with the Publish button. */
+function PublishCard() {
+  const { publish, content, unpublished } = usePublishState();
   const status =
     publish?.status === 'building'
       ? { tone: 'pending', text: 'Publishing now…' }
@@ -111,27 +117,59 @@ export function Dashboard() {
           : { tone: 'pending', text: 'Not published from the admin panel yet' };
 
   return (
+    <div className="card publish-card">
+      <h3>Website</h3>
+      <p>
+        <span className={`chip chip-${status.tone}`}>{unpublished && publish?.status !== 'building' ? 'Unpublished changes' : status.text}</span>
+      </p>
+      <p className="muted">
+        {content?.updatedAt && <>Last change {formatDate(content.updatedAt)}{content.updatedBy ? ` by ${content.updatedBy}` : ''}. </>}
+        {publish?.finishedAt && <>Last published {formatDate(publish.finishedAt)}.</>}
+      </p>
+      {publish?.status === 'failed' && publish.runUrl && (
+        <p>
+          <a href={publish.runUrl} target="_blank" rel="noopener">
+            See what went wrong <Icon name="ExternalLink" size={14} />
+          </a>
+        </p>
+      )}
+      <PublishButton />
+    </div>
+  );
+}
+
+function LinkGrid({ items }: { items: typeof links }) {
+  return (
+    <div className="link-grid">
+      {items.map((l) => (
+        <a key={l.href} className="card link-card" href={l.href}>
+          <Icon name={l.icon} size={24} />
+          <strong>{l.title}</strong>
+          <span>{l.text}</span>
+        </a>
+      ))}
+    </div>
+  );
+}
+
+const HowItWorks = () => (
+  <p className="muted how">
+    How it works: changes you save are stored safely but don’t appear on the website until you press <strong>Publish</strong>. Publishing
+    rebuilds the whole site with your changes, which takes about 3 minutes.
+  </p>
+);
+
+function AdminDashboard() {
+  const { email } = useSession();
+  const newCount = useCount('handled', '==', false);
+  const problems = useCount('litmus.status', 'in', ['failed', 'not_configured']);
+  const calls = useRecentCalls();
+
+  return (
     <>
       <PageHeader title="Dashboard" intro={`Signed in as ${email}`} />
       <div className="stat-grid">
-        <div className="card publish-card">
-          <h3>Website</h3>
-          <p>
-            <span className={`chip chip-${status.tone}`}>{unpublished && publish?.status !== 'building' ? 'Unpublished changes' : status.text}</span>
-          </p>
-          <p className="muted">
-            {content?.updatedAt && <>Last change {formatDate(content.updatedAt)}{content.updatedBy ? ` by ${content.updatedBy}` : ''}. </>}
-            {publish?.finishedAt && <>Last published {formatDate(publish.finishedAt)}.</>}
-          </p>
-          {publish?.status === 'failed' && publish.runUrl && (
-            <p>
-              <a href={publish.runUrl} target="_blank" rel="noopener">
-                See what went wrong <Icon name="ExternalLink" size={14} />
-              </a>
-            </p>
-          )}
-          <PublishButton />
-        </div>
+        <PublishCard />
         <a className="card stat" href="#/submissions">
           <span className="stat-value">{newCount ?? '–'}</span>
           <span>new submissions to follow up</span>
@@ -146,19 +184,27 @@ export function Dashboard() {
         </a>
       </div>
       <h2 className="section-title">Edit the website</h2>
-      <div className="link-grid">
-        {links.map((l) => (
-          <a key={l.href} className="card link-card" href={l.href}>
-            <Icon name={l.icon} size={24} />
-            <strong>{l.title}</strong>
-            <span>{l.text}</span>
-          </a>
-        ))}
+      <LinkGrid items={links} />
+      <HowItWorks />
+    </>
+  );
+}
+
+/** Branch admins: publish status and their two pages. */
+function BranchDashboard() {
+  const { email } = useSession();
+  return (
+    <>
+      <PageHeader
+        title="Dashboard"
+        intro={`Signed in as ${email}, a branch admin: you can write blog posts and update your centre head’s profile.`}
+      />
+      <div className="stat-grid">
+        <PublishCard />
       </div>
-      <p className="muted how">
-        How it works: changes you save are stored safely but don’t appear on the website until you press <strong>Publish</strong>. Publishing
-        rebuilds the whole site with your changes, which takes about 3 minutes.
-      </p>
+      <h2 className="section-title">Edit the website</h2>
+      <LinkGrid items={branchLinks} />
+      <HowItWorks />
     </>
   );
 }

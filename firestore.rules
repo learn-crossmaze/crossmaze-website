@@ -1,6 +1,8 @@
 rules_version = '2';
 
 // Only signed-in admins (verified email listed in /admins) can read or change anything.
+// Branch admins (listed in /branchAdmins) get a small part of it: their own blog posts, the centre
+// head profile of the branches they're given, and the Publish button.
 // The public website never reads Firestore directly: content is pulled at build time with the
 // Admin SDK, and form submissions arrive through the `submit` Cloud Function.
 service cloud.firestore {
@@ -15,12 +17,33 @@ service cloud.firestore {
         && exists(/databases/$(database)/documents/admins/$(email()));
     }
 
+    function isBranchAdmin() {
+      return request.auth != null
+        && request.auth.token.email_verified == true
+        && exists(/databases/$(database)/documents/branchAdmins/$(email()));
+    }
+
+    function isBranchAdminFor(slug) {
+      return isBranchAdmin()
+        && slug in get(/databases/$(database)/documents/branchAdmins/$(email())).data.branches;
+    }
+
+    function onlyChanges(keys) {
+      return request.resource.data.diff(resource == null ? {} : resource.data).affectedKeys().hasOnly(keys);
+    }
+
     // Website content edited in the admin panel.
     match /content/{doc} {
       allow read, write: if isAdmin();
     }
     match /branches/{slug} {
       allow read, write: if isAdmin();
+      // A branch admin sees their branch and may change only its centre head.
+      allow get: if isBranchAdminFor(slug);
+      allow update: if isBranchAdminFor(slug)
+        && onlyChanges(['centerHead'])
+        && request.resource.data.centerHead is map
+        && request.resource.data.centerHead.keys().hasOnly(['name', 'photo', 'bio']);
     }
     match /programs/{slug} {
       allow read, write: if isAdmin();
@@ -33,6 +56,17 @@ service cloud.firestore {
     }
     match /posts/{slug} {
       allow read, write: if isAdmin();
+      // Branch admins write their own posts (createdBy is their email) and can't touch anyone else's.
+      // They may look up an address nobody has used yet, to check it's free.
+      allow get: if isBranchAdmin() && (resource == null || resource.data.createdBy == email());
+      allow list: if isBranchAdmin() && resource.data.createdBy == email();
+      allow create: if isBranchAdmin()
+        && request.resource.data.createdBy == email()
+        && slug.matches('^[a-z0-9]+(-[a-z0-9]+)*$');
+      allow update: if isBranchAdmin()
+        && resource.data.createdBy == email()
+        && request.resource.data.createdBy == email();
+      allow delete: if isBranchAdmin() && resource.data.createdBy == email();
     }
 
     // Form submissions are created only by the submit function.
@@ -55,11 +89,16 @@ service cloud.firestore {
     // Publish status is written by the publishSite function and the deploy workflow;
     // "content" records when an admin last saved a change.
     match /meta/publish {
-      allow read: if isAdmin();
+      allow read: if isAdmin() || isBranchAdmin();
       allow write: if false;
     }
     match /meta/content {
       allow read, write: if isAdmin();
+      allow read: if isBranchAdmin();
+      allow create, update: if isBranchAdmin()
+        && onlyChanges(['updatedAt', 'updatedBy'])
+        && request.resource.data.updatedBy == email()
+        && request.resource.data.updatedAt == request.time;
     }
 
     // People allowed into the admin panel, keyed by lower-case email.
@@ -68,6 +107,13 @@ service cloud.firestore {
       allow get: if request.auth != null && adminEmail == email();
       allow list, create, update: if isAdmin();
       allow delete: if isAdmin() && adminEmail != email();
+    }
+
+    // Branch admins, keyed by lower-case email: { email, branches: [branch slugs], addedBy, addedAt }.
+    // They can check their own entry; only full admins manage the list.
+    match /branchAdmins/{adminEmail} {
+      allow get: if request.auth != null && adminEmail == email();
+      allow read, write: if isAdmin();
     }
 
     match /ratelimits/{id} {
