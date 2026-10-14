@@ -31,6 +31,9 @@ service cloud.firestore {
     match /testimonials/{id} {
       allow read, write: if isAdmin();
     }
+    match /posts/{slug} {
+      allow read, write: if isAdmin();
+    }
 
     // Form submissions are created only by the submit function.
     match /submissions/{id} {

@@ -1,0 +1,97 @@
+---
+// Share buttons: WhatsApp (how most parents share), the phone's own share menu where there is one,
+// and "copy link".
+import Icon from '../Icon.astro';
+import { site } from '../../data/site';
+import { postUrl, type Post } from '../../data/blog';
+
+interface Props {
+  post: Post;
+  class?: string;
+}
+const { post, class: className } = Astro.props;
+const url = new URL(postUrl(post), Astro.site ?? site.url).href;
+const whatsapp = `https://wa.me/?text=${encodeURIComponent(`${post.title} ${url}`)}`;
+---
+
+<div class:list={['post-share', className]}>
+  <span class="post-share__label">Share</span>
+  <a class="post-share__btn" href={whatsapp} target="_blank" rel="noopener" aria-label="Share on WhatsApp">
+    <Icon name="MessageCircle" size={18} />
+  </a>
+  <button type="button" class="post-share__btn" data-share={url} data-share-title={post.title} aria-label="More ways to share" hidden>
+    <Icon name="Share2" size={18} />
+  </button>
+  <button type="button" class="post-share__btn" data-copy-link={url} aria-label="Copy link" hidden>
+    <Icon name="Link" size={18} />
+  </button>
+  <span class="post-share__done" role="status" aria-live="polite"></span>
+</div>
+
+<script>
+  document.querySelectorAll<HTMLButtonElement>('[data-share]').forEach((button) => {
+    if (!navigator.share) return;
+    button.hidden = false;
+    button.addEventListener('click', () => {
+      navigator.share({ title: button.dataset.shareTitle, url: button.dataset.share }).catch(() => {});
+    });
+  });
+
+  document.querySelectorAll<HTMLButtonElement>('[data-copy-link]').forEach((button) => {
+    if (!navigator.clipboard) return;
+    button.hidden = false;
+    button.addEventListener('click', async () => {
+      const done = button.parentElement?.querySelector('.post-share__done');
+      try {
+        await navigator.clipboard.writeText(button.dataset.copyLink ?? location.href);
+        if (done) done.textContent = 'Link copied';
+      } catch {
+        if (done) done.textContent = 'Copy the address from your browser';
+      }
+      setTimeout(() => done && (done.textContent = ''), 2500);
+    });
+  });
+</script>
+
+<style>
+  .post-share {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 8px;
+  }
+
+  .post-share__label {
+    margin-right: 4px;
+    color: var(--muted);
+    font-weight: 800;
+    font-size: 0.9rem;
+  }
+
+  .post-share__btn {
+    display: grid;
+    place-items: center;
+    width: 42px;
+    height: 42px;
+    border: 1px solid var(--glass-edge);
+    border-radius: 50%;
+    background: var(--glass-thick);
+    -webkit-backdrop-filter: var(--glass-blur);
+    backdrop-filter: var(--glass-blur);
+    box-shadow: var(--glass-rim), var(--shadow-sm);
+    color: var(--navy);
+    cursor: pointer;
+    transition: transform 0.2s ease;
+  }
+
+  .post-share__btn:hover {
+    color: var(--navy);
+    transform: translateY(-2px);
+  }
+
+  .post-share__done {
+    color: var(--green-fg);
+    font-weight: 700;
+    font-size: 0.9rem;
+  }
+</style>

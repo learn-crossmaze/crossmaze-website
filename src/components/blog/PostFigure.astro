@@ -1,0 +1,51 @@
+---
+// A photo in a post, in the site's thin glass frame, with an optional caption.
+import { Image } from 'astro:assets';
+import { hasImage, image } from '../../data/content';
+
+interface Props {
+  photo: string;
+  alt: string;
+  caption?: string;
+  /** Wider sizes for photos that fill the page width. */
+  wide?: boolean;
+  eager?: boolean;
+  class?: string;
+}
+const { photo, alt, caption, wide = false, eager = false, class: className } = Astro.props;
+---
+
+{
+  hasImage(photo) && (
+    <figure class:list={['post-figure', className]}>
+      <Image
+        src={image(photo)}
+        alt={alt}
+        widths={wide ? [640, 960, 1280, 1600] : [480, 720, 960]}
+        sizes={wide ? '(max-width: 1200px) 100vw, 1180px' : '(max-width: 760px) 100vw, 720px'}
+        loading={eager ? 'eager' : 'lazy'}
+      />
+      {caption && <figcaption>{caption}</figcaption>}
+    </figure>
+  )
+}
+
+<style>
+  .post-figure {
+    margin: 28px 0;
+  }
+  .post-figure :global(img) {
+    width: 100%;
+    height: auto;
+    padding: 5px;
+    border-radius: var(--radius-photo-sm);
+    background: var(--g-ring);
+    box-shadow: var(--shadow);
+  }
+  .post-figure figcaption {
+    margin-top: 10px;
+    color: var(--muted);
+    font-size: 0.92rem;
+    text-align: center;
+  }
+</style>

@@ -1,0 +1,16 @@
+---
+import type { Post } from '../../data/blog';
+
+interface Props {
+  post: Post;
+}
+const { post } = Astro.props;
+---
+
+<nav aria-label="Breadcrumb">
+  <ol class="breadcrumbs">
+    <li><a href="/">Home</a></li>
+    <li><a href="/blog">Blog</a></li>
+    <li><span aria-current="page">{post.title}</span></li>
+  </ol>
+</nav>

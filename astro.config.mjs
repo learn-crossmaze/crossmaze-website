@@ -9,5 +9,6 @@ export default defineConfig({
   // serves them at clean URLs (/about) and redirects trailing slashes away.
   trailingSlash: 'never',
   build: { format: 'file' },
-  integrations: [react(), sitemap({ filter: (page) => !page.includes('/admin') })],
+  // Blog draft previews (/blog/preview/…) are private links, kept out of the sitemap.
+  integrations: [react(), sitemap({ filter: (page) => !page.includes('/admin') && !page.includes('/blog/preview/') })],
 });

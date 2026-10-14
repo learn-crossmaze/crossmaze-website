@@ -1,0 +1,93 @@
+---
+// Classic: a clean article. Title on the banner, the cover photo below it, then a single readable
+// column of text with photos, a quote card and the key points.
+import FloatingShapes from '../FloatingShapes.astro';
+import PostCrumbs from './PostCrumbs.astro';
+import PostMeta from './PostMeta.astro';
+import PostFigure from './PostFigure.astro';
+import PostQuote from './PostQuote.astro';
+import PostTakeaways from './PostTakeaways.astro';
+import PostEnd from './PostEnd.astro';
+import RichText from './RichText.astro';
+import { categoryLabel, type Post } from '../../data/blog';
+
+interface Props {
+  post: Post;
+}
+const { post } = Astro.props;
+const quoteAfter = Math.min(1, post.sections.length - 1);
+---
+
+<section class="page-hero classic-hero">
+  <FloatingShapes />
+  <div class="container classic-narrow">
+    <PostCrumbs post={post} />
+    <span class="eyebrow">{categoryLabel(post.category)}</span>
+    <h1>{post.title}</h1>
+    {post.summary && <p class="lead">{post.summary}</p>}
+    <PostMeta post={post} />
+  </div>
+</section>
+
+<section class="section section--tight classic-body">
+  <div class="container">
+    <PostFigure photo={post.cover} alt={post.coverAlt || post.title} wide eager class="classic-cover" />
+    <div class="classic-narrow">
+      <RichText text={post.intro} class="classic-intro" />
+      {
+        post.sections.map((s, i) => (
+          <>
+            {s.heading && <h2>{s.heading}</h2>}
+            <RichText text={s.text} />
+            <PostFigure photo={s.photo} alt={s.caption || s.heading || post.title} caption={s.caption} />
+            {i === quoteAfter && <PostQuote text={post.quote.text} by={post.quote.by} />}
+          </>
+        ))
+      }
+      {post.sections.length === 0 && <PostQuote text={post.quote.text} by={post.quote.by} />}
+      <PostTakeaways items={post.takeaways} />
+    </div>
+  </div>
+</section>
+
+<PostEnd post={post} />
+
+<style>
+  .classic-narrow {
+    max-width: calc(720px + var(--gutter) * 2);
+    margin-inline: auto;
+  }
+
+  .classic-hero h1 {
+    max-width: 22ch;
+  }
+
+  .classic-hero .lead {
+    margin-bottom: 18px;
+  }
+
+  .classic-body {
+    padding-top: 0;
+  }
+
+  .classic-body :global(.classic-cover) {
+    max-width: 1000px;
+    margin: 0 auto clamp(28px, 4vw, 44px);
+  }
+
+  .classic-body :global(.classic-cover img) {
+    aspect-ratio: 16 / 9;
+    object-fit: cover;
+    border-radius: var(--radius-photo);
+  }
+
+  .classic-body h2 {
+    margin-top: 1.6em;
+    font-size: clamp(1.4rem, 2.6vw, 1.8rem);
+  }
+
+  .classic-body :global(.classic-intro) {
+    font-size: clamp(1.12rem, 1.6vw, 1.25rem);
+    color: var(--ink);
+  }
+</style>

@@ -1,0 +1,239 @@
+---
+// Photo story: large photos beside short text, alternating sides, and every photo opens in a
+// swipeable album. For events, trips and celebrations.
+import { Image, getImage } from 'astro:assets';
+import FloatingShapes from '../FloatingShapes.astro';
+import Icon from '../Icon.astro';
+import PhotoAlbum from '../PhotoAlbum.astro';
+import PostCrumbs from './PostCrumbs.astro';
+import PostMeta from './PostMeta.astro';
+import PostQuote from './PostQuote.astro';
+import PostTakeaways from './PostTakeaways.astro';
+import PostEnd from './PostEnd.astro';
+import RichText from './RichText.astro';
+import { hasImage, image } from '../../data/content';
+import { categoryLabel, photosOf, type Post } from '../../data/blog';
+
+interface Props {
+  post: Post;
+}
+const { post } = Astro.props;
+const photos = photosOf(post);
+// Without JavaScript a photo link opens the full-size photo.
+const full = await Promise.all(photos.map((p) => getImage({ src: p.src, width: 1600, format: 'webp' })));
+const indexOf = (path: string) => (hasImage(path) ? photos.findIndex((p) => p.src.src === image(path).src) : -1);
+// The cover gets its own wide photo only when no section shows the same picture.
+const coverIndex = post.sections.some((s) => s.photo && indexOf(s.photo) === indexOf(post.cover)) ? -1 : indexOf(post.cover);
+---
+
+<section class="page-hero story-hero">
+  <FloatingShapes />
+  <div class="container story-head">
+    <PostCrumbs post={post} />
+    <span class="eyebrow">{categoryLabel(post.category)}</span>
+    <h1>{post.title}</h1>
+    {post.summary && <p class="lead">{post.summary}</p>}
+    <PostMeta post={post} />
+  </div>
+</section>
+
+<section class="section section--tight story-body">
+  <div class="container">
+    {
+      coverIndex >= 0 && (
+        <a class="story-cover" href={full[coverIndex]!.src} data-album-for="story" data-album-open={coverIndex} aria-haspopup="dialog">
+          <Image
+            src={photos[coverIndex]!.src}
+            alt={post.coverAlt || post.title}
+            widths={[640, 960, 1280, 1600]}
+            sizes="(max-width: 1220px) 100vw, 1180px"
+            loading="eager"
+          />
+          <span class="story-chip">
+            <Icon name="Images" size={16} /> {photos.length} photo{photos.length === 1 ? '' : 's'}
+          </span>
+        </a>
+      )
+    }
+    <RichText text={post.intro} class="story-intro" />
+
+    <div class="story-rows">
+      {
+        post.sections.map((s) => {
+          const i = indexOf(s.photo);
+          return (
+            <article class:list={['story-row', { 'story-row--text': i < 0 }]}>
+              {i >= 0 && (
+                <a class="story-photo" href={full[i]!.src} data-album-for="story" data-album-open={i} aria-haspopup="dialog">
+                  <Image src={photos[i]!.src} alt={s.caption || s.heading || post.title} widths={[480, 720, 960]} sizes="(max-width: 860px) 100vw, 580px" />
+                  {s.caption && <span class="story-chip">{s.caption}</span>}
+                </a>
+              )}
+              <div class="story-text">
+                {s.heading && <h2>{s.heading}</h2>}
+                <RichText text={s.text} />
+              </div>
+            </article>
+          );
+        })
+      }
+    </div>
+
+    <div class="story-narrow">
+      <PostQuote text={post.quote.text} by={post.quote.by} variant="big" />
+      <PostTakeaways items={post.takeaways} />
+    </div>
+  </div>
+</section>
+
+{
+  photos.length > 0 && (
+    <PhotoAlbum
+      id="story"
+      photos={photos.map((p) => p.src)}
+      title={post.title}
+      alt={(n) => photos[n - 1]!.alt}
+      captions={photos.map((p) => ({ title: p.caption }))}
+    />
+  )
+}
+
+<PostEnd post={post} />
+
+<style>
+  .story-head {
+    text-align: center;
+  }
+
+  .story-head :global(.breadcrumbs),
+  .story-head :global(.post-meta) {
+    justify-content: center;
+  }
+
+  .story-head h1,
+  .story-head .lead {
+    margin-inline: auto;
+  }
+
+  .story-head h1 {
+    max-width: 20ch;
+  }
+
+  .story-head .lead {
+    margin-bottom: 18px;
+  }
+
+  /* The centred title fills the banner on narrow screens, where the doodles would sit behind it. */
+  @media (max-width: 900px) {
+    .story-hero :global(.fx__shape) {
+      display: none;
+    }
+  }
+
+  .story-body {
+    padding-top: 0;
+  }
+
+  .story-cover,
+  .story-photo {
+    position: relative;
+    display: block;
+    cursor: zoom-in;
+  }
+
+  .story-cover :global(img),
+  .story-photo :global(img) {
+    width: 100%;
+    height: auto;
+    object-fit: cover;
+    padding: 6px;
+    border-radius: var(--radius-photo);
+    background: var(--g-ring);
+    box-shadow: var(--shadow);
+    transition: transform 0.4s ease;
+  }
+
+  .story-cover :global(img) {
+    aspect-ratio: 21 / 9;
+  }
+
+  .story-photo :global(img) {
+    aspect-ratio: 4 / 3;
+  }
+
+  .story-cover:hover :global(img),
+  .story-photo:hover :global(img) {
+    transform: scale(1.01);
+  }
+
+  /* Captions on liquid glass over the photo. */
+  .story-chip {
+    position: absolute;
+    left: 20px;
+    bottom: 20px;
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    max-width: calc(100% - 40px);
+    padding: 6px 14px;
+    border: 1px solid var(--glass-edge);
+    border-radius: 999px;
+    background: var(--glass-thick);
+    -webkit-backdrop-filter: var(--glass-blur);
+    backdrop-filter: var(--glass-blur);
+    box-shadow: var(--glass-rim), var(--shadow-sm);
+    color: var(--ink);
+    font-weight: 800;
+    font-size: 0.9rem;
+  }
+
+  .story-body :global(.story-intro) {
+    max-width: 62ch;
+    margin: clamp(28px, 4vw, 44px) auto 0;
+    font-size: clamp(1.12rem, 1.6vw, 1.25rem);
+    text-align: center;
+  }
+
+  .story-rows {
+    display: grid;
+    gap: clamp(36px, 6vw, 72px);
+    margin-top: clamp(36px, 6vw, 72px);
+  }
+
+  .story-row {
+    display: grid;
+    grid-template-columns: 1.15fr 1fr;
+    align-items: center;
+    gap: clamp(24px, 4vw, 56px);
+  }
+
+  .story-row:nth-child(even) .story-photo {
+    order: 2;
+  }
+
+  .story-row--text {
+    grid-template-columns: minmax(0, 62ch);
+    justify-content: center;
+  }
+
+  .story-text h2 {
+    font-size: clamp(1.5rem, 3vw, 2.1rem);
+  }
+
+  @media (max-width: 860px) {
+    .story-row {
+      grid-template-columns: 1fr;
+    }
+    .story-row:nth-child(even) .story-photo {
+      order: 0;
+    }
+    .story-cover :global(img) {
+      aspect-ratio: 4 / 3;
+    }
+  }
+
+  .story-narrow {
+    max-width: 760px;
+    margin: clamp(28px, 4vw, 48px) auto 0;
+  }
+</style>

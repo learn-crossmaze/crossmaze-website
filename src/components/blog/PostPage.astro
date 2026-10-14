@@ -1,0 +1,87 @@
+---
+// One blog post, in the template it was written for.
+import BaseLayout from '../../layouts/BaseLayout.astro';
+import Icon from '../Icon.astro';
+import TemplateClassic from './TemplateClassic.astro';
+import TemplateMagazine from './TemplateMagazine.astro';
+import TemplateStory from './TemplateStory.astro';
+import TemplateTips from './TemplateTips.astro';
+import TemplateNotice from './TemplateNotice.astro';
+import TemplateLetter from './TemplateLetter.astro';
+import { site } from '../../data/site';
+import { cover, postUrl, templateOf, type Post } from '../../data/blog';
+
+interface Props {
+  post: Post;
+}
+const { post } = Astro.props;
+const draft = post.hidden === true;
+const photo = cover(post);
+const url = new URL(postUrl(post), Astro.site ?? site.url).href;
+
+const article = {
+  '@context': 'https://schema.org',
+  '@type': 'BlogPosting',
+  headline: post.title,
+  description: post.summary,
+  datePublished: post.date || undefined,
+  mainEntityOfPage: url,
+  author: post.author?.name ? { '@type': 'Person', name: post.author.name } : { '@type': 'Organization', name: site.fullName },
+  publisher: { '@type': 'Organization', name: site.fullName, url: site.url },
+};
+
+const Template = {
+  classic: TemplateClassic,
+  magazine: TemplateMagazine,
+  story: TemplateStory,
+  tips: TemplateTips,
+  notice: TemplateNotice,
+  letter: TemplateLetter,
+}[templateOf(post)];
+---
+
+<BaseLayout title={post.title} description={post.summary || site.description} image={photo} type="article" noindex={draft} jsonLd={draft ? undefined : article}>
+  <Template post={post} />
+  {
+    draft && (
+      <div class="draft-bar" role="note">
+        <Icon name="EyeOff" size={18} />
+        <span>
+          <strong>Draft preview.</strong> Only people with this link can see it. To publish it, untick “Hide from website” in the admin panel
+          and press Publish.
+        </span>
+      </div>
+    )
+  }
+</BaseLayout>
+
+<style>
+  /* Centred in the space left of the WhatsApp button. */
+  .draft-bar {
+    position: fixed;
+    left: 16px;
+    right: 90px;
+    bottom: max(16px, env(safe-area-inset-bottom));
+    z-index: 45;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    max-width: 680px;
+    margin-inline: auto;
+    padding: 12px 18px;
+    border: 1px solid var(--glass-edge);
+    border-radius: 18px;
+    background: var(--glass-thick);
+    -webkit-backdrop-filter: var(--glass-blur);
+    backdrop-filter: var(--glass-blur);
+    box-shadow: var(--glass-rim), var(--shadow-lift);
+    color: var(--ink);
+    font-size: 0.92rem;
+    line-height: 1.4;
+  }
+
+  .draft-bar :global(svg) {
+    flex: none;
+    color: var(--coral-fg);
+  }
+</style>

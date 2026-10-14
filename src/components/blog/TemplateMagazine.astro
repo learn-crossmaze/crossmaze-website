@@ -1,0 +1,229 @@
+---
+// Magazine: a big cover photo with the title on a glass panel over it, a contents list beside the
+// text, a drop cap and a large pull quote. For longer reads.
+import { Image } from 'astro:assets';
+import PostCrumbs from './PostCrumbs.astro';
+import PostMeta from './PostMeta.astro';
+import PostFigure from './PostFigure.astro';
+import PostQuote from './PostQuote.astro';
+import PostShare from './PostShare.astro';
+import PostTakeaways from './PostTakeaways.astro';
+import PostEnd from './PostEnd.astro';
+import RichText from './RichText.astro';
+import { categoryLabel, cover, type Post } from '../../data/blog';
+
+interface Props {
+  post: Post;
+}
+const { post } = Astro.props;
+const photo = cover(post);
+const contents = post.sections.map((s, i) => ({ id: `part-${i + 1}`, heading: s.heading })).filter((c) => c.heading);
+const quoteAfter = Math.min(1, post.sections.length - 1);
+---
+
+<section class="page-hero mag-hero">
+  <div class="container">
+    <PostCrumbs post={post} />
+    <div class:list={['mag-hero__frame', { 'mag-hero__frame--plain': !photo }]}>
+      {
+        photo && (
+          <Image
+            class="mag-hero__photo"
+            src={photo}
+            alt={post.coverAlt || post.title}
+            widths={[640, 960, 1280, 1600]}
+            sizes="(max-width: 1220px) 100vw, 1180px"
+            loading="eager"
+          />
+        )
+      }
+      <div class="mag-hero__panel">
+        <span class="eyebrow">{categoryLabel(post.category)}</span>
+        <h1>{post.title}</h1>
+        {post.summary && <p class="mag-hero__summary">{post.summary}</p>}
+        <PostMeta post={post} />
+      </div>
+    </div>
+  </div>
+</section>
+
+<section class="section section--tight mag-body">
+  <div class="container mag-layout">
+    <aside class="mag-aside">
+      <div class="card mag-toc">
+        {
+          contents.length > 0 && (
+            <>
+              <p class="mag-toc__title">In this story</p>
+              <ol>
+                {contents.map((c) => (
+                  <li>
+                    <a href={`#${c.id}`}>{c.heading}</a>
+                  </li>
+                ))}
+              </ol>
+            </>
+          )
+        }
+        <PostShare post={post} />
+      </div>
+    </aside>
+    <div class="mag-article">
+      <RichText text={post.intro} class="mag-intro" />
+      {
+        post.sections.map((s, i) => (
+          <>
+            {s.heading && <h2 id={`part-${i + 1}`}>{s.heading}</h2>}
+            <RichText text={s.text} />
+            <PostFigure photo={s.photo} alt={s.caption || s.heading || post.title} caption={s.caption} />
+            {i === quoteAfter && <PostQuote text={post.quote.text} by={post.quote.by} variant="big" />}
+          </>
+        ))
+      }
+      {post.sections.length === 0 && <PostQuote text={post.quote.text} by={post.quote.by} variant="big" />}
+      <PostTakeaways items={post.takeaways} />
+    </div>
+  </div>
+</section>
+
+<PostEnd post={post} noShare />
+
+<style>
+  .mag-hero__frame {
+    position: relative;
+    margin-top: 6px;
+  }
+
+  .mag-hero :global(.mag-hero__photo) {
+    display: block;
+    width: 100%;
+    height: clamp(380px, 52vw, 600px);
+    object-fit: cover;
+    padding: 6px;
+    border-radius: var(--radius-photo);
+    background: var(--g-ring);
+    box-shadow: var(--shadow-lift);
+  }
+
+  /* The title sits on liquid glass over the bottom of the photo. */
+  .mag-hero__panel {
+    position: absolute;
+    left: clamp(16px, 3vw, 36px);
+    bottom: clamp(16px, 3vw, 36px);
+    max-width: min(640px, calc(100% - 32px));
+    padding: clamp(20px, 3vw, 32px);
+    border: 1px solid var(--glass-edge);
+    border-radius: var(--radius-card);
+    background: var(--glass-thick);
+    -webkit-backdrop-filter: var(--glass-blur);
+    backdrop-filter: var(--glass-blur);
+    box-shadow: var(--glass-rim), var(--shadow);
+  }
+
+  .mag-hero__panel h1 {
+    font-size: clamp(1.9rem, 4vw, 3rem);
+  }
+
+  .mag-hero__summary {
+    margin: 0 0 14px;
+    color: var(--muted);
+    font-size: 1.05rem;
+  }
+
+  .mag-hero__frame--plain .mag-hero__panel {
+    position: static;
+    max-width: 760px;
+  }
+
+  @media (max-width: 760px) {
+    .mag-hero :global(.mag-hero__photo) {
+      height: 320px;
+    }
+    .mag-hero__panel {
+      position: relative;
+      left: auto;
+      bottom: auto;
+      max-width: none;
+      margin: -64px 12px 0;
+    }
+  }
+
+  .mag-layout {
+    display: grid;
+    grid-template-columns: 250px minmax(0, 720px);
+    justify-content: center;
+    gap: clamp(28px, 4vw, 56px);
+  }
+
+  .mag-toc {
+    position: sticky;
+    top: calc(var(--header-gap) + var(--header-h) + 20px);
+    display: grid;
+    gap: 18px;
+    padding: 22px;
+  }
+
+  .mag-toc__title {
+    margin: 0;
+    color: var(--eyebrow-fg);
+    font-family: var(--font-display);
+    font-weight: 600;
+    font-size: 0.82rem;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+  }
+
+  .mag-toc ol {
+    display: grid;
+    gap: 10px;
+    margin: 0;
+    padding-left: 1.2em;
+    font-weight: 700;
+    line-height: 1.35;
+  }
+
+  .mag-toc a {
+    color: var(--ink);
+    text-decoration: none;
+  }
+
+  .mag-toc a:hover {
+    color: var(--navy);
+    text-decoration: underline;
+  }
+
+  .mag-toc ol li::marker {
+    color: var(--coral);
+  }
+
+  @media (max-width: 900px) {
+    .mag-layout {
+      grid-template-columns: minmax(0, 1fr);
+    }
+    .mag-toc {
+      position: static;
+    }
+  }
+
+  .mag-article h2 {
+    margin-top: 1.6em;
+    font-size: clamp(1.4rem, 2.6vw, 1.85rem);
+    scroll-margin-top: calc(var(--header-gap) + var(--header-h) + 20px);
+  }
+
+  .mag-article :global(.mag-intro) {
+    font-size: clamp(1.12rem, 1.6vw, 1.25rem);
+    color: var(--ink);
+  }
+
+  /* A large first letter, in the heading colours. */
+  .mag-article :global(.mag-intro > p:first-child::first-letter) {
+    float: left;
+    margin: 0.06em 0.12em 0 0;
+    font-family: var(--font-display);
+    font-weight: var(--display-weight);
+    font-size: 3.6em;
+    line-height: 0.82;
+    color: var(--navy);
+  }
+</style>

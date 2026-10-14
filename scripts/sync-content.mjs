@@ -27,7 +27,10 @@ const contentDir = path.join(root, 'content');
 const assetsDir = path.join(root, 'src', 'assets');
 const cmsDir = path.join(assetsDir, 'cms');
 
-const COLLECTIONS = ['branches', 'programs', 'jobs', 'testimonials'];
+const COLLECTIONS = ['branches', 'programs', 'jobs', 'testimonials', 'posts'];
+// Collections that Firestore was first seeded with. Ones added later (the blog) are copied in from the
+// repository the first time a deploy finds them empty, then left to the admin panel; see pull().
+const FIRST_COLLECTIONS = ['branches', 'programs', 'jobs', 'testimonials'];
 const SINGLETONS = ['site', 'sections'];
 
 const args = new Set(process.argv.slice(2));
@@ -63,6 +66,10 @@ async function mapImages(kind, item, fn) {
   } else if (kind === 'branches') {
     copy.photos = await each(copy.photos, fn);
     if (copy.centerHead?.photo) copy.centerHead.photo = await fn(copy.centerHead.photo);
+  } else if (kind === 'posts') {
+    copy.cover = await fn(copy.cover);
+    copy.sections = await each(copy.sections, async (s) => (s?.photo ? { ...s, photo: await fn(s.photo) } : s));
+    if (copy.author?.photo) copy.author.photo = await fn(copy.author.photo);
   }
   return copy;
 }
@@ -77,6 +84,20 @@ async function uploadPhoto(bucket, localPath) {
   const [exists] = await bucket.file(dest).exists();
   if (!exists) await bucket.upload(file, { destination: dest, metadata: { cacheControl: 'public, max-age=3600' } });
   return dest;
+}
+
+/** Copies one collection from the repository into Firestore (photos to Storage) and records it as seeded. */
+async function seedCollection(db, bucket, name) {
+  const batch = db.batch();
+  for (const [order, item] of readJson(name).entries()) {
+    const data = await mapImages(name, item, (localPath) => uploadPhoto(bucket, localPath));
+    batch.set(db.doc(`${name}/${item.slug}`), { ...data, order });
+  }
+  // FIRST_COLLECTIONS too: older Firestore copies don't list them, and an empty list would make an
+  // emptied collection (say, every testimonial deleted) look new and be refilled from the repository.
+  batch.set(db.doc('meta/content'), { seededCollections: FieldValue.arrayUnion(...FIRST_COLLECTIONS, name) }, { merge: true });
+  await batch.commit();
+  console.log(`Added ${name} to Firestore from the repository (${readJson(name).length} items).`);
 }
 
 async function seed(db, bucket) {
@@ -95,7 +116,11 @@ async function seed(db, bucket) {
       batch.set(db.doc(`${name}/${id}`), { ...data, order });
     }
   }
-  batch.set(db.doc('meta/content'), { seededAt: FieldValue.serverTimestamp(), updatedAt: FieldValue.serverTimestamp() });
+  batch.set(db.doc('meta/content'), {
+    seededAt: FieldValue.serverTimestamp(),
+    updatedAt: FieldValue.serverTimestamp(),
+    seededCollections: COLLECTIONS,
+  });
   // The repository copy just written already contains every content update.
   const included = ContentUpdates.files().map((u) => [u.id, { appliedAt: FieldValue.serverTimestamp(), changed: 0, seeded: true }]);
   if (included.length) batch.set(db.doc('meta/contentUpdates'), { applied: Object.fromEntries(included) }, { merge: true });
@@ -139,6 +164,24 @@ const normalize = {
   programs: (p) => ({ ...p, paragraphs: list(p.paragraphs), focus: list(p.focus) }),
   jobs: (j) => ({ ...j, timings: list(j.timings), responsibilities: list(j.responsibilities).filter((r) => r.text) }),
   testimonials: (t) => t,
+  posts: (p) => ({
+    ...p,
+    title: text(p.title),
+    date: /^\d{4}-\d{2}-\d{2}$/.test(text(p.date)) ? p.date : '',
+    category: text(p.category) || 'news',
+    template: text(p.template) || 'classic',
+    summary: text(p.summary),
+    cover: text(p.cover),
+    coverAlt: text(p.coverAlt),
+    intro: text(p.intro),
+    sections: list(p.sections)
+      .map((s) => ({ heading: text(s.heading), text: text(s.text), photo: text(s.photo), caption: text(s.caption) }))
+      .filter((s) => s.heading || s.text || s.photo),
+    quote: { text: text(p.quote?.text), by: text(p.quote?.by) },
+    takeaways: list(p.takeaways).map(text),
+    author: { name: text(p.author?.name), role: text(p.author?.role), photo: text(p.author?.photo) },
+    cta: { label: text(p.cta?.label), link: text(p.cta?.link) },
+  }),
 };
 
 const required = {
@@ -147,6 +190,7 @@ const required = {
   programs: ['slug', 'name', 'photo'],
   jobs: ['slug', 'title'],
   testimonials: ['quote', 'name'],
+  posts: ['slug', 'title'],
 };
 
 function check(kind, item, label) {
@@ -154,6 +198,7 @@ function check(kind, item, label) {
     if (!text(item[key]).trim()) throw new Error(`${label} is missing "${key}". Fill it in on the admin panel and publish again.`);
   }
   if (kind === 'branches' && !/^[a-z0-9-]+$/.test(item.slug)) throw new Error(`Branch "${item.name}" has an invalid web address.`);
+  if (kind === 'posts' && !/^[a-z0-9-]+$/.test(item.slug)) throw new Error(`Blog post "${item.title}" has an invalid web address.`);
 }
 
 /**
@@ -314,6 +359,7 @@ async function pull(db, bucket) {
   fs.rmSync(cmsDir, { recursive: true, force: true });
   const out = {};
   const updates = await ContentUpdates.load(db);
+  const seeded = new Set((await db.doc('meta/content').get()).data()?.seededCollections ?? FIRST_COLLECTIONS);
 
   for (const name of SINGLETONS) {
     const snap = await db.doc(`content/${name}`).get();
@@ -323,15 +369,29 @@ async function pull(db, bucket) {
     out[name] = await mapImages(name, data, download);
   }
   for (const name of COLLECTIONS) {
-    const snap = await db.collection(name).get();
-    const docs = snap.docs
-      .map((d) => ({ id: d.id, ...updates.apply(`${name}/${d.id}`, d.data()) }))
-      .filter((d) => d.hidden !== true)
+    let snap = await db.collection(name).get();
+    let docs;
+    if (snap.empty && !seeded.has(name)) {
+      // A collection added to the site after Firestore was seeded (the blog): start it from the
+      // repository's copy. Deploys from main store it in Firestore; previews only build from it.
+      if (args.has('--add-missing')) {
+        await seedCollection(db, bucket, name);
+        snap = await db.collection(name).get();
+      } else {
+        console.log(`Firestore has no ${name} yet; using the repository's copy.`);
+        docs = readJson(name).map((item, order) => ({ id: item.slug, ...item, order }));
+      }
+    }
+    docs ??= snap.docs.map((d) => ({ id: d.id, ...updates.apply(`${name}/${d.id}`, d.data()) }));
+    docs = docs
+      // Hidden blog posts are kept as drafts: they are built only at their private preview address.
+      .filter((d) => d.hidden !== true || name === 'posts')
       .sort((a, b) => (a.order ?? 0) - (b.order ?? 0));
     out[name] = [];
     for (const doc of docs) {
       const { id, order, hidden, updatedAt, ...rest } = doc;
       const item = normalize[name](name === 'testimonials' ? rest : { ...rest, slug: rest.slug || id });
+      if (name === 'posts' && hidden === true) item.hidden = true;
       check(name, item, `${name.replace(/s$/, '')} "${item.name ?? item.title ?? id}"`);
       out[name].push(await mapImages(name, item, download));
     }
@@ -341,7 +401,7 @@ async function pull(db, bucket) {
   await updates.finish(db, args.has('--add-missing'), bucket);
   const downloaded = fs.existsSync(cmsDir) ? fs.readdirSync(cmsDir, { recursive: true }).filter((f) => /\.\w+$/.test(f)).length : 0;
   console.log(
-    `Pulled content from Firestore: ${out.branches.length} branches, ${out.programs.length} programs, ${out.jobs.length} jobs, ${out.testimonials.length} testimonials; ${downloaded} new photos downloaded.`,
+    `Pulled content from Firestore: ${out.branches.length} branches, ${out.programs.length} programs, ${out.jobs.length} jobs, ${out.testimonials.length} testimonials, ${out.posts.filter((p) => !p.hidden).length} blog posts (+${out.posts.filter((p) => p.hidden).length} drafts); ${downloaded} new photos downloaded.`,
   );
 }
 

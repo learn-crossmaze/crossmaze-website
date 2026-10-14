@@ -94,6 +94,8 @@ window.addEventListener('click', (event) => {
   const channel = href.startsWith('tel:') ? 'phone' : /^https:\/\/(wa\.me|api\.whatsapp\.com)\//.test(href) ? 'whatsapp' : '';
   if (!channel) return;
   const number = href.replace(/\?.*$/, '').replace(/\D/g, '');
+  // A "share on WhatsApp" link (wa.me/?text=…) has no number: it isn't someone contacting a centre.
+  if (!number) return;
   const inPicker = Boolean(link.closest('.call-picker'));
 
   send({

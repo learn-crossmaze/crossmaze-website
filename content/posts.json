@@ -1,0 +1,318 @@
+[
+  {
+    "slug": "getting-ready-for-preschool",
+    "title": "Getting ready for the first day of preschool",
+    "date": "2026-10-13",
+    "category": "tips",
+    "template": "classic",
+    "summary": "Small, simple steps that help a young child, and their parents, feel ready for a happy start at preschool.",
+    "cover": "photos/class-table.jpg",
+    "coverAlt": "Two children working together at a classroom table",
+    "intro": "The first day of preschool is a big step for a little person, and often for their parents too. A few small routines in the weeks before can turn nervous excitement into a confident start.",
+    "sections": [
+      {
+        "heading": "Talk about it, cheerfully",
+        "text": "Mention preschool now and then in everyday chat: the friends your child will meet, the songs they will sing and the toys they will play with. Keep it light and positive, and answer questions simply and honestly.",
+        "photo": "",
+        "caption": ""
+      },
+      {
+        "heading": "Practise the new routine",
+        "text": "A week or two before school starts, move bedtime and wake-up time to match the school day. Try a short morning rehearsal: breakfast, getting dressed and leaving the house at the same time each day.\n\n- Pack the school bag together the night before\n- Let your child choose their water bottle or lunch box\n- Keep mornings calm and unhurried",
+        "photo": "photos/corridor.jpg",
+        "caption": "A bright, open space to explore helps new children feel at home."
+      },
+      {
+        "heading": "Keep goodbyes short and warm",
+        "text": "A hug, a clear goodbye and a promise of when you will be back works better than slipping away. Children settle faster when they know what to expect, and teachers are used to helping with first-day tears.",
+        "photo": "",
+        "caption": ""
+      },
+      {
+        "heading": "Celebrate the small wins",
+        "text": "Ask about the day with open questions such as **“What made you smile today?”** and celebrate every small step, from saying hello to a new friend to trying a new activity.",
+        "photo": "",
+        "caption": ""
+      }
+    ],
+    "quote": {
+      "text": "Children settle faster when they know what to expect.",
+      "by": ""
+    },
+    "takeaways": [
+      "Talk about preschool positively and often",
+      "Start the school-day routine a week or two early",
+      "Say a short, warm goodbye and come back on time",
+      "Celebrate every small step"
+    ],
+    "author": {
+      "name": "The Crossmaze team",
+      "role": "",
+      "photo": ""
+    },
+    "cta": {
+      "label": "",
+      "link": ""
+    },
+    "hidden": true,
+    "previewKey": "78118aa7820b5d58"
+  },
+  {
+    "slug": "why-play-is-serious-learning",
+    "title": "Why play is serious learning",
+    "date": "2026-10-10",
+    "category": "learning",
+    "template": "magazine",
+    "summary": "Children under five learn best by seeing and doing. Here is what is really happening when a preschooler plays.",
+    "cover": "photos/play-area.jpg",
+    "coverAlt": "A bright indoor play area with rockers and slides on green turf",
+    "intro": "To a grown-up, it can look like a child is simply playing. Look closer and you will see a scientist testing ideas, an engineer building, a storyteller practising new words and a team player learning to take turns.",
+    "sections": [
+      {
+        "heading": "Learning through the senses",
+        "text": "Children under five understand the world best through what they see, touch and do. Hands-on Montessori materials let them learn through their senses, at their own pace, and what they learn this way stays with them.",
+        "photo": "photos/teacher-flashcards.jpg",
+        "caption": "Picture cards turn new words into something children can see and hold."
+      },
+      {
+        "heading": "Big skills from small games",
+        "text": "Stacking blocks builds early maths and patience. Pretend play builds language and empathy. Group games build problem-solving, communication and teamwork, the real-life skills that prepare children for what comes next.",
+        "photo": "",
+        "caption": ""
+      },
+      {
+        "heading": "Moving bodies, growing minds",
+        "text": "Movement matters too. Dance, yoga and outdoor play strengthen the body, improve balance and coordination, and help children focus when it is time to sit and listen.",
+        "photo": "photos/yoga.jpg",
+        "caption": "Yoga and movement help little bodies and minds find their balance."
+      },
+      {
+        "heading": "How to play along at home",
+        "text": "You don’t need special toys. Follow your child’s interests, ask open questions (“What happens if…?”), and give them time to try things their own way before stepping in.",
+        "photo": "",
+        "caption": ""
+      }
+    ],
+    "quote": {
+      "text": "Children under five learn best by seeing and doing.",
+      "by": ""
+    },
+    "takeaways": [],
+    "author": {
+      "name": "The Crossmaze team",
+      "role": "",
+      "photo": ""
+    },
+    "cta": {
+      "label": "",
+      "link": ""
+    },
+    "hidden": true,
+    "previewKey": "1e208b899ff646af"
+  },
+  {
+    "slug": "annual-day-moments",
+    "title": "Little stars on the big stage",
+    "date": "2026-10-06",
+    "category": "events",
+    "template": "story",
+    "summary": "Costumes, music and plenty of courage: a few of our favourite moments from annual day.",
+    "cover": "photos/annual-day-bees.jpg",
+    "coverAlt": "Children dressed as bees smiling on stage",
+    "intro": "Annual day is when our children step into the spotlight. Weeks of practice, bright costumes and a lot of courage came together on one very happy stage. Here are a few moments we loved.",
+    "sections": [
+      {
+        "heading": "Busy little bees",
+        "text": "Buzzing, twirling and grinning from ear to ear, our bees opened the show with plenty of energy.",
+        "photo": "photos/annual-day-bees.jpg",
+        "caption": "Our bees, ready to buzz"
+      },
+      {
+        "heading": "A visit from the forest",
+        "text": "Our little bears brought the forest to life, and remembered every step of their dance.",
+        "photo": "photos/annual-day-bears.jpg",
+        "caption": "Bears in the spotlight"
+      },
+      {
+        "heading": "Fairies and flowers",
+        "text": "A garden full of fairies filled the stage with colour and sparkle.",
+        "photo": "photos/annual-day-fairies.jpg",
+        "caption": "Fairy friends"
+      },
+      {
+        "heading": "Dancing in the rain",
+        "text": "Umbrellas up! A graceful dance that showed how much confidence our children have gained.",
+        "photo": "photos/dance-umbrella.jpg",
+        "caption": "Umbrellas up"
+      },
+      {
+        "heading": "A star solo",
+        "text": "Performing alone takes real courage. We could not be prouder.",
+        "photo": "photos/dance-solo.jpg",
+        "caption": "A brave solo performance"
+      }
+    ],
+    "quote": {
+      "text": "Every child on that stage was a star.",
+      "by": ""
+    },
+    "takeaways": [],
+    "author": {
+      "name": "The Crossmaze team",
+      "role": "",
+      "photo": ""
+    },
+    "cta": {
+      "label": "",
+      "link": ""
+    },
+    "hidden": true,
+    "previewKey": "45ad9b4836987f11"
+  },
+  {
+    "slug": "reading-habits-at-home",
+    "title": "Five simple ways to build a love of reading at home",
+    "date": "2026-10-02",
+    "category": "tips",
+    "template": "tips",
+    "summary": "Reading together for a few minutes a day does more than any app. Five easy habits that make books a favourite part of the day.",
+    "cover": "photos/teacher-flashcards.jpg",
+    "coverAlt": "A teacher showing a picture card to a group of children",
+    "intro": "A love of reading starts long before a child can read on their own. These five habits take only a few minutes a day.",
+    "sections": [
+      {
+        "heading": "Make it a daily ritual",
+        "text": "Pick a regular time, such as after dinner or just before bed, and read together every day, even if only for five minutes.",
+        "photo": "",
+        "caption": ""
+      },
+      {
+        "heading": "Let your child choose",
+        "text": "Children read more when they pick the book. Read the same favourite again and again; repetition builds vocabulary and confidence.",
+        "photo": "",
+        "caption": ""
+      },
+      {
+        "heading": "Talk about the pictures",
+        "text": "Point, ask and wonder together: “What do you think happens next?” “How does the bear feel?” Talking about a story matters as much as reading the words.",
+        "photo": "",
+        "caption": ""
+      },
+      {
+        "heading": "Keep books within reach",
+        "text": "A low shelf or a basket of books in the living room invites children to pick one up on their own.",
+        "photo": "",
+        "caption": ""
+      },
+      {
+        "heading": "Be a reading role model",
+        "text": "When children see the grown-ups around them reading, they learn that books are for everyone, not just for school.",
+        "photo": "",
+        "caption": ""
+      }
+    ],
+    "quote": {
+      "text": "",
+      "by": ""
+    },
+    "takeaways": [
+      "Read together every day, even briefly",
+      "Let your child choose (and repeat) favourites",
+      "Talk about the story and the pictures",
+      "Keep books where little hands can reach them"
+    ],
+    "author": {
+      "name": "The Crossmaze team",
+      "role": "",
+      "photo": ""
+    },
+    "cta": {
+      "label": "",
+      "link": ""
+    },
+    "hidden": true,
+    "previewKey": "abf1674dd37e368c"
+  },
+  {
+    "slug": "admissions-open",
+    "title": "Admissions are open",
+    "date": "2026-10-01",
+    "category": "announcements",
+    "template": "notice",
+    "summary": "Admissions are open for Play Group, Nursery, Junior KG, Senior KG and Day Care at our five centres in Electronic City and Begur.",
+    "cover": "branches/crossmaze-neotown/01.jpg",
+    "coverAlt": "A colourful indoor play area at Crossmaze Neotown",
+    "intro": "We are welcoming new children at all five Crossmaze centres in Electronic City and Begur.",
+    "sections": [
+      {
+        "heading": "Programs",
+        "text": "- Play Group\n- Nursery\n- Junior KG\n- Senior KG\n- Day Care",
+        "photo": "",
+        "caption": ""
+      },
+      {
+        "heading": "How to apply",
+        "text": "Fill in the enquiry form or call your nearest centre. Our admissions team will answer your questions and help you book a visit to see the classrooms and meet the teachers.",
+        "photo": "",
+        "caption": ""
+      }
+    ],
+    "quote": {
+      "text": "",
+      "by": ""
+    },
+    "takeaways": [],
+    "author": {
+      "name": "",
+      "role": "",
+      "photo": ""
+    },
+    "cta": {
+      "label": "Book a school visit",
+      "link": "/contact#enquire"
+    },
+    "hidden": true,
+    "previewKey": "bc8ec6e2cd15edce"
+  },
+  {
+    "slug": "a-note-to-our-parents",
+    "title": "A note to our parents",
+    "date": "2026-09-28",
+    "category": "letters",
+    "template": "letter",
+    "summary": "Thank you for trusting us with your children. A few words on what we believe in and how we work with families.",
+    "cover": "photos/yoga.jpg",
+    "coverAlt": "Children practising yoga together in a bright hall",
+    "intro": "Dear parents,\n\nThank you for trusting us with the most precious part of your life. Every morning, when your child walks through our doors, we take that trust seriously.",
+    "sections": [
+      {
+        "heading": "",
+        "text": "We believe every child is special. We embrace diversity and make sure every child feels valued and included, whatever their background or ability, and we set achievable goals for each child and celebrate every milestone, big or small.",
+        "photo": "",
+        "caption": ""
+      },
+      {
+        "heading": "",
+        "text": "We also believe in working together with you. We are open and honest with families, and we would love to hear from you, whether it is a question, an idea or simply a story from home about something your child learned.",
+        "photo": "",
+        "caption": ""
+      }
+    ],
+    "quote": {
+      "text": "Every child is special.",
+      "by": ""
+    },
+    "takeaways": [],
+    "author": {
+      "name": "The Crossmaze team",
+      "role": "Crossmaze Preschool & Day Care",
+      "photo": ""
+    },
+    "cta": {
+      "label": "",
+      "link": ""
+    },
+    "hidden": true,
+    "previewKey": "45730cd7151a09f0"
+  }
+]

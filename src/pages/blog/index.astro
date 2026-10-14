@@ -1,0 +1,155 @@
+---
+import BaseLayout from '../../layouts/BaseLayout.astro';
+import PageHero from '../../components/PageHero.astro';
+import PostCard from '../../components/blog/PostCard.astro';
+import Icon from '../../components/Icon.astro';
+import { categories, posts } from '../../data/blog';
+
+const [featured, ...rest] = posts;
+// Only the categories that have posts, in the usual order.
+const used = Object.keys(categories).filter((c) => posts.some((p) => p.category === c));
+---
+
+<BaseLayout title="Blog" description="Stories, tips and news from Crossmaze Preschool & Day Care: learning through play, parenting tips, events and announcements.">
+  <PageHero
+    eyebrow="Blog"
+    title="Stories, tips and news"
+    lead="Little moments from our classrooms, ideas to try at home and news from all our centres."
+    crumbs={[{ label: 'Blog' }]}
+  />
+
+  <section class="section section--tight blog-list">
+    <div class="container">
+      {
+        posts.length === 0 ? (
+          <div class="card blog-empty">
+            <span class="icon-badge tone-sky">
+              <Icon name="BookOpen" size={26} />
+            </span>
+            <h2>Our first stories are on their way</h2>
+            <p class="muted">Check back soon for news, events and tips from Crossmaze.</p>
+          </div>
+        ) : (
+          <>
+            {used.length > 1 && (
+              <div class="blog-filters" role="group" aria-label="Show posts about" hidden data-blog-filters>
+                <button type="button" class="blog-filter is-on" data-filter="all" aria-pressed="true">
+                  All
+                </button>
+                {used.map((c) => (
+                  <button type="button" class="blog-filter" data-filter={c} aria-pressed="false">
+                    {categories[c]}
+                  </button>
+                ))}
+              </div>
+            )}
+            <div class="blog-featured" data-blog-item data-category={featured!.category}>
+              <PostCard post={featured!} featured headingLevel="h2" />
+            </div>
+            {rest.length > 0 && (
+              <div class="grid grid--3 blog-grid">
+                {rest.map((p) => (
+                  <div data-blog-item data-category={p.category}>
+                    <PostCard post={p} headingLevel="h2" />
+                  </div>
+                ))}
+              </div>
+            )}
+            <p class="muted blog-none" hidden data-blog-none>
+              No posts in this category yet.
+            </p>
+          </>
+        )
+      }
+    </div>
+  </section>
+</BaseLayout>
+
+<script>
+  // Category buttons: show only the posts in the chosen category. Without JavaScript every post shows.
+  const bar = document.querySelector<HTMLElement>('[data-blog-filters]');
+  if (bar) {
+    bar.hidden = false;
+    const items = [...document.querySelectorAll<HTMLElement>('[data-blog-item]')];
+    const none = document.querySelector<HTMLElement>('[data-blog-none]');
+    bar.addEventListener('click', (event) => {
+      const button = (event.target as Element).closest<HTMLButtonElement>('[data-filter]');
+      if (!button) return;
+      const filter = button.dataset.filter;
+      bar.querySelectorAll<HTMLButtonElement>('[data-filter]').forEach((b) => {
+        const on = b === button;
+        b.classList.toggle('is-on', on);
+        b.setAttribute('aria-pressed', String(on));
+      });
+      let shown = 0;
+      for (const item of items) {
+        const show = filter === 'all' || item.dataset.category === filter;
+        item.hidden = !show;
+        if (show) shown += 1;
+      }
+      if (none) none.hidden = shown > 0;
+    });
+  }
+</script>
+
+<style>
+  .blog-list {
+    padding-top: 0;
+  }
+
+  .blog-filters {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 10px;
+    margin-bottom: 28px;
+  }
+
+  .blog-filters[hidden] {
+    display: none;
+  }
+
+  /* Glass pills; the chosen one fills with the theme's colour. */
+  .blog-filter {
+    padding: 9px 18px;
+    border: 1px solid var(--glass-edge);
+    border-radius: 999px;
+    background: var(--glass);
+    -webkit-backdrop-filter: var(--glass-blur);
+    backdrop-filter: var(--glass-blur);
+    box-shadow: var(--glass-rim), 0 0 0 1px color-mix(in srgb, var(--navy) 14%, transparent);
+    color: var(--navy);
+    font: inherit;
+    font-weight: 800;
+    font-size: 0.95rem;
+    cursor: pointer;
+  }
+
+  .blog-filter.is-on {
+    border-color: transparent;
+    background: var(--g-navy);
+    box-shadow: 0 8px 18px -12px color-mix(in srgb, var(--navy) 70%, transparent);
+    color: #fff;
+  }
+
+  .blog-featured {
+    margin-bottom: 24px;
+  }
+
+  [data-blog-item][hidden] {
+    display: none;
+  }
+
+  .blog-none {
+    text-align: center;
+  }
+
+  .blog-empty {
+    max-width: 560px;
+    margin-inline: auto;
+    text-align: center;
+  }
+
+  .blog-empty .icon-badge {
+    margin-inline: auto;
+  }
+</style>

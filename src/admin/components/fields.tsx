@@ -2,7 +2,7 @@ import { createContext, useContext, useId, useRef, useState, type ReactNode } fr
 import { icons } from '../icons';
 import { uploadImage, useImageUrl } from '../data';
 import type { FirebaseServices } from '../firebase';
-import { iconOptions, type Field, type Option } from '../schemas';
+import { iconOptions, templateOptions, type Field, type Option } from '../schemas';
 
 type Value = unknown;
 type Obj = Record<string, unknown>;
@@ -121,6 +121,27 @@ export function FieldEditor({ field, value, onChange }: { field: Exclude<Field, 
           />
         </Row>
       );
+    case 'date':
+      return (
+        <Row label={field.label} help={field.help} required={field.required} htmlFor={id}>
+          <input id={id} type="date" value={asText(value)} onChange={(e) => onChange(e.target.value)} />
+        </Row>
+      );
+    case 'template':
+      return (
+        <Row label={field.label} help={field.help} required={field.required}>
+          <div className="template-picker" role="radiogroup" aria-label={field.label}>
+            {templateOptions.map((t) => (
+              <label key={t.id} className={`template-option ${asText(value) === t.id ? 'on' : ''}`}>
+                <input type="radio" name={id} value={t.id} checked={asText(value) === t.id} onChange={() => onChange(t.id)} />
+                <TemplateSketch id={t.id} />
+                <strong>{t.label}</strong>
+                <span>{t.text}</span>
+              </label>
+            ))}
+          </div>
+        </Row>
+      );
     case 'boolean':
       return (
         <label className="check">
@@ -228,6 +249,90 @@ export function FieldEditor({ field, value, onChange }: { field: Exclude<Field, 
     case 'objects':
       return <ObjectsField field={field} value={asList<Obj>(value)} onChange={onChange} />;
   }
+}
+
+/** A small drawing of each blog design's layout, for the design picker. */
+function TemplateSketch({ id }: { id: string }) {
+  const photo = 'sk-photo';
+  const line = 'sk-line';
+  const card = 'sk-card';
+  const shapes: Record<string, ReactNode> = {
+    classic: (
+      <>
+        <rect className={line} x="30" y="8" width="60" height="5" rx="2" />
+        <rect className={line} x="38" y="16" width="44" height="3" rx="1.5" />
+        <rect className={photo} x="18" y="24" width="84" height="26" rx="4" />
+        <rect className={line} x="30" y="55" width="60" height="3" rx="1.5" />
+        <rect className={line} x="30" y="61" width="54" height="3" rx="1.5" />
+        <rect className={line} x="30" y="67" width="58" height="3" rx="1.5" />
+      </>
+    ),
+    magazine: (
+      <>
+        <rect className={photo} x="8" y="6" width="104" height="40" rx="5" />
+        <rect className={card} x="14" y="26" width="46" height="16" rx="3" />
+        <rect className={line} x="18" y="30" width="34" height="4" rx="2" />
+        <rect className={card} x="8" y="52" width="26" height="22" rx="3" />
+        <rect className={line} x="42" y="53" width="66" height="3" rx="1.5" />
+        <rect className={line} x="42" y="59" width="60" height="3" rx="1.5" />
+        <rect className={line} x="42" y="65" width="64" height="3" rx="1.5" />
+      </>
+    ),
+    story: (
+      <>
+        <rect className={photo} x="10" y="8" width="52" height="28" rx="4" />
+        <rect className={line} x="68" y="16" width="38" height="4" rx="2" />
+        <rect className={line} x="68" y="24" width="30" height="3" rx="1.5" />
+        <rect className={line} x="14" y="50" width="38" height="4" rx="2" />
+        <rect className={line} x="14" y="58" width="30" height="3" rx="1.5" />
+        <rect className={photo} x="58" y="42" width="52" height="28" rx="4" />
+      </>
+    ),
+    tips: (
+      <>
+        <rect className={line} x="10" y="8" width="56" height="5" rx="2" />
+        {[0, 1, 2].map((i) => (
+          <g key={i}>
+            <rect className={card} x={10 + i * 35} y="22" width="30" height="24" rx="3" />
+            <text className="sk-num" x={14 + i * 35} y="33">
+              {`0${i + 1}`}
+            </text>
+          </g>
+        ))}
+        <rect className={card} x="10" y="52" width="100" height="20" rx="3" />
+        <rect className={line} x="16" y="58" width="50" height="3" rx="1.5" />
+        <rect className={line} x="16" y="64" width="40" height="3" rx="1.5" />
+      </>
+    ),
+    notice: (
+      <>
+        <rect className={card} x="22" y="6" width="76" height="68" rx="5" />
+        <circle className={photo} cx="32" cy="16" r="5" />
+        <rect className={card} x="80" y="11" width="12" height="11" rx="2" />
+        <rect className={line} x="28" y="28" width="50" height="5" rx="2" />
+        <rect className={line} x="28" y="38" width="62" height="3" rx="1.5" />
+        <rect className={line} x="28" y="44" width="56" height="3" rx="1.5" />
+        <rect className="sk-button" x="28" y="56" width="30" height="9" rx="4.5" />
+      </>
+    ),
+    letter: (
+      <>
+        <rect className={card} x="20" y="6" width="80" height="68" rx="5" />
+        <circle className={photo} cx="30" cy="16" r="5" />
+        <rect className={line} x="38" y="14" width="30" height="3" rx="1.5" />
+        <rect className={photo} x="68" y="24" width="24" height="26" rx="2" transform="rotate(4 80 37)" />
+        <rect className={line} x="28" y="28" width="34" height="3" rx="1.5" />
+        <rect className={line} x="28" y="34" width="32" height="3" rx="1.5" />
+        <rect className={line} x="28" y="40" width="34" height="3" rx="1.5" />
+        <path className="sk-sign" d="M28 62 q6 -8 12 0 t12 0 t10 -2" />
+      </>
+    ),
+  };
+  return (
+    <svg className="template-sketch" viewBox="0 0 120 80" aria-hidden="true">
+      {shapes[id]}
+    </svg>
+  );
 }
 
 function ObjectsField({ field, value, onChange }: { field: Extract<Field, { type: 'objects' }>; value: Obj[]; onChange: (v: Value) => void }) {

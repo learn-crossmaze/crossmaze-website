@@ -90,6 +90,7 @@ const links = [
   { href: '#/programs', icon: 'BookMarked', title: 'Programs', text: 'Names, ages, timings, descriptions, photos' },
   { href: '#/jobs', icon: 'Briefcase', title: 'Jobs', text: 'Open positions on the careers page' },
   { href: '#/testimonials', icon: 'Quote', title: 'Testimonials', text: 'What parents say' },
+  { href: '#/posts', icon: 'Newspaper', title: 'Blog', text: 'Write posts in six designs and publish them' },
   { href: '#/sections', icon: 'LayoutList', title: 'Page sections', text: 'Values, facilities, FAQs and more' },
 ];
 
