@@ -64,6 +64,8 @@ export interface SiteContent {
   social: { label: string; href: string }[];
   /** Colour theme settings; see src/data/themes.ts. */
   theme?: Partial<ThemeSettings>;
+  /** Google Analytics; an empty ID switches it off. */
+  analytics?: { measurementId?: string };
 }
 
 export interface IconItem {

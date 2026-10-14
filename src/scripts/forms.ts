@@ -8,7 +8,15 @@
 // File inputs (the resume on the careers form) are checked here for type and size, then sent in the
 // same JSON body as { name, data } with the contents base64-encoded.
 
+import { track } from './analytics';
+
 const endpoint = import.meta.env.PUBLIC_FORM_ENDPOINT || '/api/submit';
+
+// Google Analytics events for a sent form, with only the choices that don't identify anyone.
+const EVENTS: Record<string, { name: string; fields: string[] }> = {
+  admission_enquiry: { name: 'generate_lead', fields: ['program', 'branch'] },
+  job_application: { name: 'job_application', fields: ['position', 'branch'] },
+};
 
 function labelFor(form: HTMLFormElement, name: string) {
   const field = form.elements.namedItem(name);
@@ -113,6 +121,8 @@ for (const form of document.querySelectorAll<HTMLFormElement>('form[data-cm-form
       });
       const result = await res.json().catch(() => ({}));
       if (res.ok) {
+        const event = EVENTS[form.dataset.formType ?? ''];
+        if (event) track(event.name, Object.fromEntries(event.fields.map((f) => [f, String(payload[f] ?? '')])));
         form.reset();
         const saved: string[] = Array.isArray(result.files) ? result.files : [];
         const missed = attached.some((input) => !saved.includes(input.name));

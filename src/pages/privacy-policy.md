@@ -82,7 +82,9 @@ The security of your data is important to us but remember that no method of tran
 
 ## Analytics
 
-We may use third-party Service Providers to monitor and analyze the use of our Service.
+We use Google Analytics to understand how visitors use this website: which pages they open, roughly where they are (to the city), the kind of device and browser, and how they found us (for example a Google search). Google Analytics uses cookies to tell visits apart. It does not receive your name, phone number, email address or the messages you send us through our forms. Google’s advertising features are switched off for this website.
+
+You can read how Google uses this information at [policies.google.com/technologies/partner-sites](https://policies.google.com/technologies/partner-sites), and stop Google Analytics from counting your visits with the [Google Analytics opt-out browser add-on](https://tools.google.com/dlpage/gaoptout).
 
 ## Payments
 

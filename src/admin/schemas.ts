@@ -132,6 +132,22 @@ export const siteSchema: Field[] = [
     ],
   },
 
+  { type: 'heading', label: 'Visitor statistics' },
+  {
+    key: 'analytics',
+    label: '',
+    type: 'group',
+    fields: [
+      {
+        key: 'measurementId',
+        label: 'Google Analytics measurement ID',
+        type: 'text',
+        placeholder: 'G-XXXXXXXXXX',
+        help: 'Counts visits, where visitors come from and which pages lead to enquiries. Find the ID in Google Analytics → Admin → Data streams → your website. Leave empty to switch it off. Changes show after you publish.',
+      },
+    ],
+  },
+
   { type: 'heading', label: 'Home page' },
   {
     key: 'hero',

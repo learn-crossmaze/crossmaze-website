@@ -18,6 +18,7 @@ See README.md for how the site, admin panel and LITMUS integration fit together.
 - To change existing copy (text, phone numbers, addresses), edit `content/*.json` and run `node scripts/content-update.mjs <id> "<what changed>"` before committing. Without a content update in `content/updates/`, the next deploy overwrites the edit with Firestore's copy.
 - Blog posts (`content/posts.json`, admin → Blog) pick one of six designs: `src/components/blog/Template*.astro`, listed in `src/data/blogOptions.ts`. A new design needs a component, an entry there, a case in `PostPage.astro` and a sketch in the admin's `TemplateSketch` (`src/admin/components/fields.tsx`). Hidden posts are drafts, built only at `/blog/preview/<previewKey>`.
 - Branch admins (`branchAdmins/{email}`) may only write their own blog posts (`createdBy`), change `centerHead` on their branches and publish. Anything new they should reach needs a rule in `firestore.rules`/`storage.rules`, a test in `tests/rules.test.mjs` and `roles` on its `NAV` entry in `src/admin/AdminApp.tsx`.
+- Google Analytics events go through `track()` in `src/scripts/analytics.ts`. Never send names, phone numbers, emails or messages; list a new event in the README's Visitor statistics table.
 - Don't invent facts about the school (fees, timings, staff, results). Add anything that needs checking to "Please verify before launch" in README.md.
 
 ## Checks
