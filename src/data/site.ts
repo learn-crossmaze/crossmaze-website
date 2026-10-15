@@ -10,12 +10,6 @@ export const site = {
   whatsappHref: `https://wa.me/${digits(siteContent.whatsapp || siteContent.phone)}`,
 };
 
-/** The Google Analytics measurement ID ("G-…") from Site settings, or '' when it's off or mistyped. */
-export const analyticsId = (() => {
-  const id = (siteContent.analytics?.measurementId ?? '').trim().toUpperCase();
-  return /^G-[A-Z0-9]{4,20}$/.test(id) ? id : '';
-})();
-
 export const coreValues = sectionsContent.coreValues;
 export const faqs = sectionsContent.faqs;
 export const dayRoutine = sectionsContent.dayRoutine ?? [];

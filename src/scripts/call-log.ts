@@ -9,8 +9,6 @@
 // Taps go to the submit function (functions/index.js, body.event "contact"). Preview links
 // (crossmaze-website--pr…) don't send any, so checking a preview doesn't add to the real log.
 
-import { track } from './analytics';
-
 const endpoint = import.meta.env.PUBLIC_FORM_ENDPOINT || '/api/submit';
 
 /** Last 10 digits of each number on the site → the centre it belongs to (see BaseLayout.astro). */
@@ -99,10 +97,15 @@ window.addEventListener('click', (event) => {
   // A "share on WhatsApp" link (wa.me/?text=…) has no number: it isn't someone contacting a centre.
   if (!number) return;
   const inPicker = Boolean(link.closest('.call-picker'));
-  const branch = numbers[number.slice(-10)] ?? '';
-  const place = inPicker ? `“Call a centre” pop-up${pickerFrom ? ` (opened from ${pickerFrom})` : ''}` : placeOf(link);
 
-  send({ channel, number, branch, page: location.pathname, place, source: visit.source, visit: visit.id, device: device() });
-  // Google Analytics too, so taps show beside enquiries in its reports.
-  track(channel === 'phone' ? 'call_tap' : 'whatsapp_tap', { branch, place });
+  send({
+    channel,
+    number,
+    branch: numbers[number.slice(-10)] ?? '',
+    page: location.pathname,
+    place: inPicker ? `“Call a centre” pop-up${pickerFrom ? ` (opened from ${pickerFrom})` : ''}` : placeOf(link),
+    source: visit.source,
+    visit: visit.id,
+    device: device(),
+  });
 });

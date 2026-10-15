@@ -84,29 +84,6 @@ Several taps in one visit count as one person. Nothing that identifies the visit
 
 To know who called (their number) you'd need call-tracking numbers from a telephony provider, shown on the website in place of the centres' own numbers.
 
-### Visitor statistics (Google Analytics)
-
-The website sends visits to Google Analytics once a **measurement ID** is set in **Site settings → Visitor statistics** (and published). Leave it empty to switch it off. Preview links don't send anything, and Google's advertising features are off. Besides page views, the site sends these events:
-
-| Event | When | Details sent |
-| --- | --- | --- |
-| `generate_lead` | An admission enquiry is sent | program, branch |
-| `job_application` | A job application is sent | position, branch |
-| `call_tap` / `whatsapp_tap` | A call or WhatsApp button is tapped | branch, place on the page |
-
-Names, phone numbers, emails and messages are never sent to Google.
-
-To set it up:
-
-1. Go to [analytics.google.com](https://analytics.google.com) with the school's Google account and choose **Start measuring**. Account name: Crossmaze. Property name: Crossmaze website, time zone **India**, currency **Indian rupee**.
-2. Choose **Web** as the platform. Website URL: `www.crossmaze.in`; stream name: Crossmaze website. Leave **Enhanced measurement** on.
-3. Copy the **Measurement ID** (`G-…`) shown for the stream (later: **Admin → Data streams → Crossmaze website**).
-4. Paste it into the admin panel: **Site settings → Visitor statistics**, then **Save** and **Publish**.
-5. Check it works: open the website on your phone, then look at **Reports → Realtime** in Google Analytics. Your visit should show within a minute.
-6. After the first enquiry (or a test one), go to **Admin → Events**, and switch on **Mark as key event** for `generate_lead`. Do the same for `call_tap` and `whatsapp_tap` if calls count as leads for you. Key events show in the reports as conversions.
-7. Optional: **Admin → Custom definitions → Create custom dimension** (scope: Event) for `branch`, `program` and `place`, so reports can be split by centre.
-8. Optional: **Admin → Data collection and modification → Data retention**: set **Event data retention** to 14 months (the default is 2) so you can compare with last year.
-
 ### Colour themes
 
 The site has seven colour themes: **Pastel Glass**, **Sunny Meadow**, **Ocean Breeze**, **Crayon Box**, **Montessori Calm**, and two bright ones, **Candy Pop** and **Tropical Splash**. Each theme changes the page background, colours and fonts; the boxes on top (cards, the floating header, the footer, forms and pop-ups) are white frosted glass in every theme. In **Site settings → Look and feel**, choose which one visitors see:
@@ -180,8 +157,6 @@ Then go to `/admin`, choose **Create an account** with one of the `ADMIN_EMAILS`
 
 In the Firebase console go to **Hosting → Add custom domain**, add `www.crossmaze.in` (and `crossmaze.in`), and update the DNS records it shows at your domain registrar. This replaces the old Wix site.
 
-Then add the site to [Google Search Console](https://search.google.com/search-console): **Add property → Domain**, `crossmaze.in`, and add the TXT record it shows at your registrar. Under **Sitemaps**, submit `https://www.crossmaze.in/sitemap-index.xml`. Finally, link it to Google Analytics (Analytics **Admin → Product links → Search Console links**) to see which Google searches bring parents to the site.
-
 ## LITMUS integration
 
 Set the LITMUS URL and key in the admin panel (**LITMUS** page), then press **Send test**. For each submission, LITMUS receives:
@@ -254,5 +229,4 @@ FIREBASE_STORAGE_BUCKET=demo-crossmaze.appspot.com ADMIN_EMAILS=you@example.com 
 - [ ] **Reworded copy** (October 2026): text across the site was rewritten for clarity without changing any facts. The FAQ "How do I apply for admission?" is new.
 - [ ] **A day at Crossmaze** and **How admission works** were written for the new site from what the old site says. Check they match how your centres work (admin panel → Page sections).
 - [ ] **Sample blog posts**: six example posts (one in each design) start as hidden drafts, written from what the site already says plus general parenting tips. Edit and publish the ones you like, and delete the rest (admin panel → Blog).
-- [ ] **Privacy policy**: the Analytics section now says the site uses Google Analytics and what it collects. Have whoever looks after the school's legal documents check it.
 - [ ] **Firebase project ID**: `.firebaserc` and the workflow use `crossmaze-website`. If the console shows a different ID, update both.
