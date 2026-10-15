@@ -122,7 +122,9 @@ const tones = ['navy', 'green', 'coral', 'sky', 'sun'];
   }
 
   .call-picker::backdrop {
-    background: color-mix(in srgb, var(--ink, #131a3a) 30%, transparent);
+    /* --scrim (global.css) darkens at night; the fallback is for browsers whose ::backdrop
+       doesn't inherit custom properties. */
+    background: var(--scrim, color-mix(in srgb, var(--ink, #131a3a) 30%, transparent));
     -webkit-backdrop-filter: blur(10px);
     backdrop-filter: blur(10px);
   }
@@ -259,6 +261,11 @@ const tones = ['navy', 'green', 'coral', 'sky', 'sun'];
 
   .call-picker__tag[hidden] {
     display: none;
+  }
+
+  /* At night the text around it is light, so the tag takes the sun buttons' dark text. */
+  :global(:root[data-mode='dark']) .call-picker__tag {
+    color: var(--sun-btn-fg);
   }
 
   .call-picker__phone {

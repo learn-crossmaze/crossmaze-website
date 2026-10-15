@@ -291,6 +291,23 @@ const albumIndex = new Map(withPhotos.map((c, i) => [c, i]));
     right: max(12px, calc(var(--strip-inset) - 26px));
   }
 
+  /* Dark mode: the badge's white sticker edge would glare, so its edge is the photo's glass frame
+     (over smoky glass, so it stays clear of the photo), and a facility without a photo gets a faint
+     highlight instead of a white one. */
+  :global(:root[data-mode='dark']) .strip__badge {
+    border-color: transparent;
+    background:
+      linear-gradient(135deg, var(--badge-bg) 0%, var(--badge-bg-2) 100%) padding-box,
+      var(--g-ring) border-box,
+      var(--glass-thick) border-box;
+  }
+
+  :global(:root[data-mode='dark']) .strip__photo--icon .strip__frame {
+    background:
+      radial-gradient(70% 70% at 30% 25%, var(--glass-edge), transparent 70%),
+      linear-gradient(135deg, var(--badge-bg) 0%, var(--badge-bg-2) 100%);
+  }
+
   /* Phones: bigger cards that peek in from the edge; swipe instead of the arrows. */
   @media (max-width: 640px) {
     .strip__track {

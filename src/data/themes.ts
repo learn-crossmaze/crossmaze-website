@@ -4,13 +4,13 @@
 // Every theme has a light and a dark version: `color` and `dark` are the browser bar colours.
 
 export const themes = [
-  { id: 'pastel', label: 'Pastel Glass', fonts: 'family=Fredoka:wght@500;600&family=Nunito:wght@400;600;700;800', color: '#0b1d5e', dark: '#141832' },
-  { id: 'meadow', label: 'Sunny Meadow', fonts: 'family=Baloo+2:wght@600;700;800&family=Nunito:wght@400;600;700;800', color: '#1b5a2b', dark: '#121a14' },
-  { id: 'ocean', label: 'Ocean Breeze', fonts: 'family=Quicksand:wght@600;700&family=Nunito:wght@400;600;700;800', color: '#0a4f70', dark: '#0b1a26' },
-  { id: 'crayon', label: 'Crayon Box', fonts: 'family=Grandstander:wght@600;700&family=Nunito:wght@400;600;700;800', color: '#b8261a', dark: '#16152a' },
-  { id: 'calm', label: 'Montessori Calm', fonts: 'family=Lexend:wght@400;500;600;700', color: '#3b5537', dark: '#171a16' },
-  { id: 'candy', label: 'Candy Pop', fonts: 'family=Sniglet:wght@400;800&family=Nunito:wght@400;600;700;800', color: '#7a0d5c', dark: '#1c1024' },
-  { id: 'tropical', label: 'Tropical Splash', fonts: 'family=Lilita+One&family=Nunito:wght@400;600;700;800', color: '#004d44', dark: '#0b1c1a' },
+  { id: 'pastel', label: 'Pastel Glass', fonts: 'family=Fredoka:wght@500;600&family=Nunito:wght@400;600;700;800', color: '#0b1d5e', dark: '#1b1430' },
+  { id: 'meadow', label: 'Sunny Meadow', fonts: 'family=Baloo+2:wght@600;700;800&family=Nunito:wght@400;600;700;800', color: '#1b5a2b', dark: '#1a210d' },
+  { id: 'ocean', label: 'Ocean Breeze', fonts: 'family=Quicksand:wght@600;700&family=Nunito:wght@400;600;700;800', color: '#0a4f70', dark: '#0b2128' },
+  { id: 'crayon', label: 'Crayon Box', fonts: 'family=Grandstander:wght@600;700&family=Nunito:wght@400;600;700;800', color: '#b8261a', dark: '#16152e' },
+  { id: 'calm', label: 'Montessori Calm', fonts: 'family=Lexend:wght@400;500;600;700', color: '#3b5537', dark: '#1b1d13' },
+  { id: 'candy', label: 'Candy Pop', fonts: 'family=Sniglet:wght@400;800&family=Nunito:wght@400;600;700;800', color: '#7a0d5c', dark: '#2a0f2c' },
+  { id: 'tropical', label: 'Tropical Splash', fonts: 'family=Lilita+One&family=Nunito:wght@400;600;700;800', color: '#004d44', dark: '#0c2427' },
 ] as const;
 
 export type ThemeId = (typeof themes)[number]['id'];

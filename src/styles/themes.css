@@ -65,6 +65,62 @@
   --shadow-tint: 110 80 10;
 }
 
+/* Sunny Meadow at night: a warm summer meadow, deep olive and forest green with firefly-butter accents. */
+:root[data-theme='meadow'][data-mode='dark'] {
+  --ink: #f1f5e4;
+  --muted: #c2cdb4;
+  --navy: #a9dd96;
+  --navy-700: #cdeec0;
+  --navy-50: #21391d;
+  --navy-100: #2f4c29;
+  --sun: #ffcd3c;
+  --sun-50: #3b3314;
+  --sun-100: #5b4915;
+  --sun-fg: #ffd866;
+  --coral: #ff8236;
+  --coral-50: #3c2515;
+  --coral-100: #5b341a;
+  --coral-fg: #ffb07a;
+  --green: #5fc46a;
+  --green-50: #18341d;
+  --green-100: #244c29;
+  --green-fg: #93dd92;
+  --sky: #3fb2d6;
+  --sky-50: #123037;
+  --sky-100: #1b4450;
+  --sky-fg: #8fd3ea;
+  --paper: #1e2a19;
+
+  /* Night-time versions of the meadow flow: olive, warm olive, moss, forest, pine and olive again. */
+  --flow-1: #1c230d;
+  --flow-2: #22210c;
+  --flow-3: #16230f;
+  --flow-4: #0e2415;
+  --flow-5: #0c2325;
+  --flow-6: #20230d;
+  --tint-1: #563315;
+  --tint-2: #4c4615;
+  --tint-3: #1d4e27;
+  --tint-4: #514213;
+  --tint-5: #143e4d;
+  --glow-1: rgb(255 205 70 / 13%);
+  --glow-2: rgb(255 150 70 / 10%);
+  --glow-3: rgb(110 200 100 / 14%);
+  --glow-4: rgb(70 170 200 / 12%);
+
+  --glass-rgb: 48 70 42;
+  --g-heading: linear-gradient(100deg, #e3f0a8 0%, #b6e3a0 50%, #9fdcc0 100%);
+  --g-highlight: linear-gradient(90deg, #ffc23d 0%, #ff8a3d 100%);
+  --g-navy: linear-gradient(135deg, #2f8442 0%, #28763a 55%, #1f6631 100%);
+  --g-sun: linear-gradient(135deg, #ffe58a 0%, #ffcd3c 100%);
+  --g-ink: linear-gradient(135deg, #34573b 0%, #1f3824 100%);
+  --sun-btn-fg: #3a2a00;
+  --sun-btn-glow: rgb(255 190 40 / 40%);
+  --eyebrow-fg: #ffc261;
+  --squiggle: #ffcd3c;
+  --shadow-tint: 0 0 0;
+}
+
 /* Ocean Breeze: aqua, periwinkle and coral, with round bubbles. */
 :root[data-theme='ocean'] {
   --ink: #0d2b45;
@@ -122,6 +178,62 @@
   --radius-photo: 40px;
   --radius-photo-sm: 30px;
   --shadow-tint: 10 80 120;
+}
+
+/* Ocean Breeze at night: deep sea and night-sky teal, with glowing aqua and coral. */
+:root[data-theme='ocean'][data-mode='dark'] {
+  --ink: #e8f8fc;
+  --muted: #a9c6d3;
+  --navy: #8fdcf0;
+  --navy-700: #c2eefa;
+  --navy-50: #123546;
+  --navy-100: #1a4a60;
+  --sun: #ff9a7a;
+  --sun-50: #0f3640;
+  --sun-100: #164d5a;
+  --sun-fg: #86e3f1;
+  --coral: #ff7560;
+  --coral-50: #3f1f25;
+  --coral-100: #5d2b32;
+  --coral-fg: #ffa391;
+  --green: #3ccfa5;
+  --green-50: #0f3229;
+  --green-100: #164a3c;
+  --green-fg: #7ee6c5;
+  --sky: #7d93ff;
+  --sky-50: #1c2350;
+  --sky-100: #29336f;
+  --sky-fg: #aab6ff;
+  --paper: #13303f;
+
+  /* The ocean flow at night: deep teal, sea blue, periwinkle, seafoam, navy and dusky rose. */
+  --flow-1: #0b2128;
+  --flow-2: #0f1e30;
+  --flow-3: #181a35;
+  --flow-4: #0a2420;
+  --flow-5: #0d202d;
+  --flow-6: #2c1729;
+  --tint-1: #0f4450;
+  --tint-2: #2a3166;
+  --tint-3: #104a3c;
+  --tint-4: #522a38;
+  --tint-5: #173f66;
+  --glow-1: rgb(80 210 235 / 15%);
+  --glow-2: rgb(255 140 115 / 11%);
+  --glow-3: rgb(130 150 255 / 15%);
+  --glow-4: rgb(80 220 180 / 12%);
+
+  --glass-rgb: 31 68 86;
+  --g-heading: linear-gradient(100deg, #b6f0fb 0%, #9fdcf5 50%, #b9c2ff 100%);
+  --g-highlight: linear-gradient(90deg, #ff8a6b 0%, #ff6b8e 100%);
+  --g-navy: linear-gradient(135deg, #127aa3 0%, #0e6890 55%, #0b5878 100%);
+  --g-sun: linear-gradient(135deg, #ffd2c4 0%, #ffb4a2 100%);
+  --g-ink: linear-gradient(135deg, #1d4a66 0%, #0f2c42 100%);
+  --sun-btn-fg: #5a1a0e;
+  --sun-btn-glow: rgb(255 140 110 / 40%);
+  --eyebrow-fg: #7fdcef;
+  --squiggle: #ff9a7a;
+  --shadow-tint: 0 0 0;
 }
 
 /* Crayon Box: the bright colours of the logo's letters, with chunky crayon buttons. */
@@ -182,6 +294,61 @@
   --radius-photo: 26px;
   --radius-photo-sm: 20px;
   --shadow-tint: 60 40 120;
+}
+
+/* Crayon Box at night: a chalkboard-indigo page where the logo's crayon colours stay bright. */
+:root[data-theme='crayon'][data-mode='dark'] {
+  --ink: #efeefe;
+  --muted: #bdbddc;
+  --navy: #9dbcff;
+  --navy-700: #cadbff;
+  --navy-50: #1f2858;
+  --navy-100: #2b3878;
+  --sun: #ffc93c;
+  --sun-50: #3b2c14;
+  --sun-100: #5c4216;
+  --sun-fg: #ffd25e;
+  --coral: #ff5a45;
+  --coral-50: #3e1d22;
+  --coral-100: #5e2830;
+  --coral-fg: #ff9a8c;
+  --green: #3fc163;
+  --green-50: #142f1e;
+  --green-100: #1e4a2c;
+  --green-fg: #7fdc94;
+  --sky: #5b95ff;
+  --sky-50: #2a1f4f;
+  --sky-100: #3d2c70;
+  --sky-fg: #c3a6ff;
+
+  /* Night-time versions of the flow: indigo, berry, warm dusk, chalkboard green, deep blue, violet. */
+  --flow-1: #171630;
+  --flow-2: #241634;
+  --flow-3: #1f1932;
+  --flow-4: #0d2424;
+  --flow-5: #101c3a;
+  --flow-6: #1d1638;
+  --tint-1: #4a2230;
+  --tint-2: #33295e;
+  --tint-3: #18432b;
+  --tint-4: #4a3a14;
+  --tint-5: #1f3768;
+  --glow-1: rgb(255 201 60 / 10%);
+  --glow-2: rgb(80 140 255 / 18%);
+  --glow-3: rgb(60 190 100 / 12%);
+  --glow-4: rgb(255 90 70 / 13%);
+
+  --glass-rgb: 40 46 98;
+  --g-heading: linear-gradient(100deg, #f0efff 0%, #a9c6ff 100%);
+  --g-highlight: linear-gradient(90deg, #5fd47c 0%, #ff9a3c 50%, #6aa2ff 100%);
+  --g-navy: linear-gradient(135deg, #d93a26 0%, #b8261a 100%);
+  --g-sun: linear-gradient(135deg, #ffe07a 0%, #ffc93c 100%);
+  --g-ink: linear-gradient(135deg, #35356c 0%, #1e1e44 100%);
+  --sun-btn-fg: #3a2a00;
+  --sun-btn-glow: rgb(255 180 30 / 40%);
+  --eyebrow-fg: #ffbe5c;
+  --squiggle: #ffc93c;
+  --shadow-tint: 0 0 0;
 }
 
 /* Montessori Calm: natural sage, oat, clay and dusty blue, with arched photos. */
@@ -261,6 +428,66 @@
   font-size: 0.78rem;
 }
 
+/* Montessori Calm at night: deep moss and charcoal-olive, with oat, warm clay and dusty blue. */
+:root[data-theme='calm'][data-mode='dark'] {
+  --ink: #f1ede2;
+  --muted: #c7c0ae;
+  --navy: #bcd3ab;
+  --navy-700: #d6e6ca;
+  --navy-50: #263224;
+  --navy-100: #33432f;
+  --sun: #e3b45e;
+  --sun-50: #33291a;
+  --sun-100: #4d3d22;
+  --sun-fg: #ecc888;
+  --coral: #d8805e;
+  --coral-50: #3a241c;
+  --coral-100: #573427;
+  --coral-fg: #eba78a;
+  --green: #8fb380;
+  --green-50: #1f2e1d;
+  --green-100: #2c4229;
+  --green-fg: #a9cc9c;
+  --sky: #7fa3c2;
+  --sky-50: #1c2933;
+  --sky-100: #283a4a;
+  --sky-fg: #a8c4dc;
+  --paper: #21261c;
+
+  --flow-1: #1d1f14;
+  --flow-2: #1b1f14;
+  --flow-3: #182115;
+  --flow-4: #211c14;
+  --flow-5: #152023;
+  --flow-6: #221a15;
+  --tint-1: #52301f;
+  --tint-2: #3d3a28;
+  --tint-3: #2c3d28;
+  --tint-4: #4a3d20;
+  --tint-5: #233a4d;
+  --glow-1: rgb(220 150 110 / 12%);
+  --glow-2: rgb(150 190 130 / 14%);
+  --glow-3: rgb(120 160 190 / 12%);
+  --glow-4: rgb(230 190 110 / 10%);
+
+  --glass-rgb: 54 64 42;
+  --g-heading: linear-gradient(100deg, #efe9da 0%, #d5e2c6 100%);
+  --g-highlight: linear-gradient(90deg, #a8cf98 0%, #8cc4ae 100%);
+  --g-navy: linear-gradient(135deg, #5a7d52 0%, #4f7049 50%, #466341 100%);
+  --g-sun: linear-gradient(135deg, #f6e3cf 0%, #eccbaa 100%);
+  --g-ink: linear-gradient(135deg, #4a4535 0%, #2c2922 100%);
+  --sun-btn-fg: #5a3418;
+  --sun-btn-glow: rgb(200 140 90 / 30%);
+  --eyebrow-fg: #e6c38b;
+  --squiggle: #e3b45e;
+  --shadow-tint: 0 0 0;
+}
+
+/* Calm's softer doodles are darkened at night like every theme's (global.css), keeping their earthy tone. */
+:root[data-theme='calm'][data-mode='dark'] main > section::before {
+  filter: saturate(0.55) sepia(0.2) brightness(0.75);
+}
+
 /* Candy Pop: bright bubblegum pink, electric purple, turquoise and lemon, with bubbly shapes. */
 :root[data-theme='candy'] {
   --ink: #2a1036;
@@ -336,6 +563,63 @@
   font-weight: 800;
 }
 
+/* Candy Pop at night: a deep plum and berry party night, with neon pink, purple, turquoise and lemon. */
+:root[data-theme='candy'][data-mode='dark'] {
+  --ink: #fdeefa;
+  --muted: #dcc0dc;
+  --navy: #ffa6dc;
+  --navy-700: #ffd1ee;
+  --navy-50: #3f1842;
+  --navy-100: #5b2160;
+  --sun: #ffd60a;
+  --sun-50: #3f300c;
+  --sun-100: #66490a;
+  --sun-fg: #ffe266;
+  --coral: #ff4f8f;
+  --coral-50: #451a33;
+  --coral-100: #672244;
+  --coral-fg: #ff9fc6;
+  --green: #22d3ae;
+  --green-50: #0f3331;
+  --green-100: #154b46;
+  --green-fg: #74ead0;
+  --sky: #9b5cff;
+  --sky-50: #2c1a52;
+  --sky-100: #402578;
+  --sky-fg: #cba9ff;
+  --paper: #2e1536;
+
+  /* Night-time versions of the candy flow: berry, raspberry, grape, deep turquoise, indigo and
+     violet (grape rather than a dark lemon, so the page doesn't turn grey on its way to turquoise). */
+  --flow-1: #2f1131;
+  --flow-2: #32122a;
+  --flow-3: #28143a;
+  --flow-4: #092630;
+  --flow-5: #16193a;
+  --flow-6: #24143f;
+  --tint-1: #521d47;
+  --tint-2: #3a2468;
+  --tint-3: #144838;
+  --tint-4: #4d3d14;
+  --tint-5: #1f3468;
+  --glow-1: rgb(255 61 127 / 16%);
+  --glow-2: rgb(123 47 247 / 18%);
+  --glow-3: rgb(15 200 160 / 12%);
+  --glow-4: rgb(255 214 10 / 9%);
+
+  --glass-rgb: 82 34 88;
+  --g-heading: linear-gradient(100deg, #ffb3dc 0%, #e9b2ff 55%, #c7b6ff 100%);
+  --g-highlight: linear-gradient(90deg, #ff9a4d 0%, #ff4f9a 50%, #a96dff 100%);
+  --g-navy: linear-gradient(135deg, #d11f6a 0%, #a8168a 55%, #7a22b8 100%);
+  --g-sun: linear-gradient(135deg, #ffe94d 0%, #ffd60a 50%, #ffb703 100%);
+  --g-ink: linear-gradient(135deg, #56246c 0%, #331442 100%);
+  --sun-btn-fg: #3a2400;
+  --sun-btn-glow: rgb(255 183 3 / 40%);
+  --eyebrow-fg: #74ead0;
+  --squiggle: #ffd60a;
+  --shadow-tint: 0 0 0;
+}
+
 /* Tropical Splash: sunny mango, lime, aqua and hibiscus, with leaf-drop photos. */
 :root[data-theme='tropical'] {
   --ink: #10302e;
@@ -404,6 +688,63 @@
 /* Lilita One has one (bold) weight, so headings get a touch more letter spacing to breathe. */
 :root[data-theme='tropical'] :is(h1, h2, h3) {
   letter-spacing: 0.01em;
+}
+
+/* Tropical Splash at night: a deep lagoon and jungle, with glowing mango, lime and hibiscus. */
+:root[data-theme='tropical'][data-mode='dark'] {
+  --ink: #e8fbf6;
+  --muted: #a6c8c1;
+  --navy: #7fe0cf;
+  --navy-700: #bdf5ea;
+  --navy-50: #11383a;
+  --navy-100: #1a4f4d;
+  --sun: #ffb31a;
+  --sun-50: #3b2a0c;
+  --sun-100: #5a3f0f;
+  --sun-fg: #ffc34d;
+  --coral: #ff6a5c;
+  --coral-50: #3f1c20;
+  --coral-100: #5f282d;
+  --coral-fg: #ff9b8f;
+  --green: #7dd13a;
+  --green-50: #1b3313;
+  --green-100: #284b1a;
+  --green-fg: #a5e86b;
+  --sky: #2cb5e6;
+  --sky-50: #0d2d3c;
+  --sky-100: #134257;
+  --sky-fg: #86d6f5;
+  --paper: #12302f;
+
+  /* The tropical flow at night: lagoon teal, sea green, jungle, lagoon, night sea and hibiscus dusk. */
+  --flow-1: #0c2427;
+  --flow-2: #10261d;
+  --flow-3: #0e2716;
+  --flow-4: #0a2528;
+  --flow-5: #0c1d30;
+  --flow-6: #241730;
+  /* The banner mists are jade and hibiscus: a mango mist turns khaki on the night teal. */
+  --tint-1: #17483f;
+  --tint-2: #461c3a;
+  --tint-3: #2c4a16;
+  --tint-4: #0f474f;
+  --tint-5: #133f5c;
+  --glow-1: rgb(255 176 0 / 8%);
+  --glow-2: rgb(0 200 170 / 16%);
+  --glow-3: rgb(130 210 40 / 12%);
+  --glow-4: rgb(255 90 110 / 14%);
+
+  --glass-rgb: 26 66 70;
+  --g-heading: linear-gradient(100deg, #c2f7e9 0%, #93ecd9 50%, #9edcfa 100%);
+  --g-highlight: linear-gradient(90deg, #ffbd3d 0%, #ff7a6b 100%);
+  --g-navy: linear-gradient(135deg, #00806f 0%, #007364 55%, #006357 100%);
+  --g-sun: linear-gradient(135deg, #ffd23f 0%, #ffb000 55%, #ff8f00 100%);
+  --g-ink: linear-gradient(135deg, #1f4e4a 0%, #12302e 100%);
+  --sun-btn-fg: #3a2000;
+  --sun-btn-glow: rgb(255 143 0 / 40%);
+  --eyebrow-fg: #ffbe55;
+  --squiggle: #9fe24a;
+  --shadow-tint: 0 0 0;
 }
 
 /* Small labels in Sniglet stay on one line on phones. */

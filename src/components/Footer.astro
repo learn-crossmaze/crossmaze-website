@@ -172,7 +172,8 @@ const mascot = image(site.mascot);
     height: auto;
     margin-top: 24px;
     border-radius: 18px;
-    background: #ffffff;
+    /* A light tile in both modes: the drawing has black outlines (a softer tile at night). */
+    background: var(--sticker);
     box-shadow: var(--shadow-sm);
     animation: mascot-bob 6s ease-in-out infinite alternate;
   }

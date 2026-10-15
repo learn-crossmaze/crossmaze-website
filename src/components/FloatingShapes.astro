@@ -172,4 +172,20 @@ const shapes = variant === 'home' ? home : page;
       width: calc(var(--size) * 0.7);
     }
   }
+
+  /* Dark mode: the wash glows in the theme's night tints (mixing in white would turn it into a grey
+     haze), and the pastel doodles are dimmed so they glow softly instead of glaring. */
+  :global(:root[data-mode='dark']) .fx__aurora {
+    background:
+      radial-gradient(32% 40% at 18% 28%, var(--tint-1) 0%, transparent 70%),
+      radial-gradient(30% 38% at 78% 22%, var(--tint-2) 0%, transparent 70%),
+      radial-gradient(34% 40% at 70% 78%, var(--tint-3) 0%, transparent 70%),
+      radial-gradient(30% 36% at 28% 82%, var(--tint-4) 0%, transparent 70%),
+      radial-gradient(26% 30% at 50% 50%, var(--tint-5) 0%, transparent 70%);
+    opacity: 0.75;
+  }
+
+  :global(:root[data-mode='dark']) .fx__shapes {
+    opacity: 0.6;
+  }
 </style>

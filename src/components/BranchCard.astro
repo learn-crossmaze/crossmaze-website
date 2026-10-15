@@ -91,6 +91,14 @@ const cover = branchPhotos(branch.slug)[0];
       radial-gradient(circle at 88% 18%, rgb(255 255 255 / 70%) 0 46px, transparent 47px),
       linear-gradient(135deg, var(--badge-bg) 0%, var(--badge-bg-2, var(--badge-bg)) 100%);
   }
+  /* Dark mode (a branch without photos): softer bubbles in the branch's colour instead of a white one
+     and a full-strength dot, which glare on the night tint. */
+  :global(:root[data-mode='dark']) .branch-card__art {
+    background:
+      radial-gradient(circle at 15% 85%, color-mix(in srgb, var(--tone) 55%, transparent) 0 34px, transparent 35px),
+      radial-gradient(circle at 88% 18%, color-mix(in srgb, var(--badge-fg) 22%, transparent) 0 46px, transparent 47px),
+      linear-gradient(135deg, var(--badge-bg) 0%, var(--badge-bg-2, var(--badge-bg)) 100%);
+  }
   .branch-card__pin {
     position: absolute;
     top: 12px;

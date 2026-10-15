@@ -332,6 +332,11 @@ const isActive = (href: string) => (href === '/' ? path === '/' : path === href 
     display: block;
   }
 
+  /* At night the sun shines in the theme's sun colour. */
+  :global(:root[data-mode='dark']) .mode-toggle {
+    color: var(--sun);
+  }
+
   @media (max-width: 1180px) {
     .site-nav__cta .btn--ghost {
       display: none;
@@ -374,7 +379,7 @@ const isActive = (href: string) => (href === '/' ? path === '/' : path === href 
       border: 1px solid var(--glass-edge);
       border-radius: 28px;
       /* Nearly opaque, so the page behind does not show through the links. */
-      background: rgb(255 255 255 / 94%);
+      background: var(--glass-sheet);
       -webkit-backdrop-filter: var(--glass-blur);
       backdrop-filter: var(--glass-blur);
       box-shadow: var(--glass-rim), var(--shadow-lift);

@@ -483,7 +483,7 @@ const jsonLd = {
     inset: 0;
     display: grid;
     place-items: center;
-    background: linear-gradient(160deg, color-mix(in srgb, var(--ink) 74%, transparent) 0%, color-mix(in srgb, var(--navy-700) 82%, transparent) 100%);
+    background: var(--photo-scrim);
     backdrop-filter: blur(2px);
     color: #fff;
     font-family: var(--font-display);
@@ -522,6 +522,11 @@ const jsonLd = {
     border-radius: 50%;
     object-fit: cover;
     border: 6px solid var(--sun-50);
+  }
+
+  /* --sun-50 is a deep, muddy tint at night: a soft golden ring instead. */
+  :global(:root[data-mode='dark']) .head :global(.head__photo) {
+    border-color: color-mix(in srgb, var(--sun) 52%, var(--paper));
   }
 
   @media (max-width: 700px) {
