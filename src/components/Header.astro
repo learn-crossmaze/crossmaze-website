@@ -4,8 +4,11 @@ import Icon from './Icon.astro';
 import { nav, site } from '../data/site';
 import { branches, shortName } from '../data/branches';
 import { cleanPath } from '../utils';
+import { themeSettings } from '../data/themes';
 
 const path = cleanPath(Astro.url.pathname);
+// The sun/moon button, unless dark mode is switched off (Site settings → Look and feel).
+const darkButton = themeSettings(site.theme).dark !== 'off';
 const isActive = (href: string) => (href === '/' ? path === '/' : path === href || path.startsWith(`${href}/`));
 ---
 
@@ -66,6 +69,20 @@ const isActive = (href: string) => (href === '/' ? path === '/' : path === href 
         <a class="btn btn--sm" href="/contact#enquire">Book a visit</a>
       </div>
     </nav>
+
+    {
+      darkButton && (
+        <button class="mode-toggle" type="button" aria-pressed="false" data-mode-toggle>
+          <span class="mode-toggle__moon">
+            <Icon name="Moon" size={20} />
+          </span>
+          <span class="mode-toggle__sun">
+            <Icon name="Sun" size={20} />
+          </span>
+          <span class="sr-only">Dark mode</span>
+        </button>
+      )
+    }
   </div>
 </header>
 
@@ -80,6 +97,44 @@ const isActive = (href: string) => (href === '/' ? path === '/' : path === href 
   toggle?.addEventListener('click', () => setOpen(toggle.getAttribute('aria-expanded') !== 'true'));
   matchMedia('(min-width: 1061px)').addEventListener('change', (e) => e.matches && setOpen(false));
   document.addEventListener('keydown', (e) => e.key === 'Escape' && setOpen(false));
+
+  // Light/dark button. window.cmMode comes from the theme script in BaseLayout's <head>.
+  type Mode = 'light' | 'dark';
+  const cm = (window as unknown as { cmMode?: { set: (m: Mode) => void; followsDevice: boolean; device: MediaQueryList | null } }).cmMode;
+  const modeToggle = document.querySelector<HTMLButtonElement>('[data-mode-toggle]');
+  const root = document.documentElement;
+  const current = (): Mode => (root.dataset.mode === 'dark' ? 'dark' : 'light');
+  const deviceMode = (): Mode => (cm?.followsDevice && cm.device?.matches ? 'dark' : 'light');
+  const saved = () => {
+    try {
+      return sessionStorage.getItem('cm-mode-preview') || localStorage.getItem('cm-mode');
+    } catch {
+      return null;
+    }
+  };
+  const show = (mode: Mode) => {
+    cm?.set(mode);
+    modeToggle?.setAttribute('aria-pressed', String(mode === 'dark'));
+  };
+  if (cm && modeToggle) {
+    show(current());
+    modeToggle.addEventListener('click', () => {
+      const next: Mode = current() === 'dark' ? 'light' : 'dark';
+      try {
+        sessionStorage.removeItem('cm-mode-preview');
+        // Picking what the device shows anyway goes back to following the device.
+        if (next === deviceMode()) localStorage.removeItem('cm-mode');
+        else localStorage.setItem('cm-mode', next);
+      } catch {
+        // Storage blocked: the choice lasts for this page only.
+      }
+      show(next);
+    });
+    // The phone switches to dark at sunset: follow it, unless the visitor chose a mode.
+    cm.device?.addEventListener('change', () => {
+      if (cm.followsDevice && !saved()) show(deviceMode());
+    });
+  }
 </script>
 
 <style>
@@ -248,6 +303,35 @@ const isActive = (href: string) => (href === '/' ? path === '/' : path === href 
     display: none;
   }
 
+  /* Light/dark: a moon in light mode, a sun in dark mode. */
+  .mode-toggle {
+    display: grid;
+    flex: none;
+    place-items: center;
+    width: 42px;
+    height: 42px;
+    margin-left: -14px;
+    border: 0;
+    border-radius: 50%;
+    background: linear-gradient(135deg, var(--navy-50) 0%, var(--navy-100) 100%);
+    color: var(--navy);
+    cursor: pointer;
+    transition: transform 0.2s ease;
+  }
+
+  .mode-toggle:hover {
+    transform: rotate(-12deg) scale(1.06);
+  }
+
+  .mode-toggle__sun,
+  :global(:root[data-mode='dark']) .mode-toggle__moon {
+    display: none;
+  }
+
+  :global(:root[data-mode='dark']) .mode-toggle__sun {
+    display: block;
+  }
+
   @media (max-width: 1180px) {
     .site-nav__cta .btn--ghost {
       display: none;
@@ -258,6 +342,16 @@ const isActive = (href: string) => (href === '/' ? path === '/' : path === href 
   @media (max-width: 1060px) {
     .menu-toggle {
       display: grid;
+      order: 3;
+    }
+
+    /* Beside the menu button. */
+    .mode-toggle {
+      order: 2;
+      width: 46px;
+      height: 46px;
+      margin-left: auto;
+      margin-right: -14px;
     }
 
     .is-open .menu-toggle__open {

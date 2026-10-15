@@ -1,7 +1,7 @@
 // Describes every editable piece of content. The admin panel builds its forms from these schemas,
 // and the field keys match content/*.json (which the website is built from).
 import { amenityList, iconChoices } from '../data/amenities';
-import { themes, themeModes, weekdays } from '../data/themes';
+import { darkModes, themes, themeModes, weekdays } from '../data/themes';
 import { categories, templates } from '../data/blogOptions';
 
 export interface Option {
@@ -128,6 +128,13 @@ export const siteSchema: Field[] = [
         type: 'group',
         help: 'For “A set theme for each day of the week”.',
         fields: weekdays.map(([key, label]) => ({ key, label, type: 'select', options: themeOptions }) as Field),
+      },
+      {
+        key: 'dark',
+        label: 'Dark mode',
+        type: 'select',
+        options: darkModes.map((m) => ({ value: m.value, label: m.label })),
+        help: 'Every theme has a dark version. With the first two choices a sun/moon button in the menu bar lets visitors switch, and the site remembers their choice. Preview it with ?mode=dark (or ?mode=light; ?mode=auto goes back to this setting).',
       },
     ],
   },

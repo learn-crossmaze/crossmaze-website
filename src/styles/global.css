@@ -118,6 +118,90 @@
   }
 }
 
+/* ---------- Dark mode ----------
+   <html data-mode="dark"> (picked by the script in layouts/BaseLayout.astro). Every theme has a dark
+   version: the page background turns into a deep night-time gradient in the theme's own colours,
+   and the boxes become smoky liquid glass (the dark counterpart of the white glass), tinted by the
+   theme's --glass-rgb. Buttons, badges and headings keep their gradients, brightened for the dark.
+   This block is Pastel Glass's dark version plus what every theme shares; each theme's dark colours
+   are in themes.css under :root[data-theme='…'][data-mode='dark'], and must set every colour token
+   its light block sets. */
+:root[data-mode='dark'] {
+  color-scheme: dark;
+
+  --ink: #eceefe;
+  --muted: #b6bbdb;
+  --navy: #a9bfff;
+  --navy-700: #cfdbff;
+  --navy-50: #232b55;
+  --navy-100: #2f3a72;
+  --sun: #ffc93c;
+  --sun-50: #3a3119;
+  --sun-100: #574620;
+  --sun-fg: #ffd36b;
+  --coral: #ff6b5e;
+  --coral-50: #3d2028;
+  --coral-100: #5c2b35;
+  --coral-fg: #ff9d92;
+  --green: #4cc46a;
+  --green-50: #17311f;
+  --green-100: #224b2f;
+  --green-fg: #82dd97;
+  --sky: #5d9cff;
+  --sky-50: #182a4a;
+  --sky-100: #213b68;
+  --sky-fg: #93bfff;
+  --paper: #1d2142;
+  --line: rgb(255 255 255 / 12%);
+
+  /* Night-time versions of the pastel flow: berry, plum, midnight, deep teal, navy and violet. */
+  --flow-1: #1d1530;
+  --flow-2: #1f1730;
+  --flow-3: #171a33;
+  --flow-4: #10202b;
+  --flow-5: #121b36;
+  --flow-6: #1b1638;
+  --tint-1: #4a2342;
+  --tint-2: #322a63;
+  --tint-3: #1b4636;
+  --tint-4: #4a3d1f;
+  --tint-5: #213a66;
+  --glow-1: rgb(255 110 170 / 15%);
+  --glow-2: rgb(110 140 255 / 17%);
+  --glow-3: rgb(70 200 150 / 12%);
+  --glow-4: rgb(255 190 80 / 10%);
+
+  /* Smoky glass: a lighter, translucent tint of the night colour, so boxes still lift off the page. */
+  --glass-rgb: 44 48 92;
+  --glass: rgb(var(--glass-rgb) / 58%);
+  --glass-thick: rgb(var(--glass-rgb) / 84%);
+  --glass-blur: blur(22px) saturate(140%);
+  --glass-edge: rgb(255 255 255 / 13%);
+  --glass-rim:
+    inset 0 1px 0 rgb(255 255 255 / 14%), inset 0 -1px 0 rgb(0 0 0 / 22%), 0 0 0 1px rgb(0 0 0 / 18%);
+  --g-ring: linear-gradient(150deg, rgb(255 255 255 / 34%) 0%, rgb(255 255 255 / 8%) 100%);
+  --g-heading: linear-gradient(100deg, #c8d5ff 0%, #b7c3ff 50%, #dcc4ff 100%);
+  --g-highlight: linear-gradient(90deg, #ff7fa6 0%, #d982ec 55%, #ab8eff 100%);
+  --g-navy: linear-gradient(135deg, #4466d6 0%, #3657c8 55%, #2743a8 100%);
+  --g-sun: linear-gradient(135deg, #ffde75 0%, #ffc93c 50%, #ffb224 100%);
+  --sun-btn-fg: #131a3a;
+  --sun-btn-glow: rgb(255 170 30 / 45%);
+  --eyebrow-fg: #ff9d92;
+  --squiggle: #ffc23d;
+  --g-ink: linear-gradient(135deg, #343c74 0%, #1d2250 100%);
+
+  /* Shadows are black at night; the theme tint would just look muddy. */
+  --shadow-tint: 0 0 0;
+  --shadow-sm: 0 1px 2px rgb(0 0 0 / 30%), 0 10px 30px -14px rgb(0 0 0 / 55%);
+  --shadow: 0 2px 4px rgb(0 0 0 / 30%), 0 24px 56px -24px rgb(0 0 0 / 60%);
+  --shadow-lift: 0 4px 8px rgb(0 0 0 / 32%), 0 32px 70px -26px rgb(0 0 0 / 66%);
+}
+
+/* The doodles behind sections and in the banners are pastel: dim them so they glow softly. */
+:root[data-mode='dark'] main > section::before {
+  opacity: 0.4;
+}
+
 /* ---------- Base ---------- */
 *,
 *::before,
