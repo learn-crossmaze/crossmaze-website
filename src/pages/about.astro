@@ -202,9 +202,13 @@ const tones = ['navy', 'green', 'coral', 'sky', 'sun', 'navy'];
 
   :global(:root[data-mode='dark']) .stat {
     border: 1px solid var(--glass-edge);
-    background:
-      linear-gradient(135deg, color-mix(in srgb, var(--badge-fg) 22%, transparent), color-mix(in srgb, var(--badge-fg) 8%, transparent)),
-      var(--glass);
+    /* The tile's own night tints, slightly see-through (a wash of the light colour over the glass
+       went grey or khaki where the two hues are far apart). */
+    background: linear-gradient(
+      135deg,
+      color-mix(in srgb, var(--badge-bg-2, var(--badge-bg)) 90%, transparent) 0%,
+      color-mix(in srgb, var(--badge-bg) 80%, transparent) 100%
+    );
     -webkit-backdrop-filter: var(--glass-blur);
     backdrop-filter: var(--glass-blur);
     box-shadow: var(--glass-rim), var(--shadow-sm);

@@ -105,7 +105,7 @@ const tones = ['coral', 'sun', 'green', 'sky', 'navy', 'coral'];
     border-color: transparent;
     background:
       linear-gradient(135deg, var(--badge-bg) 0%, var(--badge-bg-2, var(--badge-bg)) 100%) padding-box,
-      linear-gradient(150deg, color-mix(in srgb, var(--badge-fg) 55%, transparent), color-mix(in srgb, var(--badge-fg) 25%, transparent)) border-box,
+      linear-gradient(150deg, var(--badge-fg), color-mix(in srgb, var(--badge-fg) 55%, #000)) border-box,
       var(--glass-thick) border-box;
     box-shadow:
       0 0 0 6px color-mix(in srgb, var(--badge-fg) 12%, transparent),

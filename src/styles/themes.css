@@ -305,12 +305,12 @@
   --navy-50: #1f2858;
   --navy-100: #2b3878;
   --sun: #ffc93c;
-  --sun-50: #3b2c14;
-  --sun-100: #5c4216;
+  --sun-50: #4a3306;
+  --sun-100: #73500a;
   --sun-fg: #ffd25e;
   --coral: #ff5a45;
-  --coral-50: #3e1d22;
-  --coral-100: #5e2830;
+  --coral-50: #4d1626;
+  --coral-100: #7a2437;
   --coral-fg: #ff9a8c;
   --green: #3fc163;
   --green-50: #142f1e;
@@ -340,7 +340,7 @@
 
   --glass-rgb: 40 46 98;
   --g-heading: linear-gradient(100deg, #f0efff 0%, #a9c6ff 100%);
-  --g-highlight: linear-gradient(90deg, #5fd47c 0%, #ff9a3c 50%, #6aa2ff 100%);
+  --g-highlight: linear-gradient(90deg, #5fd47c 0%, #c9dc4f 22%, #ffb23c 42%, #ff8a6b 60%, #c58bff 80%, #6aa2ff 100%);
   --g-navy: linear-gradient(135deg, #d93a26 0%, #b8261a 100%);
   --g-sun: linear-gradient(135deg, #ffe07a 0%, #ffc93c 100%);
   --g-ink: linear-gradient(135deg, #35356c 0%, #1e1e44 100%);
@@ -434,19 +434,19 @@
   --muted: #c7c0ae;
   --navy: #bcd3ab;
   --navy-700: #d6e6ca;
-  --navy-50: #263224;
-  --navy-100: #33432f;
+  --navy-50: #3a4d34;
+  --navy-100: #4a6342;
   --sun: #e3b45e;
-  --sun-50: #33291a;
-  --sun-100: #4d3d22;
+  --sun-50: #4a3a1a;
+  --sun-100: #6a5226;
   --sun-fg: #ecc888;
   --coral: #d8805e;
-  --coral-50: #3a241c;
-  --coral-100: #573427;
+  --coral-50: #4d2a1c;
+  --coral-100: #6b3a26;
   --coral-fg: #eba78a;
   --green: #8fb380;
-  --green-50: #1f2e1d;
-  --green-100: #2c4229;
+  --green-50: #2f4a2c;
+  --green-100: #3f6139;
   --green-fg: #a9cc9c;
   --sky: #7fa3c2;
   --sky-50: #1c2933;
@@ -483,9 +483,10 @@
   --shadow-tint: 0 0 0;
 }
 
-/* Calm's softer doodles are darkened at night like every theme's (global.css), keeping their earthy tone. */
-:root[data-theme='calm'][data-mode='dark'] main > section::before {
-  filter: saturate(0.55) sepia(0.2) brightness(0.75);
+/* Calm's doodles stay earthy at night, but less muted than by day: the night colours are already deeper. */
+:root[data-theme='calm'][data-mode='dark'] main > section::before,
+:root[data-theme='calm'][data-mode='dark'] .fx {
+  filter: saturate(0.7) sepia(0.12);
 }
 
 /* Candy Pop: bright bubblegum pink, electric purple, turquoise and lemon, with bubbly shapes. */
@@ -572,8 +573,8 @@
   --navy-50: #3f1842;
   --navy-100: #5b2160;
   --sun: #ffd60a;
-  --sun-50: #3f300c;
-  --sun-100: #66490a;
+  --sun-50: #4c2f06;
+  --sun-100: #7a4c08;
   --sun-fg: #ffe266;
   --coral: #ff4f8f;
   --coral-50: #451a33;
@@ -699,8 +700,8 @@
   --navy-50: #11383a;
   --navy-100: #1a4f4d;
   --sun: #ffb31a;
-  --sun-50: #3b2a0c;
-  --sun-100: #5a3f0f;
+  --sun-50: #52300a;
+  --sun-100: #7a4a0c;
   --sun-fg: #ffc34d;
   --coral: #ff6a5c;
   --coral-50: #3f1c20;

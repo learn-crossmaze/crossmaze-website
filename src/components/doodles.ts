@@ -1,6 +1,8 @@
 // Playful preschool doodles (crayons, ABC blocks, kites, rainbows…) drawn as small SVGs in a
 // 100 × 100 box. FloatingShapes.astro draws them inline in the page banners, and BaseLayout turns
 // sectionDoodleCss into the two drifting doodles behind every page section (see global.css).
+// Each doodle has a day version in pastels and a night version in deeper, clearer colours for dark
+// mode: pastels dimmed for a dark page turn grey or khaki.
 
 export type DoodleKind =
   | 'abacus'
@@ -30,10 +32,27 @@ export const pastel = {
   butter: ['#ffe59a', '#ffd463'],
 } satisfies Record<string, Colors>;
 
+/** The night versions of the pastels: mid-tone colours that glow softly on a dark page. */
+export const night = {
+  pink: ['#f28db5', '#e46a9c'],
+  lavender: ['#a78bfa', '#8b6cf0'],
+  mint: ['#5cc996', '#3db07c'],
+  peach: ['#f6a07a', '#ec8058'],
+  sky: ['#74a7f0', '#5689e2'],
+  butter: ['#f0c544', '#dca623'],
+} satisfies Record<keyof typeof pastel, Colors>;
+
+/** The night colours for a pastel pair (the same pair if it isn't one of the pastels). */
+export const nightOf = (colors: Colors): Colors => {
+  const name = (Object.keys(pastel) as (keyof typeof pastel)[]).find((k) => pastel[k] === colors);
+  return name ? night[name] : colors;
+};
+
 const LETTER_FONT = "Fredoka, 'Arial Rounded MT Bold', Arial, sans-serif";
 
-/** Inner SVG markup (no <svg> wrapper) for a doodle. */
-export function doodle(kind: DoodleKind, [main, shade]: Colors, letter = 'A'): string {
+/** Inner SVG markup (no <svg> wrapper) for a doodle; `atNight` swaps its fixed details for night colours. */
+export function doodle(kind: DoodleKind, [main, shade]: Colors, letter = 'A', atNight = false): string {
+  const n = (day: string, nightColour: string) => (atNight ? nightColour : day);
   switch (kind) {
     case 'abacus':
       return (
@@ -43,7 +62,7 @@ export function doodle(kind: DoodleKind, [main, shade]: Colors, letter = 'A'): s
             (y, row) =>
               `<path d="M16 ${y}h68" stroke="${shade}" stroke-width="3"/>` +
               [0, 1, 2]
-                .map((i) => `<circle cx="${26 + i * 13 + (row % 2) * 22}" cy="${y}" r="6.5" fill="${['#ffa9c4', '#ffd463', '#a5ccfc'][(i + row) % 3]}"/>`)
+                .map((i) => `<circle cx="${26 + i * 13 + (row % 2) * 22}" cy="${y}" r="6.5" fill="${(atNight ? ['#e46a9c', '#dca623', '#5689e2'] : ['#ffa9c4', '#ffd463', '#a5ccfc'])[(i + row) % 3]}"/>`)
                 .join(''),
           )
           .join('')
@@ -88,9 +107,9 @@ export function doodle(kind: DoodleKind, [main, shade]: Colors, letter = 'A'): s
       );
     case 'pencil':
       return (
-        `<g transform="rotate(35 50 50)"><rect x="6" y="41" width="12" height="18" rx="4" fill="#ffc2d4"/>` +
-        `<rect x="17" y="41" width="7" height="18" fill="#dfe2ef"/><rect x="24" y="41" width="48" height="18" fill="${main}"/>` +
-        `<rect x="24" y="47" width="48" height="6" fill="${shade}"/><path d="M72 41l18 9-18 9z" fill="#ffe3c4"/>` +
+        `<g transform="rotate(35 50 50)"><rect x="6" y="41" width="12" height="18" rx="4" fill="${n('#ffc2d4', '#f28db5')}"/>` +
+        `<rect x="17" y="41" width="7" height="18" fill="${n('#dfe2ef', '#b9bfd6')}"/><rect x="24" y="41" width="48" height="18" fill="${main}"/>` +
+        `<rect x="24" y="47" width="48" height="6" fill="${shade}"/><path d="M72 41l18 9-18 9z" fill="${n('#ffe3c4', '#e9c39a')}"/>` +
         `<path d="M84 47l6 3-6 3z" fill="#8d96bd"/></g>`
       );
     case 'plane':
@@ -103,14 +122,14 @@ export function doodle(kind: DoodleKind, [main, shade]: Colors, letter = 'A'): s
     case 'rainbow':
       return (
         [
-          [40, '#ffb3cb'],
-          [31, '#ffd98a'],
-          [22, '#aee3c3'],
-          [13, '#b4d3fd'],
+          [40, n('#ffb3cb', '#f28db5')],
+          [31, n('#ffd98a', '#f0c544')],
+          [22, n('#aee3c3', '#5cc996')],
+          [13, n('#b4d3fd', '#74a7f0')],
         ]
           .map(([r, c]) => `<path d="M${50 - Number(r)} 72a${r} ${r} 0 0 1 ${2 * Number(r)} 0" fill="none" stroke="${c}" stroke-width="8"/>`)
           .join('') +
-        `<path d="M4 78a8 8 0 0 1 10-10 9 9 0 0 1 16 2 7 7 0 0 1-2 8zM70 78a8 8 0 0 1 10-10 9 9 0 0 1 16 2 7 7 0 0 1-2 8z" fill="#fff"/>`
+        `<path d="M4 78a8 8 0 0 1 10-10 9 9 0 0 1 16 2 7 7 0 0 1-2 8zM70 78a8 8 0 0 1 10-10 9 9 0 0 1 16 2 7 7 0 0 1-2 8z" fill="${n('#fff', '#dfe6f5')}"/>`
       );
     case 'star':
       return `<path d="M50 8l12 25 27 4-20 19 5 27-24-13-24 13 5-27-20-19 27-4z" fill="${main}" stroke="${main}" stroke-width="8" stroke-linejoin="round"/>`;
@@ -125,8 +144,8 @@ export function doodle(kind: DoodleKind, [main, shade]: Colors, letter = 'A'): s
           })
           .join('') +
         `</g><circle cx="50" cy="50" r="25" fill="${main}"/>` +
-        `<path d="M40 54c5 6 15 6 20 0" fill="none" stroke="#e0a100" stroke-width="3.5" stroke-linecap="round"/>` +
-        `<circle cx="41" cy="45" r="3" fill="#e0a100"/><circle cx="59" cy="45" r="3" fill="#e0a100"/>`
+        `<path d="M40 54c5 6 15 6 20 0" fill="none" stroke="${n('#e0a100', '#9a6a00')}" stroke-width="3.5" stroke-linecap="round"/>` +
+        `<circle cx="41" cy="45" r="3" fill="${n('#e0a100', '#9a6a00')}"/><circle cx="59" cy="45" r="3" fill="${n('#e0a100', '#9a6a00')}"/>`
       );
   }
 }
@@ -135,18 +154,21 @@ const dataUri = (inner: string) =>
   `url("data:image/svg+xml,${encodeURIComponent(`<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100">${inner}</svg>`)}")`;
 
 /** The doodle beside each section, in a six-step cycle down the page. */
-const sectionDoodles: string[] = [
-  doodle('kite', pastel.sky),
-  doodle('rainbow', pastel.pink),
-  doodle('block', pastel.butter, 'A'),
-  doodle('plane', pastel.lavender),
-  doodle('book', pastel.peach),
-  doodle('star', pastel.pink),
+const sectionDoodles: [DoodleKind, keyof typeof pastel, string?][] = [
+  ['kite', 'sky'],
+  ['rainbow', 'pink'],
+  ['block', 'butter', 'A'],
+  ['plane', 'lavender'],
+  ['book', 'peach'],
+  ['star', 'pink'],
 ];
 
 export const sectionDoodleCss = sectionDoodles
-  .map((d, i) => {
+  .map(([kind, colour, letter], i) => {
     const nth = i === 5 ? '6n' : `6n+${i + 1}`;
-    return `main > section:nth-of-type(${nth}){--shape-1:${dataUri(d)}}`;
+    return (
+      `main > section:nth-of-type(${nth}){--shape-1:${dataUri(doodle(kind, pastel[colour], letter))}}\n` +
+      `:root[data-mode='dark'] main > section:nth-of-type(${nth}){--shape-1:${dataUri(doodle(kind, night[colour], letter, true))}}`
+    );
   })
   .join('\n');

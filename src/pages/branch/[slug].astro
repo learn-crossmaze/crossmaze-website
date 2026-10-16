@@ -317,6 +317,11 @@ const jsonLd = {
     }
   }
 
+  /* The page set's cloud would sit behind the photo and poke out above its frame. */
+  .branch-hero :global(.fx__shape--cloud) {
+    display: none;
+  }
+
   .branch-hero h1 {
     max-width: 16ch;
   }
@@ -525,8 +530,16 @@ const jsonLd = {
   }
 
   /* --sun-50 is a deep, muddy tint at night: a soft golden ring instead. */
+  /* At night the portrait gets the same glass frame as the other photos (a mixed ring went khaki). */
   :global(:root[data-mode='dark']) .head :global(.head__photo) {
-    border-color: color-mix(in srgb, var(--sun-fg) 45%, var(--paper));
+    border-color: transparent;
+    background: var(--g-ring) border-box;
+  }
+
+  :global(:root[data-mode='dark']) .head .head__photo--initials {
+    background:
+      var(--g-navy) padding-box,
+      var(--g-ring) border-box;
   }
 
   @media (max-width: 700px) {

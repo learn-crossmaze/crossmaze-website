@@ -178,9 +178,12 @@ const mascot = image(site.mascot);
     animation: mascot-bob 6s ease-in-out infinite alternate;
   }
 
+  /* At night the tile is framed like a photo, so it reads as a sticker, not a stray light box. */
   :global(:root[data-mode='dark']) .site-footer__about :global(.site-footer__mascot) {
-    outline: 1px solid var(--glass-edge);
-    outline-offset: -1px;
+    border: 4px solid transparent;
+    background:
+      linear-gradient(var(--sticker), var(--sticker)) padding-box,
+      var(--g-ring) border-box;
   }
 
   @keyframes mascot-bob {

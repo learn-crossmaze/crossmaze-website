@@ -40,9 +40,10 @@ const mascot = image(site.mascot);
   :global(:root[data-mode='dark']) .notfound :global(.notfound__mascot) {
     padding: 12px;
     border-radius: 28px;
-    background: var(--sticker);
-    outline: 1px solid var(--glass-edge);
-    outline-offset: -1px;
+    border: 4px solid transparent;
+    background:
+      linear-gradient(var(--sticker), var(--sticker)) padding-box,
+      var(--g-ring) border-box;
     box-shadow: var(--shadow-sm);
   }
   .notfound .btn-row {
