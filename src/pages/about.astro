@@ -200,6 +200,20 @@ const tones = ['navy', 'green', 'coral', 'sky', 'sun', 'navy'];
     background: linear-gradient(135deg, var(--badge-bg) 0%, var(--badge-bg-2, var(--badge-bg)) 100%);
   }
 
+  :global(:root[data-mode='dark']) .stat {
+    border: 1px solid var(--glass-edge);
+    /* The tile's own night tints, slightly see-through (a wash of the light colour over the glass
+       went grey or khaki where the two hues are far apart). */
+    background: linear-gradient(
+      135deg,
+      color-mix(in srgb, var(--badge-bg-2, var(--badge-bg)) 90%, transparent) 0%,
+      color-mix(in srgb, var(--badge-bg) 80%, transparent) 100%
+    );
+    -webkit-backdrop-filter: var(--glass-blur);
+    backdrop-filter: var(--glass-blur);
+    box-shadow: var(--glass-rim), var(--shadow-sm);
+  }
+
   .stat strong {
     font-family: var(--font-display);
     font-size: clamp(1.6rem, 3vw, 2.2rem);

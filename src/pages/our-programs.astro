@@ -216,6 +216,12 @@ import { site, faqs, dayRoutine } from '../data/site';
     background: linear-gradient(135deg, var(--badge-bg) 0%, var(--badge-bg-2, var(--badge-bg)) 100%);
   }
 
+  /* At night the glass frame would take on the dark tint behind it and look muddy: let the page
+     show through instead, as round every other photo. */
+  :global(:root[data-mode='dark']) .program__media {
+    background: none;
+  }
+
   .program__media :global(img) {
     width: 100%;
     height: 100%;
@@ -283,6 +289,8 @@ import { site, faqs, dayRoutine } from '../data/site';
   }
 
   .extra__list .card {
+    display: grid;
+    justify-items: start;
     padding: 20px;
   }
 

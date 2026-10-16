@@ -86,7 +86,7 @@ To know who called (their number) you'd need call-tracking numbers from a teleph
 
 ### Colour themes
 
-The site has seven colour themes: **Pastel Glass**, **Sunny Meadow**, **Ocean Breeze**, **Crayon Box**, **Montessori Calm**, and two bright ones, **Candy Pop** and **Tropical Splash**. Each theme changes the page background, colours and fonts; the boxes on top (cards, the floating header, the footer, forms and pop-ups) are white frosted glass in every theme. In **Site settings → Look and feel**, choose which one visitors see:
+The site has seven colour themes: **Pastel Glass**, **Sunny Meadow**, **Ocean Breeze**, **Crayon Box**, **Montessori Calm**, and two bright ones, **Candy Pop** and **Tropical Splash**. Each theme changes the page background, colours and fonts; the boxes on top (cards, the floating header, the footer, forms and pop-ups) are white frosted glass in every theme, or smoky dark glass in dark mode (below). In **Site settings → Look and feel**, choose which one visitors see:
 
 | Setting | What visitors see |
 | --- | --- |
@@ -97,6 +97,16 @@ The site has seven colour themes: **Pastel Glass**, **Sunny Meadow**, **Ocean Br
 | A random theme for each new visitor, kept on their repeat visits | A random ticked theme on someone's first visit, then the same one whenever they come back |
 
 A visit keeps one theme from page to page. To look at a theme yourself, add `?theme=meadow` (or `pastel`, `ocean`, `crayon`, `calm`, `candy`, `tropical`) to any page address; `?theme=auto` goes back to the setting. Like other changes, a new setting goes live when you press **Publish**.
+
+**Dark mode.** Every theme also has a dark version: a deep night-time gradient in the theme's own colours, with smoky glass boxes and light text; buttons, badges and headings keep their bright gradients. **Site settings → Look and feel → Dark mode** chooses who sees it:
+
+| Setting | What visitors see |
+| --- | --- |
+| Follow each visitor's phone or computer, with a light/dark button | Dark when their device is set to dark mode, light otherwise. The sun/moon button in the menu bar switches, and the site remembers their choice |
+| Light, with a button to switch to dark | Light, until they press the sun/moon button (remembered) |
+| Light only | Light; no button |
+
+To look at dark mode yourself, add `?mode=dark` to any page address (it works even when dark mode is off, so you can check it first); `?mode=light` shows light and `?mode=auto` goes back to the setting. Combine them: `?theme=ocean&mode=dark`. The admin panel itself stays light.
 
 ## One-time setup
 
@@ -214,7 +224,7 @@ FIREBASE_STORAGE_BUCKET=demo-crossmaze.appspot.com ADMIN_EMAILS=you@example.com 
 - A field that's new in `content/site.json` or `content/sections.json` (such as a new page section) is copied into Firestore on the next deploy from `main`, so it appears in the admin panel. Pull-request previews use the repository's copy without writing to Firestore.
 - **Changing existing copy from the repository** (reworded text, a corrected phone number) needs a content update, because the live text is in Firestore and each deploy overwrites `content/*.json` with it. Edit the JSON, then run `node scripts/content-update.mjs <id> "<what changed>"` before committing (it compares with the last commit; pass another git ref as a third argument, e.g. `origin/main`). It writes `content/updates/<id>.json`, one entry per changed field. Pull-request previews show the change without saving it. The next deploy from `main` saves it to Firestore once, and only where Firestore still has the old text, so anything edited in the admin panel is kept. The deploy log lists what was updated and what was kept. Photos inside a list that changes as a whole (such as each facility's photo) are included and copied to Cloud Storage when the update is saved; other photo fields and new items, such as a branch or a job, are added in the admin panel.
 - `scripts/report-publish.mjs` tells the admin panel whether a deploy succeeded.
-- Colour themes: the tokens in `src/styles/global.css` are Pastel Glass; `src/styles/themes.css` overrides them for the other themes, and `src/data/themes.ts` lists each theme's fonts. A script at the top of `layouts/BaseLayout.astro` picks the theme in the browser before the page is drawn.
+- Colour themes: the tokens in `src/styles/global.css` are Pastel Glass; `src/styles/themes.css` overrides them for the other themes, and `src/data/themes.ts` lists each theme's fonts and browser-bar colours. A script at the top of `layouts/BaseLayout.astro` picks the theme and light or dark (`<html data-theme="…" data-mode="light|dark">`) in the browser before the page is drawn. Dark colours: `:root[data-mode='dark']` in global.css (Pastel Glass at night, plus the smoky glass and shadows every theme shares) and `:root[data-theme='…'][data-mode='dark']` in themes.css, which must re-set every colour token the theme's light block sets.
 - The admin panel lives in `src/admin/`. Its forms are generated from `src/admin/schemas.ts`, so adding a field there and in `src/data/content.ts` is all it takes.
 - Who can do what is decided by `firestore.rules` and `storage.rules`: full admins are listed in `admins/{email}`, branch admins in `branchAdmins/{email}` (`branches`: the branch slugs whose `centerHead` they may change). Blog posts record their writer in `createdBy`. The panel's menu (`NAV` in `src/admin/AdminApp.tsx`) only hides pages; the rules are what stop a branch admin, so test them with `npm run test:rules`.
 

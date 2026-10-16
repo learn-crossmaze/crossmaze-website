@@ -35,6 +35,17 @@ const mascot = image(site.mascot);
     height: auto;
     margin-bottom: 16px;
   }
+  /* At night the drawing's black outlines would vanish into the page: it sits on a soft light
+     tile, like the one in the footer. */
+  :global(:root[data-mode='dark']) .notfound :global(.notfound__mascot) {
+    padding: 12px;
+    border-radius: 28px;
+    border: 4px solid transparent;
+    background:
+      linear-gradient(var(--sticker), var(--sticker)) padding-box,
+      var(--g-ring) border-box;
+    box-shadow: var(--shadow-sm);
+  }
   .notfound .btn-row {
     justify-content: center;
   }

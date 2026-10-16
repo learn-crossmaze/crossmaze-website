@@ -86,6 +86,25 @@
   --squiggle: #ffc23d;
   --g-ink: linear-gradient(135deg, #2a3366 0%, #131a3a 100%);
   --g-whatsapp: linear-gradient(135deg, #4be27f 0%, #25d366 50%, #12a84b 100%);
+  /* Bits of the glass and chrome that change at night (dark values in the dark-mode block below;
+     they are the same in every theme). */
+  --glass-shine: #fff; /* the bright top edge of a glass button */
+  --glass-sheet: rgb(255 255 255 / 94%); /* nearly opaque glass: the phone menu */
+  --badge-rim: inset 0 1px 0 rgb(255 255 255 / 80%), inset 0 0 0 1px rgb(255 255 255 / 50%);
+  --scrim: color-mix(in srgb, var(--ink) 30%, transparent); /* dims the page behind a pop-up */
+  --sticker: #ffffff; /* the light tile the mascot drawing sits on */
+  --field-dash: color-mix(in srgb, var(--navy) 28%, #fff); /* the file drop area's dashed edge */
+  --success-fg: #1e6b31;
+  --error-fg: #a3301e;
+  /* Mixed into an accent text colour for more contrast (the home page's stat numbers). */
+  --contrast-mix: #000;
+  --quote-mark: var(--coral); /* the big soft opening quote marks */
+  /* A dark veil over a photo, under white text (the branch gallery's "+3"). */
+  --photo-scrim: linear-gradient(
+    160deg,
+    color-mix(in srgb, var(--ink) 74%, transparent) 0%,
+    color-mix(in srgb, var(--navy-700) 82%, transparent) 100%
+  );
 
   --font-display: 'Fredoka', 'Nunito', system-ui, sans-serif;
   --font-body: 'Nunito', system-ui, -apple-system, 'Segoe UI', sans-serif;
@@ -116,6 +135,114 @@
     --gutter: 16px;
     --header-h: 64px;
   }
+}
+
+/* ---------- Dark mode ----------
+   <html data-mode="dark"> (picked by the script in layouts/BaseLayout.astro). Every theme has a dark
+   version: the page background turns into a deep night-time gradient in the theme's own colours,
+   and the boxes become smoky liquid glass (the dark counterpart of the white glass), tinted by the
+   theme's --glass-rgb. Buttons, badges and headings keep their gradients, brightened for the dark.
+   This block is Pastel Glass's dark version plus what every theme shares; each theme's dark colours
+   are in themes.css under :root[data-theme='…'][data-mode='dark'], and must set every colour token
+   its light block sets. */
+:root[data-mode='dark'] {
+  color-scheme: dark;
+
+  --ink: #eceefe;
+  --muted: #b6bbdb;
+  --navy: #a9bfff;
+  --navy-700: #cfdbff;
+  --navy-50: #2a3570;
+  --navy-100: #384a92;
+  --sun: #ffc93c;
+  --sun-50: #45300f;
+  --sun-100: #6a4614;
+  --sun-fg: #ffd36b;
+  --coral: #ff6b5e;
+  --coral-50: #4a1d30;
+  --coral-100: #6e2942;
+  --coral-fg: #ff9d92;
+  --green: #4cc46a;
+  --green-50: #17311f;
+  --green-100: #224b2f;
+  --green-fg: #82dd97;
+  --sky: #5d9cff;
+  --sky-50: #182a4a;
+  --sky-100: #213b68;
+  --sky-fg: #93bfff;
+  --paper: #1d2142;
+  --line: rgb(255 255 255 / 12%);
+
+  /* Night-time versions of the pastel flow: berry, plum, midnight, deep teal, navy and violet. */
+  --flow-1: #1d1530;
+  --flow-2: #1f1730;
+  --flow-3: #171a33;
+  --flow-4: #10202b;
+  --flow-5: #121b36;
+  --flow-6: #1b1638;
+  --tint-1: #4a2342;
+  --tint-2: #322a63;
+  --tint-3: #1b4636;
+  --tint-4: #4a3d1f;
+  --tint-5: #213a66;
+  --glow-1: rgb(255 110 170 / 15%);
+  --glow-2: rgb(110 140 255 / 17%);
+  --glow-3: rgb(70 200 150 / 12%);
+  --glow-4: rgb(255 190 80 / 10%);
+
+  /* Smoky glass: a lighter, translucent tint of the night colour, so boxes still lift off the page. */
+  --glass-rgb: 44 48 92;
+  --glass: rgb(var(--glass-rgb) / 58%);
+  --glass-thick: rgb(var(--glass-rgb) / 84%);
+  --glass-blur: blur(22px) saturate(140%);
+  --glass-edge: rgb(255 255 255 / 13%);
+  --glass-rim:
+    inset 0 1px 0 rgb(255 255 255 / 14%), inset 0 -1px 0 rgb(0 0 0 / 22%), 0 0 0 1px rgb(0 0 0 / 18%);
+  /* Photo frames: opaque, from a glint of the theme's accent to its glass colour (see-through, they
+     looked grey and showed the doodles tucked behind the photos). */
+  --g-ring: linear-gradient(150deg, color-mix(in srgb, var(--navy) 55%, rgb(var(--glass-rgb))) 0%, rgb(var(--glass-rgb)) 100%);
+  --g-heading: linear-gradient(100deg, #c8d5ff 0%, #b7c3ff 50%, #dcc4ff 100%);
+  --g-highlight: linear-gradient(90deg, #ff7fa6 0%, #d982ec 55%, #ab8eff 100%);
+  --g-navy: linear-gradient(135deg, #4466d6 0%, #3657c8 55%, #2743a8 100%);
+  --g-sun: linear-gradient(135deg, #ffde75 0%, #ffc93c 50%, #ffb224 100%);
+  --sun-btn-fg: #131a3a;
+  --sun-btn-glow: rgb(255 170 30 / 45%);
+  --eyebrow-fg: #ff9d92;
+  --squiggle: #ffc23d;
+  --g-ink: linear-gradient(135deg, #343c74 0%, #1d2250 100%);
+
+  /* The chrome at night, from the theme's own tokens (so themes.css needn't set these). Rims and
+     edges glint faintly instead of shining white; the phone menu is the smoky glass made nearly
+     opaque; pop-ups dim the page rather than wash it out; the mascot drawing (black outlines) sits
+     on a soft tile of the theme's light text colour rather than bright white. */
+  --glass-shine: rgb(255 255 255 / 14%);
+  --glass-sheet: rgb(var(--glass-rgb) / 96%);
+  --badge-rim: inset 0 1px 0 rgb(255 255 255 / 14%), inset 0 0 0 1px rgb(255 255 255 / 7%);
+  --scrim: rgb(0 0 0 / 42%);
+  --sticker: color-mix(in srgb, var(--ink) 80%, var(--sun-100));
+  --field-dash: color-mix(in srgb, var(--navy) 40%, transparent);
+  --success-fg: var(--green-fg);
+  --error-fg: var(--coral-fg);
+  --contrast-mix: #fff;
+  --quote-mark: var(--navy);
+  --photo-scrim: linear-gradient(160deg, rgb(var(--glass-rgb) / 74%) 0%, color-mix(in srgb, var(--paper) 86%, transparent) 100%);
+
+  /* Shadows are black at night; the theme tint would just look muddy. */
+  --shadow-tint: 0 0 0;
+  --shadow-sm: 0 1px 2px rgb(0 0 0 / 30%), 0 10px 30px -14px rgb(0 0 0 / 55%);
+  --shadow: 0 2px 4px rgb(0 0 0 / 30%), 0 24px 56px -24px rgb(0 0 0 / 60%);
+  --shadow-lift: 0 4px 8px rgb(0 0 0 / 32%), 0 32px 70px -26px rgb(0 0 0 / 66%);
+}
+
+/* The doodles behind sections switch to their night colours (doodles.ts, sectionDoodleCss); a little
+   softer than by day, as the page is darker. */
+:root[data-mode='dark'] main > section::before {
+  opacity: 0.6;
+}
+
+/* Placeholders: the browser's grey is too faint on smoky glass. */
+:root[data-mode='dark'] :is(input, textarea)::placeholder {
+  color: color-mix(in srgb, var(--muted) 80%, transparent);
 }
 
 /* ---------- Base ---------- */
@@ -504,8 +631,8 @@ main > section.section--tight.section--feature {
   backdrop-filter: var(--glass-blur);
   color: var(--btn-bg);
   box-shadow:
-    inset 0 1px 0 #fff,
-    0 0 0 1px color-mix(in srgb, var(--btn-bg) 26%, transparent),
+    inset 0 1px 0 var(--glass-shine),
+    0 0 0 1px color-mix(in srgb, var(--btn-bg) var(--ghost-ring, 26%), transparent),
     0 10px 22px -14px var(--btn-glow);
 }
 
@@ -513,15 +640,27 @@ main > section.section--tight.section--feature {
   color: var(--btn-bg);
   background: var(--glass-thick);
   box-shadow:
-    inset 0 1px 0 #fff,
-    0 0 0 1px color-mix(in srgb, var(--btn-bg) 40%, transparent),
+    inset 0 1px 0 var(--glass-shine),
+    0 0 0 1px color-mix(in srgb, var(--btn-bg) var(--ghost-ring-hover, 40%), transparent),
     0 14px 28px -14px var(--btn-glow);
+}
+
+/* At night the outline is a light colour on dark glass, so it is drawn fainter. */
+:root[data-mode='dark'] .btn--ghost {
+  --ghost-ring: 16%;
+  --ghost-ring-hover: 30%;
 }
 
 .btn--white {
   --btn-bg: #fff;
   --btn-fg: var(--navy);
   --btn-grad: linear-gradient(135deg, #ffffff 0%, var(--navy-50) 100%);
+}
+
+/* A white button would glare at night: it becomes a soft tint of the theme colour. */
+:root[data-mode='dark'] .btn--white {
+  --btn-bg: var(--navy-100);
+  --btn-grad: linear-gradient(135deg, var(--navy-100) 0%, var(--navy-50) 100%);
 }
 
 .btn--sm {
@@ -578,7 +717,7 @@ main > section.section--tight.section--feature {
   margin-bottom: 18px;
   border-radius: 16px;
   background: linear-gradient(135deg, var(--badge-bg, var(--navy-50)) 0%, var(--badge-bg-2, var(--navy-100)) 100%);
-  box-shadow: inset 0 1px 0 rgb(255 255 255 / 80%), inset 0 0 0 1px rgb(255 255 255 / 50%);
+  box-shadow: var(--badge-rim);
   color: var(--badge-fg, var(--navy));
 }
 
@@ -740,7 +879,7 @@ main > :is(.hero, .page-hero):first-child {
 .field input[type='file'] {
   padding: 14px;
   border-style: dashed;
-  border-color: color-mix(in srgb, var(--navy) 28%, #fff);
+  border-color: var(--field-dash);
   background: var(--glass-thick);
   color: var(--muted);
   cursor: pointer;
@@ -780,12 +919,12 @@ main > :is(.hero, .page-hero):first-child {
 
 .form-status[data-state='success'] {
   background: var(--green-50);
-  color: #1e6b31;
+  color: var(--success-fg);
 }
 
 .form-status[data-state='error'] {
   background: var(--coral-50);
-  color: #a3301e;
+  color: var(--error-fg);
 }
 
 .form-note {

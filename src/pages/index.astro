@@ -467,16 +467,17 @@ const tones = ['navy', 'green', 'coral', 'sky', 'sun', 'navy'];
     color: transparent;
   }
 
+  /* Each number deepens towards --contrast-mix (darker on light pages, lighter at night). */
   .stats__list li:nth-child(4n + 2) strong {
-    --num: linear-gradient(135deg, var(--coral-fg) 0%, color-mix(in srgb, var(--coral-fg) 75%, #000) 100%);
+    --num: linear-gradient(135deg, var(--coral-fg) 0%, color-mix(in srgb, var(--coral-fg) 75%, var(--contrast-mix)) 100%);
   }
 
   .stats__list li:nth-child(4n + 3) strong {
-    --num: linear-gradient(135deg, var(--green-fg) 0%, color-mix(in srgb, var(--green-fg) 70%, #000) 100%);
+    --num: linear-gradient(135deg, var(--green-fg) 0%, color-mix(in srgb, var(--green-fg) 70%, var(--contrast-mix)) 100%);
   }
 
   .stats__list li:nth-child(4n + 4) strong {
-    --num: linear-gradient(135deg, var(--sky-fg) 0%, color-mix(in srgb, var(--sky-fg) 72%, #000) 100%);
+    --num: linear-gradient(135deg, var(--sky-fg) 0%, color-mix(in srgb, var(--sky-fg) 72%, var(--contrast-mix)) 100%);
   }
 
   .stats__list span {
@@ -619,7 +620,7 @@ const tones = ['navy', 'green', 'coral', 'sky', 'sun', 'navy'];
     font-family: Georgia, 'Times New Roman', serif;
     font-size: 3.4rem;
     line-height: 1;
-    color: color-mix(in srgb, var(--coral) 55%, transparent);
+    color: color-mix(in srgb, var(--quote-mark) 55%, transparent);
   }
 
   .testimonial blockquote {

@@ -1,15 +1,16 @@
 // Colour themes and how the site rotates between them. The colours live in src/styles/global.css
 // (Pastel Glass, the default) and src/styles/themes.css; the choice of theme is made in the admin
 // panel (Site settings → Look and feel) and applied in the browser by layouts/BaseLayout.astro.
+// Every theme has a light and a dark version: `color` and `dark` are the browser bar colours.
 
 export const themes = [
-  { id: 'pastel', label: 'Pastel Glass', fonts: 'family=Fredoka:wght@500;600&family=Nunito:wght@400;600;700;800', color: '#0b1d5e' },
-  { id: 'meadow', label: 'Sunny Meadow', fonts: 'family=Baloo+2:wght@600;700;800&family=Nunito:wght@400;600;700;800', color: '#1b5a2b' },
-  { id: 'ocean', label: 'Ocean Breeze', fonts: 'family=Quicksand:wght@600;700&family=Nunito:wght@400;600;700;800', color: '#0a4f70' },
-  { id: 'crayon', label: 'Crayon Box', fonts: 'family=Grandstander:wght@600;700&family=Nunito:wght@400;600;700;800', color: '#b8261a' },
-  { id: 'calm', label: 'Montessori Calm', fonts: 'family=Lexend:wght@400;500;600;700', color: '#3b5537' },
-  { id: 'candy', label: 'Candy Pop', fonts: 'family=Sniglet:wght@400;800&family=Nunito:wght@400;600;700;800', color: '#7a0d5c' },
-  { id: 'tropical', label: 'Tropical Splash', fonts: 'family=Lilita+One&family=Nunito:wght@400;600;700;800', color: '#004d44' },
+  { id: 'pastel', label: 'Pastel Glass', fonts: 'family=Fredoka:wght@500;600&family=Nunito:wght@400;600;700;800', color: '#0b1d5e', dark: '#1b1430' },
+  { id: 'meadow', label: 'Sunny Meadow', fonts: 'family=Baloo+2:wght@600;700;800&family=Nunito:wght@400;600;700;800', color: '#1b5a2b', dark: '#132216' },
+  { id: 'ocean', label: 'Ocean Breeze', fonts: 'family=Quicksand:wght@600;700&family=Nunito:wght@400;600;700;800', color: '#0a4f70', dark: '#0b2128' },
+  { id: 'crayon', label: 'Crayon Box', fonts: 'family=Grandstander:wght@600;700&family=Nunito:wght@400;600;700;800', color: '#b8261a', dark: '#16152e' },
+  { id: 'calm', label: 'Montessori Calm', fonts: 'family=Lexend:wght@400;500;600;700', color: '#3b5537', dark: '#1b1d13' },
+  { id: 'candy', label: 'Candy Pop', fonts: 'family=Sniglet:wght@400;800&family=Nunito:wght@400;600;700;800', color: '#7a0d5c', dark: '#2a0f2c' },
+  { id: 'tropical', label: 'Tropical Splash', fonts: 'family=Lilita+One&family=Nunito:wght@400;600;700;800', color: '#004d44', dark: '#0c2427' },
 ] as const;
 
 export type ThemeId = (typeof themes)[number]['id'];
@@ -23,6 +24,15 @@ export const themeModes = [
 ] as const;
 
 export type ThemeMode = (typeof themeModes)[number]['value'];
+
+/** Who sees the dark version of the theme. */
+export const darkModes = [
+  { value: 'device', label: 'Follow each visitor’s phone or computer, with a light/dark button' },
+  { value: 'button', label: 'Light, with a button to switch to dark' },
+  { value: 'off', label: 'Light only' },
+] as const;
+
+export type DarkMode = (typeof darkModes)[number]['value'];
 
 export const weekdays = [
   ['mon', 'Monday'],
@@ -42,6 +52,8 @@ export interface ThemeSettings {
   rotation: ThemeId[];
   /** One theme per day of the week, for "weekday". */
   weekdays: Record<(typeof weekdays)[number][0], ThemeId>;
+  /** Dark mode: follow the visitor's device, only by the button, or never. */
+  dark: DarkMode;
 }
 
 export const fontsHref = (fonts: string) => `https://fonts.googleapis.com/css2?${fonts}&display=swap`;
@@ -55,9 +67,11 @@ export function themeSettings(raw: Partial<Record<keyof ThemeSettings, unknown>>
   const fixed = isTheme(raw?.fixed) ? raw.fixed : 'pastel';
   const picked = Array.isArray(raw?.rotation) ? ids.filter((id) => (raw.rotation as unknown[]).includes(id)) : [];
   const days = (raw?.weekdays ?? {}) as Record<string, unknown>;
+  const dark = darkModes.some((m) => m.value === raw?.dark) ? (raw!.dark as DarkMode) : 'device';
   return {
     mode,
     fixed,
+    dark,
     rotation: (picked.length ? picked : [fixed]) as ThemeId[],
     weekdays: Object.fromEntries(weekdays.map(([day]) => [day, isTheme(days[day]) ? days[day] : fixed])) as ThemeSettings['weekdays'],
   };

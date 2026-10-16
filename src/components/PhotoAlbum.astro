@@ -573,6 +573,43 @@ const { id, photos, title, alt, captions } = Astro.props;
     }
   }
 
+  /* Dark mode: --ink and --navy-700 turn light at night, so the backdrop is drawn from the theme's
+     night page colours instead (darker still, so the photos stand out), and the controls become the
+     theme's smoky glass. */
+  :global(:root[data-mode='dark']) .album {
+    color: var(--ink);
+    background:
+      radial-gradient(55% 45% at 12% 8%, color-mix(in srgb, var(--tint-1) 45%, transparent), transparent 70%),
+      radial-gradient(55% 45% at 88% 92%, color-mix(in srgb, var(--tint-5) 45%, transparent), transparent 70%),
+      linear-gradient(160deg, color-mix(in srgb, var(--flow-1) 72%, #000) 0%, color-mix(in srgb, var(--flow-5) 72%, #000) 100%);
+  }
+
+  :global(:root[data-mode='dark']) .album__count,
+  :global(:root[data-mode='dark']) .album__btn {
+    border: 1px solid var(--glass-edge);
+    background: var(--glass);
+    -webkit-backdrop-filter: var(--glass-blur);
+    backdrop-filter: var(--glass-blur);
+    box-shadow: var(--glass-rim);
+    color: var(--ink);
+  }
+
+  :global(:root[data-mode='dark']) .album__btn:hover {
+    background: var(--glass-thick);
+  }
+
+  :global(:root[data-mode='dark']) .album__caption span {
+    color: var(--muted);
+  }
+
+  :global(:root[data-mode='dark']) .album__thumb {
+    background: var(--glass);
+  }
+
+  :global(:root[data-mode='dark']) .album__thumb[aria-current='true'] {
+    background: var(--g-ring);
+  }
+
   /* The zoom between the page and the album. */
   :global(::view-transition-group(album-photo)) {
     animation-duration: 0.48s;

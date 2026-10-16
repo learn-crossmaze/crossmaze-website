@@ -1,0 +1,12 @@
+{
+  "id": "2026-10-15-dark-mode",
+  "description": "Dark mode setting: follow each visitor's device, with a light/dark button",
+  "changes": [
+    {
+      "doc": "content/site",
+      "field": "theme.dark",
+      "from": null,
+      "to": "device"
+    }
+  ]
+}

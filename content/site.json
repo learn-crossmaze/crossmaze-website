@@ -140,6 +140,7 @@
       "fri": "calm",
       "sat": "candy",
       "sun": "tropical"
-    }
+    },
+    "dark": "device"
   }
 }

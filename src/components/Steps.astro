@@ -98,6 +98,28 @@ const tones = ['coral', 'sun', 'green', 'sky', 'navy', 'coral'];
     line-height: 1.5;
   }
 
+  /* Dark mode: a solid white ring and halo would glare, so the icons (and numbers) sit in the thin
+     glass frame the photos use (over smoky glass, so the dashed path stays behind it), with a faint
+     glass halo and the theme's night shadow. */
+  :global(:root[data-mode='dark']) .steps__icon {
+    border-color: transparent;
+    background:
+      linear-gradient(135deg, var(--badge-bg) 0%, var(--badge-bg-2, var(--badge-bg)) 100%) padding-box,
+      linear-gradient(150deg, var(--badge-fg), color-mix(in srgb, var(--badge-fg) 55%, #000)) border-box,
+      var(--glass-thick) border-box;
+    box-shadow:
+      0 0 0 6px color-mix(in srgb, var(--badge-fg) 12%, transparent),
+      0 10px 24px -12px color-mix(in srgb, var(--badge-fg) 45%, transparent);
+  }
+
+  :global(:root[data-mode='dark']) .steps__num {
+    border-color: transparent;
+    background:
+      var(--g-navy) padding-box,
+      var(--g-ring) border-box,
+      var(--glass-thick) border-box;
+  }
+
   @media (max-width: 1000px) {
     .steps {
       grid-template-columns: repeat(2, minmax(0, 1fr));

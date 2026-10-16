@@ -2,7 +2,7 @@
 // Animated background for page banners: a slowly shifting pastel wash plus floating preschool
 // doodles (see doodles.ts). Purely decorative (aria-hidden) and still for visitors who prefer
 // reduced motion.
-import { doodle, pastel, type Colors, type DoodleKind } from './doodles';
+import { doodle, nightOf, pastel, type Colors, type DoodleKind } from './doodles';
 
 interface Props {
   variant?: 'home' | 'page';
@@ -48,10 +48,11 @@ const shapes = variant === 'home' ? home : page;
     {
       shapes.map((s) => (
         <span
-          class:list={['fx__shape', `fx__shape--${s.motion}`, { 'fx__shape--desktop': s.hideOnMobile }]}
+          class:list={['fx__shape', `fx__shape--${s.motion}`, `fx__shape--${s.kind}`, { 'fx__shape--desktop': s.hideOnMobile }]}
           style={`--size:${s.size}px;--top:${s.top};--left:${s.left};--dur:${s.dur}s;--delay:${s.delay}s${s.mobile ? `;--top-m:${s.mobile.top};--left-m:${s.mobile.left}` : ''}`}
         >
-          <svg viewBox="0 0 100 100" set:html={doodle(s.kind, s.colors, s.letter)} />
+          <svg class="fx__day" viewBox="0 0 100 100" set:html={doodle(s.kind, s.colors, s.letter)} />
+          <svg class="fx__night" viewBox="0 0 100 100" set:html={doodle(s.kind, nightOf(s.colors), s.letter, true)} />
         </span>
       ))
     }
@@ -171,5 +172,27 @@ const shapes = variant === 'home' ? home : page;
     .fx__shape {
       width: calc(var(--size) * 0.7);
     }
+  }
+
+  /* Dark mode: the wash glows in the theme's night tints (mixing in white would turn it into a grey
+     haze), and the pastel doodles are dimmed so they glow softly instead of glaring. */
+  :global(:root[data-mode='dark']) .fx__aurora {
+    background:
+      radial-gradient(32% 40% at 18% 28%, var(--tint-1) 0%, transparent 70%),
+      radial-gradient(30% 38% at 78% 22%, var(--tint-2) 0%, transparent 70%),
+      radial-gradient(34% 40% at 70% 78%, var(--tint-3) 0%, transparent 70%),
+      radial-gradient(30% 36% at 28% 82%, var(--tint-4) 0%, transparent 70%),
+      radial-gradient(26% 30% at 50% 50%, var(--tint-5) 0%, transparent 70%);
+    opacity: 0.75;
+  }
+
+  /* Each doodle comes in day pastels and night colours (doodles.ts); dimmed pastels turn grey. */
+  .fx__night,
+  :global(:root[data-mode='dark']) .fx__day {
+    display: none;
+  }
+
+  :global(:root[data-mode='dark']) .fx__night {
+    display: block;
   }
 </style>
