@@ -1,8 +1,6 @@
-// Playful preschool doodles (crayons, ABC blocks, kites, rainbows…) drawn as small SVGs in a
-// 100 × 100 box. FloatingShapes.astro draws them inline in the page banners, and BaseLayout turns
-// sectionDoodleCss into the two drifting doodles behind every page section (see global.css).
-// Each doodle has a day version in pastels and a night version in deeper, clearer colours for dark
-// mode: pastels dimmed for a dark page turn grey or khaki.
+// Pastel Glass: the original preschool doodles (clouds, kites, rainbows, ABC blocks…). Pastels by
+// day; at night, mid-tone colours that glow softly on the dark page (dimmed pastels turn grey).
+import { type Colors, type ThemeDoodles } from './shared';
 
 export type DoodleKind =
   | 'abacus'
@@ -20,10 +18,8 @@ export type DoodleKind =
   | 'star'
   | 'sun';
 
-/** Main colour, then a shade for details. Pastel enough to sit quietly behind text. */
-export type Colors = [string, string];
-
-export const pastel = {
+/** Pastel enough to sit quietly behind text. */
+const pastel = {
   pink: ['#ffc7da', '#ffa9c4'],
   lavender: ['#d6caff', '#bfaeff'],
   mint: ['#bfeacf', '#9fdcb8'],
@@ -32,8 +28,8 @@ export const pastel = {
   butter: ['#ffe59a', '#ffd463'],
 } satisfies Record<string, Colors>;
 
-/** The night versions of the pastels: mid-tone colours that glow softly on a dark page. */
-export const night = {
+/** The night versions of the pastels. */
+const night = {
   pink: ['#f28db5', '#e46a9c'],
   lavender: ['#a78bfa', '#8b6cf0'],
   mint: ['#5cc996', '#3db07c'],
@@ -42,16 +38,10 @@ export const night = {
   butter: ['#f0c544', '#dca623'],
 } satisfies Record<keyof typeof pastel, Colors>;
 
-/** The night colours for a pastel pair (the same pair if it isn't one of the pastels). */
-export const nightOf = (colors: Colors): Colors => {
-  const name = (Object.keys(pastel) as (keyof typeof pastel)[]).find((k) => pastel[k] === colors);
-  return name ? night[name] : colors;
-};
-
 const LETTER_FONT = "Fredoka, 'Arial Rounded MT Bold', Arial, sans-serif";
 
 /** Inner SVG markup (no <svg> wrapper) for a doodle; `atNight` swaps its fixed details for night colours. */
-export function doodle(kind: DoodleKind, [main, shade]: Colors, letter = 'A', atNight = false): string {
+export function draw(kind: DoodleKind, [main, shade]: Colors, letter = 'A', atNight = false): string {
   const n = (day: string, nightColour: string) => (atNight ? nightColour : day);
   switch (kind) {
     case 'abacus':
@@ -150,25 +140,14 @@ export function doodle(kind: DoodleKind, [main, shade]: Colors, letter = 'A', at
   }
 }
 
-const dataUri = (inner: string) =>
-  `url("data:image/svg+xml,${encodeURIComponent(`<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100">${inner}</svg>`)}")`;
+const make = (kind: DoodleKind, colour: keyof typeof pastel, letter?: string) => ({
+  day: draw(kind, pastel[colour], letter),
+  night: draw(kind, night[colour], letter, true),
+});
 
-/** The doodle beside each section, in a six-step cycle down the page. */
-const sectionDoodles: [DoodleKind, keyof typeof pastel, string?][] = [
-  ['kite', 'sky'],
-  ['rainbow', 'pink'],
-  ['block', 'butter', 'A'],
-  ['plane', 'lavender'],
-  ['book', 'peach'],
-  ['star', 'pink'],
-];
-
-export const sectionDoodleCss = sectionDoodles
-  .map(([kind, colour, letter], i) => {
-    const nth = i === 5 ? '6n' : `6n+${i + 1}`;
-    return (
-      `main > section:nth-of-type(${nth}){--shape-1:${dataUri(doodle(kind, pastel[colour], letter))}}\n` +
-      `:root[data-mode='dark'] main > section:nth-of-type(${nth}){--shape-1:${dataUri(doodle(kind, night[colour], letter, true))}}`
-    );
-  })
-  .join('\n');
+export const pastelDoodles: ThemeDoodles = {
+  home: [make('cloud', 'sky'), make('sun', 'butter'), make('balloon', 'pink'), make('plane', 'lavender')],
+  page: [make('cloud', 'sky'), make('star', 'butter'), make('balloon', 'pink')],
+  sections: [make('kite', 'sky'), make('rainbow', 'pink'), make('block', 'butter', 'A'), make('plane', 'lavender'), make('book', 'peach'), make('star', 'pink')],
+  underline: 'M2 8 C 20 2, 40 2, 60 7 S 100 12, 118 4',
+};

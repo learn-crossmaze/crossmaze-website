@@ -1,8 +1,7 @@
 ---
-// Animated background for page banners: a slowly shifting pastel wash plus floating preschool
-// doodles (see doodles.ts). Purely decorative (aria-hidden) and still for visitors who prefer
-// reduced motion.
-import { doodle, nightOf, pastel, type Colors, type DoodleKind } from './doodles';
+// Animated background for page banners: a slowly shifting pastel wash plus a few floating doodles
+// from the theme's set (components/doodles; the places, sizes and movements here are the same in
+// every theme). Purely decorative (aria-hidden) and still for visitors who prefer reduced motion.
 
 interface Props {
   variant?: 'home' | 'page';
@@ -10,33 +9,31 @@ interface Props {
 const { variant = 'page' } = Astro.props;
 
 type Shape = {
-  kind: DoodleKind;
-  colors: Colors;
   size: number;
   top: string;
   left: string;
   motion: 'bob' | 'drift' | 'spin';
   dur: number;
   delay: number;
-  letter?: string;
   /** Hidden once the banner stacks into one column (900px and narrower), where it would cover text. */
   hideOnMobile?: boolean;
   /** Where to put the shape in the one-column layout, if different (keeps it clear of the text). */
   mobile?: { top: string; left: string };
 };
 
-// A few doodles only, so the banners stay calm and the text has room.
+// A few doodles only, so the banners stay calm and the text has room. Each is drawn by the theme's
+// --doodle-home-1…4 or --doodle-page-1…3 (in Pastel: a cloud, the sun, a balloon and a paper plane).
 const home: Shape[] = [
-  { kind: 'cloud', colors: pastel.sky, size: 120, top: '6%', left: '34%', motion: 'drift', dur: 28, delay: -4, hideOnMobile: true },
-  { kind: 'sun', colors: pastel.butter, size: 58, top: '6%', left: '87%', motion: 'bob', dur: 9, delay: -8 },
-  { kind: 'balloon', colors: pastel.pink, size: 50, top: '58%', left: '2%', motion: 'bob', dur: 7, delay: -2, mobile: { top: '47%', left: '86%' } },
-  { kind: 'plane', colors: pastel.lavender, size: 46, top: '80%', left: '28%', motion: 'drift', dur: 16, delay: -5 },
+  { size: 120, top: '6%', left: '34%', motion: 'drift', dur: 28, delay: -4, hideOnMobile: true },
+  { size: 58, top: '6%', left: '87%', motion: 'bob', dur: 9, delay: -8 },
+  { size: 50, top: '58%', left: '2%', motion: 'bob', dur: 7, delay: -2, mobile: { top: '47%', left: '86%' } },
+  { size: 46, top: '80%', left: '28%', motion: 'drift', dur: 16, delay: -5 },
 ];
 
 const page: Shape[] = [
-  { kind: 'cloud', colors: pastel.sky, size: 104, top: '10%', left: '62%', motion: 'drift', dur: 26, delay: -3, mobile: { top: '1%', left: '66%' } },
-  { kind: 'star', colors: pastel.butter, size: 32, top: '18%', left: '90%', motion: 'spin', dur: 20, delay: -2 },
-  { kind: 'balloon', colors: pastel.pink, size: 46, top: '56%', left: '84%', motion: 'bob', dur: 7, delay: -1, hideOnMobile: true },
+  { size: 104, top: '10%', left: '62%', motion: 'drift', dur: 26, delay: -3, mobile: { top: '1%', left: '66%' } },
+  { size: 32, top: '18%', left: '90%', motion: 'spin', dur: 20, delay: -2 },
+  { size: 46, top: '56%', left: '84%', motion: 'bob', dur: 7, delay: -1, hideOnMobile: true },
 ];
 
 const shapes = variant === 'home' ? home : page;
@@ -46,14 +43,11 @@ const shapes = variant === 'home' ? home : page;
   <div class="fx__aurora"></div>
   <div class="fx__shapes">
     {
-      shapes.map((s) => (
+      shapes.map((s, i) => (
         <span
-          class:list={['fx__shape', `fx__shape--${s.motion}`, `fx__shape--${s.kind}`, { 'fx__shape--desktop': s.hideOnMobile }]}
-          style={`--size:${s.size}px;--top:${s.top};--left:${s.left};--dur:${s.dur}s;--delay:${s.delay}s${s.mobile ? `;--top-m:${s.mobile.top};--left-m:${s.mobile.left}` : ''}`}
-        >
-          <svg class="fx__day" viewBox="0 0 100 100" set:html={doodle(s.kind, s.colors, s.letter)} />
-          <svg class="fx__night" viewBox="0 0 100 100" set:html={doodle(s.kind, nightOf(s.colors), s.letter, true)} />
-        </span>
+          class:list={['fx__shape', `fx__shape--${s.motion}`, `fx__shape--${variant}-${i + 1}`, { 'fx__shape--desktop': s.hideOnMobile }]}
+          style={`--art:var(--doodle-${variant}-${i + 1});--size:${s.size}px;--top:${s.top};--left:${s.left};--dur:${s.dur}s;--delay:${s.delay}s${s.mobile ? `;--top-m:${s.mobile.top};--left-m:${s.mobile.left}` : ''}`}
+        />
       ))
     }
   </div>
@@ -106,6 +100,8 @@ const shapes = variant === 'home' ? home : page;
     top: var(--top);
     left: var(--left);
     width: var(--size);
+    aspect-ratio: 1;
+    background: var(--art) no-repeat center / contain;
     animation-duration: var(--dur);
     animation-delay: var(--delay);
     animation-iteration-count: infinite;
@@ -113,13 +109,7 @@ const shapes = variant === 'home' ? home : page;
     opacity: 0.85;
   }
 
-  .fx__shape svg {
-    width: 100%;
-    height: auto;
-    overflow: visible;
-  }
-
-  .fx__shape--bob {
+    .fx__shape--bob {
     animation-name: fx-bob;
     animation-direction: alternate;
   }
@@ -175,7 +165,7 @@ const shapes = variant === 'home' ? home : page;
   }
 
   /* Dark mode: the wash glows in the theme's night tints (mixing in white would turn it into a grey
-     haze), and the pastel doodles are dimmed so they glow softly instead of glaring. */
+     haze). The doodles switch to their night colours (components/doodles). */
   :global(:root[data-mode='dark']) .fx__aurora {
     background:
       radial-gradient(32% 40% at 18% 28%, var(--tint-1) 0%, transparent 70%),
@@ -184,15 +174,5 @@ const shapes = variant === 'home' ? home : page;
       radial-gradient(30% 36% at 28% 82%, var(--tint-4) 0%, transparent 70%),
       radial-gradient(26% 30% at 50% 50%, var(--tint-5) 0%, transparent 70%);
     opacity: 0.75;
-  }
-
-  /* Each doodle comes in day pastels and night colours (doodles.ts); dimmed pastels turn grey. */
-  .fx__night,
-  :global(:root[data-mode='dark']) .fx__day {
-    display: none;
-  }
-
-  :global(:root[data-mode='dark']) .fx__night {
-    display: block;
   }
 </style>
