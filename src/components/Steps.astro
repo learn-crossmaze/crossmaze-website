@@ -105,11 +105,11 @@ const tones = ['coral', 'sun', 'green', 'sky', 'navy', 'coral'];
     border-color: transparent;
     background:
       linear-gradient(135deg, var(--badge-bg) 0%, var(--badge-bg-2, var(--badge-bg)) 100%) padding-box,
-      var(--g-ring) border-box,
+      linear-gradient(150deg, color-mix(in srgb, var(--badge-fg) 55%, transparent), color-mix(in srgb, var(--badge-fg) 25%, transparent)) border-box,
       var(--glass-thick) border-box;
     box-shadow:
-      0 0 0 6px var(--glass-edge),
-      var(--shadow-sm);
+      0 0 0 6px color-mix(in srgb, var(--badge-fg) 12%, transparent),
+      0 10px 24px -12px color-mix(in srgb, var(--badge-fg) 45%, transparent);
   }
 
   :global(:root[data-mode='dark']) .steps__num {

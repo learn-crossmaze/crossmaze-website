@@ -137,7 +137,8 @@ const themeConfig = {
         if (asked === 'auto') put(session, 'cm-theme-preview', '');
         else if (byId[asked]) put(session, 'cm-theme-preview', asked);
 
-        var theme = get(session, 'cm-theme-preview');
+        // The address wins even when storage is blocked; storage only carries it to later pages.
+        var theme = byId[asked] ? asked : asked === 'auto' ? null : get(session, 'cm-theme-preview');
         if (!byId[theme]) {
           var now = new Date();
           var day = Math.floor((now.getTime() - now.getTimezoneOffset() * 60000) / 86400000);
@@ -180,24 +181,31 @@ const themeConfig = {
           return m === 'dark' || m === 'light';
         };
         var device = window.matchMedia ? matchMedia('(prefers-color-scheme: dark)') : null;
-        var preview = get(session, 'cm-mode-preview');
-        var chosen = get(local, 'cm-mode');
-        var mode = isMode(preview)
-          ? preview
-          : c.dark === 'off'
-            ? 'light'
-            : isMode(chosen)
-              ? chosen
-              : c.dark === 'device' && device && device.matches
-                ? 'dark'
-                : 'light';
+        // A preview, then the visitor's own choice, then (for "device") their phone or computer.
+        var decide = function () {
+          var preview = get(session, 'cm-mode-preview');
+          if (isMode(preview)) return preview;
+          if (c.dark === 'off') return 'light';
+          var chosen = get(local, 'cm-mode');
+          if (isMode(chosen)) return chosen;
+          return c.dark === 'device' && device && device.matches ? 'dark' : 'light';
+        };
         var meta = document.querySelector('meta[name="theme-color"]');
         var setMode = function (m) {
           document.documentElement.dataset.mode = m;
           if (meta) meta.setAttribute('content', m === 'dark' ? byId[theme].dark : byId[theme].color);
         };
-        setMode(mode);
-        window.cmMode = { set: setMode, followsDevice: c.dark === 'device', device: device };
+        setMode(isMode(askedMode) ? askedMode : decide());
+        window.cmMode = { set: setMode, decide: decide, followsDevice: c.dark === 'device', device: device };
+        // Print in light colours: the night palette would come out as pale text on white paper.
+        var printedDark = false;
+        window.addEventListener('beforeprint', function () {
+          printedDark = document.documentElement.dataset.mode === 'dark';
+          if (printedDark) setMode('light');
+        });
+        window.addEventListener('afterprint', function () {
+          if (printedDark) setMode('dark');
+        });
       })();
     </script>
     <noscript><link rel="stylesheet" href={fontsHref(themes[0].fonts)} /></noscript>

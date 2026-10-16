@@ -200,6 +200,16 @@ const tones = ['navy', 'green', 'coral', 'sky', 'sun', 'navy'];
     background: linear-gradient(135deg, var(--badge-bg) 0%, var(--badge-bg-2, var(--badge-bg)) 100%);
   }
 
+  :global(:root[data-mode='dark']) .stat {
+    border: 1px solid var(--glass-edge);
+    background:
+      linear-gradient(135deg, color-mix(in srgb, var(--badge-fg) 22%, transparent), color-mix(in srgb, var(--badge-fg) 8%, transparent)),
+      var(--glass);
+    -webkit-backdrop-filter: var(--glass-blur);
+    backdrop-filter: var(--glass-blur);
+    box-shadow: var(--glass-rim), var(--shadow-sm);
+  }
+
   .stat strong {
     font-family: var(--font-display);
     font-size: clamp(1.6rem, 3vw, 2.2rem);

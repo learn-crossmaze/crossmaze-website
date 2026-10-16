@@ -178,6 +178,11 @@ const mascot = image(site.mascot);
     animation: mascot-bob 6s ease-in-out infinite alternate;
   }
 
+  :global(:root[data-mode='dark']) .site-footer__about :global(.site-footer__mascot) {
+    outline: 1px solid var(--glass-edge);
+    outline-offset: -1px;
+  }
+
   @keyframes mascot-bob {
     to {
       transform: translateY(-6px) rotate(-2deg);

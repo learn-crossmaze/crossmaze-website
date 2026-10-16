@@ -100,18 +100,15 @@ const isActive = (href: string) => (href === '/' ? path === '/' : path === href 
 
   // Light/dark button. window.cmMode comes from the theme script in BaseLayout's <head>.
   type Mode = 'light' | 'dark';
-  const cm = (window as unknown as { cmMode?: { set: (m: Mode) => void; followsDevice: boolean; device: MediaQueryList | null } }).cmMode;
+  const cm = (
+    window as unknown as {
+      cmMode?: { set: (m: Mode) => void; decide: () => Mode; followsDevice: boolean; device: MediaQueryList | null };
+    }
+  ).cmMode;
   const modeToggle = document.querySelector<HTMLButtonElement>('[data-mode-toggle]');
   const root = document.documentElement;
   const current = (): Mode => (root.dataset.mode === 'dark' ? 'dark' : 'light');
   const deviceMode = (): Mode => (cm?.followsDevice && cm.device?.matches ? 'dark' : 'light');
-  const saved = () => {
-    try {
-      return sessionStorage.getItem('cm-mode-preview') || localStorage.getItem('cm-mode');
-    } catch {
-      return null;
-    }
-  };
   const show = (mode: Mode) => {
     cm?.set(mode);
     modeToggle?.setAttribute('aria-pressed', String(mode === 'dark'));
@@ -130,10 +127,12 @@ const isActive = (href: string) => (href === '/' ? path === '/' : path === href 
       }
       show(next);
     });
-    // The phone switches to dark at sunset: follow it, unless the visitor chose a mode.
-    cm.device?.addEventListener('change', () => {
-      if (cm.followsDevice && !saved()) show(deviceMode());
-    });
+    // Work it out again when the phone switches to dark at sunset, when the visitor picks a mode in
+    // another tab, and when the browser brings this page back from its back/forward cache.
+    const sync = () => show(cm.decide());
+    cm.device?.addEventListener('change', sync);
+    window.addEventListener('storage', (e) => (e.key === 'cm-mode' || e.key === null) && sync());
+    window.addEventListener('pageshow', (e) => e.persisted && sync());
   }
 </script>
 
@@ -171,9 +170,11 @@ const isActive = (href: string) => (href === '/' ? path === '/' : path === href 
     padding-inline: max(var(--gutter), 24px);
   }
 
+  /* The logo gives way first on narrow phones (it scales down as a whole); the buttons never do. */
   .site-header__brand {
     text-decoration: none;
-    flex: none;
+    flex: 0 1 auto;
+    min-width: 0;
   }
 
   .site-nav {
@@ -289,6 +290,7 @@ const isActive = (href: string) => (href === '/' ? path === '/' : path === href 
 
   .menu-toggle {
     display: none;
+    flex: none;
     place-items: center;
     width: 46px;
     height: 46px;
@@ -332,9 +334,15 @@ const isActive = (href: string) => (href === '/' ? path === '/' : path === href 
     display: block;
   }
 
-  /* At night the sun shines in the theme's sun colour. */
+  /* At night the sun shines in the theme's sun colour, and both round buttons are raised glass
+     tinted by the theme's accent (the dark navy tints sank into the bar). */
   :global(:root[data-mode='dark']) .mode-toggle {
     color: var(--sun);
+  }
+
+  :global(:root[data-mode='dark']) :is(.mode-toggle, .menu-toggle) {
+    background: color-mix(in srgb, var(--navy) 14%, transparent);
+    box-shadow: var(--badge-rim);
   }
 
   @media (max-width: 1180px) {
@@ -345,18 +353,16 @@ const isActive = (href: string) => (href === '/' ? path === '/' : path === href 
 
   /* Below this the links don't fit beside the logo in every theme's font: use the menu button. */
   @media (max-width: 1060px) {
+    /* The menu button and then the light/dark button, at the right (the order they are in the page,
+       so Tab goes the same way). */
     .menu-toggle {
       display: grid;
-      order: 3;
+      margin-left: auto;
     }
 
-    /* Beside the menu button. */
     .mode-toggle {
-      order: 2;
       width: 46px;
       height: 46px;
-      margin-left: auto;
-      margin-right: -14px;
     }
 
     .is-open .menu-toggle__open {
@@ -436,6 +442,24 @@ const isActive = (href: string) => (href === '/' ? path === '/' : path === href 
 
     .site-nav__cta .btn {
       min-height: 52px;
+    }
+  }
+
+  /* Phones: tighter spacing, so the logo and both buttons fit down to 320px. */
+  @media (max-width: 480px) {
+    .site-header__inner {
+      gap: 12px;
+      padding-inline: 16px;
+    }
+
+    .menu-toggle,
+    .mode-toggle {
+      width: 44px;
+      height: 44px;
+    }
+
+    .mode-toggle {
+      margin-left: -4px;
     }
   }
 

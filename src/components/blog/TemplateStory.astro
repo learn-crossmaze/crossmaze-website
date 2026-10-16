@@ -123,6 +123,11 @@ const coverIndex = post.sections.some((s) => s.photo && indexOf(s.photo) === ind
     margin-bottom: 18px;
   }
 
+  /* The page set's cloud sits where the centred breadcrumb and title run. */
+  .story-hero :global(.fx__shape--cloud) {
+    display: none;
+  }
+
   /* The centred title fills the banner on narrow screens, where the doodles would sit behind it. */
   @media (max-width: 900px) {
     .story-hero :global(.fx__shape) {

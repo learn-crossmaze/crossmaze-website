@@ -5,7 +5,7 @@
 
 export const themes = [
   { id: 'pastel', label: 'Pastel Glass', fonts: 'family=Fredoka:wght@500;600&family=Nunito:wght@400;600;700;800', color: '#0b1d5e', dark: '#1b1430' },
-  { id: 'meadow', label: 'Sunny Meadow', fonts: 'family=Baloo+2:wght@600;700;800&family=Nunito:wght@400;600;700;800', color: '#1b5a2b', dark: '#1a210d' },
+  { id: 'meadow', label: 'Sunny Meadow', fonts: 'family=Baloo+2:wght@600;700;800&family=Nunito:wght@400;600;700;800', color: '#1b5a2b', dark: '#132216' },
   { id: 'ocean', label: 'Ocean Breeze', fonts: 'family=Quicksand:wght@600;700&family=Nunito:wght@400;600;700;800', color: '#0a4f70', dark: '#0b2128' },
   { id: 'crayon', label: 'Crayon Box', fonts: 'family=Grandstander:wght@600;700&family=Nunito:wght@400;600;700;800', color: '#b8261a', dark: '#16152e' },
   { id: 'calm', label: 'Montessori Calm', fonts: 'family=Lexend:wght@400;500;600;700', color: '#3b5537', dark: '#1b1d13' },
