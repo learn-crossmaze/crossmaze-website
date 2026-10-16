@@ -134,15 +134,20 @@ const isActive = (href: string) => (href === '/' ? path === '/' : path === href 
     window.addEventListener('storage', (e) => (e.key === 'cm-mode' || e.key === null) && sync());
     window.addEventListener('pageshow', (e) => e.persisted && sync());
 
-    // Once the page has settled, fetch the other mode's doodles (a few small files, listed in
-    // --doodle-other by components/doodles), so they're there the moment the mode switches.
-    const prefetch = () =>
-      getComputedStyle(root)
-        .getPropertyValue('--doodle-other')
-        .replace(/['"]/g, '')
-        .split(' ')
-        .filter(Boolean)
-        .forEach((name) => (new Image().src = `/doodles/${name}.svg`));
+    // Once the page has settled, fetch the other mode's doodles (a few small files, listed by
+    // components/doodles; the section ones only show from 1360px), so they're there the moment the
+    // mode switches. Holding on to the images keeps them in the browser's memory cache.
+    const kept: HTMLImageElement[] = [];
+    const listed = (name: string) => getComputedStyle(root).getPropertyValue(name).replace(/['"]/g, '').split(' ').filter(Boolean);
+    const prefetch = () => {
+      const names = listed('--doodle-other');
+      if (matchMedia('(min-width: 1360px)').matches) names.push(...listed('--doodle-other-sections'));
+      for (const name of names) {
+        const img = new Image();
+        img.src = `/doodles/${name}.svg`;
+        kept.push(img);
+      }
+    };
     const whenIdle = () => ('requestIdleCallback' in window ? requestIdleCallback(prefetch) : setTimeout(prefetch, 1000));
     if (document.readyState === 'complete') whenIdle();
     else window.addEventListener('load', whenIdle, { once: true });

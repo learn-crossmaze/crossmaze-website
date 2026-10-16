@@ -27,7 +27,8 @@ const home: Shape[] = [
   { size: 120, top: '6%', left: '34%', motion: 'drift', dur: 28, delay: -4, hideOnMobile: true },
   { size: 58, top: '6%', left: '87%', motion: 'bob', dur: 9, delay: -8 },
   { size: 50, top: '58%', left: '2%', motion: 'bob', dur: 7, delay: -2, mobile: { top: '47%', left: '86%' } },
-  { size: 46, top: '80%', left: '28%', motion: 'drift', dur: 16, delay: -5 },
+  // In the one-column layout it would sit behind the photos, with only a sliver showing between them.
+  { size: 46, top: '80%', left: '28%', motion: 'drift', dur: 16, delay: -5, hideOnMobile: true },
 ];
 
 const page: Shape[] = [
@@ -160,9 +161,12 @@ const shapes = variant === 'home' ? home : page;
 
   /* Home banner, 901–1359px: the two columns leave no room at the left edge, so the doodle there
      would sit behind the text (it comes back at 1360px, where the page margin opens up, as the
-     section doodles do); the low one moves below the facts, and the big top one waits until the
-     title is narrow enough to leave room above it. */
+     section doodles do); the low one moves below the facts, the top-right one up out of the big
+     photo, and the big top one waits until the title is narrow enough to leave room above it. */
   @media (min-width: 901px) and (max-width: 1359px) {
+    .fx__shape--home-2 {
+      top: 4%;
+    }
     .fx__shape--home-3 {
       display: none;
     }
@@ -171,7 +175,7 @@ const shapes = variant === 'home' ? home : page;
     }
   }
 
-  @media (min-width: 901px) and (max-width: 1100px) {
+  @media (min-width: 901px) and (max-width: 1180px) {
     .fx__shape--home-1 {
       display: none;
     }

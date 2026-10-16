@@ -86,7 +86,7 @@ To know who called (their number) you'd need call-tracking numbers from a teleph
 
 ### Colour themes
 
-The site has seven colour themes: **Pastel Glass**, **Sunny Meadow**, **Ocean Breeze**, **Crayon Box**, **Montessori Calm**, and two bright ones, **Candy Pop** and **Tropical Splash**. Each theme changes the page background, colours, fonts and the little doodles in the banners and page margins (clouds and kites in Pastel Glass, butterflies and bees in Sunny Meadow, whales and starfish in Ocean Breeze, paints and crayons in Crayon Box, wooden toys and leaves in Montessori Calm, sweets in Candy Pop, and fruit, palms and parrots in Tropical Splash); the boxes on top (cards, the floating header, the footer, forms and pop-ups) are white frosted glass in every theme, or smoky dark glass in dark mode (below). In **Site settings → Look and feel**, choose which one visitors see:
+The site has seven colour themes: **Pastel Glass**, **Sunny Meadow**, **Ocean Breeze**, **Crayon Box**, **Montessori Calm**, and two bright ones, **Candy Pop** and **Tropical Splash**. Each theme changes the page background, colours, fonts and the little doodles in the banners and page margins (clouds and kites in Pastel Glass, butterflies and bees in Sunny Meadow, whales and starfish in Ocean Breeze, paints and crayons in Crayon Box, wooden toys and leaves in Montessori Calm, sweets in Candy Pop, and fruit, palms, flamingos and toucans in Tropical Splash); the boxes on top (cards, the floating header, the footer, forms and pop-ups) are white frosted glass in every theme, or smoky dark glass in dark mode (below). In **Site settings → Look and feel**, choose which one visitors see:
 
 | Setting | What visitors see |
 | --- | --- |

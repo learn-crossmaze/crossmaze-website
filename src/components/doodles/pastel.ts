@@ -33,10 +33,8 @@ const night = {
   butter: ['#f0c544', '#dca623'],
 } satisfies Record<keyof typeof pastel, Colors>;
 
-const LETTER_FONT = "Fredoka, 'Arial Rounded MT Bold', Arial, sans-serif";
-
 /** Inner SVG markup (no <svg> wrapper) for a doodle; `atNight` swaps its fixed details for night colours. */
-function draw(kind: DoodleKind, [main, shade]: Colors, letter = 'A', atNight = false): string {
+function draw(kind: DoodleKind, [main, shade]: Colors, atNight = false): string {
   const n = (day: string, nightColour: string) => (atNight ? nightColour : day);
   switch (kind) {
     case 'balloon':
@@ -49,7 +47,8 @@ function draw(kind: DoodleKind, [main, shade]: Colors, letter = 'A', atNight = f
       return (
         `<path d="M14 30l14-14h58l-14 14z" fill="${shade}"/><path d="M72 30l14-14v56l-14 14z" fill="${shade}" fill-opacity=".75"/>` +
         `<rect x="14" y="30" width="58" height="56" rx="6" fill="${main}"/>` +
-        `<text x="43" y="73" text-anchor="middle" font-family="${LETTER_FONT}" font-weight="700" font-size="40" fill="#fff">${letter}</text>`
+        // A rounded letter A, drawn as a line: the files are images, so web fonts never load in them.
+        `<path d="M31 73L43 42l12 31M35.5 63h15" fill="none" stroke="#fff" stroke-width="7" stroke-linecap="round" stroke-linejoin="round"/>`
       );
     case 'book':
       return (
@@ -101,14 +100,14 @@ function draw(kind: DoodleKind, [main, shade]: Colors, letter = 'A', atNight = f
   }
 }
 
-const make = (kind: DoodleKind, colour: keyof typeof pastel, letter?: string) => ({
-  day: draw(kind, pastel[colour], letter),
-  night: draw(kind, night[colour], letter, true),
+const make = (kind: DoodleKind, colour: keyof typeof pastel) => ({
+  day: draw(kind, pastel[colour]),
+  night: draw(kind, night[colour], true),
 });
 
 export const pastelDoodles: ThemeDoodles = {
   home: [make('cloud', 'sky'), make('sun', 'butter'), make('balloon', 'pink'), make('plane', 'lavender')],
   page: [make('cloud', 'sky'), make('star', 'butter'), make('balloon', 'pink')],
-  sections: [make('kite', 'sky'), make('rainbow', 'pink'), make('block', 'butter', 'A'), make('plane', 'lavender'), make('book', 'peach'), make('star', 'pink')],
+  sections: [make('kite', 'sky'), make('rainbow', 'pink'), make('block', 'butter'), make('plane', 'lavender'), make('book', 'peach'), make('star', 'pink')],
   underline: 'M2 8 C 20 2, 40 2, 60 7 S 100 12, 118 4',
 };

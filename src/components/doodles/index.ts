@@ -2,8 +2,9 @@
 // variables that pick the current theme's set, by day or at night: --doodle-home-1…4 and
 // --doodle-page-1…3 for the banners (FloatingShapes.astro), --doodle-section-1…6 for the sections
 // (global.css) and --underline-shape for the home page title. BaseLayout puts doodleCss in every page.
-// Browsers download the files the current theme and mode show; --doodle-other lists the other mode's
-// files, which the light/dark button fetches ahead of time (Header.astro).
+// Browsers download the files the current theme and mode show; --doodle-other (banners) and
+// --doodle-other-sections list the other mode's files, which the light/dark button fetches ahead of
+// time (Header.astro).
 import { createHash } from 'node:crypto';
 import { themes, type ThemeId } from '../../data/themes';
 import { calmDoodles } from './calm';
@@ -62,9 +63,11 @@ export const doodleCss = themes
   .map(({ id }) => {
     const root = id === 'pastel' ? ':root' : `:root[data-theme='${id}']`;
     const of = (mode: 'day' | 'night') => placed.filter((p) => p.theme === id && p.mode === mode);
+    const names = (list: typeof placed) => [...new Set(list.map((p) => p.name))].join(' ');
     const block = (mode: 'day' | 'night', other: 'day' | 'night') => [
       ...of(mode).map((p) => `--doodle-${p.slot}:url(/doodles/${p.name}.svg)`),
-      `--doodle-other:'${[...new Set(of(other).map((p) => p.name))].join(' ')}'`,
+      `--doodle-other:'${names(of(other).filter((p) => !p.slot.startsWith('section')))}'`,
+      `--doodle-other-sections:'${names(of(other).filter((p) => p.slot.startsWith('section')))}'`,
     ];
     return (
       `${root}{${[...block('day', 'night'), `--underline-shape:${underline(themeDoodles[id].underline)}`].join(';')}}\n` +

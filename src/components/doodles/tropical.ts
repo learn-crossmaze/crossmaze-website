@@ -15,6 +15,8 @@ const pastel = {
   beak: ['#ffe08c', '#ffcb57'],
   orange: ['#ffd0a8', '#ffb57f'],
   lime: ['#d3f0a2', '#b6e277'],
+  /** A tender coconut: a deeper green than the lime, so the shell reads on the lime-tinted page. */
+  coconut: ['#b4e07f', '#97cf5c'],
   jade: ['#ade9dc', '#86dac8'],
   /** The monstera: a step deeper than jade, so it still shows on the mint stretch of the page. */
   leaf: ['#8ad8c4', '#5abda5'],
@@ -37,6 +39,7 @@ const night = {
   beak: ['#ffc061', '#ff9f3f'],
   orange: ['#ffa86a', '#f78a4c'],
   lime: ['#a2df60', '#82c540'],
+  coconut: ['#a2df60', '#82c540'],
   jade: ['#55dcc3', '#31bea6'],
   leaf: ['#55dcc3', '#31bea6'],
   lagoon: ['#5cc4f2', '#36a6de'],
@@ -320,6 +323,6 @@ const splash = 'M2 7.5 C 22 3.5, 44 3.5, 64 7 C 72 8.5, 76 8.5, 80 6 S 88 2.5, 9
 export const tropicalDoodles: ThemeDoodles = {
   home: [make(watermelon, 'coral'), make(hibiscus, 'hibiscus'), make(pineapple, 'mango'), make(turtle, 'jade')],
   page: [make(watermelon, 'coral'), make(citrus, 'orange'), make(pineapple, 'mango')],
-  sections: [make(palm, 'lime'), make(flamingo, 'flamingo'), make(monstera, 'leaf'), make(turtle, 'lagoon'), make(coconut, 'lime'), make(toucan, 'jade')],
+  sections: [make(palm, 'lime'), make(flamingo, 'flamingo'), make(monstera, 'leaf'), make(turtle, 'lagoon'), make(coconut, 'coconut'), make(toucan, 'jade')],
   underline: splash,
 };
