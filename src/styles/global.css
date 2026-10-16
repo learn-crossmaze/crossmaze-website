@@ -234,10 +234,10 @@
   --shadow-lift: 0 4px 8px rgb(0 0 0 / 32%), 0 32px 70px -26px rgb(0 0 0 / 66%);
 }
 
-/* The doodles behind sections switch to their night colours (doodles.ts, sectionDoodleCss); a little
-   softer than by day, as the page is darker. */
+/* The doodles behind sections switch to their night colours (components/doodles). Faded any further
+   on the dark page, the warm ones (yellows, peaches, pinks) turn brown or khaki. */
 :root[data-mode='dark'] main > section::before {
-  opacity: 0.6;
+  opacity: 0.8;
 }
 
 /* Placeholders: the browser's grey is too faint on smoky glass. */
@@ -414,8 +414,8 @@ body::before {
 /* ---------- Sections with preschool doodles ----------
    Sections have no background of their own: the flowing page gradient (body) runs behind all
    of them, so colours change smoothly with no hard edges. Each section gets one softly drifting
-   doodle (a kite, ABC block, rainbow…; drawn in components/doodles.ts), sized to fit in the
-   page margin beside the content. Screens without room in the margin leave them out. */
+   doodle from the theme's set (a kite, an octopus, a cupcake…; drawn in components/doodles), sized to
+   fit in the page margin beside the content. Screens without room in the margin leave them out. */
 main > section {
   --doodle-room: calc(50vw - var(--container) / 2);
   --doodle-size: clamp(52px, calc(var(--doodle-room) - 36px), 104px);
@@ -452,9 +452,35 @@ main > section:nth-of-type(even) {
   --shape-1-at: 22px var(--doodle-edge) auto auto;
 }
 
+/* The theme's six section doodles take turns down the page (components/doodles). */
+main > section:nth-of-type(6n + 1) {
+  --shape-1: var(--doodle-section-1);
+}
+
+main > section:nth-of-type(6n + 2) {
+  --shape-1: var(--doodle-section-2);
+}
+
+main > section:nth-of-type(6n + 3) {
+  --shape-1: var(--doodle-section-3);
+}
+
+main > section:nth-of-type(6n + 4) {
+  --shape-1: var(--doodle-section-4);
+}
+
+main > section:nth-of-type(6n + 5) {
+  --shape-1: var(--doodle-section-5);
+}
+
+main > section:nth-of-type(6n) {
+  --shape-1: var(--doodle-section-6);
+}
+
 @media (max-width: 1359px) {
   main > section::before {
     content: none;
+    background: none; /* so the doodle files aren't downloaded */
   }
 }
 
@@ -463,6 +489,7 @@ main > section.hero::before,
 main > section.page-hero::before,
 main > section.no-shapes::before {
   content: none;
+  background: none;
 }
 
 @keyframes cm-drift-a {
@@ -952,9 +979,8 @@ main > :is(.hero, .page-hero):first-child {
   bottom: -0.12em;
   height: 0.32em;
   background: var(--squiggle);
-  -webkit-mask: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 120 12' preserveAspectRatio='none'%3E%3Cpath d='M2 8 C 20 2, 40 2, 60 7 S 100 12, 118 4' fill='none' stroke='%23000' stroke-width='5' stroke-linecap='round'/%3E%3C/svg%3E")
-    no-repeat center / 100% 100%;
-  mask: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 120 12' preserveAspectRatio='none'%3E%3Cpath d='M2 8 C 20 2, 40 2, 60 7 S 100 12, 118 4' fill='none' stroke='%23000' stroke-width='5' stroke-linecap='round'/%3E%3C/svg%3E")
-    no-repeat center / 100% 100%;
+  /* Each theme draws its own line (components/doodles, `underline`). */
+  -webkit-mask: var(--underline-shape) no-repeat center / 100% 100%;
+  mask: var(--underline-shape) no-repeat center / 100% 100%;
   z-index: -1;
 }

@@ -66,6 +66,11 @@ const quoteAfter = Math.min(1, post.sections.length - 1);
     margin-bottom: 18px;
   }
 
+  /* The page set's big drifting doodle would sit on the breadcrumb, which ends with the post's title. */
+  .classic-hero :global(.fx__shape--page-1) {
+    display: none;
+  }
+
   .classic-body {
     padding-top: 0;
   }

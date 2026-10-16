@@ -412,9 +412,8 @@
   --shadow-tint: 90 70 40;
 }
 
-/* Softer, earthier doodles so they sit with the natural palette. */
-:root[data-theme='calm'] main > section::before,
-:root[data-theme='calm'] .fx {
+/* A softer, earthier banner wash, so it sits with the natural palette (the doodles are drawn in it). */
+:root[data-theme='calm'] .fx__aurora {
   filter: saturate(0.55) sepia(0.2);
 }
 
@@ -483,9 +482,8 @@
   --shadow-tint: 0 0 0;
 }
 
-/* Calm's doodles stay earthy at night, but less muted than by day: the night colours are already deeper. */
-:root[data-theme='calm'][data-mode='dark'] main > section::before,
-:root[data-theme='calm'][data-mode='dark'] .fx {
+/* The wash stays earthy at night, but less muted than by day: the night tints are already deeper. */
+:root[data-theme='calm'][data-mode='dark'] .fx__aurora {
   filter: saturate(0.7) sepia(0.12);
 }
 
