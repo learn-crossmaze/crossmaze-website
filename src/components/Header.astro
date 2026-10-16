@@ -133,6 +133,19 @@ const isActive = (href: string) => (href === '/' ? path === '/' : path === href 
     cm.device?.addEventListener('change', sync);
     window.addEventListener('storage', (e) => (e.key === 'cm-mode' || e.key === null) && sync());
     window.addEventListener('pageshow', (e) => e.persisted && sync());
+
+    // Once the page has settled, fetch the other mode's doodles (a few small files, listed in
+    // --doodle-other by components/doodles), so they're there the moment the mode switches.
+    const prefetch = () =>
+      getComputedStyle(root)
+        .getPropertyValue('--doodle-other')
+        .replace(/['"]/g, '')
+        .split(' ')
+        .filter(Boolean)
+        .forEach((name) => (new Image().src = `/doodles/${name}.svg`));
+    const whenIdle = () => ('requestIdleCallback' in window ? requestIdleCallback(prefetch) : setTimeout(prefetch, 1000));
+    if (document.readyState === 'complete') whenIdle();
+    else window.addEventListener('load', whenIdle, { once: true });
   }
 </script>
 

@@ -66,6 +66,13 @@ const quoteAfter = Math.min(1, post.sections.length - 1);
     margin-bottom: 18px;
   }
 
+  /* On phones the page set's big drifting doodle would sit on the post's long breadcrumb. */
+  @media (max-width: 760px) {
+    .classic-hero :global(.fx__shape--page-1) {
+      display: none;
+    }
+  }
+
   .classic-body {
     padding-top: 0;
   }

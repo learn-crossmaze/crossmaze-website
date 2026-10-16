@@ -152,7 +152,7 @@ const shell: Draw = ([main, shade], atNight) => {
 };
 
 /** A smiling sea turtle with a patterned shell, paddling with rounded flippers swept back. */
-const turtle: Draw = ([main, shade, face], atNight) =>
+const turtle: Draw = ([main, shade, face]) =>
   `<g fill="${shade}" stroke="${shade}" stroke-width="4" stroke-linejoin="round">` +
   `<path d="M64 66C63 78 52 86 36 88 42 83 46 76 48 66z"/><path d="M27 66C26 74 18 80 8 80 12 76 14 71 15 66z"/>` +
   `<path d="M64 58c6-6 10-10 18-10a11 11 0 0 1 0 22c-6 0-10-3-14-6z" stroke="none"/></g>` +

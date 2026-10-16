@@ -109,7 +109,7 @@ const shapes = variant === 'home' ? home : page;
     opacity: 0.85;
   }
 
-    .fx__shape--bob {
+  .fx__shape--bob {
     animation-name: fx-bob;
     animation-direction: alternate;
   }
@@ -158,9 +158,41 @@ const shapes = variant === 'home' ? home : page;
     }
   }
 
+  /* Home banner, 901–1359px: the two columns leave no room at the left edge, so the doodle there
+     would sit behind the text (it comes back at 1360px, where the page margin opens up, as the
+     section doodles do); the low one moves below the facts, and the big top one waits until the
+     title is narrow enough to leave room above it. */
+  @media (min-width: 901px) and (max-width: 1359px) {
+    .fx__shape--home-3 {
+      display: none;
+    }
+    .fx__shape--home-4 {
+      top: 91%;
+    }
+  }
+
+  @media (min-width: 901px) and (max-width: 1100px) {
+    .fx__shape--home-1 {
+      display: none;
+    }
+  }
+
   @media (max-width: 760px) {
     .fx__shape {
       width: calc(var(--size) * 0.7);
+    }
+  }
+
+  /* On phones the small top-right doodles would touch the ends of the title lines. */
+  @media (max-width: 480px) {
+    .fx__shape--page-2 {
+      display: none;
+    }
+  }
+
+  @media (max-width: 380px) {
+    .fx__shape--home-2 {
+      display: none;
     }
   }
 

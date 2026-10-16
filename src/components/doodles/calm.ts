@@ -6,11 +6,11 @@ import { type Colors, type Doodle, type ThemeDoodles, doodle } from './shared';
 
 /** Pastel enough to sit quietly behind text. */
 const pastel = {
-  sage: ['#cfe1c2', '#b3cfa2'],
+  sage: ['#bdd6ad', '#9fc28b'],
   honey: ['#f5dc9c', '#eec66f'],
   clay: ['#f3c9b2', '#e9ad8e'],
   rose: ['#eec3bd', '#e2a29a'],
-  blue: ['#c9dbea', '#a9c4dc'],
+  blue: ['#b7cfe4', '#94b5d3'],
   wood: ['#efd5b1', '#dcb588'],
 } satisfies Record<string, Colors>;
 

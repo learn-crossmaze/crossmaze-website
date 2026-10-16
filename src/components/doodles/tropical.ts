@@ -1,5 +1,5 @@
 // Tropical Splash: a sunny island-holiday set (watermelon slice, hibiscus, pineapple, sea turtle,
-// orange slice, palm tree, flamingo, monstera leaf, coconut drink, toucan) in coral, mango, lime and
+// orange slice, palm tree, flamingo, monstera leaf, tender coconut, toucan) in coral, mango, lime and
 // lagoon teal. Soft pastels by day; at night, clearer mid-tones that glow on the dark lagoon page
 // (dimmed pastels turn grey or khaki).
 import { type Colors, type Doodle, type ThemeDoodles, doodle } from './shared';
@@ -18,7 +18,7 @@ const pastel = {
   jade: ['#ade9dc', '#86dac8'],
   /** The monstera: a step deeper than jade, so it still shows on the mint stretch of the page. */
   leaf: ['#8ad8c4', '#5abda5'],
-  lagoon: ['#b3e3fb', '#8dd2f4'],
+  lagoon: ['#9fd8f7', '#77c4ee'],
   /** Island sand, then palm bark. */
   sand: ['#ffe7bf', '#f5c993'],
   /** Coconuts on the palm: the front one, then the one behind. */
@@ -278,15 +278,13 @@ const monstera: Draw = ([main, shade], atNight) => {
   );
 };
 
-/** A coconut drink: a cut coconut with a striped straw and a little paper umbrella. */
+/** A tender coconut with a striped straw. */
 const coconut: Draw = ([main, shade], atNight) => {
   const t = tones(atNight);
   const flesh = shine(atNight);
   return (
     `<path d="M56 44L64 14 76 10" fill="none" stroke="${t.coral[1]}" stroke-width="5" stroke-linecap="round" stroke-linejoin="round"/>` +
     `<path d="M56 44L64 14 76 10" fill="none" stroke="${flesh}" stroke-width="5" stroke-dasharray="3 5"/>` +
-    `<path d="M36 42L28 20" stroke="${shade}" stroke-width="3" stroke-linecap="round"/>` +
-    `<path d="M12 22C16 10 30 4 42 10 38 14 34 13 32 17 28 14 24 15 22 19 18 17 15 19 12 22z" fill="${t.mango[1]}"/>` +
     `<path d="M24 44A30 30 0 1 0 72 44z" fill="${main}"/>` +
     `<ellipse cx="48" cy="44" rx="24" ry="7" fill="${flesh}"/><ellipse cx="48" cy="45" rx="18" ry="4.5" fill="${shade}"/>` +
     `<path d="M28 60c2 10 8 18 16 22" fill="none" stroke="${shine(atNight)}" stroke-width="4" stroke-linecap="round" stroke-opacity=".5"/>`

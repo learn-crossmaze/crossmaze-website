@@ -177,11 +177,11 @@ const wateringCan = ({ main, shade, other, hi }: Paint) =>
   `<circle cx="45" cy="64" r="3.5" fill="${other('butter', 1)}"/>`;
 
 /**
- * The underline: a gently waving vine with two little leaves leaning forward. The title stretches it
- * about 3:1 sideways, which turns any filled or curled shape into a blob, but a short slanted stroke
- * only grows into a longer leaf. Every point stays inside the 2.5–9.5 band, so nothing is clipped.
+ * The underline: a gently winding vine. The title stretches it about 3:1 sideways, which turns leaves
+ * or curls into blobs, so it is a single line. Every point stays inside the 2.5–9.5 band, so nothing
+ * is clipped.
  */
-const vine = 'M2 8 C 20 4, 38 4, 56 7.5 C 66 9.4, 92 9.5, 118 3.5 M62 8.3 C 64 6, 67 3.8, 72 2.8 M88 8.1 C 90 6, 93 4, 98 3';
+const vine = 'M2 7.5 C 16 3.5, 28 3.5, 40 6.5 S 64 9.5, 78 6.5 S 104 3.5, 118 5.5';
 
 export const meadowDoodles: ThemeDoodles = {
   home: [make(caterpillar, 'leaf'), make(sunflower, 'butter'), make(tulip, 'poppy'), make(butterfly, 'sky')],

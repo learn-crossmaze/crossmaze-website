@@ -154,13 +154,13 @@ const crayonBox: Draw = ([main, shade], atNight) => {
   );
 };
 
-/** Open children's scissors: round coloured handles and two silver blades. */
+/** Children's craft scissors: round coloured handles and two short silver blades with blunt, rounded tips. */
 const scissors: Draw = ([main, shade], atNight) => {
   const [steel, steelShade] = metal(atNight);
   return (
     `<g transform="rotate(-12 50 50)">` +
-    `<path d="M59 55L30 10 48 61zM41 55L70 10 52 61z" fill="${steel}" stroke="${steel}" stroke-width="4" stroke-linejoin="round"/>` +
-    `<path d="M33 18l13 26M67 18L54 44" stroke="${steelShade}" stroke-width="2.5" stroke-linecap="round"/>` +
+    `<path d="M57 55L37 15 47 61zM43 55L63 15 53 61z" fill="${steel}" stroke="${steel}" stroke-width="9" stroke-linejoin="round"/>` +
+    `<path d="M39 22l9 20M61 22L52 42" stroke="${steelShade}" stroke-width="2.5" stroke-linecap="round"/>` +
     `<path d="M53 56l9 11M47 56l-9 11" stroke="${main}" stroke-width="9" stroke-linecap="round"/>` +
     `<ellipse cx="34" cy="76" rx="12" ry="10" fill="none" stroke="${main}" stroke-width="8"/>` +
     `<ellipse cx="66" cy="76" rx="12" ry="10" fill="none" stroke="${main}" stroke-width="8"/>` +
