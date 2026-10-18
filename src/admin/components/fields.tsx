@@ -40,14 +40,19 @@ function move<T>(list: T[], from: number, to: number): T[] {
 /** The whole document being edited, for fields that depend on another field (a batch's program on the branch's `programs`). */
 const RootContext = createContext<Obj | null>(null);
 
-/** A select's choices. A value that is no longer offered stays listed, marked, so it isn't shown as unchosen. */
-function selectOptions(field: Extract<Field, { type: 'select' }>, value: string, root: Obj | null, programOptions: Option[]): Option[] {
+/**
+ * A select's choices. A value that is no longer offered stays listed, marked with why, so it isn't shown
+ * as unchosen. `short`: the brief mark for a collapsed item's summary.
+ */
+function selectOptions(field: Extract<Field, { type: 'select' }>, value: string, root: Obj | null, programOptions: Option[], short = false): Option[] {
   let options = field.optionsFrom === 'programs' ? programOptions : (field.options ?? []);
   const offered = root?.programs;
   if (field.offeredOnly) options = options.filter((o) => !o.hidden && (!Array.isArray(offered) || offered.includes(o.value)));
   if (value && !options.some((o) => o.value === value)) {
-    const label = programOptions.find((o) => o.value === value)?.label ?? value;
-    options = [...options, { value, label: `${label} (not offered here, so not shown on the website)` }];
+    const known = programOptions.find((o) => o.value === value);
+    const hidden = known?.hidden && (!Array.isArray(offered) || offered.includes(value));
+    const why = hidden ? 'hidden on the website' : short ? 'not offered here' : 'not offered here, so not shown on the website';
+    options = [...options, { value, label: `${known?.label ?? value} (${why})` }];
   }
   return options;
 }
@@ -376,7 +381,7 @@ function ObjectsField({ field, value, onChange }: { field: Extract<Field, { type
     const sub = field.fields.find((f) => f.key === key);
     const v = asText(item[key]);
     if (sub?.type !== 'select') return v;
-    return selectOptions(sub, v, root, programOptions).find((o) => o.value === v)?.label ?? v;
+    return selectOptions(sub, v, root, programOptions, true).find((o) => o.value === v)?.label ?? v;
   };
   /** What stops an item being saved, so the row can say so before Save is pressed. */
   const problemOf = (item: Obj) => {

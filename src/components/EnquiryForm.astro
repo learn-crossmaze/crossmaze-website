@@ -139,6 +139,8 @@ const batchChoices = askBatch
     program.addEventListener('change', update);
     branch.addEventListener('change', update);
     form.addEventListener('reset', () => setTimeout(update));
+    // After Back or a restored tab the browser puts the chosen program back without a change event.
+    addEventListener('pageshow', update);
     update();
   }
 </script>

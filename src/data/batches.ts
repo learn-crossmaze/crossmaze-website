@@ -46,10 +46,10 @@ const order = weekdays.map(([key]) => key) as DayKey[];
 const short = (key: DayKey) => weekdays.find(([k]) => k === key)![1].slice(0, 3);
 const dayName = (key: DayKey) => weekdays.find(([k]) => k === key)![1];
 
-/** ['mon', 'tue', 'wed', 'thu', 'fri', 'sat'] → "Mon – Sat"; ['mon', 'wed', 'fri'] → "Mon, Wed, Fri"; ['sat', 'sun', 'mon'] → "Sat – Mon". */
-export function formatDays(days: readonly string[] = []): string {
+/** ['mon', 'tue', 'wed', 'thu', 'fri', 'sat'] → ["Mon – Sat"]; ['mon', 'wed', 'fri'] → ["Mon", "Wed", "Fri"]; ['sat', 'sun', 'mon'] → ["Sat – Mon"]. */
+export function dayRuns(days: readonly string[] = []): string[] {
   const picked = order.filter((d) => days.includes(d));
-  if (picked.length === 7) return 'Every day';
+  if (picked.length === 7) return ['Every day'];
   const runs: DayKey[][] = [];
   for (const day of picked) {
     const run = runs.at(-1);
@@ -60,8 +60,11 @@ export function formatDays(days: readonly string[] = []): string {
   const [first, last] = [runs[0], runs.at(-1)];
   if (runs.length > 1 && first![0] === 'mon' && last!.at(-1) === 'sun' && first!.length + last!.length > 2 && (first!.length < 3 || last!.length < 3))
     runs.unshift([...runs.pop()!, ...runs.shift()!]);
-  return runs.map((run) => (run.length > 2 ? `${short(run[0]!)} – ${short(run.at(-1)!)}` : run.map(short).join(', '))).join(', ');
+  return runs.flatMap((run) => (run.length > 2 ? [`${short(run[0]!)} – ${short(run.at(-1)!)}`] : run.map(short)));
 }
+
+/** "Mon – Sat", "Mon, Wed, Fri", "Sat – Mon". */
+export const formatDays = (days: readonly string[] = []) => dayRuns(days).join(', ');
 
 /**
  * Cleans up batches from the admin panel: drops half-filled ones and ones that end before they start,

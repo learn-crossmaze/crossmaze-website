@@ -742,9 +742,14 @@ textarea:focus {
   white-space: nowrap;
 }
 
-/* An item that can't be saved yet says why in its row (fields.tsx, ObjectsField). */
+/* An item that can't be saved yet says why in its row (fields.tsx, ObjectsField), wrapping so the
+   reason is never cut off. */
 .object.needs-attention {
   border-color: var(--a-red);
+}
+
+.object.needs-attention .object-toggle span:last-child {
+  white-space: normal;
 }
 
 .object-problem {

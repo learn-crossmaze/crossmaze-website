@@ -1,7 +1,7 @@
 // Branch admins: the centre head's name, photo and biography on their branch pages, and the branch's
 // timings and batches. Saving changes only `centerHead` and `batches`, which is all the security rules
-// let a branch admin change.
-import { useState } from 'react';
+// let a branch admin change, and only the one that was edited, so it never undoes someone else's save.
+import { useEffect, useState } from 'react';
 import { doc, updateDoc } from 'firebase/firestore';
 import { clean, markChanged, same, useDoc, useImageUrl } from '../data';
 import { batchesField, centerHeadFields } from '../schemas';
@@ -81,10 +81,20 @@ function CentreHeadEditor({ slug, branch, several }: { slug: string; branch: Bra
   const { services, email } = useSession();
   const toast = useToast();
   const stored = { ...headOf(branch), batches: Array.isArray(branch.batches) ? branch.batches : [] };
+  // `base`: the saved copy the draft started from, to tell what was edited here.
+  const [base, setBase] = useState<Record<string, unknown>>(stored);
   const [draft, setDraft] = useState<Record<string, unknown>>(stored);
   const [saving, setSaving] = useState(false);
-  const dirty = !same(draft, stored);
+  const dirty = !same(draft, base);
   useUnsavedWarning(dirty);
+  // Pick up other people's saves while nothing here is being edited.
+  const live = JSON.stringify(stored);
+  useEffect(() => {
+    if (!dirty) {
+      setBase(stored);
+      setDraft(stored);
+    }
+  }, [live, dirty]);
 
   const save = async () => {
     const problem = formProblem([batchesField, ...centerHeadFields], draft);
@@ -96,10 +106,11 @@ function CentreHeadEditor({ slug, branch, several }: { slug: string; branch: Bra
     try {
       const { batches, ...head } = clean(draft);
       const { name, photo, bio } = headOf({ centerHead: head });
-      await updateDoc(doc(services.db, 'branches', slug), {
-        centerHead: { name: name.trim(), photo, bio },
-        batches: Array.isArray(batches) ? batches : [],
-      });
+      const changes: Record<string, unknown> = {};
+      if (!same(draft.batches, base.batches)) changes.batches = Array.isArray(batches) ? batches : [];
+      if (!same(headOf({ centerHead: head }), headOf({ centerHead: base }))) changes.centerHead = { name: name.trim(), photo, bio };
+      if (Object.keys(changes).length) await updateDoc(doc(services.db, 'branches', slug), changes);
+      setBase(draft);
       await markChanged(services.db, email);
       toast('ok', 'Saved. Press Publish when you’re ready to update the website.');
     } catch (e) {
@@ -143,7 +154,13 @@ function CentreHeadEditor({ slug, branch, several }: { slug: string; branch: Bra
       {dirty && (
         <div className="savebar">
           <span>You have unsaved changes.</span>
-          <button className="btn btn-light" onClick={() => setDraft(stored)}>
+          <button
+            className="btn btn-light"
+            onClick={() => {
+              setBase(stored);
+              setDraft(stored);
+            }}
+          >
             Discard
           </button>
           <button className="btn" disabled={saving} onClick={save}>

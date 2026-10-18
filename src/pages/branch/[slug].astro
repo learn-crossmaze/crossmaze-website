@@ -17,7 +17,7 @@ import {
   type Branch,
 } from '../../data/branches';
 import TimeRange from '../../components/TimeRange.astro';
-import { formatDays, openingHoursSpecification, openingTimes, seatLabels } from '../../data/batches';
+import { dayRuns, openingHoursSpecification, openingTimes, seatLabels } from '../../data/batches';
 import { programs } from '../../data/programs';
 import { site } from '../../data/site';
 
@@ -306,8 +306,21 @@ const jsonLd = {
                           <TimeRange from={b.from} to={b.to} />
                         </strong>
                       )}
-                      {b.days?.length ? <span class="batch__days">{formatDays(b.days)}</span> : null}
-                      {b.seats && <span class:list={['batch__seats', `batch__seats--${b.seats}`]}>{seatLabels[b.seats]}</span>}
+                      {b.days?.length || b.seats ? (
+                        <span class="batch__more">
+                          {b.days?.length ? (
+                            <span class="batch__days">
+                              {dayRuns(b.days).map((run, i) => (
+                                <>
+                                  {i > 0 && ', '}
+                                  <span class="batch__run">{run}</span>
+                                </>
+                              ))}
+                            </span>
+                          ) : null}
+                          {b.seats && <span class:list={['batch__seats', `batch__seats--${b.seats}`]}>{seatLabels[b.seats]}</span>}
+                        </span>
+                      ) : null}
                     </li>
                   ))}
                 </ul>
@@ -788,11 +801,12 @@ const jsonLd = {
     list-style: none;
   }
 
-  /* Two columns, filled in order: the name (or the time) and the time, then the days and the seats
-     label. A long name wraps in its own column, so the times stay lined up on the right. */
+  /* The name (or the time) and the time, sharing the space so a short name stays whole and a time
+     that doesn't fit breaks after its dash; under them, the days and the seats label. */
   .batch {
     display: grid;
-    grid-template-columns: minmax(min-content, 1fr) auto;
+    grid-template-columns: auto auto;
+    justify-content: space-between;
     align-items: center;
     gap: 2px 12px;
     padding: 10px 14px;
@@ -805,17 +819,29 @@ const jsonLd = {
     grid-column: 1;
   }
 
-  .batch__time,
-  .batch__seats {
+  .batch__time {
     grid-column: 2;
     justify-self: end;
     text-align: right;
   }
 
+  /* The seats label keeps to the right, under the days when they don't fit beside it. */
+  .batch__more {
+    display: flex;
+    grid-column: 1 / -1;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 2px 12px;
+  }
+
   .batch__days {
-    grid-column: 1;
     color: var(--muted);
     font-size: 0.88rem;
+  }
+
+  /* "Mon – Sat" stays together; a list of days wraps at its commas. */
+  .batch__run {
+    white-space: nowrap;
   }
 
   .batch__time,
@@ -829,8 +855,10 @@ const jsonLd = {
     border-radius: 999px;
     background: var(--coral-50);
     color: color-mix(in srgb, var(--coral-fg) 80%, var(--ink));
+    margin-left: auto;
     font-size: 0.78rem;
     font-weight: 800;
+    white-space: nowrap;
   }
 
   .batch__seats--full {
