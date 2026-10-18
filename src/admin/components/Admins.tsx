@@ -81,7 +81,7 @@ interface BranchAdmin {
   addedAt?: unknown;
 }
 
-/** Branch admins: their own blog posts, the centre head of the branches ticked here, and Publish. */
+/** Branch admins: their own blog posts, the timings and centre head of the branches ticked here, and Publish. */
 function BranchAdmins({ admins }: { admins: string[] }) {
   const { services, email } = useSession();
   const toast = useToast();
@@ -123,7 +123,7 @@ function BranchAdmins({ admins }: { admins: string[] }) {
     <>
       <h2 className="section-title">Branch admins</h2>
       <p className="muted">
-        Can write blog posts and publish them, and update the centre head’s name, photo and biography for the branches ticked here.
+        Can write blog posts and publish them, and update the timings and batches and the centre head’s profile for the branches ticked here.
         They can’t see enquiries, calls or anything else, and can only change their own posts.
       </p>
       {error ? (
@@ -139,7 +139,7 @@ function BranchAdmins({ admins }: { admins: string[] }) {
           <form className="card add-admin" onSubmit={add}>
             <label htmlFor="branch-admin-email">Add a branch admin</label>
             <input id="branch-admin-email" type="email" placeholder="name@crossmaze.in" value={newEmail} onChange={(e) => setNewEmail(e.target.value)} />
-            <span className="add-admin-sub">Centre head they look after</span>
+            <span className="add-admin-sub">Branches they look after</span>
             <BranchChecks options={options} value={picked} onChange={setPicked} />
             <button className="btn">
               <Icon name="Plus" /> Add branch admin

@@ -96,7 +96,7 @@ const links = [
 
 const branchLinks = [
   { href: '#/posts', icon: 'Newspaper', title: 'Blog', text: 'Write posts in six designs and publish them' },
-  { href: '#/centre', icon: 'UserRound', title: 'Centre head', text: 'Name, photo and biography on your branch page' },
+  { href: '#/centre', icon: 'Building', title: 'Your branch', text: 'Timings and batches, and the centre head’s profile' },
 ];
 
 export function Dashboard() {
@@ -197,7 +197,7 @@ function BranchDashboard() {
     <>
       <PageHeader
         title="Dashboard"
-        intro={`Signed in as ${email}, a branch admin: you can write blog posts and update your centre head’s profile.`}
+        intro={`Signed in as ${email}, a branch admin: you can write blog posts and update your branch’s timings and centre head.`}
       />
       <div className="stat-grid">
         <PublishCard />
