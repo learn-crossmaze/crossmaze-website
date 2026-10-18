@@ -56,8 +56,8 @@ const facts = [
   branch.centerHead && { icon: 'UserRound', label: 'Centre head', value: branch.centerHead.name },
   // One line when the days share their hours ("Open Mon – Fri · 9:00 am – 6:00 pm"), else a line per group of days.
   open.length === 1 && { icon: 'Clock', label: openLabel(open[0]!.days), value: formatRange(open[0]!.from, open[0]!.to) },
-  open.length > 1 && { icon: 'Clock', label: 'Open', value: open.map((t) => `${t.days} ${formatRange(t.from, t.to)}`) },
-].filter(Boolean) as { icon: string; label: string; value: string | string[] }[];
+  open.length > 1 && { icon: 'Clock', label: 'Open', value: open.map((t) => [t.days, formatRange(t.from, t.to)] as [string, string]) },
+].filter(Boolean) as { icon: string; label: string; value: string | [string, string][] }[];
 
 const jsonLd = {
   '@context': 'https://schema.org',
@@ -141,7 +141,17 @@ const jsonLd = {
               </span>
               <span>
                 <span class="facts__label">{f.label}</span>
-                <strong>{Array.isArray(f.value) ? f.value.map((line) => <span class="facts__line">{line}</span>) : f.value}</strong>
+                {Array.isArray(f.value) ? (
+                  <strong class="facts__hours">
+                    {f.value.map(([days, time]) => (
+                      <span class="facts__group">
+                        <span class="facts__days">{days}</span> <span class="facts__time">{time}</span>
+                      </span>
+                    ))}
+                  </strong>
+                ) : (
+                  <strong>{f.value}</strong>
+                )}
               </span>
             </li>
           ))
@@ -448,8 +458,29 @@ const jsonLd = {
     color: var(--muted);
   }
 
-  .facts__line {
-    display: block;
+  /* Opening hours that differ by day: a line per group of days, the time moving under its days when the
+     column is narrow. */
+  .facts__hours {
+    display: grid;
+    gap: 2px;
+  }
+
+  .facts__group {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: baseline;
+    column-gap: 8px;
+  }
+
+  .facts__days,
+  .facts__time {
+    white-space: nowrap;
+  }
+
+  .facts__days {
+    font-size: 0.85rem;
+    font-weight: 600;
+    color: var(--muted);
   }
 
   .about {
