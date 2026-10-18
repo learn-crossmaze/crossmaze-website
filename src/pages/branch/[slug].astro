@@ -16,7 +16,8 @@ import {
   telHref,
   type Branch,
 } from '../../data/branches';
-import { formatDays, formatRange, openingHoursSpecification, openingTimes, rangeParts, seatLabels } from '../../data/batches';
+import TimeRange from '../../components/TimeRange.astro';
+import { formatDays, openingHoursSpecification, openingTimes, seatLabels } from '../../data/batches';
 import { programs } from '../../data/programs';
 import { site } from '../../data/site';
 
@@ -54,10 +55,10 @@ const facts = [
   branch.carpetArea && { icon: 'Ruler', label: 'Carpet area', value: branch.carpetArea },
   branch.capacity && { icon: 'Users', label: 'Capacity', value: `${branch.capacity} children` },
   branch.centerHead && { icon: 'UserRound', label: 'Centre head', value: branch.centerHead.name },
-  // One line when the days share their hours ("Open Mon – Fri · 9:00 am – 6:00 pm"), else a line per group of days.
-  open.length === 1 && { icon: 'Clock', label: openLabel(open[0]!.days), value: formatRange(open[0]!.from, open[0]!.to) },
-  open.length > 1 && { icon: 'Clock', label: 'Open', value: open.map((t) => [t.days, formatRange(t.from, t.to)] as [string, string]) },
-].filter(Boolean) as { icon: string; label: string; value: string | [string, string][] }[];
+  // One range when the days share their hours ("Open Mon – Fri", "9:00 am – 6:00 pm"), else one per group of days.
+  open.length === 1 && { icon: 'Clock', label: openLabel(open[0]!.days), hours: [{ ...open[0]!, days: '' }] },
+  open.length > 1 && { icon: 'Clock', label: 'Open', hours: open },
+].filter(Boolean) as { icon: string; label: string; value?: string; hours?: { days: string; from: string; to: string }[] }[];
 
 const jsonLd = {
   '@context': 'https://schema.org',
@@ -141,12 +142,13 @@ const jsonLd = {
               </span>
               <span>
                 <span class="facts__label">{f.label}</span>
-                {Array.isArray(f.value) ? (
+                {f.hours ? (
                   <strong class="facts__hours">
-                    {f.value.map(([days, time]) => (
-                      <span class="facts__group">
-                        <span class="facts__days">{days}</span> <span class="facts__time">{time}</span>
-                      </span>
+                    {f.hours.map((h) => (
+                      <>
+                        {h.days && <span class="facts__days">{h.days}</span>}
+                        <TimeRange from={h.from} to={h.to} />
+                      </>
                     ))}
                   </strong>
                 ) : (
@@ -287,31 +289,27 @@ const jsonLd = {
                 <span class="icon-badge">
                   <Icon name={p.icon} size={24} />
                 </span>
-                <span>
+                <div>
                   <h3 class="offered__name" id={`offered-${p.slug}`}>
                     {p.name}
                   </h3>
                   <span class="muted">{p.ages}</span>
-                </span>
+                </div>
               </a>
               {batchesOf(p.slug).length ? (
                 <ul class="batches">
-                  {batchesOf(p.slug).map((b) => {
-                    const [from, to] = rangeParts(b.from, b.to);
-                    const time = (
-                      <>
-                        <time datetime={b.from}>{from}</time> – <time datetime={b.to}>{to}</time>
-                      </>
-                    );
-                    return (
-                      <li class="batch">
-                        <strong class="batch__name">{b.name || time}</strong>
-                        {b.name && <strong class="batch__time">{time}</strong>}
-                        {b.days?.length ? <span class="batch__days">{formatDays(b.days)}</span> : null}
-                        {b.seats && <span class:list={['batch__seats', `batch__seats--${b.seats}`]}>{seatLabels[b.seats]}</span>}
-                      </li>
-                    );
-                  })}
+                  {batchesOf(p.slug).map((b) => (
+                    <li class="batch">
+                      <strong class="batch__name">{b.name || <TimeRange from={b.from} to={b.to} />}</strong>
+                      {b.name && (
+                        <strong class="batch__time">
+                          <TimeRange from={b.from} to={b.to} />
+                        </strong>
+                      )}
+                      {b.days?.length ? <span class="batch__days">{formatDays(b.days)}</span> : null}
+                      {b.seats && <span class:list={['batch__seats', `batch__seats--${b.seats}`]}>{seatLabels[b.seats]}</span>}
+                    </li>
+                  ))}
                 </ul>
               ) : (
                 <p class="batches-none muted">
@@ -458,28 +456,36 @@ const jsonLd = {
     color: var(--muted);
   }
 
-  /* Opening hours that differ by day: a line per group of days, the time moving under its days when the
-     column is narrow. */
+  /* Opening hours that differ by day: each group of days above its hours, or beside them, lined up in two
+     columns, when the fact has room. */
+  .facts li > span:last-child {
+    flex: 1;
+    min-width: 0;
+    container-type: inline-size;
+  }
+
+  @media (max-width: 640px) {
+    .facts li > span:last-child {
+      align-self: stretch;
+    }
+  }
+
   .facts__hours {
     display: grid;
-    gap: 2px;
-  }
-
-  .facts__group {
-    display: flex;
-    flex-wrap: wrap;
     align-items: baseline;
-    column-gap: 8px;
+    column-gap: 10px;
   }
 
-  .facts__days,
-  .facts__time {
-    white-space: nowrap;
+  @container (min-width: 230px) {
+    .facts__hours:has(.facts__days) {
+      grid-template-columns: max-content minmax(0, 1fr);
+    }
   }
 
   .facts__days {
     font-size: 0.85rem;
     font-weight: 600;
+    white-space: nowrap;
     color: var(--muted);
   }
 
@@ -747,12 +753,14 @@ const jsonLd = {
     color: inherit;
   }
 
+  /* The program's name, as a heading for screen readers, looking as the bold name always did. */
   .offered__name {
     margin: 0;
     font-family: inherit;
-    font-size: 1rem;
+    font-size: inherit;
     font-weight: 700;
     line-height: inherit;
+    letter-spacing: normal;
     color: inherit;
   }
 
@@ -767,7 +775,7 @@ const jsonLd = {
     flex: none;
   }
 
-  .offered__head > span:last-child {
+  .offered__head > div {
     display: grid;
     line-height: 1.3;
   }
@@ -784,7 +792,7 @@ const jsonLd = {
      label. A long name wraps in its own column, so the times stay lined up on the right. */
   .batch {
     display: grid;
-    grid-template-columns: minmax(0, 1fr) auto;
+    grid-template-columns: minmax(min-content, 1fr) auto;
     align-items: center;
     gap: 2px 12px;
     padding: 10px 14px;

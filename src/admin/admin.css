@@ -742,6 +742,17 @@ textarea:focus {
   white-space: nowrap;
 }
 
+/* An item that can't be saved yet says why in its row (fields.tsx, ObjectsField). */
+.object.needs-attention {
+  border-color: var(--a-red);
+}
+
+.object-problem {
+  color: var(--a-red);
+  font-style: normal;
+  font-weight: 600;
+}
+
 .object-body {
   padding: 4px 14px 16px;
   border-top: 1px solid var(--a-line);
@@ -926,6 +937,16 @@ textarea:focus {
 }
 
 @media (max-width: 600px) {
+  /* Nested boxes give back their padding, and item summaries wrap instead of being cut off. */
+  .card {
+    padding: 14px;
+  }
+  .group {
+    padding: 10px;
+  }
+  .object-toggle span:last-child {
+    white-space: normal;
+  }
   .list-row .row-actions,
   .images-item .row-actions {
     flex-direction: column;

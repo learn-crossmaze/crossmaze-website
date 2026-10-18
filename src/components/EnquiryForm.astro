@@ -13,12 +13,13 @@ interface Props {
 const { branch, id = 'enquiry', askBatch = false } = Astro.props;
 
 // Branch name → program name → that program's batches there, as the form shows them. Batches that would
-// read the same (one name and time on different days) get their days added.
+// read the same (one name and time on different days) start with their days, so they differ even when a
+// phone cuts the end of the choice off.
 const choices = (list: Batch[]) =>
   list.map((x, _, all) => {
     const label = batchLabel(x);
-    const days = all.some((y) => y !== x && batchLabel(y) === label) && x.days?.length ? ` (${formatDays(x.days)})` : '';
-    return label + days + (x.seats === 'full' ? ` – ${seatLabels.full.toLowerCase()}` : '');
+    const clash = all.some((y) => y !== x && batchLabel(y) === label) && x.days?.length;
+    return (clash ? `${formatDays(x.days)} · ` : '') + label + (x.seats === 'full' ? ` (${seatLabels.full.toLowerCase()})` : '');
   });
 const batchChoices = askBatch
   ? Object.fromEntries(

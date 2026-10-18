@@ -8,6 +8,8 @@ import { endsAfterStart, formatTime, seatLabels } from '../data/batches';
 export interface Option {
   value: string;
   label: string;
+  /** A program hidden from the website. */
+  hidden?: boolean;
 }
 
 interface Base {
@@ -27,8 +29,11 @@ export type Field =
   /** The blog post design picker (src/data/blogOptions.ts). */
   | (Base & { type: 'template' })
   | (Base & { type: 'boolean' })
-  /** `emptyLabel` names the empty choice (default "Choose…"); `optionsFrom: 'programs'` lists the programs. */
-  | (Base & { type: 'select'; options?: Option[]; optionsFrom?: 'programs'; emptyLabel?: string })
+  /**
+   * `emptyLabel` names the empty choice (default "Choose…"); `optionsFrom: 'programs'` lists the programs,
+   * and with `offeredOnly` just those the branch being edited offers (its `programs`) and the website shows.
+   */
+  | (Base & { type: 'select'; options?: Option[]; optionsFrom?: 'programs'; offeredOnly?: boolean; emptyLabel?: string })
   | (Base & { type: 'icon' })
   | (Base & { type: 'checkboxes'; options?: Option[]; optionsFrom?: 'programs' })
   | (Base & { type: 'list'; itemLabel: string; multiline?: boolean })
@@ -256,14 +261,19 @@ export const batchesField: Field = {
     [
       text('program') || 'Choose a program',
       text('name'),
-      item.from && item.to ? `${formatTime(String(item.from))} – ${formatTime(String(item.to))}` : 'needs a start and end time',
+      item.from && item.to ? `${formatTime(String(item.from))} – ${formatTime(String(item.to))}` : '',
       text('seats'),
     ]
       .filter(Boolean)
       .join(' · '),
-  check: (item) => (item.from && item.to && !endsAfterStart(item.from, item.to) ? 'Ends at must be after Starts at' : undefined),
+  check: (item) =>
+    item.from && item.to && !endsAfterStart(item.from, item.to)
+      ? 'Ends at must be after Starts at'
+      : String(item.name ?? '').trim().length > 40
+        ? 'Batch name must be 40 characters or fewer'
+        : undefined,
   fields: [
-    { key: 'program', label: 'Program', type: 'select', optionsFrom: 'programs', required: true },
+    { key: 'program', label: 'Program', type: 'select', optionsFrom: 'programs', offeredOnly: true, required: true },
     { key: 'name', label: 'Batch name', type: 'text', placeholder: 'Morning', maxLength: 40, help: 'A short name. Leave it empty when the program has just one batch here.' },
     { key: 'from', label: 'Starts at', type: 'time', required: true },
     { key: 'to', label: 'Ends at', type: 'time', required: true },

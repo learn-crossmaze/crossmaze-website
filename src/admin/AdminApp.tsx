@@ -185,11 +185,11 @@ function Gate({ services, user }: { services: FirebaseServices; user: User }) {
 function FormProvider({ children }: { children: ReactNode }) {
   const { services, role } = useSession();
   // For "programs offered" on branches and each batch's program (branch admins may read the list too).
-  const programs = useCollection<{ slug?: string; name?: string }>(services.db, role ? 'programs' : null);
+  const programs = useCollection<{ slug?: string; name?: string; hidden?: boolean }>(services.db, role ? 'programs' : null);
   const value = useMemo(
     () => ({
       services,
-      programOptions: programs.items.map((p) => ({ value: String(p.slug ?? p.id), label: String(p.name ?? p.id) })),
+      programOptions: programs.items.map((p) => ({ value: String(p.slug ?? p.id), label: String(p.name ?? p.id), hidden: p.hidden === true })),
     }),
     [services, programs.items],
   );

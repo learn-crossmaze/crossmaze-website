@@ -1,11 +1,11 @@
 // Branch admins: the centre head's name, photo and biography on their branch pages, and the branch's
 // timings and batches. Saving changes only `centerHead` and `batches`, which is all the security rules
 // let a branch admin change.
-import { useContext, useMemo, useState } from 'react';
+import { useState } from 'react';
 import { doc, updateDoc } from 'firebase/firestore';
 import { clean, markChanged, same, useDoc, useImageUrl } from '../data';
 import { batchesField, centerHeadFields } from '../schemas';
-import { FormContext, Icon, SchemaForm, formProblem } from './fields';
+import { Icon, SchemaForm, formProblem } from './fields';
 import { ErrorBox, PageHeader, SITE_URL, Spinner, errorText, useSession, useToast, useUnsavedWarning } from './ui';
 
 type Head = { name: string; photo: string; bio: string[] };
@@ -86,13 +86,6 @@ function CentreHeadEditor({ slug, branch, several }: { slug: string; branch: Bra
   const dirty = !same(draft, stored);
   useUnsavedWarning(dirty);
 
-  // Batches can only be for the programs this branch offers (the site leaves out any others).
-  const form = useContext(FormContext)!;
-  const offered = useMemo(
-    () => ({ ...form, programOptions: form.programOptions.filter((o) => !branch.programs || branch.programs.includes(o.value)) }),
-    [form, branch.programs],
-  );
-
   const save = async () => {
     const problem = formProblem([batchesField, ...centerHeadFields], draft);
     if (problem) {
@@ -140,9 +133,8 @@ function CentreHeadEditor({ slug, branch, several }: { slug: string; branch: Bra
       />
       <h2 className="section-title first">Timings and batches</h2>
       <div className="card">
-        <FormContext.Provider value={offered}>
-          <SchemaForm fields={[batchesField]} value={draft} onChange={setDraft} />
-        </FormContext.Provider>
+        {/* The branch's programs, so each batch's program can only be one the branch offers. */}
+        <SchemaForm fields={[batchesField]} value={draft} onChange={setDraft} root={{ ...draft, programs: branch.programs }} />
       </div>
       <h2 className="section-title">Centre head</h2>
       <div className="card">

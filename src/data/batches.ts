@@ -56,30 +56,36 @@ export function formatDays(days: readonly string[] = []): string {
     if (run && order.indexOf(day) === order.indexOf(run.at(-1)!) + 1) run.push(day);
     else runs.push([day]);
   }
-  // Sunday runs on into Monday.
-  if (runs.length > 1 && runs[0]![0] === 'mon' && runs.at(-1)!.at(-1) === 'sun') runs.unshift([...runs.pop()!, ...runs.shift()!]);
+  // Sunday runs on into Monday, when that makes a range ("Sat – Mon") out of shorter pieces.
+  const [first, last] = [runs[0], runs.at(-1)];
+  if (runs.length > 1 && first![0] === 'mon' && last!.at(-1) === 'sun' && first!.length + last!.length > 2 && (first!.length < 3 || last!.length < 3))
+    runs.unshift([...runs.pop()!, ...runs.shift()!]);
   return runs.map((run) => (run.length > 2 ? `${short(run[0]!)} – ${short(run.at(-1)!)}` : run.map(short).join(', '))).join(', ');
 }
 
-/** Cleans up batches from the admin panel: drops half-filled ones, ones that end before they start and repeats, and sorts by start time. */
+/**
+ * Cleans up batches from the admin panel: drops half-filled ones and ones that end before they start,
+ * keeps one of any repeated batch (the one with a seats label), caps names at 40 characters and sorts by
+ * start time.
+ */
 export function cleanBatches(raw: unknown): Batch[] {
-  const seen = new Set<string>();
-  return (Array.isArray(raw) ? raw : [])
+  const kept = new Map<string, Batch>();
+  const batches = (Array.isArray(raw) ? raw : [])
     .filter((b): b is Record<string, unknown> => !!b && typeof b === 'object')
     .filter((b) => typeof b.program === 'string' && b.program && endsAfterStart(b.from, b.to))
     .map((b): Batch => ({
       program: b.program as string,
-      name: typeof b.name === 'string' ? b.name.trim() : '',
+      name: typeof b.name === 'string' ? b.name.trim().slice(0, 40) : '',
       from: b.from as string,
       to: b.to as string,
       days: Array.isArray(b.days) ? order.filter((d) => (b.days as unknown[]).includes(d)) : [],
       seats: b.seats === 'few' || b.seats === 'full' ? b.seats : '',
-    }))
-    .filter((b) => {
-      const key = JSON.stringify([b.program, b.name, b.from, b.to, b.days]);
-      return seen.has(key) ? false : (seen.add(key), true);
-    })
-    .sort((a, b) => minutes(a.from) - minutes(b.from));
+    }));
+  for (const b of batches) {
+    const key = JSON.stringify([b.program, b.name, b.from, b.to, b.days]);
+    if (!kept.has(key) || (b.seats && !kept.get(key)!.seats)) kept.set(key, b);
+  }
+  return [...kept.values()].sort((a, b) => minutes(a.from) - minutes(b.from));
 }
 
 const earliest = (batches: Batch[]) => batches.map((b) => b.from).sort((a, b) => minutes(a) - minutes(b))[0]!;

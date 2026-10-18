@@ -37,8 +37,25 @@ function move<T>(list: T[], from: number, to: number): T[] {
   return copy;
 }
 
-export function SchemaForm({ fields, value, onChange }: { fields: Field[]; value: Obj; onChange: (v: Obj) => void }) {
-  return (
+/** The whole document being edited, for fields that depend on another field (a batch's program on the branch's `programs`). */
+const RootContext = createContext<Obj | null>(null);
+
+/** A select's choices. A value that is no longer offered stays listed, marked, so it isn't shown as unchosen. */
+function selectOptions(field: Extract<Field, { type: 'select' }>, value: string, root: Obj | null, programOptions: Option[]): Option[] {
+  let options = field.optionsFrom === 'programs' ? programOptions : (field.options ?? []);
+  const offered = root?.programs;
+  if (field.offeredOnly) options = options.filter((o) => !o.hidden && (!Array.isArray(offered) || offered.includes(o.value)));
+  if (value && !options.some((o) => o.value === value)) {
+    const label = programOptions.find((o) => o.value === value)?.label ?? value;
+    options = [...options, { value, label: `${label} (not offered here, so not shown on the website)` }];
+  }
+  return options;
+}
+
+/** `root`: the document the form belongs to, when it holds more than `value` (defaults to `value`). */
+export function SchemaForm({ fields, value, onChange, root }: { fields: Field[]; value: Obj; onChange: (v: Obj) => void; root?: Obj }) {
+  const outer = useContext(RootContext);
+  const form = (
     <div className="schema-form">
       {fields.map((field, i) =>
         field.type === 'heading' ? (
@@ -57,6 +74,7 @@ export function SchemaForm({ fields, value, onChange }: { fields: Field[]; value
       )}
     </div>
   );
+  return outer && !root ? form : <RootContext.Provider value={root ?? value}>{form}</RootContext.Provider>;
 }
 
 function Row({ label, help, required, htmlFor, children }: { label: string; help?: string; required?: boolean; htmlFor?: string; children: ReactNode }) {
@@ -93,6 +111,7 @@ function ArrowButtons({ index, count, onMove, onRemove, label }: { index: number
 export function FieldEditor({ field, value, onChange }: { field: Exclude<Field, { type: 'heading' }>; value: Value; onChange: (v: Value) => void }) {
   const id = useId();
   const { programOptions } = useForm();
+  const root = useContext(RootContext);
 
   switch (field.type) {
     case 'text':
@@ -166,7 +185,7 @@ export function FieldEditor({ field, value, onChange }: { field: Exclude<Field, 
         <Row label={field.label} help={field.help} required={field.required} htmlFor={id}>
           <select id={id} value={asText(value)} onChange={(e) => onChange(e.target.value)}>
             <option value="">{field.emptyLabel ?? 'Choose…'}</option>
-            {(field.optionsFrom === 'programs' ? programOptions : (field.options ?? [])).map((o) => (
+            {selectOptions(field, asText(value), root, programOptions).map((o) => (
               <option key={o.value} value={o.value}>
                 {o.label}
               </option>
@@ -351,12 +370,18 @@ function TemplateSketch({ id }: { id: string }) {
 function ObjectsField({ field, value, onChange }: { field: Extract<Field, { type: 'objects' }>; value: Obj[]; onChange: (v: Value) => void }) {
   const [open, setOpen] = useState<number | null>(null);
   const { programOptions } = useForm();
+  const root = useContext(RootContext);
   /** An item's field as the editor shows it: the label of a chosen option rather than its value. */
   const shown = (item: Obj, key: string) => {
     const sub = field.fields.find((f) => f.key === key);
     const v = asText(item[key]);
     if (sub?.type !== 'select') return v;
-    return (sub.optionsFrom === 'programs' ? programOptions : (sub.options ?? [])).find((o) => o.value === v)?.label ?? v;
+    return selectOptions(sub, v, root, programOptions).find((o) => o.value === v)?.label ?? v;
+  };
+  /** What stops an item being saved, so the row can say so before Save is pressed. */
+  const problemOf = (item: Obj) => {
+    const missing = missingRequired(field.fields, item);
+    return missing.length ? `fill in ${missing.join(', ')}` : field.check?.(item);
   };
   const summaryOf = (item: Obj, i: number) => {
     const s =
@@ -368,12 +393,15 @@ function ObjectsField({ field, value, onChange }: { field: Extract<Field, { type
       <legend>{field.label}</legend>
       {field.help && <p className="help">{field.help}</p>}
       {value.map((item, i) => (
-        <div className={`object ${open === i ? 'open' : ''}`} key={i}>
+        <div className={`object ${open === i ? 'open' : ''} ${problemOf(item) ? 'needs-attention' : ''}`} key={i}>
           <div className="object-head">
             <button type="button" className="object-toggle" aria-expanded={open === i} onClick={() => setOpen(open === i ? null : i)}>
               <Icon name={open === i ? 'ChevronDown' : 'ChevronRight'} size={16} />
               {typeof item.icon === 'string' && <Icon name={item.icon} size={16} />}
-              <span>{summaryOf(item, i)}</span>
+              <span>
+                {summaryOf(item, i)}
+                {problemOf(item) && <em className="object-problem"> · {problemOf(item)}</em>}
+              </span>
             </button>
             <ArrowButtons
               index={i}
@@ -519,7 +547,6 @@ function ImagesField({ folder, value, onChange }: { folder: string; value: strin
   );
 }
 
-/** Lists required fields that are still empty. */
 /** What stops a form being saved, as one message: required fields left empty, then items that fail their `check`. */
 export function formProblem(fields: Field[], value: Obj): string | undefined {
   const missing = missingRequired(fields, value);
@@ -538,6 +565,7 @@ export function formProblem(fields: Field[], value: Obj): string | undefined {
   return problems.length ? `${problems.join('. ')}.` : undefined;
 }
 
+/** Lists required fields that are still empty. */
 export function missingRequired(fields: Field[], value: Obj, prefix = ''): string[] {
   const out: string[] = [];
   for (const field of fields) {
