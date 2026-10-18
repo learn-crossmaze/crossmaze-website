@@ -825,10 +825,12 @@ const jsonLd = {
     text-align: right;
   }
 
-  /* The seats label keeps to the right, under the days when they don't fit beside it. */
+  /* The seats label keeps to the right, under the days when they don't fit beside it. This line
+     takes the row's width without widening the columns above it. */
   .batch__more {
     display: flex;
     grid-column: 1 / -1;
+    contain: inline-size;
     flex-wrap: wrap;
     align-items: center;
     gap: 2px 12px;

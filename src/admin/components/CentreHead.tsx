@@ -1,6 +1,6 @@
 // Branch admins: the centre head's name, photo and biography on their branch pages, and the branch's
 // timings and batches. Saving changes only `centerHead` and `batches`, which is all the security rules
-// let a branch admin change, and only the one that was edited, so it never undoes someone else's save.
+// let a branch admin change, and only the parts edited here, so it never undoes someone else's save.
 import { useEffect, useState } from 'react';
 import { doc, updateDoc } from 'firebase/firestore';
 import { clean, markChanged, same, useDoc, useImageUrl } from '../data';
@@ -105,10 +105,14 @@ function CentreHeadEditor({ slug, branch, several }: { slug: string; branch: Bra
     setSaving(true);
     try {
       const { batches, ...head } = clean(draft);
-      const { name, photo, bio } = headOf({ centerHead: head });
+      const edited = headOf({ centerHead: head });
+      const written = { ...edited, name: edited.name.trim() };
+      const before = headOf({ centerHead: base });
       const changes: Record<string, unknown> = {};
       if (!same(draft.batches, base.batches)) changes.batches = Array.isArray(batches) ? batches : [];
-      if (!same(headOf({ centerHead: head }), headOf({ centerHead: base }))) changes.centerHead = { name: name.trim(), photo, bio };
+      // The rules want `centerHead` to be exactly a name, photo and biography: write it whole until it is.
+      if (!same(branch.centerHead, headOf(branch))) changes.centerHead = written;
+      else for (const key of ['name', 'photo', 'bio'] as const) if (!same(edited[key], before[key])) changes[`centerHead.${key}`] = written[key];
       if (Object.keys(changes).length) await updateDoc(doc(services.db, 'branches', slug), changes);
       setBase(draft);
       await markChanged(services.db, email);

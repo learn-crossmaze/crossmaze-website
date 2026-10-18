@@ -477,9 +477,17 @@ function useUpload(folder: string) {
   return { upload, busy, error };
 }
 
+/** The newest `value`, for code that runs after an upload and would otherwise change the form as it was when the upload began. */
+function useLatest<T>(value: T) {
+  const ref = useRef(value);
+  ref.current = value;
+  return ref;
+}
+
 function ImageField({ folder, value, onChange }: { folder: string; value: string; onChange: (v: Value) => void }) {
   const input = useRef<HTMLInputElement>(null);
   const { upload, busy, error } = useUpload(folder);
+  const latest = useLatest(onChange);
   return (
     <div className="image-field">
       {value ? <Thumb path={value} /> : <span className="thumb thumb-empty">No image</span>}
@@ -502,7 +510,7 @@ function ImageField({ folder, value, onChange }: { folder: string; value: string
         onChange={async (e) => {
           const [path] = await upload(e.target.files);
           e.target.value = '';
-          if (path) onChange(path);
+          if (path) latest.current(path);
         }}
       />
     </div>
@@ -512,6 +520,7 @@ function ImageField({ folder, value, onChange }: { folder: string; value: string
 function ImagesField({ folder, value, onChange }: { folder: string; value: string[]; onChange: (v: Value) => void }) {
   const input = useRef<HTMLInputElement>(null);
   const { upload, busy, error } = useUpload(folder);
+  const latest = useLatest({ value, onChange });
   return (
     <div className="images-field">
       <div className="images-grid">
@@ -545,7 +554,7 @@ function ImagesField({ folder, value, onChange }: { folder: string; value: strin
         onChange={async (e) => {
           const paths = await upload(e.target.files);
           e.target.value = '';
-          if (paths.length) onChange([...value, ...paths]);
+          if (paths.length) latest.current.onChange([...latest.current.value, ...paths]);
         }}
       />
     </div>

@@ -260,8 +260,8 @@ export const batchesField: Field = {
   summary: (item, text) =>
     [
       text('program') || 'Choose a program',
-      text('name'),
       item.from && item.to ? `${formatTime(String(item.from))} – ${formatTime(String(item.to))}` : '',
+      text('name'),
       text('seats'),
     ]
       .filter(Boolean)
