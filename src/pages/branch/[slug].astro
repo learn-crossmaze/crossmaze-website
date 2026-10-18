@@ -16,7 +16,7 @@ import {
   telHref,
   type Branch,
 } from '../../data/branches';
-import { formatDays, formatRange, openingHours, openingHoursSpecification, seatLabels } from '../../data/batches';
+import { formatDays, formatRange, openingHoursSpecification, openingTimes, rangeParts, seatLabels } from '../../data/batches';
 import { programs } from '../../data/programs';
 import { site } from '../../data/site';
 
@@ -34,7 +34,9 @@ const offered = programs.filter((p) => branch.programs.includes(p.slug));
 // Each program's batches here (src/data/batches.ts), and when the branch is open: earliest start to latest end.
 const batches = branch.batches ?? [];
 const batchesOf = (slug: string) => batches.filter((b) => b.program === slug);
-const open = openingHours(batches);
+const open = openingTimes(batches);
+const openLabel = (days: string) => (!days ? 'Open' : days === 'Every day' ? 'Open every day' : `Open ${days}`);
+const hours = openingHoursSpecification(batches);
 const others = branches.filter((b) => b.slug !== branch.slug);
 const photos = branchPhotos(branch.slug);
 // The cover photo sits in the hero; the next five fill the gallery's 2×2 + 4 grid. Every photo opens
@@ -52,19 +54,22 @@ const facts = [
   branch.carpetArea && { icon: 'Ruler', label: 'Carpet area', value: branch.carpetArea },
   branch.capacity && { icon: 'Users', label: 'Capacity', value: `${branch.capacity} children` },
   branch.centerHead && { icon: 'UserRound', label: 'Centre head', value: branch.centerHead.name },
-  open && { icon: 'Clock', label: open.days ? `Open ${open.days}` : 'Open', value: formatRange(open.from, open.to) },
-].filter(Boolean) as { icon: string; label: string; value: string }[];
+  // One line when the days share their hours ("Open Mon – Fri · 9:00 am – 6:00 pm"), else a line per group of days.
+  open.length === 1 && { icon: 'Clock', label: openLabel(open[0]!.days), value: formatRange(open[0]!.from, open[0]!.to) },
+  open.length > 1 && { icon: 'Clock', label: 'Open', value: open.map((t) => `${t.days} ${formatRange(t.from, t.to)}`) },
+].filter(Boolean) as { icon: string; label: string; value: string | string[] }[];
 
 const jsonLd = {
   '@context': 'https://schema.org',
-  '@type': 'Preschool',
+  // Preschool, and as day care a local business, for which Google shows opening hours.
+  '@type': ['Preschool', 'ChildCare'],
   name: branch.name,
   url: new URL(`/branch/${branch.slug}`, site.url).href,
   telephone: branch.phone,
   email: branch.email,
   ...(cover ? { image: new URL(fullSize[0]!.src, site.url).href } : {}),
   parentOrganization: { '@type': 'Organization', name: site.fullName, url: site.url },
-  ...(openingHoursSpecification(batches).length ? { openingHoursSpecification: openingHoursSpecification(batches) } : {}),
+  ...(hours.length ? { openingHoursSpecification: hours } : {}),
   address: {
     '@type': 'PostalAddress',
     streetAddress: branch.address.slice(0, -1).join(', '),
@@ -136,7 +141,7 @@ const jsonLd = {
               </span>
               <span>
                 <span class="facts__label">{f.label}</span>
-                <strong>{f.value}</strong>
+                <strong>{Array.isArray(f.value) ? f.value.map((line) => <span class="facts__line">{line}</span>) : f.value}</strong>
               </span>
             </li>
           ))
@@ -267,30 +272,36 @@ const jsonLd = {
       <div class="offered">
         {
           offered.map((p) => (
-            <article class:list={['offered__item', 'card', `tone-${p.color}`]}>
+            <article class:list={['offered__item', 'card', `tone-${p.color}`]} aria-labelledby={`offered-${p.slug}`}>
               <a class="offered__head" href={`/our-programs#${p.slug}`}>
                 <span class="icon-badge">
                   <Icon name={p.icon} size={24} />
                 </span>
                 <span>
-                  <strong>{p.name}</strong>
+                  <h3 class="offered__name" id={`offered-${p.slug}`}>
+                    {p.name}
+                  </h3>
                   <span class="muted">{p.ages}</span>
                 </span>
               </a>
               {batchesOf(p.slug).length ? (
                 <ul class="batches">
-                  {batchesOf(p.slug).map((b) => (
-                    <li class="batch">
-                      <span class="batch__what">
-                        <strong>{b.name || formatRange(b.from, b.to)}</strong>
+                  {batchesOf(p.slug).map((b) => {
+                    const [from, to] = rangeParts(b.from, b.to);
+                    const time = (
+                      <>
+                        <time datetime={b.from}>{from}</time> – <time datetime={b.to}>{to}</time>
+                      </>
+                    );
+                    return (
+                      <li class="batch">
+                        <strong class="batch__name">{b.name || time}</strong>
+                        {b.name && <strong class="batch__time">{time}</strong>}
                         {b.days?.length ? <span class="batch__days">{formatDays(b.days)}</span> : null}
-                      </span>
-                      <span class="batch__when">
-                        {b.name && <strong class="batch__time">{formatRange(b.from, b.to)}</strong>}
                         {b.seats && <span class:list={['batch__seats', `batch__seats--${b.seats}`]}>{seatLabels[b.seats]}</span>}
-                      </span>
-                    </li>
-                  ))}
+                      </li>
+                    );
+                  })}
                 </ul>
               ) : (
                 <p class="batches-none muted">
@@ -435,6 +446,10 @@ const jsonLd = {
     display: block;
     font-size: 0.85rem;
     color: var(--muted);
+  }
+
+  .facts__line {
+    display: block;
   }
 
   .about {
@@ -701,7 +716,16 @@ const jsonLd = {
     color: inherit;
   }
 
-  .offered__head:hover strong {
+  .offered__name {
+    margin: 0;
+    font-family: inherit;
+    font-size: 1rem;
+    font-weight: 700;
+    line-height: inherit;
+    color: inherit;
+  }
+
+  .offered__head:hover .offered__name {
     text-decoration: underline;
     text-decoration-color: var(--tone);
     text-underline-offset: 3px;
@@ -725,50 +749,55 @@ const jsonLd = {
     list-style: none;
   }
 
+  /* Two columns, filled in order: the name (or the time) and the time, then the days and the seats
+     label. A long name wraps in its own column, so the times stay lined up on the right. */
   .batch {
-    display: flex;
-    flex-wrap: wrap;
-    justify-content: space-between;
-    align-items: start;
-    gap: 4px 12px;
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) auto;
+    align-items: center;
+    gap: 2px 12px;
     padding: 10px 14px;
     border: 1px solid color-mix(in srgb, var(--tone) 22%, transparent);
     border-radius: 14px;
     background: color-mix(in srgb, var(--badge-bg) 70%, transparent);
   }
 
-  .batch__what,
-  .batch__when {
-    display: grid;
-    gap: 2px;
+  .batch__name {
+    grid-column: 1;
   }
 
-  .batch__when {
-    justify-items: end;
+  .batch__time,
+  .batch__seats {
+    grid-column: 2;
+    justify-self: end;
     text-align: right;
   }
 
-  .batch strong {
-    font-variant-numeric: tabular-nums;
-  }
-
   .batch__days {
+    grid-column: 1;
     color: var(--muted);
     font-size: 0.88rem;
   }
 
+  .batch__time,
+  .batch__name {
+    font-variant-numeric: tabular-nums;
+  }
+
   .batch__seats {
     padding: 2px 10px;
+    border: 1px solid color-mix(in srgb, var(--coral-fg) 30%, transparent);
     border-radius: 999px;
     background: var(--coral-50);
-    color: var(--coral-fg);
+    color: color-mix(in srgb, var(--coral-fg) 80%, var(--ink));
     font-size: 0.78rem;
     font-weight: 800;
   }
 
   .batch__seats--full {
+    border-color: color-mix(in srgb, var(--muted) 30%, transparent);
     background: color-mix(in srgb, var(--muted) 16%, transparent);
-    color: var(--muted);
+    color: color-mix(in srgb, var(--muted) 60%, var(--ink));
   }
 
   .batches-none {

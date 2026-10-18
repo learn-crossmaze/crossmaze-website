@@ -101,7 +101,14 @@ export function FieldEditor({ field, value, onChange }: { field: Exclude<Field, 
     case 'url':
       return (
         <Row label={field.label} help={field.help} required={field.required} htmlFor={id}>
-          <input id={id} type={field.type} value={asText(value)} placeholder={field.placeholder} onChange={(e) => onChange(e.target.value)} />
+          <input
+            id={id}
+            type={field.type}
+            value={asText(value)}
+            placeholder={field.placeholder}
+            maxLength={field.maxLength}
+            onChange={(e) => onChange(e.target.value)}
+          />
         </Row>
       );
     case 'textarea':
@@ -513,6 +520,24 @@ function ImagesField({ folder, value, onChange }: { folder: string; value: strin
 }
 
 /** Lists required fields that are still empty. */
+/** What stops a form being saved, as one message: required fields left empty, then items that fail their `check`. */
+export function formProblem(fields: Field[], value: Obj): string | undefined {
+  const missing = missingRequired(fields, value);
+  const wrong = (list: Field[], v: Obj): string[] =>
+    list.flatMap((field) =>
+      field.type === 'group'
+        ? wrong(field.fields, asObj(v[field.key]))
+        : field.type === 'objects' && field.check
+          ? asList<Obj>(v[field.key]).flatMap((item, i) => {
+              const message = field.check!(item);
+              return message ? [`${field.label} ${i + 1} › ${message}`] : [];
+            })
+          : [],
+    );
+  const problems = [missing.length ? `Please fill in: ${missing.join(', ')}` : '', ...wrong(fields, value)].filter(Boolean);
+  return problems.length ? `${problems.join('. ')}.` : undefined;
+}
+
 export function missingRequired(fields: Field[], value: Obj, prefix = ''): string[] {
   const out: string[] = [];
   for (const field of fields) {

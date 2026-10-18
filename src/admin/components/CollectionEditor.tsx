@@ -2,7 +2,7 @@ import { useEffect, useState } from 'react';
 import { addDoc, collection, deleteDoc, doc, getDoc, setDoc, writeBatch } from 'firebase/firestore';
 import { clean, markChanged, same, useCollection, useImageUrl, type WithId } from '../data';
 import { slugify, type CollectionConfig } from '../schemas';
-import { Icon, SchemaForm, missingRequired } from './fields';
+import { Icon, SchemaForm, formProblem } from './fields';
 import { ErrorBox, PageHeader, SITE_URL, Spinner, errorText, useSession, useToast, useUnsavedWarning } from './ui';
 
 type Obj = Record<string, unknown>;
@@ -215,9 +215,9 @@ function ItemEditor({ config, item }: { config: CollectionConfig; item: Item }) 
   useUnsavedWarning(dirty);
 
   const save = async () => {
-    const missing = missingRequired(config.schema, draft);
-    if (missing.length) {
-      toast('error', `Please fill in: ${missing.join(', ')}`);
+    const problem = formProblem(config.schema, draft);
+    if (problem) {
+      toast('error', problem);
       return;
     }
     setSaving(true);

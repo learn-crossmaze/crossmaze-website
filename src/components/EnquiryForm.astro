@@ -1,5 +1,5 @@
 ---
-import { batchLabel, seatLabels } from '../data/batches';
+import { batchLabel, formatDays, seatLabels, type Batch } from '../data/batches';
 import { branches, shortName } from '../data/branches';
 import { programs } from '../data/programs';
 import { site } from '../data/site';
@@ -12,18 +12,17 @@ interface Props {
 }
 const { branch, id = 'enquiry', askBatch = false } = Astro.props;
 
-// Branch name → program name → that program's batches there, as the form shows them.
+// Branch name → program name → that program's batches there, as the form shows them. Batches that would
+// read the same (one name and time on different days) get their days added.
+const choices = (list: Batch[]) =>
+  list.map((x, _, all) => {
+    const label = batchLabel(x);
+    const days = all.some((y) => y !== x && batchLabel(y) === label) && x.days?.length ? ` (${formatDays(x.days)})` : '';
+    return label + days + (x.seats === 'full' ? ` – ${seatLabels.full.toLowerCase()}` : '');
+  });
 const batchChoices = askBatch
   ? Object.fromEntries(
-      branches.map((b) => [
-        b.name,
-        Object.fromEntries(
-          programs.map((p) => [
-            p.name,
-            (b.batches ?? []).filter((x) => x.program === p.slug).map((x) => batchLabel(x) + (x.seats === 'full' ? ` (${seatLabels.full.toLowerCase()})` : '')),
-          ]),
-        ),
-      ]),
+      branches.map((b) => [b.name, Object.fromEntries(programs.map((p) => [p.name, choices((b.batches ?? []).filter((x) => x.program === p.slug))]))]),
     )
   : undefined;
 ---

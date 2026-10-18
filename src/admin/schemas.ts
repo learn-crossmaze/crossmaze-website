@@ -3,7 +3,7 @@
 import { amenityList, iconChoices } from '../data/amenities';
 import { darkModes, themes, themeModes, weekdays } from '../data/themes';
 import { categories, templates } from '../data/blogOptions';
-import { formatTime, seatLabels } from '../data/batches';
+import { endsAfterStart, formatTime, seatLabels } from '../data/batches';
 
 export interface Option {
   value: string;
@@ -18,7 +18,7 @@ interface Base {
 }
 
 export type Field =
-  | (Base & { type: 'text' | 'email' | 'tel' | 'url'; placeholder?: string })
+  | (Base & { type: 'text' | 'email' | 'tel' | 'url'; placeholder?: string; maxLength?: number })
   | (Base & { type: 'textarea'; rows?: number })
   | (Base & { type: 'number' })
   | (Base & { type: 'date' })
@@ -35,8 +35,17 @@ export type Field =
   | (Base & { type: 'image'; folder: string })
   | (Base & { type: 'images'; folder: string })
   | (Base & { type: 'group'; fields: Field[] })
-  /** `summary` is the field shown on each collapsed item, or a function of the item; `text(key)` gives a field's value as shown. */
-  | (Base & { type: 'objects'; itemLabel: string; fields: Field[]; summary?: string | ((item: Record<string, unknown>, text: (key: string) => string) => string) })
+  /**
+   * `summary` is the field shown on each collapsed item, or a function of the item (`text(key)` gives a
+   * field's value as shown); `check` returns what is wrong with an item, which stops it being saved.
+   */
+  | (Base & {
+      type: 'objects';
+      itemLabel: string;
+      fields: Field[];
+      summary?: string | ((item: Record<string, unknown>, text: (key: string) => string) => string);
+      check?: (item: Record<string, unknown>) => string | undefined;
+    })
   | { type: 'heading'; label: string; help?: string; key?: undefined };
 
 export const iconOptions: Option[] = iconChoices.map((name) => ({ value: name, label: name }));
@@ -233,7 +242,7 @@ export const sectionsSchema: Field[] = [
 
 // ------------------------------------------------------------------- collections
 
-/** The centre head's profile on a branch page. Branch admins edit only this (Centre head page). */
+/** Monday to Sunday, for the days a batch runs. */
 const dayOptions: Option[] = weekdays.map(([value, label]) => ({ value, label: label.slice(0, 3) }));
 
 /** One batch of a program at a branch (src/data/batches.ts), for the branch page's "Programs and timings". */
@@ -244,15 +253,27 @@ export const batchesField: Field = {
   itemLabel: 'Batch',
   help: 'One entry per batch of each program this branch offers. They are shown on the branch page only, earliest first, and parents can pick a batch when they enquire there.',
   summary: (item, text) =>
-    [text('program') || 'Choose a program', text('name'), [item.from, item.to].every(Boolean) ? `${formatTime(String(item.from))} – ${formatTime(String(item.to))}` : '', text('seats')]
+    [
+      text('program') || 'Choose a program',
+      text('name'),
+      item.from && item.to ? `${formatTime(String(item.from))} – ${formatTime(String(item.to))}` : 'needs a start and end time',
+      text('seats'),
+    ]
       .filter(Boolean)
       .join(' · '),
+  check: (item) => (item.from && item.to && !endsAfterStart(item.from, item.to) ? 'Ends at must be after Starts at' : undefined),
   fields: [
     { key: 'program', label: 'Program', type: 'select', optionsFrom: 'programs', required: true },
-    { key: 'name', label: 'Batch name', type: 'text', placeholder: 'Morning', help: 'Leave it empty when the program has just one batch here.' },
+    { key: 'name', label: 'Batch name', type: 'text', placeholder: 'Morning', maxLength: 40, help: 'A short name. Leave it empty when the program has just one batch here.' },
     { key: 'from', label: 'Starts at', type: 'time', required: true },
     { key: 'to', label: 'Ends at', type: 'time', required: true },
-    { key: 'days', label: 'Days', type: 'checkboxes', options: dayOptions },
+    {
+      key: 'days',
+      label: 'Days',
+      type: 'checkboxes',
+      options: dayOptions,
+      help: 'Tick the days for every batch here: once they all have days, the branch page shows the opening days, and Google gets the opening hours too.',
+    },
     {
       key: 'seats',
       label: 'Seats',
@@ -264,6 +285,7 @@ export const batchesField: Field = {
   ],
 };
 
+/** The centre head's profile on a branch page (branch admins edit it, and the batches, on "Your branch"). */
 export const centerHeadFields: Field[] = [
   { key: 'name', label: 'Name', type: 'text' },
   { key: 'photo', label: 'Photo', type: 'image', folder: 'heads', help: 'A square portrait works best.' },

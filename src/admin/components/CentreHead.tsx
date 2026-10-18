@@ -1,11 +1,11 @@
 // Branch admins: the centre head's name, photo and biography on their branch pages, and the branch's
 // timings and batches. Saving changes only `centerHead` and `batches`, which is all the security rules
 // let a branch admin change.
-import { useState } from 'react';
+import { useContext, useMemo, useState } from 'react';
 import { doc, updateDoc } from 'firebase/firestore';
 import { clean, markChanged, same, useDoc, useImageUrl } from '../data';
 import { batchesField, centerHeadFields } from '../schemas';
-import { Icon, SchemaForm } from './fields';
+import { FormContext, Icon, SchemaForm, formProblem } from './fields';
 import { ErrorBox, PageHeader, SITE_URL, Spinner, errorText, useSession, useToast, useUnsavedWarning } from './ui';
 
 type Head = { name: string; photo: string; bio: string[] };
@@ -14,6 +14,7 @@ interface Branch {
   area?: string;
   centerHead?: Partial<Head>;
   batches?: unknown[];
+  programs?: string[];
 }
 
 const headOf = (branch?: Branch): Head => ({
@@ -85,7 +86,19 @@ function CentreHeadEditor({ slug, branch, several }: { slug: string; branch: Bra
   const dirty = !same(draft, stored);
   useUnsavedWarning(dirty);
 
+  // Batches can only be for the programs this branch offers (the site leaves out any others).
+  const form = useContext(FormContext)!;
+  const offered = useMemo(
+    () => ({ ...form, programOptions: form.programOptions.filter((o) => !branch.programs || branch.programs.includes(o.value)) }),
+    [form, branch.programs],
+  );
+
   const save = async () => {
+    const problem = formProblem([batchesField, ...centerHeadFields], draft);
+    if (problem) {
+      toast('error', problem);
+      return;
+    }
     setSaving(true);
     try {
       const { batches, ...head } = clean(draft);
@@ -127,7 +140,9 @@ function CentreHeadEditor({ slug, branch, several }: { slug: string; branch: Bra
       />
       <h2 className="section-title first">Timings and batches</h2>
       <div className="card">
-        <SchemaForm fields={[batchesField]} value={draft} onChange={setDraft} />
+        <FormContext.Provider value={offered}>
+          <SchemaForm fields={[batchesField]} value={draft} onChange={setDraft} />
+        </FormContext.Provider>
       </div>
       <h2 className="section-title">Centre head</h2>
       <div className="card">

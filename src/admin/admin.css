@@ -706,6 +706,8 @@ textarea:focus {
 
 .object {
   width: 100%;
+  /* Long summaries truncate instead of widening the form on phones. */
+  min-width: 0;
   border: 1px solid var(--a-line);
   border-radius: 10px;
   background: #fff;
