@@ -27,6 +27,7 @@ const FIELDS: Record<Submission['type'], [string, string][]> = {
     ['child_age', 'Child age'],
     ['program', 'Program'],
     ['branch', 'Branch'],
+    ['batch', 'Batch'],
     ['message', 'Message'],
   ],
   job_application: [
@@ -51,7 +52,7 @@ const LITMUS_LABEL: Record<string, string> = {
 
 const nameOf = (s: Submission) => s.data.parent_name || s.data.name || '–';
 const whatOf = (s: Submission) =>
-  s.type === 'admission_enquiry' ? [s.data.program, s.data.branch].filter(Boolean).join(' · ') : s.data.position;
+  s.type === 'admission_enquiry' ? [s.data.program, s.data.batch, s.data.branch].filter(Boolean).join(' · ') : s.data.position;
 
 function toCsv(rows: Submission[]) {
   const keys = [...new Set(rows.flatMap((r) => Object.keys(r.data)))];

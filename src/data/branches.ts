@@ -3,7 +3,8 @@
 // A branch's first photo is its cover; the next five fill the gallery.
 import type { ImageMetadata } from 'astro';
 import { amenityList } from './amenities';
-import { branchesContent, hasImage, image, sectionsContent, type BranchContent } from './content';
+import { cleanBatches } from './batches';
+import { branchesContent, hasImage, image, programsContent, sectionsContent, type BranchContent } from './content';
 
 export type Branch = BranchContent;
 
@@ -14,6 +15,8 @@ export const facilities = sectionsContent.facilities;
 export const branches: Branch[] = branchesContent.map((b) => ({
   ...b,
   amenities: b.amenities.filter((key) => key in amenityList),
+  // Only batches of programs the branch offers that are on the website, earliest first.
+  batches: cleanBatches(b.batches).filter((batch) => b.programs.includes(batch.program) && programsContent.some((p) => p.slug === batch.program)),
 }));
 
 export function branchPhotos(slug: string): ImageMetadata[] {

@@ -2,7 +2,7 @@ import { useEffect, useRef, useState } from 'react';
 import { doc, setDoc } from 'firebase/firestore';
 import { clean, markChanged, same, useDoc } from '../data';
 import type { Field } from '../schemas';
-import { Icon, SchemaForm, missingRequired } from './fields';
+import { Icon, SchemaForm, formProblem } from './fields';
 import { ErrorBox, PageHeader, Spinner, errorText, useSession, useToast, useUnsavedWarning } from './ui';
 
 type Obj = Record<string, unknown>;
@@ -27,9 +27,9 @@ export function DocEditor({ path, title, intro, schema }: { path: string; title:
 
   const save = async () => {
     if (!draft) return;
-    const missing = missingRequired(schema, draft);
-    if (missing.length) {
-      toast('error', `Please fill in: ${missing.join(', ')}`);
+    const problem = formProblem(schema, draft);
+    if (problem) {
+      toast('error', problem);
       return;
     }
     setSaving(true);

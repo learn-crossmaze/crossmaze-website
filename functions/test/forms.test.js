@@ -22,6 +22,14 @@ test('accepts a complete admission enquiry and trims values', () => {
   assert.equal('email' in r.data, false);
 });
 
+test('keeps the batch picked on a branch page, and does without one', () => {
+  const r = validateSubmission({ ...enquiry, batch: 'Morning · 9:00 – 11:30 am' });
+  assert.equal(r.ok, true);
+  assert.equal(r.data.batch, 'Morning · 9:00 – 11:30 am');
+  assert.equal('batch' in validateSubmission(enquiry).data, false);
+  assert.deepEqual(validateSubmission({ ...enquiry, batch: 'x'.repeat(121) }).errors, ['Batch is too long']);
+});
+
 test('rejects missing required fields and bad values', () => {
   const r = validateSubmission({ ...enquiry, parent_name: '', phone: 'call me', email: 'nope' });
   assert.equal(r.ok, false);

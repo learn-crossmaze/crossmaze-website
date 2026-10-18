@@ -6,6 +6,7 @@
 //
 // Image fields hold a path relative to src/assets/, e.g. "branches/crossmaze-neotown/01.jpg".
 import type { ImageMetadata } from 'astro';
+import type { Batch } from './batches';
 import type { ThemeSettings } from './themes';
 
 const images = import.meta.glob<{ default: ImageMetadata }>('../assets/**/*.{jpg,jpeg,png,webp,gif,avif}', {
@@ -43,7 +44,6 @@ export interface SiteContent {
   careersEmail: string;
   address: string[];
   addressPincode: string;
-  hours: { preschool: string; daycare: string };
   hero: {
     titleStart: string;
     titleHighlight: string;
@@ -92,7 +92,6 @@ export interface ProgramContent {
   ages: string;
   icon: string;
   color: ToneColor;
-  timing: string;
   headline: string;
   summary: string;
   paragraphs: string[];
@@ -118,6 +117,8 @@ export interface BranchContent {
   capacity?: number;
   amenities: string[];
   programs: string[];
+  /** Each program's batches and timings at this branch (src/data/batches.ts). */
+  batches?: Batch[];
   photos: string[];
 }
 

@@ -27,7 +27,9 @@ X-Crossmaze-Submission-Id: 9fQx2kL…          (same id on every retry)
   "data": {
     "parent_name": "…", "phone": "…", "email": "…",
     "child_name": "…", "child_age": "…",
-    "program": "Nursery", "branch": "Crossmaze – Neotown", "message": "…"
+    "program": "Nursery", "branch": "Crossmaze – Neotown",
+    "batch": "Morning · 9:00 am – 12:30 pm",    // only when picked
+    "message": "…"
   }
 }
 

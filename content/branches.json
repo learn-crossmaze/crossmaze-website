@@ -48,6 +48,48 @@
       "senior-kg",
       "day-care"
     ],
+    "batches": [
+      {
+        "program": "play-group",
+        "name": "",
+        "from": "09:00",
+        "to": "12:30",
+        "days": [],
+        "seats": ""
+      },
+      {
+        "program": "nursery",
+        "name": "",
+        "from": "09:00",
+        "to": "12:30",
+        "days": [],
+        "seats": ""
+      },
+      {
+        "program": "junior-kg",
+        "name": "",
+        "from": "09:00",
+        "to": "12:30",
+        "days": [],
+        "seats": ""
+      },
+      {
+        "program": "senior-kg",
+        "name": "",
+        "from": "09:00",
+        "to": "12:30",
+        "days": [],
+        "seats": ""
+      },
+      {
+        "program": "day-care",
+        "name": "",
+        "from": "09:00",
+        "to": "18:00",
+        "days": [],
+        "seats": ""
+      }
+    ],
     "photos": [
       "branches/crossmaze-the-hub/01.jpg",
       "branches/crossmaze-the-hub/02.jpg",
@@ -106,6 +148,48 @@
       "senior-kg",
       "day-care"
     ],
+    "batches": [
+      {
+        "program": "play-group",
+        "name": "",
+        "from": "09:00",
+        "to": "12:30",
+        "days": [],
+        "seats": ""
+      },
+      {
+        "program": "nursery",
+        "name": "",
+        "from": "09:00",
+        "to": "12:30",
+        "days": [],
+        "seats": ""
+      },
+      {
+        "program": "junior-kg",
+        "name": "",
+        "from": "09:00",
+        "to": "12:30",
+        "days": [],
+        "seats": ""
+      },
+      {
+        "program": "senior-kg",
+        "name": "",
+        "from": "09:00",
+        "to": "12:30",
+        "days": [],
+        "seats": ""
+      },
+      {
+        "program": "day-care",
+        "name": "",
+        "from": "09:00",
+        "to": "18:00",
+        "days": [],
+        "seats": ""
+      }
+    ],
     "photos": [
       "branches/crossmaze-neotown/01.jpg",
       "branches/crossmaze-neotown/02.jpg",
@@ -162,6 +246,48 @@
       "junior-kg",
       "senior-kg",
       "day-care"
+    ],
+    "batches": [
+      {
+        "program": "play-group",
+        "name": "",
+        "from": "09:00",
+        "to": "12:30",
+        "days": [],
+        "seats": ""
+      },
+      {
+        "program": "nursery",
+        "name": "",
+        "from": "09:00",
+        "to": "12:30",
+        "days": [],
+        "seats": ""
+      },
+      {
+        "program": "junior-kg",
+        "name": "",
+        "from": "09:00",
+        "to": "12:30",
+        "days": [],
+        "seats": ""
+      },
+      {
+        "program": "senior-kg",
+        "name": "",
+        "from": "09:00",
+        "to": "12:30",
+        "days": [],
+        "seats": ""
+      },
+      {
+        "program": "day-care",
+        "name": "",
+        "from": "09:00",
+        "to": "18:00",
+        "days": [],
+        "seats": ""
+      }
     ],
     "photos": [
       "branches/crossmaze-snn-greenbay/01.jpg",
@@ -221,6 +347,48 @@
       "senior-kg",
       "day-care"
     ],
+    "batches": [
+      {
+        "program": "play-group",
+        "name": "",
+        "from": "09:00",
+        "to": "12:30",
+        "days": [],
+        "seats": ""
+      },
+      {
+        "program": "nursery",
+        "name": "",
+        "from": "09:00",
+        "to": "12:30",
+        "days": [],
+        "seats": ""
+      },
+      {
+        "program": "junior-kg",
+        "name": "",
+        "from": "09:00",
+        "to": "12:30",
+        "days": [],
+        "seats": ""
+      },
+      {
+        "program": "senior-kg",
+        "name": "",
+        "from": "09:00",
+        "to": "12:30",
+        "days": [],
+        "seats": ""
+      },
+      {
+        "program": "day-care",
+        "name": "",
+        "from": "09:00",
+        "to": "18:00",
+        "days": [],
+        "seats": ""
+      }
+    ],
     "photos": [
       "branches/crossmaze-neeladri/01.jpg",
       "branches/crossmaze-neeladri/02.jpg",
@@ -277,6 +445,48 @@
       "junior-kg",
       "senior-kg",
       "day-care"
+    ],
+    "batches": [
+      {
+        "program": "play-group",
+        "name": "",
+        "from": "09:00",
+        "to": "12:30",
+        "days": [],
+        "seats": ""
+      },
+      {
+        "program": "nursery",
+        "name": "",
+        "from": "09:00",
+        "to": "12:30",
+        "days": [],
+        "seats": ""
+      },
+      {
+        "program": "junior-kg",
+        "name": "",
+        "from": "09:00",
+        "to": "12:30",
+        "days": [],
+        "seats": ""
+      },
+      {
+        "program": "senior-kg",
+        "name": "",
+        "from": "09:00",
+        "to": "12:30",
+        "days": [],
+        "seats": ""
+      },
+      {
+        "program": "day-care",
+        "name": "",
+        "from": "09:00",
+        "to": "18:00",
+        "days": [],
+        "seats": ""
+      }
     ],
     "photos": [
       "branches/crossmaze-ananth-nagar/01.jpg",

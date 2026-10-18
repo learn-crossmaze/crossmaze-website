@@ -706,6 +706,8 @@ textarea:focus {
 
 .object {
   width: 100%;
+  /* Long summaries truncate instead of widening the form on phones. */
+  min-width: 0;
   border: 1px solid var(--a-line);
   border-radius: 10px;
   background: #fff;
@@ -738,6 +740,22 @@ textarea:focus {
   overflow: hidden;
   text-overflow: ellipsis;
   white-space: nowrap;
+}
+
+/* An item that can't be saved yet says why in its row (fields.tsx, ObjectsField), wrapping so the
+   reason is never cut off. */
+.object.needs-attention {
+  border-color: var(--a-red);
+}
+
+.object.needs-attention .object-toggle span:last-child {
+  white-space: normal;
+}
+
+.object-problem {
+  color: var(--a-red);
+  font-style: normal;
+  font-weight: 600;
 }
 
 .object-body {
@@ -924,6 +942,16 @@ textarea:focus {
 }
 
 @media (max-width: 600px) {
+  /* Nested boxes give back their padding, and item summaries wrap instead of being cut off. */
+  .card {
+    padding: 14px;
+  }
+  .group {
+    padding: 10px;
+  }
+  .object-toggle span:last-child {
+    white-space: normal;
+  }
   .list-row .row-actions,
   .images-item .row-actions {
     flex-direction: column;

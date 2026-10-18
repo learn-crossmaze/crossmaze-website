@@ -37,7 +37,7 @@ const NAV: { href: string; icon: string; label: string; roles?: Role[] }[] = [
   { href: '#/jobs', icon: 'Briefcase', label: 'Jobs' },
   { href: '#/testimonials', icon: 'Quote', label: 'Testimonials' },
   { href: '#/posts', icon: 'Newspaper', label: 'Blog', roles: BOTH },
-  { href: '#/centre', icon: 'UserRound', label: 'Centre head', roles: ['branch'] },
+  { href: '#/centre', icon: 'Building', label: 'Your branch', roles: ['branch'] },
   { href: '#/sections', icon: 'LayoutList', label: 'Page sections' },
   { href: '#/submissions', icon: 'Inbox', label: 'Submissions' },
   { href: '#/calls', icon: 'Phone', label: 'Calls' },
@@ -96,7 +96,7 @@ function Centered({ children }: { children: React.ReactNode }) {
 
 /**
  * Checks that the signed-in person has a verified email that is on the admin list, or on the
- * branch admin list (blog posts and their centre head only).
+ * branch admin list (blog posts, and their branches' centre head and timings only).
  */
 function Gate({ services, user }: { services: FirebaseServices; user: User }) {
   const [state, setState] = useState<'checking' | Role | 'denied' | 'unverified'>('checking');
@@ -184,12 +184,12 @@ function Gate({ services, user }: { services: FirebaseServices; user: User }) {
 /** Shared data for the editors: Firebase services and the program list for "programs offered". */
 function FormProvider({ children }: { children: ReactNode }) {
   const { services, role } = useSession();
-  // Only the branch editor uses the program list, and branch admins can't read it.
-  const programs = useCollection<{ slug?: string; name?: string }>(services.db, role === 'admin' ? 'programs' : null);
+  // For "programs offered" on branches and each batch's program (branch admins may read the list too).
+  const programs = useCollection<{ slug?: string; name?: string; hidden?: boolean }>(services.db, role ? 'programs' : null);
   const value = useMemo(
     () => ({
       services,
-      programOptions: programs.items.map((p) => ({ value: String(p.slug ?? p.id), label: String(p.name ?? p.id) })),
+      programOptions: programs.items.map((p) => ({ value: String(p.slug ?? p.id), label: String(p.name ?? p.id), hidden: p.hidden === true })),
     }),
     [services, programs.items],
   );
@@ -227,7 +227,7 @@ function Shell() {
 
   const page = (() => {
     if (role === 'branch' && !nav.some((n) => n.href === `#/${section}`))
-      return <ErrorBox>Branch admins can write blog posts and update their centre head. Ask an admin for anything else.</ErrorBox>;
+      return <ErrorBox>Branch admins can write blog posts and update their branch’s timings and centre head. Ask an admin for anything else.</ErrorBox>;
     switch (section) {
       case '':
         return <Dashboard />;
@@ -264,7 +264,7 @@ function Shell() {
       case 'admins':
         return <AdminsPage />;
       case 'centre':
-        return role === 'branch' ? <CentreHeadPage id={id} /> : <ErrorBox>Full admins edit centre heads under Branches.</ErrorBox>;
+        return role === 'branch' ? <CentreHeadPage id={id} /> : <ErrorBox>Full admins edit timings and centre heads under Branches.</ErrorBox>;
       default:
         return <ErrorBox>Page not found.</ErrorBox>;
     }

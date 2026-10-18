@@ -1,10 +1,11 @@
-// Branch admins: the centre head's name, photo and biography on their branch pages. Saving
-// changes only `centerHead`, which is all the security rules let a branch admin change.
-import { useState } from 'react';
+// Branch admins: the centre head's name, photo and biography on their branch pages, and the branch's
+// timings and batches. Saving changes only `centerHead` and `batches`, which is all the security rules
+// let a branch admin change, and only the parts edited here, so it never undoes someone else's save.
+import { useEffect, useState } from 'react';
 import { doc, updateDoc } from 'firebase/firestore';
 import { clean, markChanged, same, useDoc, useImageUrl } from '../data';
-import { centerHeadFields } from '../schemas';
-import { Icon, SchemaForm } from './fields';
+import { batchesField, centerHeadFields } from '../schemas';
+import { Icon, SchemaForm, formProblem } from './fields';
 import { ErrorBox, PageHeader, SITE_URL, Spinner, errorText, useSession, useToast, useUnsavedWarning } from './ui';
 
 type Head = { name: string; photo: string; bio: string[] };
@@ -12,6 +13,8 @@ interface Branch {
   name?: string;
   area?: string;
   centerHead?: Partial<Head>;
+  batches?: unknown[];
+  programs?: string[];
 }
 
 const headOf = (branch?: Branch): Head => ({
@@ -34,7 +37,7 @@ function BranchChooser() {
   const { branches } = useSession();
   return (
     <>
-      <PageHeader title="Centre heads" intro="The centre head’s profile on each of your branch pages." />
+      <PageHeader title="Your branches" intro="The centre head’s profile and the timings and batches on each of your branch pages." />
       <ul className="item-list">
         {branches.map((slug) => (
           <BranchRow key={slug} slug={slug} />
@@ -77,17 +80,41 @@ function CentreHeadLoader({ slug, several }: { slug: string; several: boolean })
 function CentreHeadEditor({ slug, branch, several }: { slug: string; branch: Branch; several: boolean }) {
   const { services, email } = useSession();
   const toast = useToast();
-  const stored = headOf(branch);
+  const stored = { ...headOf(branch), batches: Array.isArray(branch.batches) ? branch.batches : [] };
+  // `base`: the saved copy the draft started from, to tell what was edited here.
+  const [base, setBase] = useState<Record<string, unknown>>(stored);
   const [draft, setDraft] = useState<Record<string, unknown>>(stored);
   const [saving, setSaving] = useState(false);
-  const dirty = !same(draft, stored);
+  const dirty = !same(draft, base);
   useUnsavedWarning(dirty);
+  // Pick up other people's saves while nothing here is being edited.
+  const live = JSON.stringify(stored);
+  useEffect(() => {
+    if (!dirty) {
+      setBase(stored);
+      setDraft(stored);
+    }
+  }, [live, dirty]);
 
   const save = async () => {
+    const problem = formProblem([batchesField, ...centerHeadFields], draft);
+    if (problem) {
+      toast('error', problem);
+      return;
+    }
     setSaving(true);
     try {
-      const { name, photo, bio } = headOf({ centerHead: clean(draft) });
-      await updateDoc(doc(services.db, 'branches', slug), { centerHead: { name: name.trim(), photo, bio } });
+      const { batches, ...head } = clean(draft);
+      const edited = headOf({ centerHead: head });
+      const written = { ...edited, name: edited.name.trim() };
+      const before = headOf({ centerHead: base });
+      const changes: Record<string, unknown> = {};
+      if (!same(draft.batches, base.batches)) changes.batches = Array.isArray(batches) ? batches : [];
+      // The rules want `centerHead` to be exactly a name, photo and biography: write it whole until it is.
+      if (!same(branch.centerHead, headOf(branch))) changes.centerHead = written;
+      else for (const key of ['name', 'photo', 'bio'] as const) if (!same(edited[key], before[key])) changes[`centerHead.${key}`] = written[key];
+      if (Object.keys(changes).length) await updateDoc(doc(services.db, 'branches', slug), changes);
+      setBase(draft);
       await markChanged(services.db, email);
       toast('ok', 'Saved. Press Publish when you’re ready to update the website.');
     } catch (e) {
@@ -102,15 +129,15 @@ function CentreHeadEditor({ slug, branch, several }: { slug: string; branch: Bra
   return (
     <>
       <PageHeader
-        title={branch.name ? `Centre head, ${branch.name.replace(/^Crossmaze\s*[–-]?\s*/i, '')}` : 'Centre head'}
-        back={several ? { href: '#/centre', label: 'Centre heads' } : undefined}
+        title={branch.name ? branch.name.replace(/^Crossmaze\s*[–-]?\s*/i, '') : 'Your branch'}
+        back={several ? { href: '#/centre', label: 'Your branches' } : undefined}
         intro={
           <>
             Shown on the branch page,{' '}
             <a href={pageUrl} target="_blank" rel="noopener">
               {pageUrl.replace(/^https?:\/\//, '')} <Icon name="ExternalLink" size={14} />
             </a>
-            . Leave the name empty to hide this part of the page.
+            . Leave the centre head’s name empty to hide that part of the page.
           </>
         }
         actions={
@@ -119,13 +146,25 @@ function CentreHeadEditor({ slug, branch, several }: { slug: string; branch: Bra
           </button>
         }
       />
+      <h2 className="section-title first">Timings and batches</h2>
+      <div className="card">
+        {/* The branch's programs, so each batch's program can only be one the branch offers. */}
+        <SchemaForm fields={[batchesField]} value={draft} onChange={setDraft} root={{ ...draft, programs: branch.programs }} />
+      </div>
+      <h2 className="section-title">Centre head</h2>
       <div className="card">
         <SchemaForm fields={centerHeadFields} value={draft} onChange={setDraft} />
       </div>
       {dirty && (
         <div className="savebar">
           <span>You have unsaved changes.</span>
-          <button className="btn btn-light" onClick={() => setDraft(stored)}>
+          <button
+            className="btn btn-light"
+            onClick={() => {
+              setBase(stored);
+              setDraft(stored);
+            }}
+          >
             Discard
           </button>
           <button className="btn" disabled={saving} onClick={save}>

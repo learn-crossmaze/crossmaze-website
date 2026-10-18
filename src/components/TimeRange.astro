@@ -1,0 +1,14 @@
+---
+// A time range, "9:00 am – 12:30 pm", that only ever breaks after its dash, with <time> elements
+// carrying the 24-hour times (src/data/batches.ts).
+import { rangeParts } from '../data/batches';
+
+interface Props {
+  from: string;
+  to: string;
+}
+const { from, to } = Astro.props;
+const [start, end] = rangeParts(from, to).map((t) => t.replace(' ', ' '));
+---
+
+<span class="time-range"><time datetime={from}>{start}</time>&nbsp;– <time datetime={to}>{end}</time></span>

@@ -37,8 +37,30 @@ function move<T>(list: T[], from: number, to: number): T[] {
   return copy;
 }
 
-export function SchemaForm({ fields, value, onChange }: { fields: Field[]; value: Obj; onChange: (v: Obj) => void }) {
-  return (
+/** The whole document being edited, for fields that depend on another field (a batch's program on the branch's `programs`). */
+const RootContext = createContext<Obj | null>(null);
+
+/**
+ * A select's choices. A value that is no longer offered stays listed, marked with why, so it isn't shown
+ * as unchosen. `short`: the brief mark for a collapsed item's summary.
+ */
+function selectOptions(field: Extract<Field, { type: 'select' }>, value: string, root: Obj | null, programOptions: Option[], short = false): Option[] {
+  let options = field.optionsFrom === 'programs' ? programOptions : (field.options ?? []);
+  const offered = root?.programs;
+  if (field.offeredOnly) options = options.filter((o) => !o.hidden && (!Array.isArray(offered) || offered.includes(o.value)));
+  if (value && !options.some((o) => o.value === value)) {
+    const known = programOptions.find((o) => o.value === value);
+    const hidden = known?.hidden && (!Array.isArray(offered) || offered.includes(value));
+    const why = hidden ? 'hidden on the website' : short ? 'not offered here' : 'not offered here, so not shown on the website';
+    options = [...options, { value, label: `${known?.label ?? value} (${why})` }];
+  }
+  return options;
+}
+
+/** `root`: the document the form belongs to, when it holds more than `value` (defaults to `value`). */
+export function SchemaForm({ fields, value, onChange, root }: { fields: Field[]; value: Obj; onChange: (v: Obj) => void; root?: Obj }) {
+  const outer = useContext(RootContext);
+  const form = (
     <div className="schema-form">
       {fields.map((field, i) =>
         field.type === 'heading' ? (
@@ -57,6 +79,7 @@ export function SchemaForm({ fields, value, onChange }: { fields: Field[]; value
       )}
     </div>
   );
+  return outer && !root ? form : <RootContext.Provider value={root ?? value}>{form}</RootContext.Provider>;
 }
 
 function Row({ label, help, required, htmlFor, children }: { label: string; help?: string; required?: boolean; htmlFor?: string; children: ReactNode }) {
@@ -93,6 +116,7 @@ function ArrowButtons({ index, count, onMove, onRemove, label }: { index: number
 export function FieldEditor({ field, value, onChange }: { field: Exclude<Field, { type: 'heading' }>; value: Value; onChange: (v: Value) => void }) {
   const id = useId();
   const { programOptions } = useForm();
+  const root = useContext(RootContext);
 
   switch (field.type) {
     case 'text':
@@ -101,7 +125,14 @@ export function FieldEditor({ field, value, onChange }: { field: Exclude<Field, 
     case 'url':
       return (
         <Row label={field.label} help={field.help} required={field.required} htmlFor={id}>
-          <input id={id} type={field.type} value={asText(value)} placeholder={field.placeholder} onChange={(e) => onChange(e.target.value)} />
+          <input
+            id={id}
+            type={field.type}
+            value={asText(value)}
+            placeholder={field.placeholder}
+            maxLength={field.maxLength}
+            onChange={(e) => onChange(e.target.value)}
+          />
         </Row>
       );
     case 'textarea':
@@ -125,6 +156,12 @@ export function FieldEditor({ field, value, onChange }: { field: Exclude<Field, 
       return (
         <Row label={field.label} help={field.help} required={field.required} htmlFor={id}>
           <input id={id} type="date" value={asText(value)} onChange={(e) => onChange(e.target.value)} />
+        </Row>
+      );
+    case 'time':
+      return (
+        <Row label={field.label} help={field.help} required={field.required} htmlFor={id}>
+          <input id={id} type="time" step={300} value={asText(value)} onChange={(e) => onChange(e.target.value)} />
         </Row>
       );
     case 'template':
@@ -152,8 +189,8 @@ export function FieldEditor({ field, value, onChange }: { field: Exclude<Field, 
       return (
         <Row label={field.label} help={field.help} required={field.required} htmlFor={id}>
           <select id={id} value={asText(value)} onChange={(e) => onChange(e.target.value)}>
-            <option value="">Choose…</option>
-            {field.options.map((o) => (
+            <option value="">{field.emptyLabel ?? 'Choose…'}</option>
+            {selectOptions(field, asText(value), root, programOptions).map((o) => (
               <option key={o.value} value={o.value}>
                 {o.label}
               </option>
@@ -337,8 +374,23 @@ function TemplateSketch({ id }: { id: string }) {
 
 function ObjectsField({ field, value, onChange }: { field: Extract<Field, { type: 'objects' }>; value: Obj[]; onChange: (v: Value) => void }) {
   const [open, setOpen] = useState<number | null>(null);
+  const { programOptions } = useForm();
+  const root = useContext(RootContext);
+  /** An item's field as the editor shows it: the label of a chosen option rather than its value. */
+  const shown = (item: Obj, key: string) => {
+    const sub = field.fields.find((f) => f.key === key);
+    const v = asText(item[key]);
+    if (sub?.type !== 'select') return v;
+    return selectOptions(sub, v, root, programOptions, true).find((o) => o.value === v)?.label ?? v;
+  };
+  /** What stops an item being saved, so the row can say so before Save is pressed. */
+  const problemOf = (item: Obj) => {
+    const missing = missingRequired(field.fields, item);
+    return missing.length ? `fill in ${missing.join(', ')}` : field.check?.(item);
+  };
   const summaryOf = (item: Obj, i: number) => {
-    const s = field.summary ? asText(item[field.summary]) : '';
+    const s =
+      typeof field.summary === 'function' ? field.summary(item, (key) => shown(item, key)) : field.summary ? asText(item[field.summary]) : '';
     return s ? (s.length > 70 ? `${s.slice(0, 70)}…` : s) : `${field.itemLabel} ${i + 1}`;
   };
   return (
@@ -346,12 +398,15 @@ function ObjectsField({ field, value, onChange }: { field: Extract<Field, { type
       <legend>{field.label}</legend>
       {field.help && <p className="help">{field.help}</p>}
       {value.map((item, i) => (
-        <div className={`object ${open === i ? 'open' : ''}`} key={i}>
+        <div className={`object ${open === i ? 'open' : ''} ${problemOf(item) ? 'needs-attention' : ''}`} key={i}>
           <div className="object-head">
             <button type="button" className="object-toggle" aria-expanded={open === i} onClick={() => setOpen(open === i ? null : i)}>
               <Icon name={open === i ? 'ChevronDown' : 'ChevronRight'} size={16} />
               {typeof item.icon === 'string' && <Icon name={item.icon} size={16} />}
-              <span>{summaryOf(item, i)}</span>
+              <span>
+                {summaryOf(item, i)}
+                {problemOf(item) && <em className="object-problem"> · {problemOf(item)}</em>}
+              </span>
             </button>
             <ArrowButtons
               index={i}
@@ -422,9 +477,17 @@ function useUpload(folder: string) {
   return { upload, busy, error };
 }
 
+/** The newest `value`, for code that runs after an upload and would otherwise change the form as it was when the upload began. */
+function useLatest<T>(value: T) {
+  const ref = useRef(value);
+  ref.current = value;
+  return ref;
+}
+
 function ImageField({ folder, value, onChange }: { folder: string; value: string; onChange: (v: Value) => void }) {
   const input = useRef<HTMLInputElement>(null);
   const { upload, busy, error } = useUpload(folder);
+  const latest = useLatest(onChange);
   return (
     <div className="image-field">
       {value ? <Thumb path={value} /> : <span className="thumb thumb-empty">No image</span>}
@@ -447,7 +510,7 @@ function ImageField({ folder, value, onChange }: { folder: string; value: string
         onChange={async (e) => {
           const [path] = await upload(e.target.files);
           e.target.value = '';
-          if (path) onChange(path);
+          if (path) latest.current(path);
         }}
       />
     </div>
@@ -457,6 +520,7 @@ function ImageField({ folder, value, onChange }: { folder: string; value: string
 function ImagesField({ folder, value, onChange }: { folder: string; value: string[]; onChange: (v: Value) => void }) {
   const input = useRef<HTMLInputElement>(null);
   const { upload, busy, error } = useUpload(folder);
+  const latest = useLatest({ value, onChange });
   return (
     <div className="images-field">
       <div className="images-grid">
@@ -490,11 +554,29 @@ function ImagesField({ folder, value, onChange }: { folder: string; value: strin
         onChange={async (e) => {
           const paths = await upload(e.target.files);
           e.target.value = '';
-          if (paths.length) onChange([...value, ...paths]);
+          if (paths.length) latest.current.onChange([...latest.current.value, ...paths]);
         }}
       />
     </div>
   );
+}
+
+/** What stops a form being saved, as one message: required fields left empty, then items that fail their `check`. */
+export function formProblem(fields: Field[], value: Obj): string | undefined {
+  const missing = missingRequired(fields, value);
+  const wrong = (list: Field[], v: Obj): string[] =>
+    list.flatMap((field) =>
+      field.type === 'group'
+        ? wrong(field.fields, asObj(v[field.key]))
+        : field.type === 'objects' && field.check
+          ? asList<Obj>(v[field.key]).flatMap((item, i) => {
+              const message = field.check!(item);
+              return message ? [`${field.label} ${i + 1} › ${message}`] : [];
+            })
+          : [],
+    );
+  const problems = [missing.length ? `Please fill in: ${missing.join(', ')}` : '', ...wrong(fields, value)].filter(Boolean);
+  return problems.length ? `${problems.join('. ')}.` : undefined;
 }
 
 /** Lists required fields that are still empty. */

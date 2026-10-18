@@ -2,7 +2,7 @@ rules_version = '2';
 
 // Only signed-in admins (verified email listed in /admins) can read or change anything.
 // Branch admins (listed in /branchAdmins) get a small part of it: their own blog posts, the centre
-// head profile of the branches they're given, and the Publish button.
+// head profile and the timings and batches of the branches they're given, and the Publish button.
 // The public website never reads Firestore directly: content is pulled at build time with the
 // Admin SDK, and form submissions arrive through the `submit` Cloud Function.
 service cloud.firestore {
@@ -38,15 +38,19 @@ service cloud.firestore {
     }
     match /branches/{slug} {
       allow read, write: if isAdmin();
-      // A branch admin sees their branch and may change only its centre head.
+      // A branch admin sees their branch and may change only its centre head and its batches.
       allow get: if isBranchAdminFor(slug);
       allow update: if isBranchAdminFor(slug)
-        && onlyChanges(['centerHead'])
+        && onlyChanges(['centerHead', 'batches'])
         && request.resource.data.centerHead is map
-        && request.resource.data.centerHead.keys().hasOnly(['name', 'photo', 'bio']);
+        && request.resource.data.centerHead.keys().hasOnly(['name', 'photo', 'bio'])
+        && (!('batches' in request.resource.data)
+          || (request.resource.data.batches is list && request.resource.data.batches.size() <= 60));
     }
     match /programs/{slug} {
       allow read, write: if isAdmin();
+      // Branch admins pick a program for each batch (the programs are on the website anyway).
+      allow read: if isBranchAdmin();
     }
     match /jobs/{slug} {
       allow read, write: if isAdmin();

@@ -3,10 +3,13 @@
 import { amenityList, iconChoices } from '../data/amenities';
 import { darkModes, themes, themeModes, weekdays } from '../data/themes';
 import { categories, templates } from '../data/blogOptions';
+import { endsAfterStart, formatTime, seatLabels } from '../data/batches';
 
 export interface Option {
   value: string;
   label: string;
+  /** A program hidden from the website. */
+  hidden?: boolean;
 }
 
 interface Base {
@@ -17,21 +20,37 @@ interface Base {
 }
 
 export type Field =
-  | (Base & { type: 'text' | 'email' | 'tel' | 'url'; placeholder?: string })
+  | (Base & { type: 'text' | 'email' | 'tel' | 'url'; placeholder?: string; maxLength?: number })
   | (Base & { type: 'textarea'; rows?: number })
   | (Base & { type: 'number' })
   | (Base & { type: 'date' })
+  /** A time of day, stored as "09:00". */
+  | (Base & { type: 'time' })
   /** The blog post design picker (src/data/blogOptions.ts). */
   | (Base & { type: 'template' })
   | (Base & { type: 'boolean' })
-  | (Base & { type: 'select'; options: Option[] })
+  /**
+   * `emptyLabel` names the empty choice (default "Choose…"); `optionsFrom: 'programs'` lists the programs,
+   * and with `offeredOnly` just those the branch being edited offers (its `programs`) and the website shows.
+   */
+  | (Base & { type: 'select'; options?: Option[]; optionsFrom?: 'programs'; offeredOnly?: boolean; emptyLabel?: string })
   | (Base & { type: 'icon' })
   | (Base & { type: 'checkboxes'; options?: Option[]; optionsFrom?: 'programs' })
   | (Base & { type: 'list'; itemLabel: string; multiline?: boolean })
   | (Base & { type: 'image'; folder: string })
   | (Base & { type: 'images'; folder: string })
   | (Base & { type: 'group'; fields: Field[] })
-  | (Base & { type: 'objects'; itemLabel: string; fields: Field[]; summary?: string })
+  /**
+   * `summary` is the field shown on each collapsed item, or a function of the item (`text(key)` gives a
+   * field's value as shown); `check` returns what is wrong with an item, which stops it being saved.
+   */
+  | (Base & {
+      type: 'objects';
+      itemLabel: string;
+      fields: Field[];
+      summary?: string | ((item: Record<string, unknown>, text: (key: string) => string) => string);
+      check?: (item: Record<string, unknown>) => string | undefined;
+    })
   | { type: 'heading'; label: string; help?: string; key?: undefined };
 
 export const iconOptions: Option[] = iconChoices.map((name) => ({ value: name, label: name }));
@@ -85,15 +104,6 @@ export const siteSchema: Field[] = [
   { key: 'careersEmail', label: 'Careers email', type: 'email' },
   { key: 'address', label: 'Main address', type: 'list', itemLabel: 'Line' },
   { key: 'addressPincode', label: 'Main address PIN code', type: 'text' },
-  {
-    key: 'hours',
-    label: 'Timings',
-    type: 'group',
-    fields: [
-      { key: 'preschool', label: 'Preschool', type: 'text' },
-      { key: 'daycare', label: 'Day care', type: 'text' },
-    ],
-  },
   {
     key: 'social',
     label: 'Social media links',
@@ -237,7 +247,55 @@ export const sectionsSchema: Field[] = [
 
 // ------------------------------------------------------------------- collections
 
-/** The centre head's profile on a branch page. Branch admins edit only this (Centre head page). */
+/** Monday to Sunday, for the days a batch runs. */
+const dayOptions: Option[] = weekdays.map(([value, label]) => ({ value, label: label.slice(0, 3) }));
+
+/** One batch of a program at a branch (src/data/batches.ts), for the branch page's "Programs and timings". */
+export const batchesField: Field = {
+  key: 'batches',
+  label: 'Batches',
+  type: 'objects',
+  itemLabel: 'Batch',
+  help: 'One entry per batch of each program this branch offers. They are shown on the branch page only, earliest first, and parents can pick a batch when they enquire there.',
+  summary: (item, text) =>
+    [
+      text('program') || 'Choose a program',
+      item.from && item.to ? `${formatTime(String(item.from))} – ${formatTime(String(item.to))}` : '',
+      text('name'),
+      text('seats'),
+    ]
+      .filter(Boolean)
+      .join(' · '),
+  check: (item) =>
+    item.from && item.to && !endsAfterStart(item.from, item.to)
+      ? 'Ends at must be after Starts at'
+      : String(item.name ?? '').trim().length > 40
+        ? 'Batch name must be 40 characters or fewer'
+        : undefined,
+  fields: [
+    { key: 'program', label: 'Program', type: 'select', optionsFrom: 'programs', offeredOnly: true, required: true },
+    { key: 'name', label: 'Batch name', type: 'text', placeholder: 'Morning', maxLength: 40, help: 'A short name. Leave it empty when the program has just one batch here.' },
+    { key: 'from', label: 'Starts at', type: 'time', required: true },
+    { key: 'to', label: 'Ends at', type: 'time', required: true },
+    {
+      key: 'days',
+      label: 'Days',
+      type: 'checkboxes',
+      options: dayOptions,
+      help: 'Tick the days for every batch here: once they all have days, the branch page shows the opening days, and Google gets the opening hours too.',
+    },
+    {
+      key: 'seats',
+      label: 'Seats',
+      type: 'select',
+      emptyLabel: 'Don’t show',
+      options: Object.entries(seatLabels).map(([value, label]) => ({ value, label })),
+      help: 'An optional label on the branch page. Keep it up to date, or leave it off.',
+    },
+  ],
+};
+
+/** The centre head's profile on a branch page (branch admins edit it, and the batches, on "Your branch"). */
 export const centerHeadFields: Field[] = [
   { key: 'name', label: 'Name', type: 'text' },
   { key: 'photo', label: 'Photo', type: 'image', folder: 'heads', help: 'A square portrait works best.' },
@@ -265,6 +323,9 @@ export const branchSchema: Field[] = [
   { key: 'amenities', label: 'Amenities', type: 'checkboxes', options: amenityOptions },
   { key: 'programs', label: 'Programs offered', type: 'checkboxes', optionsFrom: 'programs' },
 
+  { type: 'heading', label: 'Timings and batches' },
+  batchesField,
+
   { type: 'heading', label: 'Centre head' },
   { key: 'centerHead', label: '', type: 'group', fields: centerHeadFields },
 ];
@@ -272,7 +333,6 @@ export const branchSchema: Field[] = [
 export const programSchema: Field[] = [
   { key: 'name', label: 'Program name', type: 'text', required: true },
   { key: 'ages', label: 'Age group', type: 'text', required: true, placeholder: '2 – 3 years' },
-  { key: 'timing', label: 'Timing', type: 'text', placeholder: '9:00 am – 12:30 pm' },
   { key: 'icon', label: 'Icon', type: 'icon' },
   { key: 'color', label: 'Colour', type: 'select', options: colorOptions },
   { key: 'photo', label: 'Photo', type: 'image', folder: 'programs', required: true },
@@ -451,6 +511,7 @@ export const collections: Record<CollectionConfig['name'], CollectionConfig> = {
       email: '',
       amenities: Object.keys(amenityList).filter((k) => k !== 'outdoorPlay' && k !== 'transport'),
       programs: [],
+      batches: [],
       photos: [],
       centerHead: { name: '', bio: [], photo: '' },
     }),
@@ -463,7 +524,7 @@ export const collections: Record<CollectionConfig['name'], CollectionConfig> = {
     titleField: 'name',
     subtitleField: 'ages',
     slug: { prefix: '', urlPrefix: '/our-programs#' },
-    blank: () => ({ name: '', ages: '', timing: '', icon: 'Star', color: 'navy', photo: '', photoAlt: '', headline: '', summary: '', paragraphs: [], focusTitle: 'Focus areas', focus: [] }),
+    blank: () => ({ name: '', ages: '', icon: 'Star', color: 'navy', photo: '', photoAlt: '', headline: '', summary: '', paragraphs: [], focusTitle: 'Focus areas', focus: [] }),
   },
   jobs: {
     name: 'jobs',

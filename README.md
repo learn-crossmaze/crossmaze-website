@@ -21,7 +21,7 @@ The URLs match the old site, so existing links and Google results keep working.
 | `/` | Home: hero, stats, about, core values, programs, a day at Crossmaze, day care, facilities, testimonials, branches, how admission works, admission enquiry |
 | `/about` | Who we are, core values, approach, annual-day photos, founders |
 | `/our-programs` | Play Group, Nursery, Junior KG, Senior KG, Day Care, how we teach, a day at Crossmaze, extra-curriculars, FAQs |
-| `/branch` and `/branch/<slug>` | All branches, then one page per branch: photos, facts, amenities, gallery, centre head, map, enquiry form |
+| `/branch` and `/branch/<slug>` | All branches, then one page per branch: photos, facts (including opening hours), programs with their batches and timings, amenities, gallery, centre head, map, enquiry form |
 | `/careers` | Why work with us, open roles, application form with resume upload |
 | `/contact` | Admission enquiry, phone / WhatsApp / email, how admission works, all branch addresses |
 | `/privacy-policy`, `/terms` | Carried over from the old site (`src/pages/*.md`) |
@@ -33,9 +33,9 @@ Go to **www.crossmaze.in/admin** and sign in.
 
 | Section | What you can change |
 | --- | --- |
-| Site settings | Logo, school name, phone, WhatsApp, emails, address, timings, social links, colour theme, home-page banner, numbers strip, about text, quote, photos |
-| Branches | Add, hide, reorder or delete branches; name, address, map, phone, size, capacity, amenities, programs offered, photos (first = cover; the page shows six, and all of them open in a swipeable album), centre head with photo and bio |
-| Programs | Add, hide, reorder; name, age group, timing, icon, colour, photo, description, focus list |
+| Site settings | Logo, school name, phone, WhatsApp, emails, address, social links, colour theme, home-page banner, numbers strip, about text, quote, photos |
+| Branches | Add, hide, reorder or delete branches; name, address, map, phone, size, capacity, amenities, programs offered, timings and batches (see below), photos (first = cover; the page shows six, and all of them open in a swipeable album), centre head with photo and bio |
+| Programs | Add, hide, reorder; name, age group, icon, colour, photo, description, focus list (timings are set per branch) |
 | Jobs | Open positions on the careers page |
 | Testimonials | Parent quotes on the home page |
 | Page sections | Core values, teaching approach, a day at Crossmaze, how admission works, day care highlights, extra-curriculars, facilities (with the photos for the scrolling strip on the home page), careers perks, FAQs |
@@ -64,9 +64,19 @@ A post has an opening paragraph, then **sections** (a heading, text and an optio
 
 New posts start **hidden**. Each hidden post has a private **preview link** (at the top of the post in the admin panel) that shows it after you press **Publish**, so you can check it before anyone else sees it. When it's ready, untick “Hide from website” and press **Publish**. The blog is at /blog, the newest three posts show on the home page, and “Blog” appears in the menu once a post is published.
 
+### Timings and batches
+
+Each branch has its own timings: under **Branches → a branch → Timings and batches**, add one **batch** for each batch of each program the branch runs (two Play Group batches, full-day and half-day Day Care…). A batch has its program, an optional name (“Morning”; leave it empty when the program has only one batch there), start and end time, the days it runs and an optional seats label (“Few seats left” or “Full”; keep it up to date or leave it off).
+
+Timings appear **only on the branch's own page**: under “Programs and timings”, each program shows its batches, earliest first, and the facts at the top show when the branch is open. Until every batch has its days, that is one range from the earliest start to the latest end; once they all have days, it shows the hours for each group of days (“Mon – Fri 9:00 am – 7:00 pm, Sat 9:00 am – 6:00 pm”), and the page tells Google the same opening hours. A batch must end after it starts, and the admin panel won't save half-filled ones; batch programs are limited to the programs the branch offers. When a program runs in more than one batch, the enquiry form on that page asks which batch the parent prefers, and the choice reaches Submissions and LITMUS as `batch`. Other pages (Our Programs, the footer, Contact) don't show timings.
+
+The branches start with the timings the site showed before (9:00 am – 12:30 pm for the preschool programs, 9:00 am – 6:00 pm for day care), without days; replace them with each branch's real batches. A program a branch offers with no batch shows “Call us for timings”.
+
+The batch choice in the enquiry form and branch admins editing timings need the database rules and functions from step 3 below (`npx firebase-tools deploy --only firestore,storage,functions`). Until then, the form still sends enquiries, just without the batch.
+
 ### Branch admins
 
-A **branch admin** gets a small part of the panel: **Blog** and **Centre head**, plus the **Publish** button. They can write, edit, publish and delete their own blog posts (not other people's), and change the centre head's name, photo and biography for the branches ticked for them. They can't see enquiries, calls, LITMUS, the admin list or any other content, and the security rules enforce this, not just the menu.
+A **branch admin** gets a small part of the panel: **Blog** and **Your branch**, plus the **Publish** button. They can write, edit, publish and delete their own blog posts (not other people's), and change the timings and batches and the centre head's name, photo and biography for the branches ticked for them. They can't see enquiries, calls, LITMUS, the admin list or any other content, and the security rules enforce this, not just the menu.
 
 Add one on **Admins → Branch admins**: their email and the branches they look after (none means blog only). They sign in at /admin the same way as other admins. **Branches** on their row changes their branches; they see the change the next time they sign in. Removing a branch admin keeps their posts, and full admins can edit those posts like any other. Full admins see who wrote each post in the Blog list.
 
@@ -184,7 +194,7 @@ X-Crossmaze-Submission-Id: 9fQx2kL…        ← same on retries; use it to igno
   "source": { "site": "www.crossmaze.in", "page": "/branch/crossmaze-neotown" },
   "data": {
     "parent_name": "…", "phone": "…", "email": "…", "child_name": "…", "child_age": "…",
-    "program": "Nursery", "branch": "Crossmaze – Neotown", "message": "…"
+    "program": "Nursery", "branch": "Crossmaze – Neotown", "batch": "Morning · 9:00 am – 12:30 pm", "message": "…"
   }
 }
 ```
@@ -233,7 +243,7 @@ FIREBASE_STORAGE_BUCKET=demo-crossmaze.appspot.com ADMIN_EMAILS=you@example.com 
 
 - [ ] **Branch phone numbers, addresses and map pins** come from the branch records behind the old www.crossmaze.in: The Hub +91 72040 21508, Neotown +91 73380 45201, SNN Greenbay +91 72595 10758, Neeladri Nagar +91 97409 21508 and Ananth Nagar +91 87225 70895. Call each number once to check it reaches the right centre. Neeladri Nagar's address changed from "Malligue Residency, 16th Cross Road" to "128, Gargeshwari, 13th Cross Road", as on the old site.
 - [ ] **Main phone and WhatsApp**: +91 72040 21508 (The Hub's number). It is the WhatsApp number, the number search engines show, and what Call buttons dial if the centre picker can't open (admin panel → Site settings).
-- [ ] **Timings**: preschool 9:00 am – 12:30 pm and day care 9:00 am – 6:00 pm came from public listings, not the old site.
+- [ ] **Timings and batches**: every branch starts with preschool 9:00 am – 12:30 pm and day care 9:00 am – 6:00 pm, which came from public listings, not the old site, and no days. Enter each branch's real batches and days (admin panel → Branches → Timings and batches, or the branch admin under Your branch).
 - [ ] **Founders and founding year** (About page) came from public sources.
 - [ ] **Careers email**: currently `admin@crossmaze.in`.
 - [ ] **Facility photos** on the home page came from the old www.crossmaze.in. CCTV surveillance, Fire safe, Parents’ communication app and Trained caregivers are stock photos from Wix’s free media library, which may only be licensed for use on Wix sites: replace them with your own (admin panel → Page sections → Facilities). The school’s own facility photos on the old site were small (555 px wide), so larger originals will look sharper, especially when opened full screen.

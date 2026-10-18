@@ -157,6 +157,7 @@ const normalize = {
     address: list(b.address),
     amenities: list(b.amenities),
     programs: list(b.programs),
+    batches: list(b.batches),
     photos: list(b.photos),
     capacity: b.capacity ? Number(b.capacity) : undefined,
     centerHead: b.centerHead?.name ? { ...b.centerHead, bio: list(b.centerHead.bio) } : undefined,

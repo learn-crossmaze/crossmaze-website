@@ -870,6 +870,10 @@ main > :is(.hero, .page-hero):first-child {
   gap: 6px;
 }
 
+.field[hidden] {
+  display: none;
+}
+
 .field label {
   font-weight: 700;
   font-size: 0.95rem;

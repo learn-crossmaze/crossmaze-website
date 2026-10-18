@@ -7,7 +7,7 @@ export interface Session {
   services: FirebaseServices;
   user: User;
   email: string;
-  /** "admin": everything. "branch": a branch admin, who writes blog posts and edits the centre head of `branches`. */
+  /** "admin": everything. "branch": a branch admin, who writes blog posts and edits the timings and centre head of `branches`. */
   role: 'admin' | 'branch';
   /** The branches (slugs) a branch admin looks after; empty for full admins. */
   branches: string[];

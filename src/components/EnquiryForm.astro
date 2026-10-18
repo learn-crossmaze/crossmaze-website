@@ -1,4 +1,5 @@
 ---
+import { batchLabel, formatDays, seatLabels, type Batch } from '../data/batches';
 import { branches, shortName } from '../data/branches';
 import { programs } from '../data/programs';
 import { site } from '../data/site';
@@ -6,8 +7,25 @@ import { site } from '../data/site';
 interface Props {
   branch?: string;
   id?: string;
+  /** Ask for a batch when the chosen program runs in more than one at the chosen branch (branch pages). */
+  askBatch?: boolean;
 }
-const { branch, id = 'enquiry' } = Astro.props;
+const { branch, id = 'enquiry', askBatch = false } = Astro.props;
+
+// Branch name → program name → that program's batches there, as the form shows them. Batches that would
+// read the same (one name and time on different days) start with their days, so they differ even when a
+// phone cuts the end of the choice off.
+const choices = (list: Batch[]) =>
+  list.map((x, _, all) => {
+    const label = batchLabel(x);
+    const clash = all.some((y) => y !== x && batchLabel(y) === label) && x.days?.length;
+    return (clash ? `${formatDays(x.days)} · ` : '') + label + (x.seats === 'full' ? ` (${seatLabels.full.toLowerCase()})` : '');
+  });
+const batchChoices = askBatch
+  ? Object.fromEntries(
+      branches.map((b) => [b.name, Object.fromEntries(programs.map((p) => [p.name, choices((b.batches ?? []).filter((x) => x.program === p.slug))]))]),
+    )
+  : undefined;
 ---
 
 <form
@@ -17,6 +35,7 @@ const { branch, id = 'enquiry' } = Astro.props;
   data-subject="Admission enquiry – Crossmaze website"
   data-mailto={site.admissionsEmail}
   data-success="Thank you! Our admissions team will call you soon."
+  data-batches={batchChoices && JSON.stringify(batchChoices)}
   novalidate
 >
   <div class="form-row">
@@ -70,6 +89,18 @@ const { branch, id = 'enquiry' } = Astro.props;
       </select>
     </div>
   </div>
+  {
+    askBatch && (
+      <div class="field" data-batch-field hidden>
+        <label for={`${id}-batch`}>
+          Preferred batch <span class="hint">(optional)</span>
+        </label>
+        <select id={`${id}-batch`} name="batch" disabled>
+          <option value="">Any batch</option>
+        </select>
+      </div>
+    )
+  }
   <div class="field">
     <label for={`${id}-email`}>Email <span class="hint">(optional)</span></label>
     <input id={`${id}-email`} name="email" type="email" autocomplete="email" />
@@ -88,4 +119,28 @@ const { branch, id = 'enquiry' } = Astro.props;
 
 <script>
   import '../scripts/forms';
+
+  // Branch pages: offer the program's batches at the chosen branch once there is more than one to pick
+  // from. While hidden, the batch field is disabled, so nothing is sent.
+  for (const form of document.querySelectorAll<HTMLFormElement>('form[data-batches]')) {
+    const choices = JSON.parse(form.dataset.batches ?? '{}') as Record<string, Record<string, string[]>>;
+    const program = form.elements.namedItem('program') as HTMLSelectElement | null;
+    const branch = form.elements.namedItem('branch') as HTMLSelectElement | null;
+    const field = form.querySelector<HTMLElement>('[data-batch-field]');
+    const batch = field?.querySelector('select');
+    if (!program || !branch || !field || !batch) continue;
+    const update = () => {
+      const list = choices[branch.value]?.[program.value] ?? [];
+      const keep = batch.value;
+      batch.replaceChildren(new Option('Any batch', ''), ...list.map((label) => new Option(label, label)));
+      batch.value = list.includes(keep) ? keep : '';
+      field.hidden = batch.disabled = list.length < 2;
+    };
+    program.addEventListener('change', update);
+    branch.addEventListener('change', update);
+    form.addEventListener('reset', () => setTimeout(update));
+    // After Back or a restored tab the browser puts the chosen program back without a change event.
+    addEventListener('pageshow', update);
+    update();
+  }
 </script>

@@ -99,10 +99,19 @@ test('people can check their own admin entry; only admins manage the list', asyn
   await assertFails(deleteDoc(doc(db, `admins/${ADMIN}`)));
 });
 
-test('branch admins change only their own centre head', async () => {
+test('branch admins change only their own centre head and batches', async () => {
   const db = head().firestore();
   await assertSucceeds(getDoc(doc(db, 'branches/crossmaze-neotown')));
   await assertSucceeds(updateDoc(doc(db, 'branches/crossmaze-neotown'), { centerHead: { name: 'New head', bio: ['Hello'], photo: 'site/uploads/heads/x.jpg' } }));
+  const batch = { program: 'nursery', name: 'Morning', from: '09:00', to: '12:30', days: ['mon', 'tue'], seats: '' };
+  await assertSucceeds(updateDoc(doc(db, 'branches/crossmaze-neotown'), { batches: [batch] }));
+  await assertSucceeds(
+    updateDoc(doc(db, 'branches/crossmaze-neotown'), { centerHead: { name: 'New head', bio: [], photo: '' }, batches: [batch, { ...batch, name: 'Afternoon' }] }),
+  );
+  await assertFails(updateDoc(doc(db, 'branches/crossmaze-neotown'), { batches: 'Morning' }));
+  await assertFails(updateDoc(doc(db, 'branches/crossmaze-neotown'), { batches: Array.from({ length: 61 }, () => batch) }));
+  await assertFails(updateDoc(doc(db, 'branches/crossmaze-neotown'), { batches: [batch], programs: ['nursery'] }));
+  await assertFails(updateDoc(doc(db, 'branches/crossmaze-the-hub'), { batches: [batch] }));
   await assertFails(updateDoc(doc(db, 'branches/crossmaze-neotown'), { phone: '999' }));
   await assertFails(updateDoc(doc(db, 'branches/crossmaze-neotown'), { centerHead: { name: 'X', bio: [], photo: '', extra: 1 } }));
   await assertFails(updateDoc(doc(db, 'branches/crossmaze-neotown'), { centerHead: 'X' }));
@@ -148,9 +157,12 @@ test('branch admins can see publish status and mark a change, and nothing else',
   await assertFails(setDoc(doc(db, 'meta/publish'), { status: 'live' }));
   await assertFails(getDoc(doc(db, 'content/site')));
   await assertFails(setDoc(doc(db, 'content/site'), { name: 'X' }));
-  for (const name of ['programs', 'jobs', 'testimonials', 'submissions', 'calls', 'private', 'admins', 'branchAdmins']) {
+  // The program list is readable, for choosing each batch's program; nothing else is.
+  await assertSucceeds(getDocs(collection(db, 'programs')));
+  for (const name of ['jobs', 'testimonials', 'submissions', 'calls', 'private', 'admins', 'branchAdmins']) {
     await assertFails(getDocs(collection(db, name)));
   }
+  await assertFails(getDocs(collection(headUnverified().firestore(), 'programs')));
   await assertFails(getDoc(doc(db, 'submissions/s1')));
   await assertFails(getDoc(doc(db, 'private/litmus')));
   await assertFails(setDoc(doc(db, 'programs/x'), { name: 'X' }));
