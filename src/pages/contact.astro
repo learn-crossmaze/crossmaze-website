@@ -50,14 +50,10 @@ import { branches, shortName, telHref } from '../data/branches';
             {site.address.map((line, i) => (i === 0 ? <strong>{line}</strong> : <span>{line}</span>))}
           </span>
         </div>
-        <div class="direct tone-sun">
+        <a class="direct tone-sun" href="#branches">
           <span class="icon-badge"><Icon name="Clock" size={24} /></span>
-          <span>
-            <span class="muted">Timings</span>
-            <strong>Preschool {site.hours.preschool}</strong>
-            <strong>Day care {site.hours.daycare}</strong>
-          </span>
-        </div>
+          <span><span class="muted">Timings and batches</span><strong>On each branch’s page</strong></span>
+        </a>
       </aside>
     </div>
   </section>
@@ -78,7 +74,7 @@ import { branches, shortName, telHref } from '../data/branches';
     )
   }
 
-  <section class="section">
+  <section class="section" id="branches">
     <div class="container">
       <h2>Our branches</h2>
       <div class="grid grid--3 branch-list">

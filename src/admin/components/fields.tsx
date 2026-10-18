@@ -127,6 +127,12 @@ export function FieldEditor({ field, value, onChange }: { field: Exclude<Field, 
           <input id={id} type="date" value={asText(value)} onChange={(e) => onChange(e.target.value)} />
         </Row>
       );
+    case 'time':
+      return (
+        <Row label={field.label} help={field.help} required={field.required} htmlFor={id}>
+          <input id={id} type="time" step={300} value={asText(value)} onChange={(e) => onChange(e.target.value)} />
+        </Row>
+      );
     case 'template':
       return (
         <Row label={field.label} help={field.help} required={field.required}>
@@ -152,8 +158,8 @@ export function FieldEditor({ field, value, onChange }: { field: Exclude<Field, 
       return (
         <Row label={field.label} help={field.help} required={field.required} htmlFor={id}>
           <select id={id} value={asText(value)} onChange={(e) => onChange(e.target.value)}>
-            <option value="">Choose…</option>
-            {field.options.map((o) => (
+            <option value="">{field.emptyLabel ?? 'Choose…'}</option>
+            {(field.optionsFrom === 'programs' ? programOptions : (field.options ?? [])).map((o) => (
               <option key={o.value} value={o.value}>
                 {o.label}
               </option>
@@ -337,8 +343,17 @@ function TemplateSketch({ id }: { id: string }) {
 
 function ObjectsField({ field, value, onChange }: { field: Extract<Field, { type: 'objects' }>; value: Obj[]; onChange: (v: Value) => void }) {
   const [open, setOpen] = useState<number | null>(null);
+  const { programOptions } = useForm();
+  /** An item's field as the editor shows it: the label of a chosen option rather than its value. */
+  const shown = (item: Obj, key: string) => {
+    const sub = field.fields.find((f) => f.key === key);
+    const v = asText(item[key]);
+    if (sub?.type !== 'select') return v;
+    return (sub.optionsFrom === 'programs' ? programOptions : (sub.options ?? [])).find((o) => o.value === v)?.label ?? v;
+  };
   const summaryOf = (item: Obj, i: number) => {
-    const s = field.summary ? asText(item[field.summary]) : '';
+    const s =
+      typeof field.summary === 'function' ? field.summary(item, (key) => shown(item, key)) : field.summary ? asText(item[field.summary]) : '';
     return s ? (s.length > 70 ? `${s.slice(0, 70)}…` : s) : `${field.itemLabel} ${i + 1}`;
   };
   return (

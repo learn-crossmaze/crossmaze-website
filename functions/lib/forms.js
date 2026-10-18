@@ -14,6 +14,8 @@ export const FORMS = {
       child_age: { label: 'Child age', required: true, max: 60 },
       program: { label: 'Program', required: true, max: 120 },
       branch: { label: 'Branch', required: true, max: 120 },
+      // Asked on branch pages when the program runs in more than one batch there.
+      batch: { label: 'Batch', max: 120 },
       message: { label: 'Message', max: 3000 },
     },
   },

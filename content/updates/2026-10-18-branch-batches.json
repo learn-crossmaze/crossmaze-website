@@ -1,0 +1,305 @@
+{
+  "id": "2026-10-18-branch-batches",
+  "description": "Timings and batches for each branch (today's timings to start with), and the timings FAQ points to the branch pages",
+  "changes": [
+    {
+      "doc": "content/sections",
+      "field": "faqs",
+      "from": [
+        {
+          "q": "What age can my child join?",
+          "a": "Play Group is for 2 – 3 years, Nursery for 3 – 4 years, Junior KG for 4 – 5 years and Senior KG for 5 – 6 years. Day care welcomes children from 2 to 8 years."
+        },
+        {
+          "q": "Which curriculum do you follow?",
+          "a": "A Montessori-based, thematic curriculum through our Foundational Development Program. By Senior KG it is aligned with State, CBSE and ICSE board requirements, so children are ready for mainstream school."
+        },
+        {
+          "q": "What are the timings?",
+          "a": "Preschool runs 9:00 am – 12:30 pm. Day care runs 9:00 am – 6:00 pm, so children can move from class straight into day care."
+        },
+        {
+          "q": "Can children from other schools join day care?",
+          "a": "Yes. Day care is open to Crossmaze children and to children from other schools, and we pick them up from a nearby drop point of their school."
+        },
+        {
+          "q": "Can I see my child during the day?",
+          "a": "Yes. Parents get live CCTV access, and the Crossmaze Care parents’ app keeps you updated on your child’s day."
+        },
+        {
+          "q": "Do you provide transport?",
+          "a": "Yes. Our in-house transport runs on set routes within a 5 km radius of each centre. Seats depend on availability, so please check with your nearest centre."
+        },
+        {
+          "q": "How do I apply for admission?",
+          "a": "Send us an enquiry, call us or message us on WhatsApp. Our admissions team will answer your questions and arrange a visit to your nearest centre, where you can meet the centre head and complete the admission."
+        }
+      ],
+      "to": [
+        {
+          "q": "What age can my child join?",
+          "a": "Play Group is for 2 – 3 years, Nursery for 3 – 4 years, Junior KG for 4 – 5 years and Senior KG for 5 – 6 years. Day care welcomes children from 2 to 8 years."
+        },
+        {
+          "q": "Which curriculum do you follow?",
+          "a": "A Montessori-based, thematic curriculum through our Foundational Development Program. By Senior KG it is aligned with State, CBSE and ICSE board requirements, so children are ready for mainstream school."
+        },
+        {
+          "q": "What are the timings?",
+          "a": "Timings differ from branch to branch, and some programs run in more than one batch. You’ll find each branch’s programs, batches and timings on its page, under Branches. Day care follows on after class, so children can move from class straight into day care."
+        },
+        {
+          "q": "Can children from other schools join day care?",
+          "a": "Yes. Day care is open to Crossmaze children and to children from other schools, and we pick them up from a nearby drop point of their school."
+        },
+        {
+          "q": "Can I see my child during the day?",
+          "a": "Yes. Parents get live CCTV access, and the Crossmaze Care parents’ app keeps you updated on your child’s day."
+        },
+        {
+          "q": "Do you provide transport?",
+          "a": "Yes. Our in-house transport runs on set routes within a 5 km radius of each centre. Seats depend on availability, so please check with your nearest centre."
+        },
+        {
+          "q": "How do I apply for admission?",
+          "a": "Send us an enquiry, call us or message us on WhatsApp. Our admissions team will answer your questions and arrange a visit to your nearest centre, where you can meet the centre head and complete the admission."
+        }
+      ]
+    },
+    {
+      "doc": "branches/crossmaze-the-hub",
+      "field": "batches",
+      "from": null,
+      "to": [
+        {
+          "program": "play-group",
+          "name": "",
+          "from": "09:00",
+          "to": "12:30",
+          "days": [],
+          "seats": ""
+        },
+        {
+          "program": "nursery",
+          "name": "",
+          "from": "09:00",
+          "to": "12:30",
+          "days": [],
+          "seats": ""
+        },
+        {
+          "program": "junior-kg",
+          "name": "",
+          "from": "09:00",
+          "to": "12:30",
+          "days": [],
+          "seats": ""
+        },
+        {
+          "program": "senior-kg",
+          "name": "",
+          "from": "09:00",
+          "to": "12:30",
+          "days": [],
+          "seats": ""
+        },
+        {
+          "program": "day-care",
+          "name": "",
+          "from": "09:00",
+          "to": "18:00",
+          "days": [],
+          "seats": ""
+        }
+      ]
+    },
+    {
+      "doc": "branches/crossmaze-neotown",
+      "field": "batches",
+      "from": null,
+      "to": [
+        {
+          "program": "play-group",
+          "name": "",
+          "from": "09:00",
+          "to": "12:30",
+          "days": [],
+          "seats": ""
+        },
+        {
+          "program": "nursery",
+          "name": "",
+          "from": "09:00",
+          "to": "12:30",
+          "days": [],
+          "seats": ""
+        },
+        {
+          "program": "junior-kg",
+          "name": "",
+          "from": "09:00",
+          "to": "12:30",
+          "days": [],
+          "seats": ""
+        },
+        {
+          "program": "senior-kg",
+          "name": "",
+          "from": "09:00",
+          "to": "12:30",
+          "days": [],
+          "seats": ""
+        },
+        {
+          "program": "day-care",
+          "name": "",
+          "from": "09:00",
+          "to": "18:00",
+          "days": [],
+          "seats": ""
+        }
+      ]
+    },
+    {
+      "doc": "branches/crossmaze-snn-greenbay",
+      "field": "batches",
+      "from": null,
+      "to": [
+        {
+          "program": "play-group",
+          "name": "",
+          "from": "09:00",
+          "to": "12:30",
+          "days": [],
+          "seats": ""
+        },
+        {
+          "program": "nursery",
+          "name": "",
+          "from": "09:00",
+          "to": "12:30",
+          "days": [],
+          "seats": ""
+        },
+        {
+          "program": "junior-kg",
+          "name": "",
+          "from": "09:00",
+          "to": "12:30",
+          "days": [],
+          "seats": ""
+        },
+        {
+          "program": "senior-kg",
+          "name": "",
+          "from": "09:00",
+          "to": "12:30",
+          "days": [],
+          "seats": ""
+        },
+        {
+          "program": "day-care",
+          "name": "",
+          "from": "09:00",
+          "to": "18:00",
+          "days": [],
+          "seats": ""
+        }
+      ]
+    },
+    {
+      "doc": "branches/crossmaze-neeladri",
+      "field": "batches",
+      "from": null,
+      "to": [
+        {
+          "program": "play-group",
+          "name": "",
+          "from": "09:00",
+          "to": "12:30",
+          "days": [],
+          "seats": ""
+        },
+        {
+          "program": "nursery",
+          "name": "",
+          "from": "09:00",
+          "to": "12:30",
+          "days": [],
+          "seats": ""
+        },
+        {
+          "program": "junior-kg",
+          "name": "",
+          "from": "09:00",
+          "to": "12:30",
+          "days": [],
+          "seats": ""
+        },
+        {
+          "program": "senior-kg",
+          "name": "",
+          "from": "09:00",
+          "to": "12:30",
+          "days": [],
+          "seats": ""
+        },
+        {
+          "program": "day-care",
+          "name": "",
+          "from": "09:00",
+          "to": "18:00",
+          "days": [],
+          "seats": ""
+        }
+      ]
+    },
+    {
+      "doc": "branches/crossmaze-ananth-nagar",
+      "field": "batches",
+      "from": null,
+      "to": [
+        {
+          "program": "play-group",
+          "name": "",
+          "from": "09:00",
+          "to": "12:30",
+          "days": [],
+          "seats": ""
+        },
+        {
+          "program": "nursery",
+          "name": "",
+          "from": "09:00",
+          "to": "12:30",
+          "days": [],
+          "seats": ""
+        },
+        {
+          "program": "junior-kg",
+          "name": "",
+          "from": "09:00",
+          "to": "12:30",
+          "days": [],
+          "seats": ""
+        },
+        {
+          "program": "senior-kg",
+          "name": "",
+          "from": "09:00",
+          "to": "12:30",
+          "days": [],
+          "seats": ""
+        },
+        {
+          "program": "day-care",
+          "name": "",
+          "from": "09:00",
+          "to": "18:00",
+          "days": [],
+          "seats": ""
+        }
+      ]
+    }
+  ]
+}

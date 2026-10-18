@@ -86,8 +86,8 @@ function useRecentCalls() {
 
 const links = [
   { href: '#/site', icon: 'Settings', title: 'Site settings', text: 'Logo, phone, emails, address, home page text' },
-  { href: '#/branches', icon: 'Building', title: 'Branches', text: 'Addresses, photos, centre heads, amenities' },
-  { href: '#/programs', icon: 'BookMarked', title: 'Programs', text: 'Names, ages, timings, descriptions, photos' },
+  { href: '#/branches', icon: 'Building', title: 'Branches', text: 'Addresses, photos, timings and batches, centre heads, amenities' },
+  { href: '#/programs', icon: 'BookMarked', title: 'Programs', text: 'Names, ages, descriptions, photos' },
   { href: '#/jobs', icon: 'Briefcase', title: 'Jobs', text: 'Open positions on the careers page' },
   { href: '#/testimonials', icon: 'Quote', title: 'Testimonials', text: 'What parents say' },
   { href: '#/posts', icon: 'Newspaper', title: 'Blog', text: 'Write posts in six designs and publish them' },
