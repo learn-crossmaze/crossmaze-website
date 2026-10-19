@@ -35,7 +35,7 @@ Go to **www.crossmaze.in/admin** and sign in.
 | --- | --- |
 | Site settings | Logo, school name, phone, WhatsApp, emails, address, social links, colour theme, home-page banner, numbers strip, about text, quote, photos |
 | Branches | Add, hide, reorder or delete branches; name, address, map, phone, size, capacity, amenities, programs offered, timings and batches (see below), photos (first = cover; the page shows six, and all of them open in a swipeable album), centre head with photo and bio |
-| Programs | Add, hide, reorder; name, age group, icon, colour, photo, description, focus list (timings are set per branch) |
+| Programs | Add, hide, reorder; name, age group, who can join (e.g. “2 years or older on 1 June”), icon, colour, photo, description, focus list (timings are set per branch) |
 | Jobs | Open positions on the careers page |
 | Testimonials | Parent quotes on the home page |
 | Page sections | Core values, teaching approach, a day at Crossmaze, how admission works, day care highlights, extra-curriculars, facilities (with the photos for the scrolling strip on the home page), careers perks, FAQs |

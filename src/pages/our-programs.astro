@@ -301,6 +301,7 @@ const centresFor = (slug: string) => branches.filter((b) => b.programs.includes(
     gap: 10px;
     margin: 0 0 28px;
     padding: 16px 20px;
+    container-type: inline-size;
   }
 
   .program__facts div {
@@ -311,6 +312,7 @@ const centresFor = (slug: string) => branches.filter((b) => b.programs.includes(
 
   .program__facts dt {
     display: flex;
+    align-self: start;
     align-items: center;
     gap: 8px;
     font-weight: 800;
@@ -330,7 +332,8 @@ const centresFor = (slug: string) => branches.filter((b) => b.programs.includes(
     white-space: nowrap;
   }
 
-  @media (max-width: 480px) {
+  /* A narrow card (phones, and the programs whose text sits in the narrower column) puts each value under its label. */
+  @container (max-width: 460px) {
     .program__facts div {
       grid-template-columns: 1fr;
     }
