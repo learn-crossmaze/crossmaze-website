@@ -19,7 +19,7 @@ See README.md for how the site, admin panel and LITMUS integration fit together.
 - Blog posts (`content/posts.json`, admin → Blog) pick one of six designs: `src/components/blog/Template*.astro`, listed in `src/data/blogOptions.ts`. A new design needs a component, an entry there, a case in `PostPage.astro` and a sketch in the admin's `TemplateSketch` (`src/admin/components/fields.tsx`). Hidden posts are drafts, built only at `/blog/preview/<previewKey>`.
 - Timings live on each branch as `batches` (program, name, from/to, days, seats; `src/data/batches.ts`) and are shown only on that branch's page; don't add school-wide timings elsewhere.
 - Branch admins (`branchAdmins/{email}`) may only write their own blog posts (`createdBy`), change `centerHead` and `batches` on their branches and publish. Anything new they should reach needs a rule in `firestore.rules`/`storage.rules`, a test in `tests/rules.test.mjs` and `roles` on its `NAV` entry in `src/admin/AdminApp.tsx`.
-- Don't invent facts about the school (fees, timings, staff, results). Add anything that needs checking to "Please verify before launch" in README.md.
+- Don't invent facts about the school (fees, timings, staff, results). Add anything that needs checking to "Please verify before launch" in README.md; facts the school has confirmed (ages on 1 June, CCTV live view for day care parents only…) are under "Confirmed by the school".
 
 ## Checks
 

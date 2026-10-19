@@ -6,7 +6,11 @@ import SectionHeading from '../components/SectionHeading.astro';
 import Icon from '../components/Icon.astro';
 import Steps from '../components/Steps.astro';
 import { programs, approach, extracurricular } from '../data/programs';
+import { branches, shortName } from '../data/branches';
 import { site, faqs, dayRoutine } from '../data/site';
+
+// Timings live on each branch's page, so each program links to the centres that run it.
+const centresFor = (slug: string) => branches.filter((b) => b.programs.includes(slug));
 
 ---
 
@@ -62,6 +66,34 @@ import { site, faqs, dayRoutine } from '../data/site';
                   </li>
                 ))}
               </ul>
+              {(p.joining || centresFor(p.slug).length > 0) && (
+                <dl class="program__facts card">
+                  {p.joining && (
+                    <div>
+                      <dt>
+                        <Icon name="CalendarCheck" size={18} /> Who can join
+                      </dt>
+                      <dd>{p.joining}</dd>
+                    </div>
+                  )}
+                  {centresFor(p.slug).length > 0 && (
+                    <div>
+                      <dt>
+                        <Icon name="Clock" size={18} /> Timings
+                      </dt>
+                      <dd>
+                        On each centre’s page:{' '}
+                        {centresFor(p.slug).map((b, i) => (
+                          <>
+                            {i > 0 && ', '}
+                            <a href={`/branch/${b.slug}#timings`}>{shortName(b)}</a>
+                          </>
+                        ))}
+                      </dd>
+                    </div>
+                  )}
+                </dl>
+              )}
               <a class="btn" href={`/contact?program=${encodeURIComponent(p.name)}#enquire`}>
                 Enquire about {p.name}
               </a>
@@ -260,7 +292,48 @@ import { site, faqs, dayRoutine } from '../data/site';
   }
 
   .program__body .check-list {
-    margin: 8px 0 28px;
+    margin: 8px 0 24px;
+  }
+
+  /* Who can join and where to find the timings: a small glass card above the enquire button. */
+  .program__facts {
+    display: grid;
+    gap: 10px;
+    margin: 0 0 28px;
+    padding: 16px 20px;
+  }
+
+  .program__facts div {
+    display: grid;
+    grid-template-columns: 9.5em 1fr;
+    gap: 4px 12px;
+  }
+
+  .program__facts dt {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    font-weight: 800;
+  }
+
+  .program__facts dt :global(svg) {
+    flex: none;
+    color: var(--badge-fg, var(--navy));
+  }
+
+  .program__facts dd {
+    margin: 0;
+    color: var(--muted);
+  }
+
+  .program__facts dd a {
+    white-space: nowrap;
+  }
+
+  @media (max-width: 480px) {
+    .program__facts div {
+      grid-template-columns: 1fr;
+    }
   }
 
   .extra {

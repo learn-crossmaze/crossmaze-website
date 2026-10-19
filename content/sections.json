@@ -109,7 +109,7 @@
     {
       "icon": "Cctv",
       "title": "CCTV surveillance",
-      "text": "Live CCTV streams, so parents can see their child in real time.",
+      "text": "CCTV at every centre, with a live view for day care parents.",
       "image": "facilities/cctv-surveillance.jpg"
     },
     {
@@ -186,23 +186,27 @@
   "faqs": [
     {
       "q": "What age can my child join?",
-      "a": "Play Group is for 2 – 3 years, Nursery for 3 – 4 years, Junior KG for 4 – 5 years and Senior KG for 5 – 6 years. Day care welcomes children from 2 to 8 years."
+      "a": "Children join the class that fits their age on 1 June: Play Group from 2 years, Nursery from 3, Junior KG from 4 and Senior KG from 5. Day care welcomes children from 2 to 8 years, with or without a Crossmaze class."
     },
     {
       "q": "Which curriculum do you follow?",
-      "a": "A Montessori-based, thematic curriculum through our Foundational Development Program. By Senior KG it is aligned with State, CBSE and ICSE board requirements, so children are ready for mainstream school."
+      "a": "A Montessori-based, thematic curriculum: our Foundational Development Program, which brings language, numbers, social skills and physical development together in every theme."
     },
     {
       "q": "What are the timings?",
       "a": "Timings differ from branch to branch, and some programs run in more than one batch. You’ll find each branch’s programs, batches and timings on its page, under Branches. Day care follows on after class, so children can move from class straight into day care."
     },
     {
+      "q": "Do children bring their own food?",
+      "a": "Yes. Children bring a packed snack from home, and children in day care bring a packed lunch too."
+    },
+    {
       "q": "Can children from other schools join day care?",
-      "a": "Yes. Day care is open to Crossmaze children and to children from other schools, and we pick them up from a nearby drop point of their school."
+      "a": "Yes. Day care is open to children up to 8 years from other schools. We collect them from the nearest drop point of their school bus."
     },
     {
       "q": "Can I see my child during the day?",
-      "a": "Yes. Parents get live CCTV access, and the Crossmaze Care parents’ app keeps you updated on your child’s day."
+      "a": "The Crossmaze Care parents’ app keeps every parent updated on their child’s day, and day care parents can also watch live on CCTV."
     },
     {
       "q": "Do you provide transport?",

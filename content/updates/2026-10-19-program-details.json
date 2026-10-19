@@ -1,0 +1,355 @@
+{
+  "id": "2026-10-19-program-details",
+  "description": "Program details the school confirmed: who can join each program (age on 1 June), day care options and packed food, Play Group nappies, CCTV live view for day care parents only, Senior KG without board claims",
+  "changes": [
+    {
+      "doc": "content/site",
+      "field": "description",
+      "from": "Crossmaze Preschool and Day Care, Bengaluru: Montessori-based Play Group, Nursery, Junior KG, Senior KG and Day Care at five centres across Electronic City and Begur, with live CCTV, a parents’ app and in-house transport.",
+      "to": "Crossmaze Preschool and Day Care, Bengaluru: Montessori-based Play Group, Nursery, Junior KG, Senior KG and Day Care at five centres across Electronic City and Begur, with CCTV, a parents’ app and in-house transport."
+    },
+    {
+      "doc": "content/sections",
+      "field": "facilities",
+      "from": [
+        {
+          "icon": "Shapes",
+          "title": "Activity-based learning",
+          "text": "A hands-on, Montessori-based approach to learning.",
+          "image": "facilities/activity-based-learning.jpg"
+        },
+        {
+          "icon": "ShieldCheck",
+          "title": "Child-safe infrastructure",
+          "text": "Spaces designed with children’s safety as the top priority.",
+          "image": "facilities/child-safe-infra.jpg"
+        },
+        {
+          "icon": "Building2",
+          "title": "Age-appropriate classes",
+          "text": "Bright classrooms tailored to each age group.",
+          "image": "facilities/age-appropriate-classes.jpg"
+        },
+        {
+          "icon": "Cctv",
+          "title": "CCTV surveillance",
+          "text": "Live CCTV streams, so parents can see their child in real time.",
+          "image": "facilities/cctv-surveillance.jpg"
+        },
+        {
+          "icon": "BedDouble",
+          "title": "Dedicated nap rooms",
+          "text": "Air-conditioned rooms made for little ones’ naps.",
+          "image": "facilities/dedicated-nap-rooms.jpg"
+        },
+        {
+          "icon": "Smartphone",
+          "title": "Parents’ communication app",
+          "text": "Daily updates on the Crossmaze Care parents’ app.",
+          "image": "facilities/parents-communication-app.jpg"
+        },
+        {
+          "icon": "Blocks",
+          "title": "Indoor play area",
+          "text": "Climate-controlled play spaces, comfortable all year round.",
+          "image": "facilities/indoor-play-area.jpg"
+        },
+        {
+          "icon": "GraduationCap",
+          "title": "Expert teachers",
+          "text": "Well-trained, dedicated teachers who put care and safety first.",
+          "image": "facilities/expert-teachers.jpg"
+        },
+        {
+          "icon": "HandHeart",
+          "title": "Trained caregivers",
+          "text": "Watchful, trained staff keep every child safe and comfortable.",
+          "image": "facilities/trained-care-giver.jpg"
+        },
+        {
+          "icon": "Flame",
+          "title": "Fire safe",
+          "text": "Fire safety measures, with the focus on prevention.",
+          "image": "facilities/fire-safe.jpg"
+        },
+        {
+          "icon": "Bus",
+          "title": "In-house transport",
+          "text": "Safe, reliable transport within a 5 km radius.",
+          "image": "facilities/in-house-transport.jpg"
+        },
+        {
+          "icon": "Music",
+          "title": "Extra-curricular activities",
+          "text": "Activities beyond the curriculum for physical well-being and growth.",
+          "image": "facilities/extra-curricular-activities.jpg"
+        }
+      ],
+      "to": [
+        {
+          "icon": "Shapes",
+          "title": "Activity-based learning",
+          "text": "A hands-on, Montessori-based approach to learning.",
+          "image": "facilities/activity-based-learning.jpg"
+        },
+        {
+          "icon": "ShieldCheck",
+          "title": "Child-safe infrastructure",
+          "text": "Spaces designed with children’s safety as the top priority.",
+          "image": "facilities/child-safe-infra.jpg"
+        },
+        {
+          "icon": "Building2",
+          "title": "Age-appropriate classes",
+          "text": "Bright classrooms tailored to each age group.",
+          "image": "facilities/age-appropriate-classes.jpg"
+        },
+        {
+          "icon": "Cctv",
+          "title": "CCTV surveillance",
+          "text": "CCTV at every centre, with a live view for day care parents.",
+          "image": "facilities/cctv-surveillance.jpg"
+        },
+        {
+          "icon": "BedDouble",
+          "title": "Dedicated nap rooms",
+          "text": "Air-conditioned rooms made for little ones’ naps.",
+          "image": "facilities/dedicated-nap-rooms.jpg"
+        },
+        {
+          "icon": "Smartphone",
+          "title": "Parents’ communication app",
+          "text": "Daily updates on the Crossmaze Care parents’ app.",
+          "image": "facilities/parents-communication-app.jpg"
+        },
+        {
+          "icon": "Blocks",
+          "title": "Indoor play area",
+          "text": "Climate-controlled play spaces, comfortable all year round.",
+          "image": "facilities/indoor-play-area.jpg"
+        },
+        {
+          "icon": "GraduationCap",
+          "title": "Expert teachers",
+          "text": "Well-trained, dedicated teachers who put care and safety first.",
+          "image": "facilities/expert-teachers.jpg"
+        },
+        {
+          "icon": "HandHeart",
+          "title": "Trained caregivers",
+          "text": "Watchful, trained staff keep every child safe and comfortable.",
+          "image": "facilities/trained-care-giver.jpg"
+        },
+        {
+          "icon": "Flame",
+          "title": "Fire safe",
+          "text": "Fire safety measures, with the focus on prevention.",
+          "image": "facilities/fire-safe.jpg"
+        },
+        {
+          "icon": "Bus",
+          "title": "In-house transport",
+          "text": "Safe, reliable transport within a 5 km radius.",
+          "image": "facilities/in-house-transport.jpg"
+        },
+        {
+          "icon": "Music",
+          "title": "Extra-curricular activities",
+          "text": "Activities beyond the curriculum for physical well-being and growth.",
+          "image": "facilities/extra-curricular-activities.jpg"
+        }
+      ]
+    },
+    {
+      "doc": "content/sections",
+      "field": "faqs",
+      "from": [
+        {
+          "q": "What age can my child join?",
+          "a": "Play Group is for 2 – 3 years, Nursery for 3 – 4 years, Junior KG for 4 – 5 years and Senior KG for 5 – 6 years. Day care welcomes children from 2 to 8 years."
+        },
+        {
+          "q": "Which curriculum do you follow?",
+          "a": "A Montessori-based, thematic curriculum through our Foundational Development Program. By Senior KG it is aligned with State, CBSE and ICSE board requirements, so children are ready for mainstream school."
+        },
+        {
+          "q": "What are the timings?",
+          "a": "Timings differ from branch to branch, and some programs run in more than one batch. You’ll find each branch’s programs, batches and timings on its page, under Branches. Day care follows on after class, so children can move from class straight into day care."
+        },
+        {
+          "q": "Can children from other schools join day care?",
+          "a": "Yes. Day care is open to Crossmaze children and to children from other schools, and we pick them up from a nearby drop point of their school."
+        },
+        {
+          "q": "Can I see my child during the day?",
+          "a": "Yes. Parents get live CCTV access, and the Crossmaze Care parents’ app keeps you updated on your child’s day."
+        },
+        {
+          "q": "Do you provide transport?",
+          "a": "Yes. Our in-house transport runs on set routes within a 5 km radius of each centre. Seats depend on availability, so please check with your nearest centre."
+        },
+        {
+          "q": "How do I apply for admission?",
+          "a": "Send us an enquiry, call us or message us on WhatsApp. Our admissions team will answer your questions and arrange a visit to your nearest centre, where you can meet the centre head and complete the admission."
+        }
+      ],
+      "to": [
+        {
+          "q": "What age can my child join?",
+          "a": "Children join the class that fits their age on 1 June: Play Group from 2 years, Nursery from 3, Junior KG from 4 and Senior KG from 5. Day care welcomes children from 2 to 8 years, with or without a Crossmaze class."
+        },
+        {
+          "q": "Which curriculum do you follow?",
+          "a": "A Montessori-based, thematic curriculum: our Foundational Development Program, which brings language, numbers, social skills and physical development together in every theme."
+        },
+        {
+          "q": "What are the timings?",
+          "a": "Timings differ from branch to branch, and some programs run in more than one batch. You’ll find each branch’s programs, batches and timings on its page, under Branches. Day care follows on after class, so children can move from class straight into day care."
+        },
+        {
+          "q": "Do children bring their own food?",
+          "a": "Yes. Children bring a packed snack from home, and children in day care bring a packed lunch too."
+        },
+        {
+          "q": "Can children from other schools join day care?",
+          "a": "Yes. Day care is open to children up to 8 years from other schools. We collect them from the nearest drop point of their school bus."
+        },
+        {
+          "q": "Can I see my child during the day?",
+          "a": "The Crossmaze Care parents’ app keeps every parent updated on their child’s day, and day care parents can also watch live on CCTV."
+        },
+        {
+          "q": "Do you provide transport?",
+          "a": "Yes. Our in-house transport runs on set routes within a 5 km radius of each centre. Seats depend on availability, so please check with your nearest centre."
+        },
+        {
+          "q": "How do I apply for admission?",
+          "a": "Send us an enquiry, call us or message us on WhatsApp. Our admissions team will answer your questions and arrange a visit to your nearest centre, where you can meet the centre head and complete the admission."
+        }
+      ]
+    },
+    {
+      "doc": "programs/play-group",
+      "field": "paragraphs",
+      "from": [
+        "Play Group is one of the most delightful ways for your child to begin a journey of discovery. It is a place to learn about the world, make friends and practise essential social skills, and an enriching experience for parents, grandparents and caregivers too.",
+        "Our Play Group sessions support physical development, encourage problem-solving, build communication and nurture positive social interaction, with every moment full of joy. Our qualified staff create a safe space where children aged two and above explore, learn and play together."
+      ],
+      "to": [
+        "Play Group is one of the most delightful ways for your child to begin a journey of discovery. It is a place to learn about the world, make friends and practise essential social skills.",
+        "Our Play Group sessions support physical development, encourage problem-solving, build communication and nurture positive social interaction, with every moment full of joy. Our qualified staff create a safe space where children aged two and above explore, learn and play together.",
+        "Children don’t need to be toilet trained to join: our staff change nappies and help each child with toilet training."
+      ]
+    },
+    {
+      "doc": "programs/play-group",
+      "field": "joining",
+      "from": null,
+      "to": "2 years or older on 1 June"
+    },
+    {
+      "doc": "programs/nursery",
+      "field": "joining",
+      "from": null,
+      "to": "3 years or older on 1 June"
+    },
+    {
+      "doc": "programs/junior-kg",
+      "field": "paragraphs",
+      "from": [
+        "Junior KG is a pivotal year in which we nurture every side of a child’s development. Our curriculum focuses on the key areas that lay the foundation for a bright future: numeracy, literacy, fine motor skills, logical thinking and problem-solving.",
+        "At this age children are refining their language and thinking skills, are eager to explore new languages and are developing a keen sense of numbers. Through engaging group activities, our teachers encourage teamwork, participation, sharing and taking turns."
+      ],
+      "to": [
+        "Junior KG is a pivotal year in which we nurture every side of a child’s development. Our curriculum focuses on the key areas that lay the foundation for a bright future: numeracy, literacy, fine motor skills, logical thinking and problem-solving.",
+        "At this age children are refining their language and thinking skills and developing a keen sense of numbers. Through engaging group activities, our teachers encourage teamwork, participation, sharing and taking turns."
+      ]
+    },
+    {
+      "doc": "programs/junior-kg",
+      "field": "joining",
+      "from": null,
+      "to": "4 years or older on 1 June"
+    },
+    {
+      "doc": "programs/senior-kg",
+      "field": "summary",
+      "from": "A confident, smooth step into primary school, with a curriculum aligned with State, CBSE and ICSE boards.",
+      "to": "A confident, smooth step into primary school, through language, maths, science, music and art."
+    },
+    {
+      "doc": "programs/senior-kg",
+      "field": "paragraphs",
+      "from": [
+        "Between five and six, we prepare your child for a smooth move into big school. A stimulating environment invites them to explore language, mathematics, science, physical activity, music and art, so they grow capable and confident while staying kind and caring.",
+        "Learning goes beyond reading and writing: we place a strong emphasis on thinking skills, communication and problem-solving, with extracurricular activities that let children express themselves. Our curriculum is aligned with State, CBSE and ICSE board requirements, so children join mainstream schools well prepared."
+      ],
+      "to": [
+        "Between five and six, we prepare your child for a smooth move into big school. A stimulating environment invites them to explore language, mathematics, science, physical activity, music and art, so they grow capable and confident while staying kind and caring.",
+        "Learning goes beyond reading and writing: we place a strong emphasis on thinking skills, communication and problem-solving, with extracurricular activities that let children express themselves."
+      ]
+    },
+    {
+      "doc": "programs/senior-kg",
+      "field": "focus",
+      "from": [
+        "Language and mathematics",
+        "Science and discovery",
+        "Music, art and movement",
+        "Aligned with State, CBSE and ICSE boards"
+      ],
+      "to": [
+        "Language and mathematics",
+        "Science and discovery",
+        "Music, art and movement",
+        "Thinking, communication and problem-solving"
+      ]
+    },
+    {
+      "doc": "programs/senior-kg",
+      "field": "joining",
+      "from": null,
+      "to": "5 years or older on 1 June"
+    },
+    {
+      "doc": "programs/day-care",
+      "field": "paragraphs",
+      "from": [
+        "Our Day Care and Activity Centre is a special place where learning takes a fresh, playful and captivating form. Dedicated, trained caregivers keep children safe at all times, so working parents have peace of mind while they are at work.",
+        "Day care is open to Crossmaze children and to children from other schools, with a smooth move from the preschool morning into afternoon activities. Every day, we put your child’s safety, well-being and all-round development first."
+      ],
+      "to": [
+        "Our Day Care and Activity Centre is a special place where learning takes a fresh, playful and captivating form. Dedicated, trained caregivers keep children safe at all times, so working parents have peace of mind while they are at work.",
+        "Day care fits around your family. Children can spend the full day with us, stay on after their morning class, or come for day care alone, without joining a class. Children up to 8 from other schools join us after school: we collect them from the nearest drop point of their school bus.",
+        "Children bring a packed snack and lunch from home. Every day, we put your child’s safety, well-being and all-round development first."
+      ]
+    },
+    {
+      "doc": "programs/day-care",
+      "field": "focus",
+      "from": [
+        "Live CCTV access for parents",
+        "The Crossmaze Care parents’ app",
+        "Air-conditioned rest and indoor play areas",
+        "A clean, professional and welcoming atmosphere",
+        "Visiting instructors for art, craft, dance and more (additional charges may apply)",
+        "Pick-up from the nearby drop point of other schools"
+      ],
+      "to": [
+        "One adult for every six children",
+        "Live CCTV for day care parents",
+        "The Crossmaze Care parents’ app",
+        "An air-conditioned sleeping room and indoor play areas",
+        "A clean, professional and welcoming atmosphere",
+        "Visiting instructors for art, craft, dance and more (additional charges may apply)",
+        "Pick-up from the nearest drop point of other schools’ buses"
+      ]
+    },
+    {
+      "doc": "programs/day-care",
+      "field": "joining",
+      "from": null,
+      "to": "2 to 8 years, with or without a Crossmaze class"
+    }
+  ]
+}
