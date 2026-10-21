@@ -35,7 +35,7 @@ Go to **www.crossmaze.in/admin** and sign in.
 | --- | --- |
 | Site settings | Logo, school name, phone, WhatsApp, emails, address, social links, colour theme, home-page banner, numbers strip, about text, quote, photos |
 | Branches | Add, hide, reorder or delete branches; name, address, map, phone, size, capacity, amenities, programs offered, timings and batches (see below), photos (first = cover; the page shows six, and all of them open in a swipeable album), centre head with photo and bio |
-| Programs | Add, hide, reorder; name, age group, icon, colour, photo, description, focus list (timings are set per branch) |
+| Programs | Add, hide, reorder; name, age group, who can join (e.g. “2 years or older on 1 June”), icon, colour, photo, description, focus list (timings are set per branch) |
 | Jobs | Open positions on the careers page |
 | Testimonials | Parent quotes on the home page |
 | Page sections | Core values, teaching approach, a day at Crossmaze, how admission works, day care highlights, extra-curriculars, facilities (with the photos for the scrolling strip on the home page), careers perks, FAQs |
@@ -68,7 +68,7 @@ New posts start **hidden**. Each hidden post has a private **preview link** (at 
 
 Each branch has its own timings: under **Branches → a branch → Timings and batches**, add one **batch** for each batch of each program the branch runs (two Play Group batches, full-day and half-day Day Care…). A batch has its program, an optional name (“Morning”; leave it empty when the program has only one batch there), start and end time, the days it runs and an optional seats label (“Few seats left” or “Full”; keep it up to date or leave it off).
 
-Timings appear **only on the branch's own page**: under “Programs and timings”, each program shows its batches, earliest first, and the facts at the top show when the branch is open. Until every batch has its days, that is one range from the earliest start to the latest end; once they all have days, it shows the hours for each group of days (“Mon – Fri 9:00 am – 7:00 pm, Sat 9:00 am – 6:00 pm”), and the page tells Google the same opening hours. A batch must end after it starts, and the admin panel won't save half-filled ones; batch programs are limited to the programs the branch offers. When a program runs in more than one batch, the enquiry form on that page asks which batch the parent prefers, and the choice reaches Submissions and LITMUS as `batch`. Other pages (Our Programs, the footer, Contact) don't show timings.
+Timings appear **only on the branch's own page**: under “Programs and timings”, each program shows its batches, earliest first, and the facts at the top show when the branch is open. Until every batch has its days, that is one range from the earliest start to the latest end; once they all have days, it shows the hours for each group of days (“Mon – Fri 9:00 am – 7:00 pm, Sat 9:00 am – 6:00 pm”), and the page tells Google the same opening hours. A batch must end after it starts, and the admin panel won't save half-filled ones; batch programs are limited to the programs the branch offers. When a program runs in more than one batch, the enquiry form on that page asks which batch the parent prefers, and the choice reaches Submissions and LITMUS as `batch`. Other pages (the footer, Contact) don't show timings; on Our Programs, each program links to the pages of the centres that run it (`/branch/<slug>#timings`), next to its **Who can join** line (admin panel → Programs → Who can join, e.g. “2 years or older on 1 June”).
 
 The branches start with the timings the site showed before (9:00 am – 12:30 pm for the preschool programs, 9:00 am – 6:00 pm for day care), without days; replace them with each branch's real batches. A program a branch offers with no batch shows “Call us for timings”.
 
@@ -239,6 +239,17 @@ FIREBASE_STORAGE_BUCKET=demo-crossmaze.appspot.com ADMIN_EMAILS=you@example.com 
 - The admin panel lives in `src/admin/`. Its forms are generated from `src/admin/schemas.ts`, so adding a field there and in `src/data/content.ts` is all it takes.
 - Who can do what is decided by `firestore.rules` and `storage.rules`: full admins are listed in `admins/{email}`, branch admins in `branchAdmins/{email}` (`branches`: the branch slugs whose `centerHead` they may change). Blog posts record their writer in `createdBy`. The panel's menu (`NAV` in `src/admin/AdminApp.tsx`) only hides pages; the rules are what stop a branch admin, so test them with `npm run test:rules`.
 
+## Confirmed by the school
+
+On 19 October 2026 the school confirmed the following, so the site states them. Keep them in line with any later change:
+
+- **Age for each class**: counted on 1 June: Play Group from 2 years, Nursery from 3, Junior KG from 4, Senior KG from 5. Day care is for 2 to 8 years, with or without a Crossmaze class.
+- **Play Group**: children don't need to be toilet trained; staff change nappies and help with toilet training.
+- **Food**: children bring a packed snack from home, and day care children a packed lunch too.
+- **Day care**: a full day, after the morning class, after school for children from other schools (collected from the nearest drop point of their school bus), or on its own without a class. One adult for every six children, for the whole day, at every centre. Air-conditioned sleeping room and indoor play areas.
+- **CCTV and the app**: every centre has CCTV, but the live view is for **day care parents only**. The Crossmaze Care parents' app is for every parent at every centre.
+- **Senior KG**: no claim about school boards (State, CBSE, ICSE).
+
 ## Please verify before launch
 
 - [ ] **Branch phone numbers, addresses and map pins** come from the branch records behind the old www.crossmaze.in: The Hub +91 72040 21508, Neotown +91 73380 45201, SNN Greenbay +91 72595 10758, Neeladri Nagar +91 97409 21508 and Ananth Nagar +91 87225 70895. Call each number once to check it reaches the right centre. Neeladri Nagar's address changed from "Malligue Residency, 16th Cross Road" to "128, Gargeshwari, 13th Cross Road", as on the old site.
@@ -250,4 +261,12 @@ FIREBASE_STORAGE_BUCKET=demo-crossmaze.appspot.com ADMIN_EMAILS=you@example.com 
 - [ ] **Reworded copy** (October 2026): text across the site was rewritten for clarity without changing any facts. The FAQ "How do I apply for admission?" is new.
 - [ ] **A day at Crossmaze** and **How admission works** were written for the new site from what the old site says. Check they match how your centres work (admin panel → Page sections).
 - [ ] **Sample blog posts**: six example posts (one in each design) start as hidden drafts, written from what the site already says plus general parenting tips. Edit and publish the ones you like, and delete the rest (admin panel → Blog).
+- [ ] **Program details still to add** (asked on 19 October 2026; the site leaves them out until the school answers):
+  - What makes the **Foundational Development Program** Crossmaze's own: KLAY, whose Neeladri Road centre is close to Crossmaze Neeladri Nagar, uses the same name for its preschool. Add two or three lines on Our Programs ("How we teach").
+  - **Senior KG**: what children can usually do by the end of the year (reading, writing, numbers), and any help with Class 1 admissions.
+  - **Settling in** (especially Play Group): whether a parent can stay at first, and whether the first days are shorter.
+  - **Languages**: the main language in class, and whether Kannada or Hindi is taught, from which class.
+  - **Progress**: how parents hear how their child is doing (app updates, parent-teacher meetings, report cards).
+  - **Joining mid-year**: which classes take children partway through the year; whether day care can start any time.
+  - **Day care's visiting instructors** (art, craft, dance; "additional charges may apply") and **"qualified staff"** on Play Group: still offered, and do all teachers hold the early-childhood certificate the careers page asks for (NTT, Montessori, ECE or CIDTT)?
 - [ ] **Firebase project ID**: `.firebaserc` and the workflow use `crossmaze-website`. If the console shows a different ID, update both.

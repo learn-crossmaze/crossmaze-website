@@ -333,6 +333,7 @@ export const branchSchema: Field[] = [
 export const programSchema: Field[] = [
   { key: 'name', label: 'Program name', type: 'text', required: true },
   { key: 'ages', label: 'Age group', type: 'text', required: true, placeholder: '2 – 3 years' },
+  { key: 'joining', label: 'Who can join', type: 'text', placeholder: '2 years or older on 1 June', help: 'Shown on Our Programs, next to the timings at each centre.' },
   { key: 'icon', label: 'Icon', type: 'icon' },
   { key: 'color', label: 'Colour', type: 'select', options: colorOptions },
   { key: 'photo', label: 'Photo', type: 'image', folder: 'programs', required: true },
@@ -524,7 +525,7 @@ export const collections: Record<CollectionConfig['name'], CollectionConfig> = {
     titleField: 'name',
     subtitleField: 'ages',
     slug: { prefix: '', urlPrefix: '/our-programs#' },
-    blank: () => ({ name: '', ages: '', icon: 'Star', color: 'navy', photo: '', photoAlt: '', headline: '', summary: '', paragraphs: [], focusTitle: 'Focus areas', focus: [] }),
+    blank: () => ({ name: '', ages: '', joining: '', icon: 'Star', color: 'navy', photo: '', photoAlt: '', headline: '', summary: '', paragraphs: [], focusTitle: 'Focus areas', focus: [] }),
   },
   jobs: {
     name: 'jobs',

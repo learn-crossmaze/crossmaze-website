@@ -90,6 +90,8 @@ export interface ProgramContent {
   slug: string;
   name: string;
   ages: string;
+  /** Who can join, e.g. "2 years or older on 1 June"; shown on Our Programs. */
+  joining?: string;
   icon: string;
   color: ToneColor;
   headline: string;
