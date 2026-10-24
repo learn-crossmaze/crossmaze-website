@@ -29,7 +29,7 @@ The URLs match the old site, so existing links and Google results keep working.
 
 ## Using the admin panel
 
-Go to **www.crossmaze.in/admin** and sign in.
+Go to **www.crossmaze.in/admin** and sign in (until the domain moves, step 6 below: **crossmaze-website.web.app/admin**).
 
 | Section | What you can change |
 | --- | --- |
@@ -175,7 +175,65 @@ Then go to `/admin`, choose **Create an account** with one of the `ADMIN_EMAILS`
 
 ### 6. Point the domain
 
-In the Firebase console go to **Hosting → Add custom domain**, add `www.crossmaze.in` (and `crossmaze.in`), and update the DNS records it shows at your domain registrar. This replaces the old Wix site.
+crossmaze.in is registered at **GoDaddy**, but its DNS (the records saying where the website and the email live) is run by **Wix**: GoDaddy points the domain at Wix's nameservers `ns6.wixdns.net` and `ns7.wixdns.net`. So every change below is made in **Wix → Domains → crossmaze.in → ⋯ (Domain Actions) → Manage DNS records**, not at GoDaddy. The email is on **Zoho** (US data centre, zoho.com) and keeps working as long as its records are left alone: the move only replaces the two records that send the website to Wix.
+
+**`www.crossmaze.in` is the main address**; `crossmaze.in` redirects to it, as it does today. The site, sitemap and LITMUS already use www, so no code changes at the switch. Old Wix addresses that people or search engines know are redirected in `firebase.json` (`/home`, the Wix sitemaps, `/admission`, `/transport`, `/onboarding`, `/onboarding-staff`), and the Google, Bing and Facebook verification tags from the Wix home page are in `BaseLayout.astro`, so those accounts stay verified. The old Wix back-office pages (`/admin/…`, `/feedback/…`, `/documents`, transport requests) are retired and are not carried over.
+
+**Never touch these records** (email, Zoho and LITMUS):
+
+| Name | Type | Value | What it is |
+| --- | --- | --- | --- |
+| crossmaze.in | MX | 10 `mx.zoho.com`, 20 `mx2.zoho.com`, 30 `mx3.zoho.com` | Where email is delivered |
+| crossmaze.in | TXT | `v=spf1 include:zoho.com include:zohomail.com include:sender.zohobooks.com ~all` | Who may send as @crossmaze.in. Must stay the only `v=spf1` record |
+| zoho._domainkey | TXT | `v=DKIM1; k=rsa; p=MIGf…` | Zoho Mail signature key |
+| 1522905413783._domainkey | TXT | `k=rsa; p=MIGf…` | Zoho Books signature key |
+| _dmarc | CNAME | `_dmarc.wixemails.com` | Email policy (set up by Wix) |
+| mail | CNAME | `mail.cs.zohohost.com` | Zoho webmail login (mail.crossmaze.in) |
+| forms | CNAME | `forms.cs.zohohost.com` | Zoho Forms |
+| litmus, staging | CNAME | `litmus-prod-crossmaze.web.app`, `litmus-staging-37942.web.app` | LITMUS |
+| s1/s2/sel1/sel2._domainkey | CNAME | `…ascendbywix.com` | Wix's own email keys; harmless, removed only when leaving Wix |
+| _acme-challenge.staging, _acme-challenge.app | TXT | `TEgQsU…`, `YcFfbe…` | Certificate codes for LITMUS staging and an unfinished app.crossmaze.in. Not the website's: add Firebase's as new rows beside them |
+
+…and anything else Wix lists that isn't the apex A records or the www CNAME.
+
+**How Wix's DNS page works**: records are grouped in sections (**A (Host)**, **CNAME (Aliases)**, **TXT (Text)**…). To add one, click **+ Add Record** in its section. Wix adds `.crossmaze.in` to the **Host Name** by itself, so type only the part before it: Firebase's `_acme-challenge.www.crossmaze.in` becomes `_acme-challenge.www`, and `_acme-challenge.crossmaze.in` becomes `_acme-challenge`. For `crossmaze.in` itself, leave Host Name **empty** (don't type `@`). Paste the value, click **Save**, then **Save Changes** in the pop-up (click **Got it** if Wix shows a notice first). To change a record, hover over it and click **Edit**; to remove one, click **⋯** at its right → **Delete**.
+
+**Before (a week or two ahead)**
+
+1. Screenshot every section of Wix → Manage DNS records, and Zoho Mail Admin (mailadmin.zoho.com) → Domains → crossmaze.in → Email Configuration (MX, SPF, DKIM). The two DKIM keys are too long to copy back from a picture, so also open and save (Ctrl+S) https://dns.google/resolve?name=zoho._domainkey.crossmaze.in&type=TXT (Zoho Mail's key) and https://dns.google/resolve?name=1522905413783._domainkey.crossmaze.in&type=TXT (Zoho Books' key, which Zoho Mail Admin doesn't show); the key is the text in quotes after `"data":`. These are the master copy if a record ever goes missing.
+2. Export what the old Wix site holds (Forms submissions, Contacts, the CMS collections) and the Wix URL Redirect Manager list.
+3. Firebase console → **Authentication → Settings → Authorized domains**: make sure `crossmaze.in` and `www.crossmaze.in` are listed (the admin panel's sign-in only works on listed domains).
+4. Firebase console → **Hosting → Add custom domain** → `www.crossmaze.in` (leave “redirect” unticked) → **Advanced setup**, and choose the **DNS** challenge (not HTTP: the old Wix site can't hold the file that one needs). Then, in Wix's **TXT** section:
+   - the `_acme-challenge.www` record: **+ Add Record**, Host Name `_acme-challenge.www`, Value the code Firebase shows.
+   - an ownership record `hosting-site=crossmaze-website` for `www`: **skip it**. Wix won't take it (“Hostname already in use”) because www holds the CNAME that keeps the old site up; changing that CNAME in step 7 proves ownership instead. Firebase showing www as **Needs setup** until then is expected.
+   - anything Firebase asks for on `crossmaze.in` itself: **+ Add Record** with Host Name empty, as in step 5.
+
+   Don't change or delete the www CNAME now, even if a Wix message suggests removing it: that takes the live site down. Firebase deletes a domain whose ownership stays unproven for 30 days, so do the switch within two weeks of this step; if www has disappeared from Hosting by then, add it again and put its new code in the `_acme-challenge.www` row.
+5. **Add custom domain** → `crossmaze.in`, tick **Redirect to** `www.crossmaze.in` → **Advanced setup** → the **DNS** challenge. Add its two records in Wix's **TXT** section, each as a **new** record:
+   - Host Name **empty**, Value `hosting-site=crossmaze-website` (copy the exact text Firebase shows). It becomes a second row beside the `v=spf1` row. Never edit the `v=spf1` row; if Wix won't save a second TXT with an empty Host Name, stop and ask for help rather than adding the text to the SPF. Keep this row for good: Firebase needs it to renew the certificate.
+   - Host Name `_acme-challenge`, Value the token Firebase shows.
+
+   Half an hour later (Google keeps the old answer for up to 30 minutes), open https://dns.google/resolve?name=crossmaze.in&type=TXT. Next to `"data":` there must be two separate values: the SPF exactly as in the table, and `hosting-site=…`. If `hosting-site` isn't there yet, wait longer and don't add it again. If the `v=spf1` value has gone or changed, put it back in Wix at once (TXT, Host Name empty), exactly as in the table.
+
+   Then press **Verify** in the Firebase wizard (if it can't find the records yet, try again an hour later), and wait (usually a few hours, up to a day) until **crossmaze.in** → **View** has finished **Prepare domain** and moved on to **Direct to Hosting**, which shows the A record for step 6. If it shows a new `_acme-challenge` value instead, **Edit** the `_acme-challenge` row in Wix to the new value and press Verify again. Don't start the switch before this; the domain list won't say **Connected** until after it.
+
+**The switch** (a quiet evening, about 30 minutes)
+
+6. Wix → **A (Host)** → **+ Add Record**: leave **Host Name** empty (Firebase may show `crossmaze.in` or `@`; type neither), Value the IP Firebase shows for crossmaze.in (today `199.36.158.100`), save. Check the new row has the same host as the three Wix A records, then delete the three Wix ones (`185.230.63.107`, `185.230.63.171`, `185.230.63.186`). Nothing goes down: crossmaze.in now redirects to www, which is still the old site.
+7. **CNAME (Aliases)**: hover over the `www` row, click **Edit** and change its value from `cdn3.wixdns.net` to `crossmaze-website.web.app`, then **Save** and **Save Changes**. Edit the row; don't delete it first. Do this even if Firebase's **Direct to Hosting** screen for www asks for an A record (`199.36.158.100`) or a `hosting-site=` TXT on www: the CNAME reaches the same Firebase servers and proves ownership by itself. Leave the `_acme-challenge.www` row where it is. If Wix refuses (“Hostname already in use”), go to Domains → **⋯** next to crossmaze.in → **Unassign from this site** → **Unassign Domain**, then edit the www row again (if the row has gone, **+ Add Record** under CNAME: Host Name `www`, Value `crossmaze-website.web.app`). Wix will then say crossmaze.in isn't connected to a site: leave it like that, because connecting it again sends the website back to Wix. Edit nothing else, and never use “Reset A and CNAME to default values”.
+8. Compare the record list with your screenshots: the MX, SPF, both DKIM keys, `_dmarc`, `mail`, `forms`, `litmus` and `staging` must all still be there, unchanged. Then check tonight's changes, because Wix doesn't say what Unassign does to records: under A only Firebase's IP, under CNAME `www` → `crossmaze-website.web.app`, and under TXT the `hosting-site=…` row. If an email, Zoho or LITMUS record is missing, add it back as in your screenshots before anything else (only what's missing, never a second `v=spf1` row), copying a DKIM key from the page saved in step 1 rather than typing it. If a Wix A record or `cdn3.wixdns.net` has come back, or `hosting-site` is gone, do step 6, 7 or 5 again; never copy those three from the screenshots, which show the old site.
+9. Refresh Firebase → Hosting until both domains say **Connected** (minutes to a couple of hours, at most 24). Until www does, https://www.crossmaze.in may still show the old site, an error page or a “Your connection is not private” warning, on some devices and not others. That is normal while Firebase makes www's certificate, so change nothing. Use the rollback below only if the new site itself is broken, or www still isn't **Connected** 3 hours after step 7.
+
+**After**
+
+10. https://www.crossmaze.in shows the new site with a padlock; http://crossmaze.in, https://crossmaze.in and http://www.crossmaze.in all end there. /home goes to /, /admission to LITMUS.
+11. Sign in again at www.crossmaze.in/admin (sign-ins are kept per address). Send a test enquiry from /contact and check Submissions and LITMUS. On your phone, tap Call on the site and pick a centre (you don't need to make the call), then check the tap appears on the admin's Calls page.
+12. Email: from an outside Gmail, write to admission@, care@ and admin@crossmaze.in and reply from Zoho. In Gmail on a computer, open each **reply that came from Zoho** → **⋮** (next to Reply) → **Show original**: SPF, DKIM and DMARC should say PASS (the message you sent from Gmail only tests Gmail's own records). In Zoho Admin → Email Configuration, press Verify on MX, SPF and DKIM. Check again the next day.
+13. Google Search Console: submit `https://www.crossmaze.in/sitemap-index.xml`. Update the website link on each centre's Google Business Profile, Facebook and Instagram.
+
+**If something goes wrong with the website**: in Wix → Manage DNS records, add back the three A records with Host Name empty, each IP in full (`185.230.63.107`, `185.230.63.171`, `185.230.63.186`), delete the one you added in step 6 (`199.36.158.100`), and edit the www CNAME back to `cdn3.wixdns.net`. If you unassigned the domain in step 7, assign it to the old Wix site again: Domains → **⋯** next to crossmaze.in → **Assign to a site**. The old site returns within about an hour. Email needs no rollback, because none of its records changed. Leave the `hosting-site` and `_acme-challenge` rows; they're harmless and let you try again.
+
+**Later, before cancelling Wix**: Wix hosts the DNS, and so the email records. Don't cancel the Wix plan or use “Remove from Wix” while GoDaddy still points at `wixdns.net`, or email stops. First move the DNS to another host (Cloudflare's free DNS is the simplest) and build the whole zone there before changing anything at GoDaddy: copy **every record Wix lists**, opening each one for its full value (the table above shortens the DKIM keys), and check Cloudflare's own import against Wix's list line by line (it can miss some, such as the Zoho Books key). Leave out only Wix's nameserver (NS) records, the four Wix email keys (s1/s2/sel1/sel2._domainkey) and the `_dmarc` CNAME, which becomes a TXT named `_dmarc` with the value `v=DMARC1; p=none`. The website's records belong in it too: A `crossmaze.in` → `199.36.158.100`, CNAME `www` → `crossmaze-website.web.app`, the `hosting-site=…` TXT and the `_acme-challenge` rows. In Cloudflare set every A and CNAME record to **DNS only** (grey cloud), never Proxied: proxying breaks Firebase and Zoho's `mail` and `forms` addresses. Then change the nameservers at GoDaddy to Cloudflare's, wait 72 hours, check email as in step 12, check Firebase still says Connected and https://litmus.crossmaze.in and https://mail.crossmaze.in open, and only then cancel Wix. Until then keep the Wix plan renewed: Wix doesn't say whether its DNS keeps working after a plan lapses.
 
 ## LITMUS integration
 
@@ -269,4 +327,5 @@ On 19 October 2026 the school confirmed the following, so the site states them. 
   - **Progress**: how parents hear how their child is doing (app updates, parent-teacher meetings, report cards).
   - **Joining mid-year**: which classes take children partway through the year; whether day care can start any time.
   - **Day care's visiting instructors** (art, craft, dance; "additional charges may apply") and **"qualified staff"** on Play Group: still offered, and do all teachers hold the early-childhood certificate the careers page asks for (NTT, Montessori, ECE or CIDTT)?
+- [ ] **Domain move** (step 6 under One-time setup): screenshots of the Wix DNS records and Zoho's email configuration, the Wix data exports, and Authorized domains in Firebase, before the switch. Wix can only be cancelled after the DNS has moved off Wix.
 - [ ] **Firebase project ID**: `.firebaserc` and the workflow use `crossmaze-website`. If the console shows a different ID, update both.
