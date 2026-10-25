@@ -1,0 +1,567 @@
+---
+// "Who we are": the About paragraphs (admin: Site settings → About), the About photo, the numbers and the quote.
+//  - variant="full" (the About page): the heading and first paragraph beside the photo, with the numbers on a
+//    glass panel; the other paragraphs in two columns under hairlines, each with an id to link to; the quote
+//    as a pull quote.
+//  - variant="teaser" (the home page): the first paragraph beside the photo with the quote on glass over its
+//    foot, then the other paragraphs as short links to their place on the About page, and a button there.
+import { Image } from 'astro:assets';
+import SectionHeading from './SectionHeading.astro';
+import Icon from './Icon.astro';
+import { site } from '../data/site';
+import { image } from '../data/content';
+import { blocksOf, type AboutParagraph } from '../data/about';
+
+interface Props {
+  variant?: 'full' | 'teaser';
+  eyebrow?: string;
+  title?: string;
+}
+
+const { variant = 'full', eyebrow = 'Who we are', title = 'Every child is special' } = Astro.props;
+const teaser = variant === 'teaser';
+
+/** A paragraph's first sentence (or its start, cut at a word), for paragraphs without a subheading. */
+const firstSentence = (text: string, max = 120) => {
+  const [block = ''] = blocksOf(text);
+  const flat = block.replace(/\s+/g, ' ');
+  // At least a few words, so "Dr. Rao…" isn't cut at "Dr.".
+  const sentence = (flat.match(/^.{12,}?[.!?…]["'’”)\]]*(?=\s|$)/)?.[0] ?? flat).replace(/[.]$/, '');
+  if (sentence.length <= max) return sentence;
+  return `${sentence.slice(0, max).replace(/\s+\S*$/, '').replace(/[\s,;:–—-]+$/, '')}…`;
+};
+
+const slugify = (s: string) =>
+  s
+    .normalize('NFKD')
+    .replace(/[̀-ͯ]/g, '')
+    .toLowerCase()
+    .replace(/&/g, ' and ')
+    .replace(/['’]/g, '')
+    .replace(/[^\p{L}\p{N}]+/gu, '-')
+    .replace(/^-+|-+$/g, '');
+
+/** Cut a slug to whole words of at most `max` characters. */
+const shorten = (slug: string, max: number) =>
+  slug.length <= max ? slug : slug.slice(0, max + 1).replace(/-[^-]*$/, '') || slug.slice(0, max);
+
+// Each paragraph's anchor on the About page (/about#<id>): its subheading, or the first words of its first
+// sentence, slugified and made unique. The home page's links use the same ids.
+const used = new Set<string>();
+const anchorOf = (p: AboutParagraph, i: number) => {
+  const base =
+    (p.heading ? shorten(slugify(p.heading), 80) : shorten(slugify(firstSentence(p.text).split(/\s+/).slice(0, 6).join(' ')), 60)) ||
+    `about-${i + 1}`;
+  let id = base;
+  for (let n = 2; used.has(id); n++) id = `${base}-${n}`;
+  used.add(id);
+  return id;
+};
+
+const paragraphs = site.about.map((p, i) => ({ ...p, id: anchorOf(p, i), label: p.heading || firstSentence(p.text) }));
+// The first paragraph is the lead beside the photo, the rest flow in two columns below.
+const [intro, ...rest] = paragraphs;
+const introLead = intro && blocksOf(intro.text)[0];
+const statTones = ['navy', 'coral', 'green', 'sky'];
+const blockTones = ['sun', 'green', 'coral', 'sky'];
+---
+
+{
+  teaser ? (
+    <div class="container story story--teaser">
+      <div class="story__intro">
+        <div class="story__lead">
+          <SectionHeading eyebrow={eyebrow} title={title} />
+          {intro && (
+            <>
+              {intro.heading && <h3 class="story__kicker">{intro.heading}</h3>}
+              {/* Only its first block: the rest is on the About page. */}
+              {introLead && <p class="lead">{introLead}</p>}
+            </>
+          )}
+          {rest.length === 0 && (
+            <p class="story__cta">
+              <a class="btn btn--ghost" href="/about">
+                More about Crossmaze
+              </a>
+            </p>
+          )}
+        </div>
+        {/* about__media: the photo fades up as it scrolls into view (scripts/motion.ts). */}
+        <div class="story__media about__media">
+          <Image
+            src={image(site.aboutPhoto.image)}
+            alt={site.aboutPhoto.alt}
+            widths={[400, 555, 720]}
+            sizes="(max-width: 900px) 100vw, 520px"
+          />
+          {site.quote.text && (
+            <blockquote class="story__glass-quote">
+              “{site.quote.text}”
+              {site.quote.author && <cite>{site.quote.author}</cite>}
+            </blockquote>
+          )}
+        </div>
+      </div>
+      {rest.length > 0 && (
+        <ul class="story__links" aria-label="More about Crossmaze">
+          {rest.map((p, i) => (
+            <li class:list={['story__link', `tone-${blockTones[i % blockTones.length]}`]}>
+              <a href={`/about#${p.id}`}>
+                <span>{p.label}</span>
+                <Icon name="ArrowRight" size={18} />
+              </a>
+            </li>
+          ))}
+          <li class="story__more">
+            <a class="btn btn--ghost" href="/about">
+              More about Crossmaze
+            </a>
+          </li>
+        </ul>
+      )}
+    </div>
+  ) : (
+    <div class="container story story--full">
+      <div class="story__intro">
+        <div class="story__lead" id={intro?.id}>
+          <SectionHeading eyebrow={eyebrow} title={title} />
+          {intro && (
+            <>
+              {intro.heading && <h3 class="story__kicker">{intro.heading}</h3>}
+              {blocksOf(intro.text).map((t, i) => (
+                <p class:list={[i === 0 && 'lead']}>{t}</p>
+              ))}
+            </>
+          )}
+        </div>
+        <div class="story__media">
+          <Image src={image(site.aboutPhoto.image)} alt={site.aboutPhoto.alt} widths={[400, 555]} sizes="(max-width: 860px) 100vw, 540px" />
+          <ul class="story__stats" aria-label="Crossmaze in numbers">
+            {site.stats.map((s, i) => (
+              <li class:list={['stat', `tone-${statTones[i % statTones.length]}`]}>
+                <strong data-countup>{s.value}</strong>
+                <span>{s.label}</span>
+              </li>
+            ))}
+          </ul>
+        </div>
+      </div>
+      <div class="story__flow">
+        {rest.map((p, i) => (
+          <div class:list={['story__block', `tone-${blockTones[i % blockTones.length]}`]} id={p.id}>
+            {p.heading && <h3>{p.heading}</h3>}
+            {blocksOf(p.text).map((t) => (
+              <p>{t}</p>
+            ))}
+          </div>
+        ))}
+        {site.quote.text && (
+          <blockquote class="story__quote">
+            <p>{site.quote.text}</p>
+            {site.quote.author && <cite>{site.quote.author}</cite>}
+          </blockquote>
+        )}
+      </div>
+    </div>
+  )
+}
+
+<style>
+  /* "Who we are": the heading and first paragraph as a lead beside the photo (with the numbers on a
+     glass panel over its lower edge), then the other paragraphs in two columns, each under a hairline
+     with a short coloured tab, and the quote as a pull quote that fills the last row. */
+  .story {
+    --story-gap: clamp(32px, 5vw, 72px);
+    --story-rule: color-mix(in srgb, var(--navy) 14%, transparent);
+  }
+
+  .story p {
+    color: var(--muted);
+  }
+
+  .story__intro {
+    display: grid;
+    grid-template-columns: minmax(0, 1.05fr) minmax(0, 0.95fr);
+    gap: var(--story-gap);
+    align-items: center;
+  }
+
+  .story__lead :global(.section-heading) {
+    margin-bottom: 24px;
+  }
+
+  /* The first paragraph's subheading, a step below the title. */
+  .story__kicker {
+    margin-bottom: 0.55em;
+    font-size: clamp(1.2rem, 1.8vw, 1.4rem);
+    color: var(--ink);
+  }
+
+  .story__lead p {
+    max-width: 60ch;
+  }
+
+  .story__lead p:last-child {
+    margin-bottom: 0;
+  }
+
+  .story__lead .lead {
+    line-height: 1.6;
+    color: var(--ink);
+  }
+
+  .story__media {
+    position: relative;
+  }
+
+  .story__media :global(img) {
+    width: 100%;
+    height: auto;
+    aspect-ratio: 4 / 3;
+    object-fit: cover;
+    padding: 6px;
+    border-radius: var(--radius-photo);
+    background: var(--g-ring);
+    box-shadow: var(--shadow);
+  }
+
+  /* The numbers: thick glass over the bottom of the photo. */
+  .story__stats {
+    position: relative;
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    margin: -72px 22px 0;
+    padding: 8px 10px;
+    list-style: none;
+    border: 1px solid var(--glass-edge);
+    border-radius: var(--radius-lg);
+    background: var(--glass-thick);
+    -webkit-backdrop-filter: var(--glass-blur);
+    backdrop-filter: var(--glass-blur);
+    box-shadow: var(--glass-rim), var(--shadow);
+  }
+
+  .stat {
+    display: grid;
+    align-content: start;
+    padding: 14px 16px;
+  }
+
+  .stat:nth-child(2n) {
+    border-left: 1px solid var(--story-rule);
+  }
+
+  .stat:nth-child(n + 3) {
+    border-top: 1px solid var(--story-rule);
+  }
+
+  /* Each number in its tone, deepening towards --contrast-mix (darker by day, lighter at night). */
+  .stat strong {
+    font-family: var(--font-display);
+    font-size: clamp(1.6rem, 2.6vw, 2.1rem);
+    font-weight: 600;
+    line-height: 1.15;
+    white-space: nowrap;
+    background: linear-gradient(
+      135deg,
+      var(--badge-fg) 0%,
+      color-mix(in srgb, var(--badge-fg) 72%, var(--contrast-mix)) 100%
+    );
+    -webkit-background-clip: text;
+    background-clip: text;
+    color: transparent;
+  }
+
+  .stat span {
+    font-weight: 700;
+    font-size: 0.92rem;
+    line-height: 1.35;
+    color: var(--muted);
+  }
+
+  /* The other paragraphs: two columns whose rows line up, so the subheadings make a steady beat. */
+  .story__flow {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: clamp(36px, 4.5vw, 56px) var(--story-gap);
+    margin-top: clamp(56px, 7vw, 96px);
+  }
+
+  .story__block {
+    position: relative;
+    padding-top: 22px;
+    border-top: 1px solid var(--story-rule);
+  }
+
+  .story__block::before,
+  .story__link::before {
+    content: '';
+    position: absolute;
+    top: -2px;
+    left: 0;
+    width: 44px;
+    height: 3px;
+    border-radius: 3px;
+    background: var(--tone);
+  }
+
+  .story__block h3 {
+    margin-bottom: 0.45em;
+    font-size: 1.2rem;
+  }
+
+  .story__block p:last-child {
+    margin-bottom: 0;
+  }
+
+  /* The quote: large words under a soft quote mark. Beside the last paragraph it fills that row;
+     when it would start a row of its own it spans both columns, centred. */
+  .story__quote {
+    align-self: center;
+    margin: 0;
+    padding: 8px 0 8px 4px;
+  }
+
+  .story__quote::before {
+    content: '\201C';
+    display: block;
+    height: 0.52em;
+    margin-bottom: 8px;
+    font-family: Georgia, 'Times New Roman', serif;
+    font-size: 4.6rem;
+    line-height: 1;
+    color: color-mix(in srgb, var(--quote-mark) 50%, transparent);
+  }
+
+  .story__quote p {
+    margin: 0;
+    font-family: var(--font-display);
+    font-weight: var(--display-weight);
+    font-size: clamp(1.35rem, 2.3vw, 1.75rem);
+    line-height: 1.32;
+    text-wrap: balance;
+    background: var(--g-heading);
+    -webkit-background-clip: text;
+    background-clip: text;
+    color: transparent;
+  }
+
+  @media (forced-colors: active) {
+    .stat strong,
+    .story__quote p {
+      color: CanvasText;
+    }
+  }
+
+  .story__quote cite {
+    display: block;
+    margin-top: 14px;
+    font-style: normal;
+    font-weight: 700;
+    font-size: 0.95rem;
+    color: var(--navy);
+  }
+
+  .story__quote cite::before {
+    content: '';
+    display: inline-block;
+    width: 28px;
+    height: 2px;
+    margin-right: 10px;
+    border-radius: 2px;
+    vertical-align: middle;
+    background: var(--g-highlight);
+  }
+
+  @media (min-width: 861px) {
+    .story__flow > .story__quote:nth-child(odd) {
+      grid-column: 1 / -1;
+      justify-self: center;
+      max-width: 720px;
+      padding-top: clamp(8px, 2vw, 24px);
+      text-align: center;
+    }
+  }
+
+  @media (max-width: 960px) {
+    .story__stats {
+      margin: -56px 14px 0;
+    }
+
+    .stat {
+      padding: 12px;
+    }
+  }
+
+  @media (max-width: 860px) {
+    .story__intro,
+    .story__flow {
+      grid-template-columns: minmax(0, 1fr);
+      max-width: 680px;
+      margin-inline: auto;
+    }
+
+    .story__flow > .story__quote {
+      justify-self: center;
+      max-width: 40ch;
+      text-align: center;
+    }
+
+    .story__stats {
+      margin-top: -52px;
+    }
+  }
+
+  /* Tablets: a wide photo with the numbers in one row. */
+  @media (min-width: 561px) and (max-width: 860px) {
+    .story__media :global(img) {
+      aspect-ratio: 16 / 9;
+    }
+
+    .story__stats {
+      grid-template-columns: none;
+      grid-auto-flow: column;
+      grid-auto-columns: 1fr;
+    }
+
+    .stat:nth-child(n) {
+      border-top: 0;
+      border-left: 1px solid var(--story-rule);
+    }
+
+    .stat:first-child {
+      border-left: 0;
+    }
+  }
+
+  /* ---------- Teaser (home page) ----------
+     The photo on the left (the hero above has its photos on the right) with the quote on glass over its
+     foot, the lead beside it, and the other paragraphs as links in the same two columns. */
+  .story--teaser .story__intro {
+    grid-template-columns: minmax(0, 0.95fr) minmax(0, 1.05fr);
+  }
+
+  .story--teaser .story__media {
+    order: -1;
+  }
+
+  /* Liquid glass over the bottom of the photo. */
+  .story__glass-quote {
+    position: relative;
+    margin: -48px 24px 0;
+    padding: 20px 24px;
+    border: 1px solid var(--glass-edge);
+    border-radius: var(--radius);
+    background: var(--glass-thick);
+    -webkit-backdrop-filter: var(--glass-blur);
+    backdrop-filter: var(--glass-blur);
+    color: var(--ink);
+    font-family: var(--font-display);
+    font-size: 1.15rem;
+    line-height: 1.4;
+    box-shadow: var(--glass-rim), var(--shadow);
+  }
+
+  .story__glass-quote cite {
+    display: block;
+    margin-top: 8px;
+    font-family: var(--font-body);
+    font-size: 0.88rem;
+    font-style: normal;
+    color: var(--navy);
+  }
+
+  /* The other paragraphs: a subheading each, linking to it on the About page, under a hairline with the
+     same coloured tab it has there. */
+  .story__links {
+    display: grid;
+    grid-template-columns: minmax(0, 0.95fr) minmax(0, 1.05fr);
+    column-gap: var(--story-gap);
+    margin: clamp(48px, 6vw, 72px) 0 0;
+    padding: 0;
+    list-style: none;
+  }
+
+  .story__link {
+    position: relative;
+    display: flex;
+    border-top: 1px solid var(--story-rule);
+  }
+
+  .story__link a {
+    display: flex;
+    flex: 1;
+    align-items: center;
+    justify-content: space-between;
+    gap: 16px;
+    min-height: 64px;
+    padding: 16px 2px 16px 0;
+    font-family: var(--font-display);
+    font-weight: var(--display-weight);
+    font-size: 1.1rem;
+    line-height: 1.3;
+    color: var(--ink);
+    text-decoration: none;
+  }
+
+  .story__link a:hover {
+    color: var(--navy);
+  }
+
+  .story__link a:hover span {
+    text-decoration: underline 2px color-mix(in srgb, var(--tone) 70%, transparent);
+    text-underline-offset: 5px;
+  }
+
+  .story__link :global(svg) {
+    flex: none;
+    color: var(--badge-fg);
+    transition: transform 0.2s ease;
+  }
+
+  .story__link a:hover :global(svg) {
+    transform: translateX(3px);
+  }
+
+  /* With no other paragraphs to link to, the button follows the lead. */
+  .story__lead .story__cta {
+    margin-top: 28px;
+  }
+
+  /* The button to the whole About page closes the list: beside the last link when that one is in the
+     left-hand column, otherwise on a row of its own. */
+  .story__more {
+    align-self: center;
+    padding-block: 8px;
+  }
+
+  .story__more:nth-child(odd) {
+    margin-top: clamp(20px, 2.5vw, 28px);
+  }
+
+  /* Tablets and phones: one centred column, the photo after the lead. */
+  @media (max-width: 900px) {
+    .story--teaser .story__intro,
+    .story__links {
+      grid-template-columns: minmax(0, 1fr);
+      max-width: 680px;
+      margin-inline: auto;
+    }
+
+    .story__more,
+    .story__more:nth-child(odd) {
+      margin-top: 24px;
+    }
+
+    .story--teaser .story__media {
+      order: 0;
+    }
+  }
+
+  @media (min-width: 561px) and (max-width: 900px) {
+    .story--teaser .story__media :global(img) {
+      aspect-ratio: 16 / 9;
+    }
+  }
+</style>

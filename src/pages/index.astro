@@ -7,6 +7,7 @@ import ProgramCard from '../components/ProgramCard.astro';
 import BranchCard from '../components/BranchCard.astro';
 import EnquiryForm from '../components/EnquiryForm.astro';
 import FloatingShapes from '../components/FloatingShapes.astro';
+import AboutStory from '../components/AboutStory.astro';
 import Steps from '../components/Steps.astro';
 import FacilityStrip from '../components/FacilityStrip.astro';
 import PostCard from '../components/blog/PostCard.astro';
@@ -16,7 +17,6 @@ import { programs, daycareHighlights } from '../data/programs';
 import { branches, facilities } from '../data/branches';
 import { testimonials } from '../data/testimonials';
 import { image } from '../data/content';
-import { blocksOf } from '../data/about';
 
 const [heroMain, ...heroSmall] = site.hero.photos;
 const tones = ['navy', 'green', 'coral', 'sky', 'sun', 'navy'];
@@ -89,29 +89,7 @@ const tones = ['navy', 'green', 'coral', 'sky', 'sun', 'navy'];
 
   <!-- About -->
   <section class="section section--white">
-    <div class="container about">
-      <div class="about__media">
-        <Image src={image(site.aboutPhoto.image)} alt={site.aboutPhoto.alt} widths={[400, 555]} sizes="(max-width: 900px) 100vw, 480px" />
-        <blockquote class="about__quote">
-          “{site.quote.text}”
-          <cite>{site.quote.author}</cite>
-        </blockquote>
-      </div>
-      <div>
-        <SectionHeading eyebrow="About us" title="Every child is special" />
-        {
-          site.about.map((p) => (
-            <>
-              {p.heading && <h3 class="about__sub">{p.heading}</h3>}
-              {blocksOf(p.text).map((t) => (
-                <p class="muted">{t}</p>
-              ))}
-            </>
-          ))
-        }
-        <a class="btn btn--ghost" href="/about">More about Crossmaze</a>
-      </div>
-    </div>
+    <AboutStory variant="teaser" eyebrow="About us" />
   </section>
 
   <!-- Core values -->
@@ -493,70 +471,6 @@ const tones = ['navy', 'green', 'coral', 'sky', 'sun', 'navy'];
   .stats__list span {
     font-weight: 700;
     color: var(--muted);
-  }
-
-  .about {
-    display: grid;
-    grid-template-columns: 0.9fr 1.1fr;
-    gap: clamp(32px, 5vw, 72px);
-    align-items: center;
-  }
-
-  @media (max-width: 900px) {
-    .about {
-      grid-template-columns: 1fr;
-    }
-  }
-
-  .about__media {
-    position: relative;
-  }
-
-  /* A subheading over an About paragraph, set from the admin panel. */
-  .about__sub {
-    margin: 1.6em 0 0.4em;
-    font-size: 1.2rem;
-  }
-
-  .about :global(.section-heading) + .about__sub {
-    margin-top: 0;
-  }
-
-  .about__media :global(img) {
-    width: 100%;
-    height: auto;
-    aspect-ratio: 4 / 3;
-    object-fit: cover;
-    padding: 6px;
-    border-radius: var(--radius-photo);
-    background: var(--g-ring);
-    box-shadow: var(--shadow);
-  }
-
-  /* Liquid glass over the bottom of the photo. */
-  .about__quote {
-    margin: -48px 24px 0;
-    position: relative;
-    padding: 20px 24px;
-    border: 1px solid var(--glass-edge);
-    border-radius: var(--radius);
-    background: var(--glass-thick);
-    -webkit-backdrop-filter: var(--glass-blur);
-    backdrop-filter: var(--glass-blur);
-    color: var(--ink);
-    font-family: var(--font-display);
-    font-size: 1.15rem;
-    line-height: 1.4;
-    box-shadow: var(--glass-rim), var(--shadow);
-  }
-
-  .about__quote cite {
-    display: block;
-    margin-top: 8px;
-    font-family: var(--font-body);
-    font-size: 0.88rem;
-    font-style: normal;
-    color: var(--navy);
   }
 
   .split-heading {
