@@ -1,6 +1,6 @@
 ; crossmaze.in DNS records: the master copy for GoDaddy (README, "Point the domain").
-; This is the zone for evening 1: the same records Wix holds today, with the website still on the old
-; Wix site (Wix's "pointing" values). On evening 2 only the A @ and www rows change, to 199.36.158.100
+; This is the zone for evening 1: the records the school uses from Wix's list, with the website still
+; on the old Wix site (Wix's "pointing" values). On evening 2 only the A @ and www rows change, to 199.36.158.100
 ; and crossmaze-website.web.app. GoDaddy adds its own NS and SOA, so they are not listed here.
 ; Enter these as a GoDaddy DNS template (Name without .crossmaze.in, @ for the domain itself, values
 ; without quotes or the final dot), or use Actions > Import Zone File as a fallback (it adds records and
@@ -25,8 +25,8 @@ zb15474756                3600  IN  CNAME  zmverify.zoho.com.
 mail                      3600  IN  CNAME  mail.cs.zohohost.com.
 forms                     3600  IN  CNAME  forms.cs.zohohost.com.
 
-; Email policy, set up by Wix (same p=none policy); becomes TXT "v=DMARC1; p=none;" after leaving Wix
-_dmarc                    3600  IN  CNAME  _dmarc.wixemails.com.
+; Email policy: no enforcement, as Wix's record had (that one also sent reports to Wix's supplier)
+_dmarc                    3600  IN  TXT    "v=DMARC1; p=none;"
 
 ; LITMUS
 litmus                    1800  IN  CNAME  litmus-prod-crossmaze.web.app.
@@ -34,9 +34,7 @@ staging                   3600  IN  CNAME  litmus-staging-37942.web.app.
 _acme-challenge.staging   3600  IN  TXT    "TEgQsUbU57mZeJL6lOn6PuYBkXDZgGcFasRp3cfIs7g"
 _acme-challenge.app       3600  IN  TXT    "YcFfbe_HSsFPk8u0FwxPib0lKAOixwf1wrJT69jywIQ"
 
-; Wix's own email records: harmless, deleted after leaving Wix
-s1._domainkey             3600  IN  CNAME  s1._domainkey.crossmaze.in.s011.ascendbywix.com.
-s2._domainkey             3600  IN  CNAME  s2._domainkey.crossmaze.in.s011.ascendbywix.com.
-sel1._domainkey           3600  IN  CNAME  sel1._domainkey.crossmaze.in.ascendbywix.com.
-sel2._domainkey           3600  IN  CNAME  sel2._domainkey.crossmaze.in.ascendbywix.com.
-sg                        3600  IN  CNAME  sg.crossmaze.in.s011.ascendbywix.com.
+
+; Not copied from Wix: CNAMEs s1._domainkey, s2._domainkey, sel1._domainkey, sel2._domainkey and sg
+; (they only let Wix send newsletters and automatic replies as @crossmaze.in, through SendGrid; Zoho
+; uses none of them), and the _dmarc CNAME to _dmarc.wixemails.com, replaced by the TXT above.
