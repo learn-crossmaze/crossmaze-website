@@ -7,6 +7,7 @@ import Icon from '../components/Icon.astro';
 import { site, coreValues } from '../data/site';
 import { approach } from '../data/programs';
 import { image } from '../data/content';
+import { blocksOf } from '../data/about';
 
 const moments = site.moments.map((m) => ({ src: image(m.image), alt: m.alt }));
 const tones = ['navy', 'green', 'coral', 'sky', 'sun', 'navy'];
@@ -27,7 +28,16 @@ const tones = ['navy', 'green', 'coral', 'sky', 'sun', 'navy'];
     <div class="container story">
       <div>
         <SectionHeading eyebrow="Who we are" title="Every child is special" />
-        {site.about.map((p) => <p>{p}</p>)}
+        {
+          site.about.map((p) => (
+            <>
+              {p.heading && <h3 class="story__sub">{p.heading}</h3>}
+              {blocksOf(p.text).map((t) => (
+                <p>{t}</p>
+              ))}
+            </>
+          ))
+        }
         <blockquote class="story__quote">
           “{site.quote.text}”
           <cite>{site.quote.author}</cite>
@@ -165,6 +175,16 @@ const tones = ['navy', 'green', 'coral', 'sky', 'sun', 'navy'];
   .story p {
     color: var(--muted);
     max-width: 65ch;
+  }
+
+  /* A subheading over an About paragraph, set from the admin panel. */
+  .story__sub {
+    margin: 1.6em 0 0.4em;
+    font-size: 1.2rem;
+  }
+
+  .story :global(.section-heading) + .story__sub {
+    margin-top: 0;
   }
 
   .story__quote {
