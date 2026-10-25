@@ -6,6 +6,7 @@
 //
 // Image fields hold a path relative to src/assets/, e.g. "branches/crossmaze-neotown/01.jpg".
 import type { ImageMetadata } from 'astro';
+import { aboutParagraphs, type AboutParagraph } from './about';
 import type { Batch } from './batches';
 import type { ThemeSettings } from './themes';
 
@@ -53,7 +54,7 @@ export interface SiteContent {
     badgeLabel: string;
   };
   promise: string;
-  about: string[];
+  about: AboutParagraph[];
   aboutPhoto: Photo;
   quote: { text: string; author: string };
   stats: { value: string; label: string }[];
@@ -173,7 +174,8 @@ import jobsJson from '../../content/jobs.json';
 import testimonialsJson from '../../content/testimonials.json';
 import postsJson from '../../content/posts.json';
 
-export const siteContent = siteJson as SiteContent;
+// The About paragraphs are stored as text, each with its subheading (src/data/about.ts).
+export const siteContent: SiteContent = { ...(siteJson as Omit<SiteContent, 'about'>), about: aboutParagraphs((siteJson as { about?: unknown }).about) };
 export const sectionsContent = sectionsJson as SectionsContent;
 export const programsContent = programsJson as ProgramContent[];
 export const branchesContent = branchesJson as BranchContent[];

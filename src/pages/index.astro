@@ -16,6 +16,7 @@ import { programs, daycareHighlights } from '../data/programs';
 import { branches, facilities } from '../data/branches';
 import { testimonials } from '../data/testimonials';
 import { image } from '../data/content';
+import { blocksOf } from '../data/about';
 
 const [heroMain, ...heroSmall] = site.hero.photos;
 const tones = ['navy', 'green', 'coral', 'sky', 'sun', 'navy'];
@@ -98,7 +99,16 @@ const tones = ['navy', 'green', 'coral', 'sky', 'sun', 'navy'];
       </div>
       <div>
         <SectionHeading eyebrow="About us" title="Every child is special" />
-        {site.about.map((p) => <p class="muted">{p}</p>)}
+        {
+          site.about.map((p) => (
+            <>
+              {p.heading && <h3 class="about__sub">{p.heading}</h3>}
+              {blocksOf(p.text).map((t) => (
+                <p class="muted">{t}</p>
+              ))}
+            </>
+          ))
+        }
         <a class="btn btn--ghost" href="/about">More about Crossmaze</a>
       </div>
     </div>
@@ -500,6 +510,16 @@ const tones = ['navy', 'green', 'coral', 'sky', 'sun', 'navy'];
 
   .about__media {
     position: relative;
+  }
+
+  /* A subheading over an About paragraph, set from the admin panel. */
+  .about__sub {
+    margin: 1.6em 0 0.4em;
+    font-size: 1.2rem;
+  }
+
+  .about :global(.section-heading) + .about__sub {
+    margin-top: 0;
   }
 
   .about__media :global(img) {

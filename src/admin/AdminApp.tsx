@@ -233,7 +233,9 @@ function Shell() {
         return <Dashboard />;
       case 'site':
         return (
+          // A key per document, so switching pages starts a fresh editor instead of carrying one page's draft over.
           <DocEditor
+            key="content/site"
             path="content/site"
             title="Site settings"
             intro="Logo, contact details and the main text on the home and about pages."
@@ -243,6 +245,7 @@ function Shell() {
       case 'sections':
         return (
           <DocEditor
+            key="content/sections"
             path="content/sections"
             title="Page sections"
             intro="Lists that appear on several pages: core values, teaching approach, facilities, perks and FAQs."

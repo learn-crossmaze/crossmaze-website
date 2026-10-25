@@ -2,7 +2,7 @@ import { useEffect, useRef, useState } from 'react';
 import { doc, setDoc } from 'firebase/firestore';
 import { clean, markChanged, same, useDoc } from '../data';
 import type { Field } from '../schemas';
-import { Icon, SchemaForm, formProblem } from './fields';
+import { Icon, SchemaForm, forStorage, formProblem } from './fields';
 import { ErrorBox, PageHeader, Spinner, errorText, useSession, useToast, useUnsavedWarning } from './ui';
 
 type Obj = Record<string, unknown>;
@@ -14,14 +14,15 @@ export function DocEditor({ path, title, intro, schema }: { path: string; title:
   const { data, loading, error } = useDoc<Obj>(services.db, path);
   const [draft, setDraft] = useState<Obj | null>(null);
   const [saving, setSaving] = useState(false);
-  const dirty = draft !== null && !same(draft, data ?? {});
+  const dirty = draft !== null && !same(forStorage(schema, draft, true), forStorage(schema, data ?? {}, true));
   useUnsavedWarning(dirty);
 
   // Follow the stored document until the editor starts changing things.
   const synced = useRef<Obj | undefined>(undefined);
   useEffect(() => {
     if (loading) return;
-    setDraft((current) => (current === null || same(current, synced.current ?? {}) ? (data ?? {}) : current));
+    const previous = synced.current ?? {};
+    setDraft((current) => (current === null || same(forStorage(schema, current, true), forStorage(schema, previous, true)) ? (data ?? {}) : current));
     synced.current = data;
   }, [data, loading]);
 
@@ -34,7 +35,7 @@ export function DocEditor({ path, title, intro, schema }: { path: string; title:
     }
     setSaving(true);
     try {
-      await setDoc(doc(services.db, path), clean(draft));
+      await setDoc(doc(services.db, path), clean(forStorage(schema, draft)));
       await markChanged(services.db, email);
       toast('ok', 'Saved. Press Publish when you’re ready to update the website.');
     } catch (e) {

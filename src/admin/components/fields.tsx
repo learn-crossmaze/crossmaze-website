@@ -28,6 +28,11 @@ export function Icon({ name, size = 18, className }: { name: string; size?: numb
 const asObj = (v: Value): Obj => (v && typeof v === 'object' && !Array.isArray(v) ? (v as Obj) : {});
 const asList = <T,>(v: Value): T[] => (Array.isArray(v) ? (v as T[]) : []);
 const asText = (v: Value) => (v == null ? '' : String(v));
+/** An objects field's items, reading any stored as text through the field's `fromText` (blank ones are skipped). */
+const itemsOf = (field: Extract<Field, { type: 'objects' }>, v: Value): Obj[] =>
+  asList<Value>(v)
+    .filter((item) => !(field.fromText && typeof item === 'string' && !item.trim()))
+    .map((item) => (typeof item === 'string' && field.fromText ? field.fromText(item) : asObj(item)));
 
 function move<T>(list: T[], from: number, to: number): T[] {
   if (to < 0 || to >= list.length) return list;
@@ -284,7 +289,7 @@ export function FieldEditor({ field, value, onChange }: { field: Exclude<Field, 
         </fieldset>
       );
     case 'objects':
-      return <ObjectsField field={field} value={asList<Obj>(value)} onChange={onChange} />;
+      return <ObjectsField field={field} value={itemsOf(field, value)} onChange={onChange} />;
   }
 }
 
@@ -561,6 +566,24 @@ function ImagesField({ folder, value, onChange }: { folder: string; value: strin
   );
 }
 
+/**
+ * A form's value as it is stored: the items of objects fields with `toText` become text. With `reread`, items
+ * already stored as text are read and written again too, so two values that read the same compare equal.
+ */
+export function forStorage(fields: Field[], value: Obj, reread = false): Obj {
+  const out = { ...value };
+  for (const field of fields) {
+    if (field.type === 'heading') continue;
+    const v = out[field.key];
+    if (field.type === 'group' && v && typeof v === 'object' && !Array.isArray(v)) out[field.key] = forStorage(field.fields, v as Obj, reread);
+    else if (field.type === 'objects' && field.toText && Array.isArray(v)) {
+      const toText = field.toText;
+      out[field.key] = (reread ? itemsOf(field, v) : v).map((item) => (typeof item === 'string' ? item : toText(asObj(item))));
+    }
+  }
+  return out;
+}
+
 /** What stops a form being saved, as one message: required fields left empty, then items that fail their `check`. */
 export function formProblem(fields: Field[], value: Obj): string | undefined {
   const missing = missingRequired(fields, value);
@@ -569,7 +592,7 @@ export function formProblem(fields: Field[], value: Obj): string | undefined {
       field.type === 'group'
         ? wrong(field.fields, asObj(v[field.key]))
         : field.type === 'objects' && field.check
-          ? asList<Obj>(v[field.key]).flatMap((item, i) => {
+          ? itemsOf(field, v[field.key]).flatMap((item, i) => {
               const message = field.check!(item);
               return message ? [`${field.label} ${i + 1} › ${message}`] : [];
             })
@@ -588,7 +611,7 @@ export function missingRequired(fields: Field[], value: Obj, prefix = ''): strin
     const label = `${prefix}${field.label}`;
     if (field.type === 'group') out.push(...missingRequired(field.fields, asObj(v), field.label ? `${field.label} › ` : prefix));
     else if (field.type === 'objects')
-      asList<Obj>(v).forEach((item, i) => out.push(...missingRequired(field.fields, item, `${field.label} ${i + 1} › `)));
+      itemsOf(field, v).forEach((item, i) => out.push(...missingRequired(field.fields, item, `${field.label} ${i + 1} › `)));
     else if (field.required && (v === undefined || v === null || asText(v).trim() === '' || (Array.isArray(v) && !v.length))) out.push(label);
   }
   return out;
