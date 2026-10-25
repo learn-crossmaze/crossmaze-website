@@ -54,7 +54,6 @@ async function mapImages(kind, item, fn) {
   };
   if (kind === 'site') {
     copy.logo = await fn(copy.logo);
-    copy.mascot = await fn(copy.mascot);
     copy.hero.photos = await each(copy.hero.photos, photo);
     copy.aboutPhoto = await photo(copy.aboutPhoto);
     copy.daycarePhoto = await photo(copy.daycarePhoto);

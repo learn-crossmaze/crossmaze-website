@@ -1,16 +1,11 @@
 ---
-import { Image } from 'astro:assets';
 import Logo from './Logo.astro';
 import Icon from './Icon.astro';
-import { image } from '../data/content';
 import { nav, site } from '../data/site';
 import { branches, shortName } from '../data/branches';
 import { programs } from '../data/programs';
 
 const year = new Date().getFullYear();
-const mascot = image(site.mascot);
-// The 404 page shows the mascot large already, so the footer leaves its small one out there.
-const showMascot = !/^\/404(\.html)?\/?$/.test(Astro.url.pathname);
 // The company name is edited in the admin panel and may already end with a full stop ("… Pvt. Ltd.").
 const legalName = site.legalName.trim();
 const copyright = /[.!?]$/.test(legalName) ? legalName : `${legalName}.`;
@@ -20,10 +15,6 @@ const copyright = /[.!?]$/.test(legalName) ? legalName : `${legalName}.`;
   <div class="container">
     <div class="site-footer__grid">
       <div class="site-footer__about">
-        <div class="site-footer__brand">
-          <Logo />
-          {showMascot && <Image src={mascot} alt="" width={160} class="site-footer__mascot" />}
-        </div>
         <p class="site-footer__blurb">
           A Montessori-based preschool and day care helping children in Electronic City and Begur grow into
           confident, curious and kind learners.
@@ -84,6 +75,10 @@ const copyright = /[.!?]$/.test(legalName) ? legalName : `${legalName}.`;
           </ul>
         </div>
       </div>
+
+      <a href="/" class="site-footer__brand" aria-label={`${site.fullName} – home`}>
+        <Logo />
+      </a>
     </div>
 
     <div class="site-footer__bottom">
@@ -148,19 +143,32 @@ const copyright = /[.!?]$/.test(legalName) ? legalName : `${legalName}.`;
     text-decoration: underline;
   }
 
-  /* Wide screens: the about block beside the three link groups and close to their height (the
-     mascot sits beside the logo, not under the contacts). Tablets: the about block on top (its
-     contacts beside the blurb once there is room) and the three groups in one row under it.
-     Phones: Explore and Programs side by side, the branches below in the same two columns. */
+  /* Wide screens: the about block (blurb, then contacts) beside the three link groups and close to
+     their height, and the logo under the groups at the right, signing the footer off above the
+     bottom row (far from the header's logo, even on a short page). Tablets: the about block on top
+     (its contacts beside the blurb once there is room), the three groups in one row under it and the
+     logo at the right below them. Phones: Explore and Programs side by side, the branches below in
+     the same two columns, then the logo at the right. */
   .site-footer__grid {
     display: grid;
     grid-template-columns: minmax(0, 2fr) minmax(0, 3fr);
-    gap: 40px;
-    align-items: start;
+    grid-template-areas:
+      'about groups'
+      'about brand';
+    gap: 28px 40px;
+  }
+
+  .site-footer__about {
+    grid-area: about;
+    display: grid;
+    align-content: start;
+    gap: 18px;
   }
 
   /* A column is never narrower than its heading, which stays on one line. */
   .site-footer__groups {
+    grid-area: groups;
+    align-self: start;
     display: grid;
     grid-template-columns: repeat(3, minmax(min-content, 1fr));
     gap: 32px 24px;
@@ -169,30 +177,19 @@ const copyright = /[.!?]$/.test(legalName) ? legalName : `${legalName}.`;
   @media (max-width: 900px) {
     .site-footer__grid {
       grid-template-columns: minmax(0, 1fr);
+      grid-template-areas:
+        'about'
+        'groups'
+        'brand';
       gap: 36px;
     }
   }
 
   @media (min-width: 640px) and (max-width: 900px) {
     .site-footer__about {
-      display: grid;
       grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
-      grid-template-areas:
-        'brand contact'
-        'blurb contact';
-      grid-template-rows: auto 1fr;
-      column-gap: 32px;
-    }
-    .site-footer__brand {
-      grid-area: brand;
-    }
-    .site-footer__blurb {
-      grid-area: blurb;
-    }
-    .site-footer__contact {
-      grid-area: contact;
-      align-self: start;
-      margin-top: 0;
+      align-items: start;
+      gap: 0 32px;
     }
   }
 
@@ -220,52 +217,23 @@ const copyright = /[.!?]$/.test(legalName) ? legalName : `${legalName}.`;
     }
   }
 
+  /* The logo links home like the header's, without the links' underline. */
   .site-footer__brand {
+    grid-area: brand;
+    justify-self: end;
+    align-self: end;
     display: flex;
-    align-items: center;
-    gap: 14px;
+    max-width: 100%;
   }
 
-  .site-footer__brand > :global(.logo) {
-    flex: 0 1 auto;
-    min-width: 0;
-  }
-
-  .site-footer__brand :global(.site-footer__mascot) {
-    flex: none;
-    width: 64px;
-    height: auto;
-    border-radius: 16px;
-    /* A light tile in both modes: the drawing has black outlines (a softer tile at night). */
-    background: var(--sticker);
-    box-shadow: var(--shadow-sm);
-    animation: mascot-bob 6s ease-in-out infinite alternate;
-  }
-
-  /* At night the tile is framed like a photo, so it reads as a sticker, not a stray light box. */
-  :global(:root[data-mode='dark']) .site-footer__brand :global(.site-footer__mascot) {
-    border: 3px solid transparent;
-    background:
-      linear-gradient(var(--sticker), var(--sticker)) padding-box,
-      var(--g-ring) border-box;
-  }
-
-  @keyframes mascot-bob {
-    to {
-      transform: translateY(-4px) rotate(-3deg);
-    }
-  }
-
-  @media (max-width: 480px) {
-    .site-footer__brand :global(.site-footer__mascot) {
-      width: 56px;
-      border-radius: 14px;
-    }
+  .site-footer .site-footer__brand,
+  .site-footer .site-footer__brand:hover {
+    text-decoration: none;
   }
 
   .site-footer__blurb {
     max-width: 42ch;
-    margin: 16px 0 0;
+    margin: 0;
   }
 
   .site-footer__heading {
@@ -293,7 +261,6 @@ const copyright = /[.!?]$/.test(legalName) ? legalName : `${legalName}.`;
   .site-footer__contact {
     display: grid;
     gap: 10px;
-    margin-top: 18px;
   }
 
   .site-footer__contact li {

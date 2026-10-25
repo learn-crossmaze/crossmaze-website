@@ -92,7 +92,6 @@
   --glass-sheet: rgb(255 255 255 / 94%); /* nearly opaque glass: the phone menu */
   --badge-rim: inset 0 1px 0 rgb(255 255 255 / 80%), inset 0 0 0 1px rgb(255 255 255 / 50%);
   --scrim: color-mix(in srgb, var(--ink) 30%, transparent); /* dims the page behind a pop-up */
-  --sticker: #ffffff; /* the light tile the mascot drawing sits on */
   --field-dash: color-mix(in srgb, var(--navy) 28%, #fff); /* the file drop area's dashed edge */
   --success-fg: #1e6b31;
   --error-fg: #a3301e;
@@ -218,13 +217,11 @@
 
   /* The chrome at night, from the theme's own tokens (so themes.css needn't set these). Rims and
      edges glint faintly instead of shining white; the phone menu is the smoky glass made nearly
-     opaque; pop-ups dim the page rather than wash it out; the mascot drawing (black outlines) sits
-     on a soft tile of the theme's light text colour rather than bright white. */
+     opaque; pop-ups dim the page rather than wash it out. */
   --glass-shine: rgb(255 255 255 / 14%);
   --glass-sheet: rgb(var(--glass-rgb) / 96%);
   --badge-rim: inset 0 1px 0 rgb(255 255 255 / 14%), inset 0 0 0 1px rgb(255 255 255 / 7%);
   --scrim: rgb(0 0 0 / 42%);
-  --sticker: color-mix(in srgb, var(--ink) 80%, var(--sun-100));
   --field-dash: color-mix(in srgb, var(--navy) 40%, transparent);
   --success-fg: var(--green-fg);
   --error-fg: var(--coral-fg);

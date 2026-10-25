@@ -100,7 +100,6 @@ export const siteSchema: Field[] = [
   { key: 'tagline', label: 'Tagline', type: 'text' },
   { key: 'description', label: 'Description for Google', type: 'textarea', rows: 3, help: 'About 150 characters. Shown in search results.' },
   { key: 'logo', label: 'Logo', type: 'image', folder: 'brand', required: true, help: 'A wide PNG with a transparent background works best.' },
-  { key: 'mascot', label: 'Mascot / footer illustration', type: 'image', folder: 'brand' },
 
   { type: 'heading', label: 'Contact details' },
   { key: 'phone', label: 'Phone number', type: 'tel', required: true },

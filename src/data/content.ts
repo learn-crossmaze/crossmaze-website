@@ -37,7 +37,6 @@ export interface SiteContent {
   description: string;
   url: string;
   logo: string;
-  mascot: string;
   phone: string;
   whatsapp: string;
   admissionsEmail: string;

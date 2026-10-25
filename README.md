@@ -333,3 +333,7 @@ On 19 October 2026 the school confirmed the following, so the site states them. 
   - **Day care's visiting instructors** (art, craft, dance; "additional charges may apply") and **"qualified staff"** on Play Group: still offered, and do all teachers hold the early-childhood certificate the careers page asks for (NTT, Montessori, ECE or CIDTT)?
 - [ ] **Domain move** (step 6 under One-time setup): the Wix data exports, the Wix plan's end date, Wix's emails to parents switched off (step 2), the GoDaddy DNS template checked against `dns/crossmaze.in.zone`, and Authorized domains in Firebase, before each evening. Wix can only be removed or cancelled two weeks after evening 2.
 - [ ] **Firebase project ID**: `.firebaserc` and the workflow use `crossmaze-website`. If the console shows a different ID, update both.
+
+## Credits
+
+- **Owl illustration** on the “page not found” page (`src/assets/brand/owl.svg`): “Owl” by anarres, from Openclipart (https://openclipart.org/detail/328460/owl), dedicated to the public domain under CC0 1.0 (https://creativecommons.org/publicdomain/zero/1.0/), so no credit is needed on the site. Only editor metadata was removed and a viewBox added.
