@@ -2,8 +2,8 @@
 import { Image, getImage } from 'astro:assets';
 import BaseLayout from '../../layouts/BaseLayout.astro';
 import SectionHeading from '../../components/SectionHeading.astro';
-import BranchCard from '../../components/BranchCard.astro';
 import EnquiryForm from '../../components/EnquiryForm.astro';
+import FormSection from '../../components/FormSection.astro';
 import Icon from '../../components/Icon.astro';
 import FloatingShapes from '../../components/FloatingShapes.astro';
 import PhotoAlbum from '../../components/PhotoAlbum.astro';
@@ -31,6 +31,9 @@ interface Props {
 
 const { branch } = Astro.props;
 const shortName = toShortName(branch);
+// "Crossmaze – The Hub" with a no-break space before the dash, so a long name wraps after the dash
+// ("Crossmaze – / Neeladri Nagar"), never before it.
+const heroTitle = branch.name.replace(/^(Crossmaze)\s+(?=[–-])/, '$1 ');
 const offered = programs.filter((p) => branch.programs.includes(p.slug));
 // Each program's batches here (src/data/batches.ts), and when the branch is open: earliest start to latest end.
 const batches = branch.batches ?? [];
@@ -40,25 +43,108 @@ const openLabel = (days: string) => (!days ? 'Open' : days === 'Every day' ? 'Op
 const hours = openingHoursSpecification(batches);
 const others = branches.filter((b) => b.slug !== branch.slug);
 const photos = branchPhotos(branch.slug);
-// The cover photo sits in the hero; the next five fill the gallery's 2×2 + 4 grid. Every photo opens
-// in the album (components/PhotoAlbum.astro), and the last tile counts the ones the grid leaves out.
+// The cover photo sits in the banner; the others fill the gallery. Every photo opens in the album
+// (components/PhotoAlbum.astro).
 const [cover, ...rest] = photos;
-const gallery = rest.slice(0, 5);
-const notShown = rest.length - gallery.length;
 const photoAlt = (n: number) => (n === 1 ? `Inside ${branch.name}` : `${branch.name} – photo ${n}`);
 const fullSize = await Promise.all(photos.map((p) => getImage({ src: p, width: 1600, format: 'webp' })));
 const head = headPhoto(branch.slug);
 const mapSrc = `https://www.google.com/maps?q=${encodeURIComponent(branch.mapQuery)}&output=embed`;
 const directions = `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(branch.mapQuery)}`;
+const emailAt = branch.email.lastIndexOf('@');
+
+// The gallery: the photos after the cover as framed 3:2 tiles in full rows, so the owner can add any
+// number of photos. Each screen width has its own plan, on a 12-column grid:
+//  - lg (from 1001px): rows of four or three, or a big first tile beside four small ones;
+//  - md (700–1000px): rows of three or two;
+//  - sm (up to 699px): rows of two, the first tile across the full width when that evens them out.
+// The fewest rows win, with the bigger tiles first. At most nine tiles: when two or more photos are left
+// over, the last tile counts them ("+3"); one photo is never left over on its own (it would have no
+// tile and no count). Every photo opens in the album.
+type Screen = { lengths: number[]; lead?: number; big?: boolean; maxRows: number };
+type Plan = { tiles: number; rows: number[]; big: boolean };
+const screens = {
+  lg: { lengths: [3, 4], big: true, maxRows: 3 },
+  md: { lengths: [2, 3], maxRows: 3 },
+  sm: { lengths: [2], lead: 1, maxRows: 5 },
+} satisfies Record<string, Screen>;
+type ScreenKey = keyof typeof screens;
+const screenKeys = Object.keys(screens) as ScreenKey[];
+const MAX_TILES = 9;
+// The big tile takes two rows of four: itself (two columns wide) and four small tiles beside it.
+const BIG_BLOCK = 5;
+
+// Every way to fill at most `maxRows` rows with exactly `tiles` tiles, a length from `lengths` a row,
+// shortest rows (biggest tiles) first.
+function fills(tiles: number, lengths: number[], maxRows: number, shortest = 0): number[][] {
+  if (tiles === 0) return [[]];
+  if (maxRows === 0) return [];
+  return lengths
+    .filter((len) => len >= shortest && len <= tiles)
+    .flatMap((len) => fills(tiles - len, lengths, maxRows - 1, len).map((more) => [len, ...more]));
+}
+
+function galleryPlan(n: number, { lengths, lead, big, maxRows }: Screen): Plan {
+  for (let tiles = Math.min(n, MAX_TILES); tiles >= 1; tiles--) {
+    if (n - tiles === 1) continue;
+    // Fewer photos than the shortest row: one row of them.
+    if (tiles < Math.min(...lengths)) return { tiles, rows: [tiles], big: false };
+    const options: Plan[] = [
+      ...fills(tiles, lengths, maxRows).map((rows) => ({ tiles, rows, big: false })),
+      ...(lead ? fills(tiles - lead, lengths, maxRows - 1).map((rows) => ({ tiles, rows: [lead, ...rows], big: false })) : []),
+      ...(big && tiles >= BIG_BLOCK ? fills(tiles - BIG_BLOCK, lengths, maxRows - 2).map((rows) => ({ tiles, rows, big: true })) : []),
+    ];
+    const rowCount = (p: Plan) => p.rows.length + (p.big ? 2 : 0);
+    const kinds = (p: Plan) => new Set(p.rows).size;
+    // The fewest rows; then the big tile; then rows all the same length.
+    options.sort((a, b) => rowCount(a) - rowCount(b) || Number(b.big) - Number(a.big) || kinds(a) - kinds(b));
+    if (options[0]) return options[0];
+  }
+  return { tiles: 0, rows: [], big: false };
+}
+
+const plans = Object.fromEntries(screenKeys.map((s) => [s, galleryPlan(rest.length, screens[s])])) as Record<ScreenKey, Plan>;
+// Each tile's width in twelfths of the row on each screen (12 for a tile the plan leaves out there).
+const spansOf = (plan: Plan) => [
+  ...(plan.big ? [6, 3, 3, 3, 3] : []),
+  ...plan.rows.flatMap((len) => Array<number>(len).fill(12 / len)),
+];
+const spans = Object.fromEntries(screenKeys.map((s) => [s, spansOf(plans[s])])) as Record<ScreenKey, number[]>;
+const span = (s: ScreenKey, i: number) => spans[s][i] ?? 12;
+const gallery = rest.slice(0, Math.max(0, ...screenKeys.map((s) => plans[s].tiles)));
+const leftOver = (s: ScreenKey) => rest.length - plans[s].tiles;
+// The width each tile is drawn at, for picking the image size (the page is at most 1180px wide).
+const tileSizes = (i: number) =>
+  `(max-width: 699px) ${Math.round((span('sm', i) / 12) * 100)}vw, (max-width: 1000px) ${Math.round((span('md', i) / 12) * 100)}vw, ${Math.round((span('lg', i) / 12) * 1180)}px`;
 
 const facts = [
   branch.carpetArea && { icon: 'Ruler', label: 'Carpet area', value: branch.carpetArea },
   branch.capacity && { icon: 'Users', label: 'Capacity', value: `${branch.capacity} children` },
-  branch.centerHead && { icon: 'UserRound', label: 'Centre head', value: branch.centerHead.name },
+  branch.centerHead && { icon: 'UserRound', label: 'Centre head', value: branch.centerHead.name, href: '#centre-head' },
   // One range when the days share their hours ("Open Mon – Fri", "9:00 am – 6:00 pm"), else one per group of days.
   open.length === 1 && { icon: 'Clock', label: openLabel(open[0]!.days), hours: [{ ...open[0]!, days: '' }] },
   open.length > 1 && { icon: 'Clock', label: 'Open', hours: open },
-].filter(Boolean) as { icon: string; label: string; value?: string; hours?: { days: string; from: string; to: string }[] }[];
+].filter(Boolean) as { icon: string; label: string; value?: string; href?: string; hours?: { days: string; from: string; to: string }[] }[];
+// All the facts in one row on wide screens, each as wide as its text needs (a long name gets more room
+// than "180 children"); two to a row on tablets (three when there are three) and phones.
+const RANGE_CHARS = '9:00 am – 6:00 pm'.length;
+const factChars = (f: (typeof facts)[number]) =>
+  Math.max(f.label.length, f.hours ? Math.max(...f.hours.map((h) => (h.days ? h.days.length + 2 : 0) + RANGE_CHARS)) : (f.value ?? '').length);
+const factsCols = facts.map((f) => `minmax(0, ${factChars(f) + 8}fr)`).join(' ');
+const factsMd = facts.length === 3 ? 3 : Math.min(facts.length, 2);
+const factsSm = Math.min(facts.length, 2);
+
+// On wide screens the timetable runs in two columns, down the first and then the second. The second
+// starts at the program that makes the two closest in height (a program with more batches is taller);
+// with a tie, the first column takes the extra program.
+const weights = offered.map((p) => 1 + 0.7 * Math.max(0, batchesOf(p.slug).length - 1));
+const weightBefore = (k: number) => weights.slice(0, k).reduce((sum, w) => sum + w, 0);
+const imbalance = (k: number) => Math.abs(2 * weightBefore(k) - weightBefore(offered.length));
+let secondColumn = offered.length - 1;
+for (let k = offered.length - 2; k >= 1; k--) if (imbalance(k) < imbalance(secondColumn)) secondColumn = k;
+// The other branches, each with its cover photo and colour.
+const tones = ['navy', 'green', 'coral', 'sky', 'sun'];
+const otherCards = others.map((b, i) => ({ branch: b, cover: branchPhotos(b.slug)[0], tone: tones[(i + 1) % tones.length] }));
 
 const jsonLd = {
   '@context': 'https://schema.org',
@@ -99,7 +185,7 @@ const jsonLd = {
           </ol>
         </nav>
         <span class="eyebrow">{branch.area} · {branch.pincode}</span>
-        <h1>{branch.name}</h1>
+        <h1>{heroTitle}</h1>
         <p class="lead">{branch.intro}</p>
         <div class="btn-row">
           <a class="btn btn--sun" href="#enquire">Book a visit</a>
@@ -116,8 +202,8 @@ const jsonLd = {
               class="branch-hero__photo"
               src={cover}
               alt={photoAlt(1)}
-              widths={[480, 720, 1000]}
-              sizes="(max-width: 900px) 100vw, 560px"
+              widths={[480, 720, 1000, 1400]}
+              sizes="(max-width: 900px) calc(100vw - 32px), 580px"
               loading="eager"
             />
             {photos.length > 1 && (
@@ -131,30 +217,92 @@ const jsonLd = {
     </div>
   </section>
 
-  <section class="section--tight section--white">
+  {
+    facts.length > 0 && (
+      <section class="section--tight branch-facts">
+        <div class="container">
+          <ul class="facts" style={`--facts-cols: ${factsCols}; --facts-md: ${factsMd}; --facts-sm: ${factsSm}`}>
+            {facts.map((f) => (
+              <li>
+                <span class="icon-badge">
+                  <Icon name={f.icon} size={22} />
+                </span>
+                <span>
+                  <span class="facts__label">{f.label}</span>
+                  {f.hours ? (
+                    <strong class="facts__hours">
+                      {f.hours.map((h) => (
+                        <>
+                          {h.days && <span class="facts__days">{h.days}</span>}
+                          <TimeRange from={h.from} to={h.to} />
+                        </>
+                      ))}
+                    </strong>
+                  ) : f.href ? (
+                    <strong>
+                      <a class="facts__link" href={f.href}>
+                        {f.value}
+                      </a>
+                    </strong>
+                  ) : (
+                    <strong>{f.value}</strong>
+                  )}
+                </span>
+              </li>
+            ))}
+          </ul>
+        </div>
+      </section>
+    )
+  }
+
+  <section class="section branch-timings" id="timings" aria-labelledby="timings-title">
     <div class="container">
-      <ul class="facts">
+      <SectionHeading eyebrow={`At ${shortName}`} title="Programs and timings" id="timings-title" />
+      {/* The timetable: a row per program (its name and ages, linking to it on Our Programs), with its
+          batches here beside it, each a soft band in the program's colour (src/data/batches.ts). */}
+      <ul class:list={['card', 'timetable', { 'timetable--single': offered.length < 2 }]}>
         {
-          facts.map((f) => (
-            <li>
-              <span class="icon-badge">
-                <Icon name={f.icon} size={22} />
-              </span>
-              <span>
-                <span class="facts__label">{f.label}</span>
-                {f.hours ? (
-                  <strong class="facts__hours">
-                    {f.hours.map((h) => (
-                      <>
-                        {h.days && <span class="facts__days">{h.days}</span>}
-                        <TimeRange from={h.from} to={h.to} />
-                      </>
-                    ))}
-                  </strong>
-                ) : (
-                  <strong>{f.value}</strong>
-                )}
-              </span>
+          offered.map((p, i) => (
+            <li class:list={['timetable__row', `tone-${p.color}`, { 'is-col-top': offered.length > 1 && i === secondColumn }]}>
+              <a class="timetable__program" href={`/our-programs#${p.slug}`}>
+                <span class="icon-badge">
+                  <Icon name={p.icon} size={22} />
+                </span>
+                <span class="timetable__label">
+                  <h3 class="timetable__name" id={`offered-${p.slug}`}>
+                    {p.name}
+                  </h3>
+                  <span class="muted">{p.ages}</span>
+                </span>
+              </a>
+              {batchesOf(p.slug).length ? (
+                <ul class="batches" aria-labelledby={`offered-${p.slug}`}>
+                  {batchesOf(p.slug).map((b) => (
+                    <li class="batch">
+                      {b.name && <strong class="batch__name">{b.name}</strong>}
+                      <strong class="batch__time">
+                        <TimeRange from={b.from} to={b.to} />
+                      </strong>
+                      {b.days?.length ? (
+                        <span class="batch__days">
+                          {dayRuns(b.days).map((run, j) => (
+                            <>
+                              {j > 0 && ', '}
+                              <span class="batch__run">{run}</span>
+                            </>
+                          ))}
+                        </span>
+                      ) : null}
+                      {b.seats && <span class:list={['batch__seats', `batch__seats--${b.seats}`]}>{seatLabels[b.seats]}</span>}
+                    </li>
+                  ))}
+                </ul>
+              ) : (
+                <p class="batches-none muted">
+                  <a href={telHref(branch.phone)}>Call us</a> for timings.
+                </p>
+              )}
             </li>
           ))
         }
@@ -162,48 +310,98 @@ const jsonLd = {
     </div>
   </section>
 
-  <section class="section">
-    <div class="container about">
-      <div>
-        <SectionHeading eyebrow="About this centre" title={`Welcome to ${shortName}`} />
-        {branch.description.map((p) => <p class="muted">{p}</p>)}
+  <section class="section branch-about" aria-labelledby="about-title">
+    <div class="container">
+      <div class:list={['about', { 'about--solo': !branch.centerHead }]}>
+        <div class="about__text">
+          <SectionHeading eyebrow="About this centre" title={`Welcome to ${shortName}`} id="about-title" />
+          {branch.description.map((p) => <p class="muted">{p}</p>)}
+        </div>
+        {
+          branch.centerHead && (
+            <aside class="card head" id="centre-head" aria-labelledby="centre-head-name">
+              <div class="head__top">
+                {head ? (
+                  <Image class="head__photo" src={head} alt={`${branch.centerHead.name}, Centre Head`} width={192} height={192} />
+                ) : (
+                  <span class="head__photo head__photo--initials" aria-hidden="true">
+                    {branch.centerHead.name
+                      .replace(/^(Mrs?s?\.|Dr\.)\s*/, '')
+                      .split(' ')
+                      .map((n) => n[0])
+                      .join('')}
+                  </span>
+                )}
+                <div>
+                  <span class="eyebrow">Know our centre head</span>
+                  <h3 class="head__name" id="centre-head-name">
+                    {branch.centerHead.name}
+                  </h3>
+                </div>
+              </div>
+              <div class="head__bio">
+                {branch.centerHead.bio.map((p) => (
+                  <p>{p}</p>
+                ))}
+              </div>
+            </aside>
+          )
+        }
       </div>
-      <div class="card about__amenities">
-        <h3>Amenities</h3>
-        <ul class="amen">
-          {
-            branch.amenities.map((key) => (
-              <li>
-                <Icon name={amenityList[key].icon} size={20} />
-                {amenityList[key].label}
-              </li>
-            ))
-          }
-        </ul>
-      </div>
+      {
+        branch.amenities.length > 0 && (
+          <div class="card amenities">
+            <h3>Amenities</h3>
+            <ul class="amen">
+              {branch.amenities.map((key) => (
+                <li>
+                  <Icon name={amenityList[key].icon} size={20} />
+                  {amenityList[key].label}
+                </li>
+              ))}
+            </ul>
+          </div>
+        )
+      }
     </div>
   </section>
 
   {
     gallery.length > 0 && (
-      <section class="section section--white" aria-labelledby="gallery-title">
+      <section class="section branch-gallery" aria-labelledby="gallery-title">
         <div class="container">
-          <SectionHeading eyebrow="Gallery" title="Take a look inside" id="gallery-title" />
-          <ul class="gallery">
+          <div class="gallery-head">
+            <SectionHeading eyebrow="Gallery" title="Take a look inside" id="gallery-title" />
+            {photos.length > 2 && (
+              <a class="btn btn--ghost btn--sm" href={fullSize[0]!.src} data-album-for="branch" data-album-open="0" aria-haspopup="dialog">
+                <Icon name="Images" size={18} /> All {photos.length} photos
+              </a>
+            )}
+          </div>
+          <ul class:list={['gallery', { 'gallery--one': gallery.length === 1 }]}>
             {gallery.map((photo, i) => (
-              <li>
-                <a href={fullSize[i + 1]!.src} data-album-for="branch" data-album-open={i + 1} aria-haspopup="dialog">
-                  <Image
-                    src={photo}
-                    alt={photoAlt(i + 2)}
-                    widths={[360, 600, 900]}
-                    sizes={i === 0 ? '(max-width: 700px) 100vw, 580px' : '(max-width: 700px) 50vw, 290px'}
-                  />
-                  {notShown > 0 && i === gallery.length - 1 && (
-                    <span class="gallery__more" aria-hidden="true">
-                      +{notShown}
-                    </span>
-                  )}
+              <li
+                class:list={[
+                  ...screenKeys.filter((s) => i >= plans[s].tiles).map((s) => `hide-${s}`),
+                  { 'big-lg': plans.lg.big && i === 0, 'full-sm': gallery.length > 1 && i < plans.sm.tiles && span('sm', i) === 12 },
+                ]}
+                style={`--lg: ${span('lg', i)}; --md: ${span('md', i)}; --sm: ${span('sm', i)}`}
+              >
+                <a
+                  class="gallery__tile ratio-frame photo-frame photo-frame--sm"
+                  href={fullSize[i + 1]!.src}
+                  data-album-for="branch"
+                  data-album-open={i + 1}
+                  aria-haspopup="dialog"
+                >
+                  <Image src={photo} alt={photoAlt(i + 2)} widths={[360, 600, 900, 1200]} sizes={tileSizes(i)} />
+                  {screenKeys
+                    .filter((s) => i === plans[s].tiles - 1 && leftOver(s) >= 2)
+                    .map((s) => (
+                      <span class={`gallery__more gallery__more--${s}`} aria-hidden="true">
+                        +{leftOver(s)}
+                      </span>
+                    ))}
                 </a>
               </li>
             ))}
@@ -213,166 +411,131 @@ const jsonLd = {
     )
   }
 
-  {
-    branch.centerHead && (
-      <section class="section">
-        <div class="container">
-          <div class="card head">
-            {head ? (
-              <Image class="head__photo" src={head} alt={`${branch.centerHead.name}, Centre Head`} width={240} height={240} />
-            ) : (
-              <span class="head__photo head__photo--initials" aria-hidden="true">
-                {branch.centerHead.name.replace(/^(Mrs?s?\.|Dr\.)\s*/, '').split(' ').map((n) => n[0]).join('')}
+  <FormSection
+    id="enquire"
+    eyebrow="Admissions open"
+    title={`Book a visit to ${shortName}`}
+    lead={`Leave your details and our team at ${shortName} will call you to arrange a visit at a time that suits you.`}
+  >
+    <div class="card visit" slot="aside">
+      <h3 class="visit__title">Visit us</h3>
+      <div class="visit__body">
+        <div class="visit__details">
+          <address class="visit__list">
+            <p>
+              <Icon name="MapPin" size={20} />
+              <span>
+                {/* The PIN code on the last line ("Bengaluru, Karnataka 560068"). */}
+                {branch.address.map((line, i) => (i < branch.address.length - 1 ? <>{line}<br /></> : `${line} `))}
+                <span class="visit__pin">{branch.pincode}</span>
               </span>
-            )}
-            <div>
-              <span class="eyebrow">Know our centre head</span>
-              <h2>{branch.centerHead.name}</h2>
-              <p>{branch.centerHead.bio[0]}</p>
-              {branch.centerHead.bio.length > 1 && (
-                <details class="head__more">
-                  <summary>
-                    Read more <Icon name="ChevronDown" size={18} />
-                  </summary>
-                  {branch.centerHead.bio.slice(1).map((p) => (
-                    <p>{p}</p>
-                  ))}
-                </details>
-              )}
-            </div>
+            </p>
+            <p>
+              <Icon name="Phone" size={20} />
+              <a href={telHref(branch.phone)}>{branch.phone}</a>
+            </p>
+            <p>
+              <Icon name="Mail" size={20} />
+              {/* Where it must wrap, the address breaks after the @, never inside a word. */}
+              <a href={`mailto:${branch.email}`}>{emailAt >= 0 ? <>{branch.email.slice(0, emailAt + 1)}<wbr />{branch.email.slice(emailAt + 1)}</> : branch.email}</a>
+            </p>
+          </address>
+          <a class="btn btn--sm" href={directions} target="_blank" rel="noopener">
+            <Icon name="Navigation" size={16} /> Open in Google Maps
+          </a>
+        </div>
+        <div class="visit__map">
+          <iframe
+            title={`Map showing ${branch.name}`}
+            src={mapSrc}
+            loading="lazy"
+            referrerpolicy="no-referrer-when-downgrade"
+            allowfullscreen></iframe>
+        </div>
+      </div>
+    </div>
+    <EnquiryForm slot="form" branch={branch.slug} id={`enquiry-${branch.slug}`} askBatch />
+  </FormSection>
+
+  {
+    others.length > 0 && (
+      <section class="section branch-others" aria-labelledby="others-title">
+        <div class="container">
+          <SectionHeading eyebrow="More centres" title="Other Crossmaze branches" id="others-title" />
+          {/* Cards with the cover photo, the facts and both buttons on one row; on phones, compact rows
+              (a small photo, the name and area, and a call button), the whole row leading to the branch.
+              "branch-card" tells the call log (scripts/call-log.ts) that a call came from a branch card. */}
+          <div class="others">
+            <ul class="grid grid--4 others__list">
+              {otherCards.map(({ branch: b, cover: photo, tone }) => (
+                <li class:list={['card', 'other', 'branch-card', `tone-${tone}`]}>
+                  <div class="other__media ratio-frame photo-frame photo-frame--sm">
+                    {photo ? (
+                      <Image src={photo} alt={`Inside ${b.name}`} widths={[200, 400, 640]} sizes="(max-width: 559px) 112px, (max-width: 1000px) 50vw, 290px" />
+                    ) : (
+                      <span class="other__art" aria-hidden="true">
+                        <Icon name="Building2" size={40} strokeWidth={1.6} />
+                      </span>
+                    )}
+                    <span class="other__pin">
+                      <Icon name="MapPin" size={15} /> {b.pincode}
+                    </span>
+                  </div>
+                  <div class="other__text">
+                    <h3 class="other__name">
+                      <a class="other__link" href={`/branch/${b.slug}`}>
+                        {toShortName(b)}
+                      </a>
+                    </h3>
+                    <p class="other__area muted">{b.area}</p>
+                    {(b.carpetArea || b.capacity) && (
+                      <ul class="other__facts">
+                        {b.carpetArea && (
+                          <li>
+                            <Icon name="Ruler" size={18} />
+                            {b.carpetArea}
+                          </li>
+                        )}
+                        {b.capacity && (
+                          <li>
+                            <Icon name="Users" size={18} />
+                            {b.capacity} children
+                          </li>
+                        )}
+                      </ul>
+                    )}
+                  </div>
+                  <div class="other__actions">
+                    <a class="btn btn--sm other__view" href={`/branch/${b.slug}`}>
+                      View branch
+                    </a>
+                    <a class="btn btn--sm btn--ghost other__call" href={telHref(b.phone)} aria-label={`Call ${b.name}`}>
+                      <Icon name="Phone" size={18} />
+                    </a>
+                  </div>
+                </li>
+              ))}
+            </ul>
           </div>
         </div>
       </section>
     )
   }
-
-  <section class="section section--white">
-    <div class="container location">
-      <div class="card location__card">
-        <h2>Visit us</h2>
-        <address>
-          <Icon name="MapPin" size={22} />
-          <span>
-            {branch.address.map((line) => <>{line}<br /></>)}
-            {branch.pincode}
-          </span>
-        </address>
-        <p>
-          <Icon name="Phone" size={20} />
-          <a href={telHref(branch.phone)}>{branch.phone}</a>
-        </p>
-        <p>
-          <Icon name="Mail" size={20} />
-          <a href={`mailto:${branch.email}`}>{branch.email}</a>
-        </p>
-        <a class="btn btn--sm" href={directions} target="_blank" rel="noopener">Open in Google Maps</a>
-      </div>
-      <div class="location__map">
-        <iframe
-          title={`Map showing ${branch.name}`}
-          src={mapSrc}
-          loading="lazy"
-          referrerpolicy="no-referrer-when-downgrade"
-          allowfullscreen></iframe>
-      </div>
-    </div>
-  </section>
-
-  <section class="section" id="timings">
-    <div class="container">
-      <SectionHeading eyebrow={`At ${shortName}`} title="Programs and timings" />
-      <div class="offered">
-        {
-          offered.map((p) => (
-            <article class:list={['offered__item', 'card', `tone-${p.color}`]} aria-labelledby={`offered-${p.slug}`}>
-              <a class="offered__head" href={`/our-programs#${p.slug}`}>
-                <span class="icon-badge">
-                  <Icon name={p.icon} size={24} />
-                </span>
-                <div>
-                  <h3 class="offered__name" id={`offered-${p.slug}`}>
-                    {p.name}
-                  </h3>
-                  <span class="muted">{p.ages}</span>
-                </div>
-              </a>
-              {batchesOf(p.slug).length ? (
-                <ul class="batches">
-                  {batchesOf(p.slug).map((b) => (
-                    <li class="batch">
-                      <strong class="batch__name">{b.name || <TimeRange from={b.from} to={b.to} />}</strong>
-                      {b.name && (
-                        <strong class="batch__time">
-                          <TimeRange from={b.from} to={b.to} />
-                        </strong>
-                      )}
-                      {b.days?.length || b.seats ? (
-                        <span class="batch__more">
-                          {b.days?.length ? (
-                            <span class="batch__days">
-                              {dayRuns(b.days).map((run, i) => (
-                                <>
-                                  {i > 0 && ', '}
-                                  <span class="batch__run">{run}</span>
-                                </>
-                              ))}
-                            </span>
-                          ) : null}
-                          {b.seats && <span class:list={['batch__seats', `batch__seats--${b.seats}`]}>{seatLabels[b.seats]}</span>}
-                        </span>
-                      ) : null}
-                    </li>
-                  ))}
-                </ul>
-              ) : (
-                <p class="batches-none muted">
-                  <a href={telHref(branch.phone)}>Call us</a> for timings.
-                </p>
-              )}
-            </article>
-          ))
-        }
-      </div>
-    </div>
-  </section>
-
-  <section class="section section--white" id="enquire">
-    <div class="container enquire">
-      <div>
-        <span class="eyebrow">Admissions open</span>
-        <h2>Book a visit to {shortName}</h2>
-        <p class="lead">
-          Leave your details and the {shortName} team will call you to arrange a visit at a time that suits you.
-        </p>
-      </div>
-      <div class="card enquire__form">
-        <EnquiryForm branch={branch.slug} id={`enquiry-${branch.slug}`} askBatch />
-      </div>
-    </div>
-  </section>
-
-  <section class="section">
-    <div class="container">
-      <SectionHeading eyebrow="More centres" title="Other Crossmaze branches" />
-      <div class="grid grid--4">
-        {others.map((b, i) => <BranchCard branch={b} index={i + 1} />)}
-      </div>
-    </div>
-  </section>
   {photos.length > 0 && <PhotoAlbum id="branch" photos={photos} title={branch.name} alt={photoAlt} />}
 </BaseLayout>
 
 <style>
+  /* ---------- Banner ---------- */
   .branch-hero__inner {
     display: grid;
-    grid-template-columns: 1fr 1fr;
+    grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
     gap: clamp(28px, 5vw, 64px);
     align-items: center;
   }
 
   @media (max-width: 900px) {
     .branch-hero__inner {
-      grid-template-columns: 1fr;
+      grid-template-columns: minmax(0, 1fr);
     }
   }
 
@@ -420,10 +583,12 @@ const jsonLd = {
     transform: translateY(-2px);
   }
 
+  /* The cover in its glass frame: 3:2 beside the text (4:3 where the columns are narrow and the text
+     runs longer), and once stacked at most 16:9 and 420px tall, so the banner stays short on tablets. */
   .branch-hero :global(.branch-hero__photo) {
     width: 100%;
     height: auto;
-    aspect-ratio: 4 / 3;
+    aspect-ratio: 3 / 2;
     object-fit: cover;
     padding: 6px;
     border-radius: var(--radius-photo);
@@ -431,13 +596,40 @@ const jsonLd = {
     box-shadow: var(--shadow);
   }
 
+  @media (max-width: 1100px) {
+    .branch-hero :global(.branch-hero__photo) {
+      aspect-ratio: 4 / 3;
+    }
+  }
+
+  @media (max-width: 900px) {
+    .branch-hero :global(.branch-hero__photo) {
+      aspect-ratio: 16 / 9;
+      max-height: 420px;
+    }
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .branch-hero__open:hover .branch-hero__count {
+      transform: none;
+    }
+  }
+
+  /* ---------- Facts: all in a row, two to a row on tablets and phones ---------- */
   .facts {
     display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(min(100%, 200px), 1fr));
+    grid-template-columns: var(--facts-cols);
     gap: 20px;
     margin: 0;
     padding: 0;
     list-style: none;
+  }
+
+  @media (max-width: 1000px) {
+    .facts {
+      grid-template-columns: repeat(var(--facts-md), minmax(0, 1fr));
+      gap: 24px 20px;
+    }
   }
 
   .facts li {
@@ -453,7 +645,7 @@ const jsonLd = {
 
   @media (max-width: 640px) {
     .facts {
-      grid-template-columns: 1fr 1fr;
+      grid-template-columns: repeat(var(--facts-sm), minmax(0, 1fr));
       gap: 24px 16px;
     }
     .facts li {
@@ -467,6 +659,17 @@ const jsonLd = {
     display: block;
     font-size: 0.85rem;
     color: var(--muted);
+  }
+
+  /* The centre head's name leads to the card about them. */
+  .facts__link {
+    color: inherit;
+    text-decoration: none;
+  }
+
+  .facts__link:hover {
+    color: var(--navy);
+    text-decoration: underline;
   }
 
   /* Opening hours that differ by day: each group of days above its hours, or beside them, lined up in two
@@ -489,6 +692,14 @@ const jsonLd = {
     column-gap: 10px;
   }
 
+  /* A time range stays on one line where the facts have room for it (it can still break after its dash
+     on phones). */
+  @container (min-width: 150px) {
+    .facts__hours :global(.time-range) {
+      white-space: nowrap;
+    }
+  }
+
   @container (min-width: 230px) {
     .facts__hours:has(.facts__days) {
       grid-template-columns: max-content minmax(0, 1fr);
@@ -502,259 +713,52 @@ const jsonLd = {
     color: var(--muted);
   }
 
-  .about {
-    display: grid;
-    grid-template-columns: 1.3fr 0.7fr;
-    gap: clamp(28px, 5vw, 64px);
-    align-items: start;
+  /* ---------- Programs and timings ---------- */
+  .branch-timings {
+    padding-top: clamp(24px, 3vw, 40px);
   }
 
-  @media (max-width: 900px) {
-    .about {
-      grid-template-columns: 1fr;
-    }
-  }
-
-  .about p {
-    max-width: 68ch;
-  }
-
-  .about__amenities h3 {
-    margin-bottom: 16px;
-  }
-
-  .amen {
-    display: grid;
-    gap: 12px;
+  .timetable {
+    --rule: color-mix(in srgb, var(--navy) 13%, transparent);
     margin: 0;
-    padding: 0;
+    padding: 6px clamp(18px, 3vw, 32px);
     list-style: none;
-    font-weight: 700;
   }
 
-  .amen li {
-    display: flex;
+  .timetable__row {
+    display: grid;
+    grid-template-columns: minmax(0, 13rem) minmax(0, 1fr);
     align-items: center;
-    gap: 10px;
+    gap: 10px 20px;
+    padding-block: 16px;
   }
 
-  .amen :global(svg) {
-    flex: none;
-    color: var(--green);
+  .timetable__row + .timetable__row {
+    border-top: 1px solid var(--rule);
   }
 
-  .gallery {
-    display: grid;
-    grid-template-columns: repeat(4, 1fr);
-    grid-auto-rows: 180px;
-    gap: 12px;
-    margin: 0;
-    padding: 0;
-    list-style: none;
-  }
+  /* Wide screens: two columns with a hairline between, read down the first and then the second. Each
+     row keeps its own height, so a program with several batches doesn't stretch the one beside it. */
+  @media (min-width: 1181px) {
+    .timetable:not(.timetable--single) {
+      columns: 2;
+      column-gap: 64px;
+      column-rule: 1px solid var(--rule);
+    }
 
-  .gallery li:first-child {
-    grid-column: span 2;
-    grid-row: span 2;
-  }
+    .timetable__row {
+      grid-template-columns: minmax(0, 11rem) minmax(0, 1fr);
+      break-inside: avoid;
+    }
 
-  @media (max-width: 700px) {
-    .gallery {
-      grid-template-columns: 1fr 1fr;
-      grid-auto-rows: 130px;
+    .timetable .timetable__row.is-col-top {
+      -webkit-column-break-before: always;
+      break-before: column;
+      border-top: 0;
     }
   }
 
-  .gallery a {
-    position: relative;
-    display: block;
-    height: 100%;
-    border-radius: var(--radius);
-    overflow: hidden;
-    cursor: zoom-in;
-  }
-
-  /* "+3": photos the grid leaves out, which the album shows. */
-  .gallery__more {
-    position: absolute;
-    inset: 0;
-    display: grid;
-    place-items: center;
-    background: var(--photo-scrim);
-    backdrop-filter: blur(2px);
-    color: #fff;
-    font-family: var(--font-display);
-    font-weight: var(--display-weight);
-    font-size: clamp(1.6rem, 3vw, 2.2rem);
-  }
-
-  .gallery :global(img) {
-    width: 100%;
-    height: 100%;
-    object-fit: cover;
-    transition: transform 0.3s ease;
-  }
-
-  .gallery a:hover :global(img) {
-    transform: scale(1.04);
-  }
-
-  .head {
-    display: grid;
-    grid-template-columns: 220px 1fr;
-    gap: clamp(24px, 4vw, 48px);
-    align-items: start;
-    padding: clamp(24px, 4vw, 40px);
-  }
-
-  @media (max-width: 700px) {
-    .head {
-      grid-template-columns: 1fr;
-    }
-  }
-
-  .head :global(.head__photo) {
-    width: 220px;
-    height: 220px;
-    border-radius: 50%;
-    object-fit: cover;
-    border: 6px solid var(--sun-50);
-  }
-
-  /* --sun-50 is a deep, muddy tint at night: a soft golden ring instead. */
-  /* At night the portrait gets the same glass frame as the other photos (a mixed ring went khaki). */
-  :global(:root[data-mode='dark']) .head :global(.head__photo) {
-    border-color: transparent;
-    background: var(--g-ring) border-box;
-  }
-
-  :global(:root[data-mode='dark']) .head .head__photo--initials {
-    background:
-      var(--g-navy) padding-box,
-      var(--g-ring) border-box;
-  }
-
-  @media (max-width: 700px) {
-    .head :global(.head__photo) {
-      width: 160px;
-      height: 160px;
-    }
-  }
-
-  .head__photo--initials {
-    display: grid;
-    place-items: center;
-    background: var(--g-navy);
-    color: var(--sun);
-    font-family: var(--font-display);
-    font-size: 3rem;
-  }
-
-  .head h2 {
-    font-size: clamp(1.6rem, 3vw, 2.1rem);
-  }
-
-  .head p {
-    color: var(--muted);
-    max-width: 70ch;
-  }
-
-  .head__more summary {
-    display: inline-flex;
-    align-items: center;
-    gap: 4px;
-    font-weight: 800;
-    color: var(--navy);
-    cursor: pointer;
-    list-style: none;
-  }
-
-  .head__more summary::-webkit-details-marker {
-    display: none;
-  }
-
-  .head__more[open] summary {
-    margin-bottom: 1em;
-  }
-
-  .head__more[open] summary :global(svg) {
-    transform: rotate(180deg);
-  }
-
-  .location {
-    display: grid;
-    grid-template-columns: 0.8fr 1.2fr;
-    gap: 24px;
-    align-items: stretch;
-  }
-
-  @media (max-width: 860px) {
-    .location {
-      grid-template-columns: 1fr;
-    }
-  }
-
-  .location__card address,
-  .location__card p {
-    display: flex;
-    gap: 12px;
-    align-items: flex-start;
-    font-style: normal;
-    margin: 0 0 16px;
-  }
-
-  .location__card :global(svg) {
-    flex: none;
-    margin-top: 3px;
-    color: var(--coral);
-  }
-
-  .location__card .btn {
-    margin-top: 8px;
-  }
-
-  .location__map {
-    min-height: 340px;
-    border-radius: var(--radius);
-    overflow: hidden;
-    border: 6px solid var(--glass-edge);
-    box-shadow: var(--glass-rim), var(--shadow-sm);
-    background: linear-gradient(135deg, var(--navy-50) 0%, var(--green-50) 100%);
-  }
-
-  .location__map iframe {
-    width: 100%;
-    height: 100%;
-    min-height: 340px;
-    border: 0;
-  }
-
-  /* At night: smoky glass behind the map, and Google's light map turned into a night map. */
-  :global(:root[data-mode='dark']) .location__map {
-    border: 1px solid var(--glass-edge);
-    background: var(--glass);
-  }
-
-  :global(:root[data-mode='dark']) .location__map iframe {
-    filter: invert(0.9) hue-rotate(180deg) saturate(0.8);
-  }
-
-  /* Programs and timings: a card per program with its batches here, each a soft band in the
-     program's colour (src/data/batches.ts). */
-  .offered {
-    display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(min(100%, 300px), 1fr));
-    gap: 16px;
-    align-items: start;
-  }
-
-  .offered__item {
-    display: grid;
-    gap: 14px;
-    padding: 18px;
-  }
-
-  .offered__head {
+  .timetable__program {
     display: flex;
     align-items: center;
     gap: 14px;
@@ -762,78 +766,86 @@ const jsonLd = {
     text-decoration: none;
   }
 
-  .offered__head:hover {
+  .timetable__program:hover {
     color: inherit;
   }
 
-  /* The program's name, as a heading for screen readers, looking as the bold name always did. */
-  .offered__name {
+  .timetable__program .icon-badge {
+    flex: none;
+    width: 46px;
+    height: 46px;
+    margin: 0;
+    border-radius: 14px;
+  }
+
+  .timetable__label {
+    display: grid;
+    line-height: 1.3;
+  }
+
+  .timetable__label .muted {
+    font-size: 0.92rem;
+  }
+
+  /* The program's name, as a heading for screen readers, in the bold body font. */
+  .timetable__name {
     margin: 0;
     font-family: inherit;
-    font-size: inherit;
-    font-weight: 700;
+    font-size: 1.05rem;
+    font-weight: 800;
     line-height: inherit;
     letter-spacing: normal;
     color: inherit;
   }
 
-  .offered__head:hover .offered__name {
+  .timetable__program:hover .timetable__name {
     text-decoration: underline;
     text-decoration-color: var(--tone);
     text-underline-offset: 3px;
   }
 
-  .offered__head .icon-badge {
-    margin: 0;
-    flex: none;
-  }
+  /* Phones: the batches under the program's name. */
+  @media (max-width: 600px) {
+    .timetable__row {
+      grid-template-columns: minmax(0, 1fr);
+      padding-block: 14px;
+    }
 
-  .offered__head > div {
-    display: grid;
-    line-height: 1.3;
+    .timetable__row > :last-child {
+      padding-left: 60px;
+    }
   }
 
   .batches {
-    display: grid;
+    display: flex;
+    flex-wrap: wrap;
     gap: 8px;
     margin: 0;
     padding: 0;
     list-style: none;
   }
 
-  /* The name (or the time) and the time, sharing the space so a short name stays whole and a time
-     that doesn't fit breaks after its dash; under them, the days and the seats label. */
+  /* A batch: its name (when it has one) and time, then its days and the seats label; the parts wrap
+     onto a second line when the band is narrow. */
   .batch {
-    display: grid;
-    grid-template-columns: auto auto;
-    justify-content: space-between;
-    align-items: center;
-    gap: 2px 12px;
-    padding: 10px 14px;
+    display: flex;
+    flex-wrap: wrap;
+    align-items: baseline;
+    gap: 2px 10px;
+    padding: 7px 14px;
     border: 1px solid color-mix(in srgb, var(--tone) 22%, transparent);
     border-radius: 14px;
     background: color-mix(in srgb, var(--badge-bg) 70%, transparent);
+    line-height: 1.4;
   }
 
   .batch__name {
-    grid-column: 1;
+    font-weight: 800;
   }
 
   .batch__time {
-    grid-column: 2;
-    justify-self: end;
-    text-align: right;
-  }
-
-  /* The seats label keeps to the right, under the days when they don't fit beside it. This line
-     takes the row's width without widening the columns above it. */
-  .batch__more {
-    display: flex;
-    grid-column: 1 / -1;
-    contain: inline-size;
-    flex-wrap: wrap;
-    align-items: center;
-    gap: 2px 12px;
+    font-weight: 700;
+    font-variant-numeric: tabular-nums;
   }
 
   .batch__days {
@@ -846,18 +858,13 @@ const jsonLd = {
     white-space: nowrap;
   }
 
-  .batch__time,
-  .batch__name {
-    font-variant-numeric: tabular-nums;
-  }
-
   .batch__seats {
-    padding: 2px 10px;
+    align-self: center;
+    padding: 1px 10px;
     border: 1px solid color-mix(in srgb, var(--coral-fg) 30%, transparent);
     border-radius: 999px;
     background: var(--coral-50);
     color: color-mix(in srgb, var(--coral-fg) 80%, var(--ink));
-    margin-left: auto;
     font-size: 0.78rem;
     font-weight: 800;
     white-space: nowrap;
@@ -873,20 +880,567 @@ const jsonLd = {
     margin: 0;
   }
 
-  .enquire {
+  /* ---------- About this centre: the description beside the centre head, the amenities below ---------- */
+  .about {
     display: grid;
-    grid-template-columns: 0.9fr 1.1fr;
-    gap: clamp(28px, 5vw, 64px);
+    grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
+    gap: clamp(28px, 4vw, 56px);
     align-items: start;
   }
 
-  @media (max-width: 860px) {
-    .enquire {
-      grid-template-columns: 1fr;
+  .about--solo {
+    grid-template-columns: minmax(0, 1fr);
+  }
+
+  @media (max-width: 900px) {
+    .about {
+      grid-template-columns: minmax(0, 1fr);
     }
   }
 
-  .enquire__form {
-    background: var(--g-soft);
+  .about__text p {
+    max-width: 68ch;
+  }
+
+  .about__text p:last-child {
+    margin-bottom: 0;
+  }
+
+  /* The centre head: a smaller glass card with the portrait, the name and the whole bio. */
+  .head {
+    padding: clamp(22px, 3vw, 32px);
+  }
+
+  .head__top {
+    display: flex;
+    align-items: center;
+    gap: 18px;
+    margin-bottom: 18px;
+  }
+
+  .head__top .eyebrow {
+    margin-bottom: 4px;
+  }
+
+  .head__name {
+    margin: 0;
+    font-size: clamp(1.3rem, 2vw, 1.55rem);
+  }
+
+  .head :global(.head__photo) {
+    flex: none;
+    width: 96px;
+    height: 96px;
+    border-radius: 50%;
+    object-fit: cover;
+    border: 5px solid var(--sun-50);
+    box-shadow: var(--shadow-sm);
+  }
+
+  /* --sun-50 is a deep, muddy tint at night: the portrait gets the same glass frame as the other
+     photos (a mixed ring went khaki). */
+  :global(:root[data-mode='dark']) .head :global(.head__photo) {
+    border-color: transparent;
+    background: var(--g-ring) border-box;
+  }
+
+  :global(:root[data-mode='dark']) .head .head__photo--initials {
+    background:
+      var(--g-navy) padding-box,
+      var(--g-ring) border-box;
+  }
+
+  .head__photo--initials {
+    display: grid;
+    place-items: center;
+    background: var(--g-navy);
+    color: var(--sun);
+    font-family: var(--font-display);
+    font-size: 2rem;
+  }
+
+  /* The bio in two columns where the card runs wide (tablets), else one. */
+  .head__bio {
+    columns: 2 17rem;
+    column-gap: 32px;
+  }
+
+  .head__bio p {
+    margin: 0 0 0.8em;
+    color: var(--muted);
+    font-size: 0.98rem;
+  }
+
+  .head__bio p:last-child {
+    margin-bottom: 0;
+  }
+
+  @media (max-width: 480px) {
+    .head :global(.head__photo) {
+      width: 76px;
+      height: 76px;
+    }
+
+    .head__top {
+      gap: 14px;
+    }
+  }
+
+  /* The amenities: a glass panel of chips in columns, two columns on phones. */
+  .amenities {
+    margin-top: clamp(28px, 4vw, 48px);
+    padding: clamp(20px, 3vw, 32px);
+  }
+
+  .amenities h3 {
+    margin-bottom: 16px;
+  }
+
+  .amen {
+    columns: 4 13rem;
+    column-gap: 12px;
+    margin: 0 0 -10px;
+    padding: 0;
+    list-style: none;
+  }
+
+  .amen li {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    margin-bottom: 10px;
+    padding: 9px 14px;
+    break-inside: avoid;
+    border: 1px solid color-mix(in srgb, var(--green) 16%, transparent);
+    border-radius: 14px;
+    background: color-mix(in srgb, var(--green-50) 60%, transparent);
+    font-weight: 700;
+    line-height: 1.3;
+  }
+
+  .amen :global(svg) {
+    flex: none;
+    color: var(--green-fg);
+  }
+
+  /* Phones: two columns of icons and names, without the chips, so a long name keeps whole words. */
+  @media (max-width: 560px) {
+    .amenities {
+      padding: 20px 18px;
+    }
+
+    .amen {
+      columns: 2;
+      column-gap: 14px;
+      margin-bottom: -12px;
+    }
+
+    .amen li {
+      align-items: flex-start;
+      gap: 8px;
+      margin-bottom: 12px;
+      padding: 0;
+      border: 0;
+      background: none;
+      font-size: 0.94rem;
+    }
+
+    .amen :global(svg) {
+      width: 18px;
+      height: 18px;
+      margin-top: 1px;
+    }
+  }
+
+  /* ---------- Gallery ---------- */
+  .gallery-head {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: flex-end;
+    justify-content: space-between;
+    gap: 12px 24px;
+    margin-bottom: clamp(24px, 3vw, 40px);
+  }
+
+  .gallery-head :global(.section-heading) {
+    margin-bottom: 0;
+  }
+
+  /* Each tile's width in twelfths of the row (--lg, --md, --sm) and the big first tile come from the
+     plan in the code above (lg from 1001px, md 700–1000px, sm up to 699px); tiles past the plan's count
+     are hidden there. */
+  .gallery {
+    display: grid;
+    grid-template-columns: repeat(12, minmax(0, 1fr));
+    gap: clamp(10px, 1.4vw, 16px);
+    margin: 0;
+    padding: 0;
+    list-style: none;
+  }
+
+  .gallery > li {
+    grid-column: span var(--lg);
+  }
+
+  /* A single photo stays photo-sized rather than filling the page's width. */
+  .gallery--one {
+    max-width: 760px;
+  }
+
+  .gallery__tile {
+    --ratio: 3 / 2;
+    display: block;
+    cursor: zoom-in;
+    transition:
+      transform 0.25s ease,
+      box-shadow 0.25s ease;
+  }
+
+  .gallery__tile:hover {
+    transform: translateY(-3px);
+    box-shadow: var(--shadow);
+  }
+
+  /* "+3": the photos the tiles leave out, which the album shows. */
+  .gallery__more {
+    position: absolute;
+    z-index: 1;
+    inset: var(--frame-pad);
+    display: none;
+    place-items: center;
+    border-radius: calc(var(--frame-radius) - var(--frame-pad));
+    background: var(--photo-scrim);
+    backdrop-filter: blur(2px);
+    color: #fff;
+    font-family: var(--font-display);
+    font-weight: var(--display-weight);
+    font-size: clamp(1.6rem, 3vw, 2.2rem);
+  }
+
+  @media (min-width: 1001px) {
+    .gallery > .hide-lg {
+      display: none;
+    }
+
+    /* The big tile: two rows tall beside the four small tiles. */
+    .gallery > .big-lg {
+      grid-row: span 2;
+    }
+
+    .gallery > .big-lg .gallery__tile {
+      aspect-ratio: auto;
+      height: 100%;
+    }
+
+    .gallery__more--lg {
+      display: grid;
+    }
+  }
+
+  @media (min-width: 700px) and (max-width: 1000px) {
+    .gallery > li {
+      grid-column: span var(--md);
+    }
+
+    .gallery > .hide-md {
+      display: none;
+    }
+
+    .gallery__more--md {
+      display: grid;
+    }
+  }
+
+  @media (max-width: 699px) {
+    .gallery > li {
+      grid-column: span var(--sm);
+    }
+
+    .gallery > .hide-sm {
+      display: none;
+    }
+
+    /* A tile across the full width is wider, so it doesn't stand twice as tall as the rest. */
+    .gallery > .full-sm .gallery__tile {
+      --ratio: 16 / 9;
+    }
+
+    .gallery__more--sm {
+      display: grid;
+    }
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .gallery__tile:hover {
+      transform: none;
+    }
+  }
+
+  /* ---------- Visit us (beside the enquiry form, components/FormSection.astro) ---------- */
+  .visit {
+    container-type: inline-size;
+    padding: clamp(20px, 2.6vw, 28px);
+  }
+
+  .visit__title {
+    margin-bottom: 14px;
+    font-size: 1.25rem;
+  }
+
+  .visit__body {
+    display: grid;
+    gap: 18px;
+  }
+
+  .visit__details {
+    display: grid;
+    align-content: start;
+    justify-items: start;
+    gap: 18px;
+  }
+
+  .visit__list {
+    display: grid;
+    gap: 12px;
+    font-style: normal;
+  }
+
+  .visit__list p {
+    display: flex;
+    gap: 12px;
+    align-items: flex-start;
+    margin: 0;
+    overflow-wrap: break-word;
+  }
+
+  .visit__pin {
+    white-space: nowrap;
+  }
+
+  .visit__list :global(svg) {
+    flex: none;
+    margin-top: 3px;
+    color: var(--coral);
+  }
+
+  /* The map in a thin glass frame, like the photos, on a soft tint while it loads. */
+  .visit__map {
+    aspect-ratio: 16 / 10;
+    padding: 5px;
+    border-radius: var(--radius-photo-sm);
+    background:
+      linear-gradient(135deg, var(--navy-50) 0%, var(--green-50) 100%) content-box,
+      var(--g-ring);
+    box-shadow: var(--shadow-sm);
+  }
+
+  .visit__map iframe {
+    display: block;
+    width: 100%;
+    height: 100%;
+    border: 0;
+    border-radius: calc(var(--radius-photo-sm) - 5px);
+  }
+
+  .visit__details .btn {
+    white-space: nowrap;
+  }
+
+  /* Under the details beside the form on smaller laptops, a wider map keeps the card about as tall as
+     the form (phones keep 16:10). */
+  @container (min-width: 360px) and (max-width: 449px) {
+    .visit__map {
+      aspect-ratio: 2 / 1;
+    }
+  }
+
+  /* With room (wide screens: the details need about 240px for the email and the button), the details
+     and the map side by side; else the map under the details. */
+  @container (min-width: 450px) {
+    .visit__body {
+      grid-template-columns: minmax(0, 1fr) minmax(0, 0.85fr);
+    }
+
+    .visit__map {
+      aspect-ratio: auto;
+      min-height: 240px;
+    }
+  }
+
+  /* At night, Google's light map turned into a night map. */
+  :global(:root[data-mode='dark']) .visit__map iframe {
+    filter: invert(0.9) hue-rotate(180deg) saturate(0.8);
+  }
+
+  /* ---------- Other branches: cards (four, or two by two), compact rows on phones ---------- */
+  .others {
+    container-type: inline-size;
+  }
+
+  .others__list {
+    margin: 0;
+    padding: 0;
+    list-style: none;
+  }
+
+  .other {
+    display: flex;
+    flex-direction: column;
+    padding: 14px 14px 20px;
+  }
+
+  .other__media {
+    --ratio: 16 / 9;
+    margin-bottom: 16px;
+  }
+
+  /* A branch without photos: its colour and a building. */
+  .other__art {
+    position: absolute;
+    inset: var(--frame-pad);
+    display: grid;
+    place-items: center;
+    border-radius: calc(var(--frame-radius) - var(--frame-pad));
+    background: linear-gradient(135deg, var(--badge-bg) 0%, var(--badge-bg-2) 100%);
+    color: var(--badge-fg);
+  }
+
+  .other__pin {
+    position: absolute;
+    z-index: 1;
+    top: 14px;
+    left: 14px;
+    display: inline-flex;
+    align-items: center;
+    gap: 4px;
+    padding: 4px 10px;
+    border: 1px solid var(--glass-edge);
+    border-radius: 999px;
+    background: var(--glass-thick);
+    -webkit-backdrop-filter: var(--glass-blur);
+    backdrop-filter: var(--glass-blur);
+    box-shadow: var(--glass-rim);
+    color: var(--ink);
+    font-size: 0.82rem;
+    font-weight: 800;
+  }
+
+  .other__text {
+    padding-inline: 6px;
+  }
+
+  .other__name {
+    margin: 0 0 4px;
+  }
+
+  .other__link {
+    color: var(--ink);
+    text-decoration: none;
+  }
+
+  .other__link:hover {
+    color: var(--navy);
+  }
+
+  .other__area {
+    margin: 0 0 12px;
+  }
+
+  .other__facts {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 6px 16px;
+    margin: 0 0 18px;
+    padding: 0;
+    list-style: none;
+    font-size: 0.95rem;
+    font-weight: 700;
+  }
+
+  .other__facts li {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+  }
+
+  .other__facts :global(svg) {
+    flex: none;
+    color: var(--badge-fg);
+  }
+
+  /* "View branch" and a round call button, always on one row. */
+  .other__actions {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    margin-top: auto;
+    padding-inline: 6px;
+  }
+
+  .other__view {
+    flex: 1;
+    min-width: 0;
+    padding-inline: 12px;
+    white-space: nowrap;
+  }
+
+  .other__call {
+    flex: none;
+    width: 40px;
+    padding: 0;
+  }
+
+  /* Phones (the list one card wide): a small photo, the name and area, and the call button. The whole
+     row leads to the branch, through its name; the call button sits above that link. */
+  @container (max-width: 519px) {
+    .other {
+      display: grid;
+      grid-template-columns: 104px minmax(0, 1fr) auto;
+      align-items: center;
+      gap: 14px;
+      padding: 10px 14px 10px 10px;
+    }
+
+    .other__media {
+      --ratio: 4 / 3;
+      margin: 0;
+    }
+
+    .other__pin,
+    .other__facts,
+    .other__view {
+      display: none;
+    }
+
+    .other__text,
+    .other__actions {
+      padding: 0;
+    }
+
+    .other__name {
+      margin-bottom: 2px;
+      font-size: 1.12rem;
+    }
+
+    .other__area {
+      margin: 0;
+      font-size: 0.92rem;
+      line-height: 1.35;
+    }
+
+    .other__link::after {
+      content: '';
+      position: absolute;
+      z-index: 1;
+      inset: 0;
+      border-radius: var(--radius-card);
+    }
+
+    .other__call {
+      position: relative;
+      z-index: 2;
+      width: 44px;
+      min-height: 44px;
+    }
   }
 </style>

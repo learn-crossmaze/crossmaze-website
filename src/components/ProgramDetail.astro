@@ -1,0 +1,525 @@
+---
+// One program on the Our Programs page (content/programs.json, admin → Programs), laid out like the About
+// page's "Who we are": on a glass panel of its own, so the programs read as separate items,
+//  - an upper row: the age, name, headline and first paragraph beside the photo (both top-aligned);
+//  - a lower row across the panel, under a hairline in the program's tone: the other paragraphs beside
+//    the focus list, then who can join, where to find the timings and the enquire button.
+// `flip` puts the photo on the left (every other program); the text always has the wider track.
+// From 1000px down the upper row is one column (name, photo, first paragraph) across the container, lined
+// up with the sections around it; the lower row follows it below 861px.
+import { Image } from 'astro:assets';
+import Icon from './Icon.astro';
+import type { Program } from '../data/programs';
+import { branches, shortName } from '../data/branches';
+
+interface Props {
+  program: Program;
+  flip?: boolean;
+}
+
+const { program: p, flip = false } = Astro.props;
+
+// Timings live on each branch's page, so each program links to the centres that run it.
+const centres = branches.filter((b) => b.programs.includes(p.slug));
+const [first, ...rest] = p.paragraphs.map((t) => t.trim()).filter(Boolean);
+const hasFocus = p.focus.length > 0;
+
+// The lower row puts the other paragraphs beside the focus list when the two are of a similar length
+// (roughly, in lines at their widths on a laptop). When one is much longer, or there is only one of them,
+// each takes the panel's whole width: the paragraphs in two columns if they are long, the list in two.
+const textLines = rest.reduce((n, t) => n + Math.ceil(t.length / 75) + 0.7, 0);
+const listLines = hasFocus ? 1.6 + p.focus.reduce((n, f) => n + Math.ceil(f.length / 50) * 1.3, 0) : 0;
+const sideBySide = rest.length > 0 && hasFocus && listLines <= textLines * 1.6 + 6 && textLines <= listLines * 1.6 + 6;
+const textColumns = !sideBySide && textLines > 8;
+
+// The photo keeps the shape it was taken in, between 4:3 and 3:2 (the shapes the school uploads), so it
+// is shown whole; anything taller or wider is cropped to the nearest of the two.
+const shape = Math.min(Math.max(p.photo.width / p.photo.height, 4 / 3), 3 / 2).toFixed(4);
+// How wide the photo is drawn (see the styles below): the panel's width on phones and tablets, at most 720px
+// in one column (to 1000px), then a share of the window beside the text, up to 490px in a full container.
+const sizes =
+  '(max-width: 560px) calc(100vw - 52px), (max-width: 826px) calc(92vw - 40px), (max-width: 1000px) 720px, (max-width: 1219px) calc(41.5vw - 18px), 490px';
+---
+
+<article
+  id={p.slug}
+  class:list={[
+    'program',
+    `tone-${p.color}`,
+    { 'program--flip': flip, 'program--stacked': !sideBySide, 'program--text-cols': textColumns },
+  ]}
+>
+  <div class="program__intro">
+    <div class="program__head">
+      <span class="pill">
+        <Icon name="Baby" size={16} />
+        {p.ages}
+      </span>
+      <h2>{p.name}</h2>
+      {p.headline && <p class="lead program__headline">{p.headline}</p>}
+    </div>
+    {first && <p class="program__first">{first}</p>}
+    <div class="program__media">
+      <div class="ratio-frame photo-frame" style={`--photo-ratio: ${shape}`}>
+        <Image src={p.photo} alt={p.photoAlt} widths={[400, 560, 720, 960, 1200, 1440]} sizes={sizes} />
+      </div>
+      <span class="icon-badge">
+        <Icon name={p.icon} size={28} />
+      </span>
+    </div>
+  </div>
+
+  <div class="program__more">
+    {
+      rest.length > 0 && (
+        <div class="program__text">
+          {rest.map((t) => (
+            <p>{t}</p>
+          ))}
+        </div>
+      )
+    }
+    {
+      hasFocus && (
+        <div class="program__focus">
+          <h3>{p.focusTitle}</h3>
+          <ul class="check-list">
+            {p.focus.map((h) => (
+              <li>
+                <Icon name="Check" size={20} />
+                <span>{h}</span>
+              </li>
+            ))}
+          </ul>
+        </div>
+      )
+    }
+    <div class="program__foot">
+      {
+        (p.joining || centres.length > 0) && (
+          <dl class="program__facts">
+            {p.joining && (
+              <div>
+                <dt>
+                  <Icon name="CalendarCheck" size={18} /> Who can join
+                </dt>
+                <dd>{p.joining}</dd>
+              </div>
+            )}
+            {centres.length > 0 && (
+              <div>
+                <dt>
+                  <Icon name="Clock" size={18} /> Timings
+                </dt>
+                <dd>
+                  On each centre’s page:{' '}
+                  {centres.map((b, i) => (
+                    <>
+                      {i > 0 && ', '}
+                      <a href={`/branch/${b.slug}#timings`}>{shortName(b)}</a>
+                    </>
+                  ))}
+                </dd>
+              </div>
+            )}
+          </dl>
+        )
+      }
+      <a class="btn" href={`/contact?program=${encodeURIComponent(p.name)}#enquire`}>
+        Enquire about {p.name}
+      </a>
+    </div>
+  </div>
+</article>
+
+<style>
+  /* The panel: white liquid glass (smoky at night), like the call-out panels, with a soft shadow. */
+  .program {
+    --program-pad: clamp(24px, 4vw, 52px);
+    --program-gap: clamp(28px, 4.5vw, 56px);
+    --program-cols: minmax(0, 1.05fr) minmax(0, 0.95fr);
+    --program-rule: color-mix(in srgb, var(--navy) 14%, transparent);
+    position: relative;
+    padding: var(--program-pad);
+    border: 1px solid var(--glass-edge);
+    border-radius: 36px;
+    background: var(--glass);
+    -webkit-backdrop-filter: var(--glass-blur);
+    backdrop-filter: var(--glass-blur);
+    box-shadow: var(--glass-rim), var(--shadow-sm);
+  }
+
+  .program--flip {
+    --program-cols: minmax(0, 0.95fr) minmax(0, 1.05fr);
+  }
+
+  .program p {
+    color: var(--muted);
+  }
+
+  /* ---------- Upper row: the name and first paragraph beside the photo ---------- */
+  .program__intro {
+    display: grid;
+    grid-template-columns: var(--program-cols);
+    grid-template-rows: auto 1fr;
+    grid-template-areas:
+      'head media'
+      'first media';
+    column-gap: var(--program-gap);
+    align-items: start;
+  }
+
+  .program--flip .program__intro {
+    grid-template-areas:
+      'media head'
+      'media first';
+  }
+
+  .program__head {
+    grid-area: head;
+  }
+
+  .program__head .pill {
+    margin-bottom: 14px;
+  }
+
+  .program__head h2 {
+    margin-bottom: 0.3em;
+  }
+
+  .program__headline {
+    margin-bottom: 0;
+    line-height: 1.45;
+  }
+
+  /* The first paragraph introduces the program, a step larger than the rest. The paragraphs keep to
+     about 75 characters a line (52–54ch in Nunito) wherever they have more room than that. */
+  .program__first {
+    grid-area: first;
+    max-width: 52ch;
+    margin: 20px 0 0;
+    font-size: clamp(1.0625rem, 1.3vw, 1.15rem);
+    line-height: 1.65;
+  }
+
+  .program .program__first {
+    color: var(--ink);
+  }
+
+  .program__media {
+    grid-area: media;
+    position: relative;
+    container: program-photo / inline-size;
+  }
+
+  .program__media .ratio-frame {
+    --ratio: var(--photo-ratio, 3 / 2);
+  }
+
+  /* The program's icon on the photo's outer corner. */
+  .program__media .icon-badge {
+    position: absolute;
+    right: -14px;
+    bottom: -14px;
+    width: 60px;
+    height: 60px;
+    margin: 0;
+    border: 5px solid var(--paper);
+    border-radius: 20px;
+    box-sizing: content-box;
+  }
+
+  .program--flip .program__media .icon-badge {
+    right: auto;
+    left: -14px;
+  }
+
+  /* ---------- Lower row: everything else, across the panel ---------- */
+  .program__more {
+    position: relative;
+    display: grid;
+    grid-template-columns: var(--program-cols);
+    gap: clamp(24px, 3vw, 32px) var(--program-gap);
+    margin-top: clamp(32px, 4vw, 48px);
+    padding-top: clamp(24px, 3vw, 32px);
+    border-top: 1px solid var(--program-rule);
+  }
+
+  /* A short tab in the program's colour on the hairline, as on the About page. */
+  .program__more::before {
+    content: '';
+    position: absolute;
+    top: -2px;
+    left: 0;
+    width: 44px;
+    height: 3px;
+    border-radius: 3px;
+    background: var(--tone);
+  }
+
+  .program__text p {
+    max-width: 54ch;
+  }
+
+  .program__text p:last-child {
+    margin-bottom: 0;
+  }
+
+  .program__focus h3 {
+    margin-bottom: 0.7em;
+    font-size: 1.1rem;
+  }
+
+  .program__focus .check-list {
+    gap: 8px;
+  }
+
+  /* Stacked (one of the two is much longer than the other): each across the panel, the list in two
+     columns, and long paragraphs in two columns too. */
+  .program--stacked .program__more > * {
+    grid-column: 1 / -1;
+  }
+
+  .program--stacked .check-list {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    column-gap: var(--program-gap);
+  }
+
+  .program--text-cols .program__text {
+    columns: 2;
+    column-gap: var(--program-gap);
+  }
+
+  .program--text-cols .program__text p {
+    max-width: none;
+  }
+
+  /* Who can join, where the timings are, and the button. */
+  .program__foot {
+    grid-column: 1 / -1;
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    justify-content: space-between;
+    gap: 20px 40px;
+  }
+
+  .program__facts {
+    display: grid;
+    flex: 1 1 520px;
+    gap: 10px;
+    max-width: 780px;
+    margin: 0;
+    container-type: inline-size;
+  }
+
+  .program__facts div {
+    display: grid;
+    grid-template-columns: 9.5em minmax(0, 1fr);
+    gap: 2px 12px;
+  }
+
+  .program__facts dt {
+    display: flex;
+    align-self: start;
+    align-items: center;
+    gap: 8px;
+    font-weight: 800;
+  }
+
+  .program__facts dt :global(svg) {
+    flex: none;
+    color: var(--badge-fg, var(--navy));
+  }
+
+  .program__facts dd {
+    margin: 0;
+    color: var(--muted);
+    text-wrap: balance;
+  }
+
+  .program__facts dd a {
+    white-space: nowrap;
+  }
+
+  /* A narrow list (phones) runs each value on after its label, to save lines. */
+  @container (max-width: 440px) {
+    .program__facts div {
+      display: block;
+    }
+
+    .program__facts dt {
+      display: inline-flex;
+      margin-right: 6px;
+      vertical-align: top;
+    }
+
+    .program__facts dd {
+      display: inline;
+    }
+  }
+
+  .program__foot .btn {
+    flex: none;
+  }
+
+  /* A small photo (phones) takes the theme's smaller corners, so a big rounded corner (Calm's arch)
+     never takes most of the photo's height. */
+  @container program-photo (max-width: 380px) {
+    .photo-frame {
+      --frame-radius: var(--radius-photo-sm);
+    }
+  }
+
+  /* ---------- One column, from 1000px down ----------
+     The panel stays as wide as the container, so its edge lines up with the banner and the sections
+     around it. The photo goes under the name: wide (16:9) and at most 720px wide (so no taller than
+     about 400px), on the left like the text. */
+  @media (max-width: 1000px) {
+    .program__intro,
+    .program--flip .program__intro {
+      grid-template-columns: minmax(0, 1fr);
+      grid-template-rows: none;
+      grid-template-areas:
+        'head'
+        'media'
+        'first';
+    }
+
+    .program__media {
+      width: 100%;
+      max-width: 720px;
+      margin-top: 24px;
+    }
+
+    .program__media .ratio-frame {
+      --ratio: 16 / 9;
+    }
+
+    .program__media .icon-badge,
+    .program--flip .program__media .icon-badge {
+      right: 14px;
+      left: auto;
+    }
+
+    .program__first {
+      margin-top: 30px;
+    }
+
+    /* The lower row keeps its two tracks while they have room, the text in the wider one. */
+    .program--flip .program__more {
+      --program-cols: minmax(0, 1.05fr) minmax(0, 0.95fr);
+    }
+  }
+
+  /* Below 861px the lower row is one column too. */
+  @media (max-width: 860px) {
+    .program__more {
+      grid-template-columns: minmax(0, 1fr);
+    }
+
+    .program__more > * {
+      grid-column: 1 / -1;
+    }
+
+    .program--text-cols .program__text {
+      columns: auto;
+    }
+
+    .program--text-cols .program__text p {
+      max-width: 54ch;
+    }
+  }
+
+  /* Two short columns for the list where the panel has room for them. */
+  @media (min-width: 621px) and (max-width: 860px) {
+    .program__focus .check-list {
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      column-gap: var(--program-gap);
+    }
+  }
+
+  @media (max-width: 620px) {
+    .program--stacked .check-list {
+      grid-template-columns: minmax(0, 1fr);
+    }
+  }
+
+  /* Phones: the panel reaches closer to the screen's edges, the photo keeps its own shape (3:2 or 4:3)
+     and everything sits a little tighter. Nothing is hidden. */
+  @media (max-width: 560px) {
+    .program {
+      --program-pad: 18px;
+      margin-inline: calc(8px - var(--gutter));
+      padding: 24px var(--program-pad) 26px;
+      border-radius: 28px;
+    }
+
+    .program__head .pill {
+      margin-bottom: 10px;
+    }
+
+    .program__media {
+      margin-top: 18px;
+    }
+
+    .program__media .ratio-frame {
+      --ratio: var(--photo-ratio, 3 / 2);
+    }
+
+    .program__media .icon-badge {
+      width: 52px;
+      height: 52px;
+      border-width: 4px;
+      border-radius: 18px;
+    }
+
+    .program__first {
+      margin-top: 24px;
+      line-height: 1.6;
+    }
+
+    .program__more {
+      gap: 20px;
+      margin-top: 22px;
+      padding-top: 20px;
+    }
+
+    .program__text p,
+    .program__facts {
+      font-size: 1rem;
+      line-height: 1.6;
+    }
+
+    .program__text p {
+      margin-bottom: 0.7em;
+    }
+
+    .program__focus h3 {
+      margin-bottom: 0.55em;
+      font-size: 1.05rem;
+    }
+
+    /* The list runs on: short items share a line (Numeracy, Literacy…), long ones take a line each. */
+    .program__focus .check-list {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 6px 22px;
+      font-size: 1rem;
+      line-height: 1.5;
+    }
+
+    .program__focus .check-list li {
+      flex: 0 1 auto;
+      gap: 8px;
+    }
+
+    .program__focus .check-list li > :first-child {
+      margin-top: 2px;
+    }
+
+    .program__foot {
+      gap: 16px;
+    }
+  }
+</style>

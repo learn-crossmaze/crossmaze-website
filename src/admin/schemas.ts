@@ -327,7 +327,7 @@ export const branchSchema: Field[] = [
   { key: 'area', label: 'Area', type: 'text', placeholder: 'Neotown, Thirupalya' },
   { key: 'intro', label: 'Short introduction', type: 'textarea', rows: 2, help: 'Shown at the top of the branch page.' },
   { key: 'description', label: 'About this centre', type: 'list', itemLabel: 'Paragraph', multiline: true },
-  { key: 'photos', label: 'Photos', type: 'images', folder: 'branches', help: 'The first photo is the cover; the next five fill the gallery. Use the arrows to reorder.' },
+  { key: 'photos', label: 'Photos', type: 'images', folder: 'branches', help: 'The first photo is the cover; up to nine more fill the gallery, and every photo opens in the album. Use the arrows to reorder.' },
 
   { type: 'heading', label: 'Contact and location' },
   { key: 'address', label: 'Address', type: 'list', itemLabel: 'Line' },

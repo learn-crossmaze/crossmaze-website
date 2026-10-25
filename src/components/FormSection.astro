@@ -1,0 +1,100 @@
+---
+// A section with a form: the intro (eyebrow, heading, lead) and an aside beside a form on a glass card.
+// The branch pages' "Book a visit" uses it with the centre's address, phone and map in the aside; the
+// home page's enquiry (with the admission steps) and the careers application (with the careers email)
+// can use it the same way.
+//  - Wide screens (from 1001px): two columns. While the form scrolls past, the intro and aside stay in
+//    view under the floating header (only on screens tall enough to show them whole).
+//  - Narrower: the intro and aside first, then the form across the full width, so its fields stay two
+//    to a row on tablets.
+//
+//   <FormSection id="enquire" eyebrow="Admissions open" title="Book a visit" lead="…">
+//     <div slot="aside">…</div>
+//     <EnquiryForm slot="form" … />
+//   </FormSection>
+interface Props {
+  /** The section's id (a link target such as #enquire); the heading's id is this plus "-title". */
+  id?: string;
+  eyebrow?: string;
+  title: string;
+  lead?: string;
+  /** More classes for the <section>. */
+  class?: string;
+}
+
+const { id, eyebrow, title, lead, class: className } = Astro.props;
+const headingId = id ? `${id}-title` : undefined;
+const hasAside = Astro.slots.has('aside');
+---
+
+<section class:list={['section', 'form-section', className]} id={id} aria-labelledby={headingId}>
+  <div class="container form-section__inner">
+    <div class="form-section__intro">
+      {eyebrow && <span class="eyebrow">{eyebrow}</span>}
+      <h2 id={headingId}>{title}</h2>
+      {lead && <p class="lead">{lead}</p>}
+      {
+        hasAside && (
+          <div class="form-section__aside">
+            <slot name="aside" />
+          </div>
+        )
+      }
+    </div>
+    <div class="card form-section__form">
+      <slot name="form" />
+      <slot />
+    </div>
+  </div>
+</section>
+
+<style>
+  /* Sections clip their drifting doodle with overflow: hidden (global.css), which would also stop the
+     intro from sticking; clip does the same clipping without that side effect. */
+  .form-section {
+    overflow: clip;
+  }
+
+  .form-section__inner {
+    display: grid;
+    grid-template-columns: minmax(0, 0.95fr) minmax(0, 1.05fr);
+    gap: clamp(32px, 5vw, 64px);
+    align-items: start;
+  }
+
+  .form-section__intro h2 {
+    max-width: 22ch;
+  }
+
+  .form-section__intro .lead {
+    margin-bottom: 0;
+  }
+
+  .form-section__aside {
+    margin-top: clamp(24px, 3vw, 32px);
+  }
+
+  .form-section__form {
+    min-width: 0;
+  }
+
+  /* Two fields to a row whenever the card is at least about 450px wide (the shared rows in global.css
+     need about 510px), so they don't fall to one a row beside the intro on smaller laptops. */
+  .form-section__form :global(.form-row) {
+    grid-template-columns: repeat(auto-fit, minmax(min(100%, 190px), 1fr));
+  }
+
+  @media (min-width: 1001px) and (min-height: 760px) {
+    .form-section__intro {
+      position: sticky;
+      top: calc(var(--header-gap) + var(--header-h) + 24px);
+    }
+  }
+
+  @media (max-width: 1000px) {
+    .form-section__inner {
+      grid-template-columns: minmax(0, 1fr);
+      gap: clamp(28px, 4vw, 40px);
+    }
+  }
+</style>

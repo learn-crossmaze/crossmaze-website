@@ -19,7 +19,18 @@ import { testimonials } from '../data/testimonials';
 import { image } from '../data/content';
 
 const [heroMain, ...heroSmall] = site.hero.photos;
+// How many photos the banner shows (the big one plus up to two small ones), for its tablet layout.
+const heroCount = Math.min(site.hero.photos.length, 3);
 const tones = ['navy', 'green', 'coral', 'sky', 'sun', 'navy'];
+
+// The day care photo keeps its own shape (within 4:3 to 2:1, so an odd upload can't make the panel very
+// tall or a thin strip), and is wider still on tablets so it isn't a screen tall.
+const careImage = image(site.daycarePhoto.image);
+const careShape = careImage.width / careImage.height;
+const careRatio = Math.min(Math.max(careShape, 4 / 3), 2).toFixed(4);
+const careRatioWide = Math.min(Math.max(careShape, 16 / 9), 2.4).toFixed(4);
+// The highlights run in rows of three under the photo (two for four, so none is left on its own).
+const careCols = daycareHighlights.length === 4 ? 2 : 3;
 ---
 
 <BaseLayout>
@@ -41,22 +52,29 @@ const tones = ['navy', 'green', 'coral', 'sky', 'sun', 'navy'];
           <li><Icon name="Users" size={20} /> 1:6 day care ratio</li>
         </ul>
       </div>
-      <div class="hero__art">
+      <div class:list={['hero__art', `hero__art--${heroCount}`]}>
         {
           heroMain && (
             <Image
               class="hero__photo hero__photo--big"
               src={image(heroMain.image)}
               alt={heroMain.alt}
-              widths={[480, 720, 960]}
-              sizes="(max-width: 900px) 100vw, 540px"
+              widths={[480, 720, 960, 1280]}
+              sizes={`(max-width: 560px) calc(100vw - 32px), (max-width: 900px) ${heroCount > 1 ? 'calc(66vw - 36px)' : 'calc(100vw - 32px)'}, (max-width: 1219px) calc(49vw - 20px), 572px`}
               loading="eager"
             />
           )
         }
         {
           heroSmall.slice(0, 2).map((p) => (
-            <Image class="hero__photo" src={image(p.image)} alt={p.alt} widths={[280, 480]} sizes="260px" loading="eager" />
+            <Image
+              class="hero__photo"
+              src={image(p.image)}
+              alt={p.alt}
+              widths={[280, 480, 640]}
+              sizes="(max-width: 560px) calc(50vw - 23px), (max-width: 900px) calc(35vw - 19px), (max-width: 1219px) calc(24vw - 17px), 280px"
+              loading="eager"
+            />
           ))
         }
         {
@@ -154,29 +172,34 @@ const tones = ['navy', 'green', 'coral', 'sky', 'sun', 'navy'];
   <!-- Day care -->
   <section class="section section--feature care">
     <div class="container care__inner">
-      <div>
+      <div class="care__intro">
         <span class="eyebrow">Day care</span>
-        <h2>A nurturing, home-like day care</h2>
+        <h2>A nurturing, <span class="care__keep">home-like</span> day care</h2>
         <p class="lead">
           Our in-house day care is open to children from 2 to 8, with or without a Crossmaze class: for the full day,
           after the morning class, or after school for children from other schools. Experienced caregivers focus on
           safety and enrichment, so you can get on with your day with complete peace of mind.
         </p>
-        <ul class="care__list">
-          {
-            daycareHighlights.map((h) => (
-              <li>
-                <Icon name="Check" size={20} />
-                {h}
-              </li>
-            ))
-          }
-        </ul>
-        <a class="btn btn--sun" href="/our-programs#day-care">About day care</a>
       </div>
-      <div class="care__media">
-        <Image src={image(site.daycarePhoto.image)} alt={site.daycarePhoto.alt} widths={[400, 555]} sizes="(max-width: 900px) 100vw, 520px" />
+      <div class="care__media ratio-frame photo-frame" style={`--ratio: ${careRatio}; --ratio-wide: ${careRatioWide}; --src-w: ${careImage.width}px`}>
+        <Image
+          src={careImage}
+          alt={site.daycarePhoto.alt}
+          widths={[480, 720, 960, 1280, 1600]}
+          sizes="(max-width: 700px) calc(100vw - 64px), (max-width: 900px) calc(87vw - 286px), (max-width: 1219px) calc(39vw - 7px), 470px"
+        />
       </div>
+      <ul class="care__list" style={`--care-cols: ${careCols}`}>
+        {
+          daycareHighlights.map((h) => (
+            <li>
+              <Icon name="Check" size={20} />
+              {h}
+            </li>
+          ))
+        }
+      </ul>
+      <a class="btn btn--sun care__cta" href="/our-programs#day-care">About day care</a>
     </div>
   </section>
 
@@ -413,6 +436,41 @@ const tones = ['navy', 'green', 'coral', 'sky', 'sun', 'navy'];
     }
   }
 
+  /* Tablets: the text runs full width, so the photos follow it in one row of capped height (the big
+     one with the small ones stacked beside it) rather than a full-width collage two screens tall.
+     The banner's columns, gap and padding stay as they are: the doodles are placed by them
+     (FloatingShapes.astro). */
+  @media (min-width: 561px) and (max-width: 900px) {
+    .hero__art:is(.hero__art--2, .hero__art--3) {
+      grid-template-columns: minmax(0, 1.9fr) minmax(0, 1fr);
+      grid-template-rows: repeat(2, minmax(0, 1fr));
+      height: clamp(240px, 42vw, 380px);
+    }
+
+    .hero__art:is(.hero__art--2, .hero__art--3) :global(.hero__photo) {
+      aspect-ratio: auto;
+    }
+
+    .hero__art:is(.hero__art--2, .hero__art--3) :global(.hero__photo--big) {
+      grid-column: 1;
+      grid-row: 1 / -1;
+    }
+
+    /* A single small photo takes the whole column beside the big one. */
+    .hero__art--2 :global(.hero__photo:not(.hero__photo--big)) {
+      grid-row: 1 / -1;
+    }
+
+    .hero__art--1 :global(.hero__photo--big) {
+      max-height: 380px;
+    }
+
+    /* The badge stays on the big photo, at its top right. */
+    .hero__art:is(.hero__art--2, .hero__art--3) .hero__badge {
+      right: calc((100% - 14px) / 2.9 + 24px);
+    }
+  }
+
   .stats {
     padding-block: 8px;
   }
@@ -439,8 +497,10 @@ const tones = ['navy', 'green', 'coral', 'sky', 'sun', 'navy'];
     }
   }
 
+  /* Rows from the top, so a label stays under its number when the number beside it is taller. */
   .stats__list li {
     display: grid;
+    align-content: start;
   }
 
   .stats__list strong {
@@ -485,24 +545,61 @@ const tones = ['navy', 'green', 'coral', 'sky', 'sun', 'navy'];
     margin-bottom: clamp(32px, 4vw, 48px);
   }
 
+  /* Day care: the photo beside the heading and introduction only, with the highlights and the button
+     running full width below, so the photo never floats beside a much taller column.
+     The glass panel (global.css) is drawn 8px outside the container's edge, so the content is set in
+     by that much plus the panel's own top and bottom padding, to keep it off the panel's sides. */
   .care__inner {
     display: grid;
-    grid-template-columns: 1.1fr 0.9fr;
-    gap: clamp(32px, 5vw, 72px);
+    grid-template-columns: minmax(0, 1.1fr) minmax(0, 0.9fr);
+    grid-template-areas:
+      'intro media'
+      'list list'
+      'cta cta';
+    gap: clamp(28px, 3.5vw, 40px) clamp(32px, 5vw, 72px);
     align-items: center;
+    padding-inline: calc(clamp(24px, 4vw, 48px) + 8px);
   }
 
-  @media (max-width: 900px) {
-    .care__inner {
-      grid-template-columns: 1fr;
-    }
+  .care__intro {
+    grid-area: intro;
   }
 
+  .care__intro > :last-child {
+    margin-bottom: 0;
+  }
+
+  /* Where the heading wraps, it breaks before "home-like" rather than at its hyphen. */
+  .care__keep {
+    white-space: nowrap;
+  }
+
+  /* Full width of its column (a grid item with a shape would otherwise shrink to fit its max-height),
+     but never wider than the uploaded photo (--src-w), so a small upload isn't blown up. */
+  .care__media {
+    grid-area: media;
+    justify-self: end;
+    width: 100%;
+    max-width: var(--src-w, none);
+  }
+
+  .care__cta {
+    grid-area: cta;
+    justify-self: start;
+  }
+
+  /* Rows of at most --care-cols highlights (fewer where there isn't room for 270px each, about the
+     width of a highlight on one line). */
   .care__list {
+    --care-gap: 20px;
+    grid-area: list;
     display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(min(100%, 220px), 1fr));
-    gap: 10px 20px;
-    margin: 24px 0 32px;
+    grid-template-columns: repeat(
+      auto-fit,
+      minmax(min(100%, max(270px, (100% - (var(--care-cols, 3) - 1) * var(--care-gap)) / var(--care-cols, 3))), 1fr)
+    );
+    gap: 10px var(--care-gap);
+    margin: 0;
     padding: 0;
     list-style: none;
     font-weight: 700;
@@ -524,15 +621,50 @@ const tones = ['navy', 'green', 'coral', 'sky', 'sun', 'navy'];
     height: 26px;
   }
 
-  .care__media :global(img) {
-    width: 100%;
-    height: auto;
-    aspect-ratio: 4 / 3;
-    object-fit: cover;
-    padding: 6px;
-    border-radius: var(--radius-photo);
-    background: var(--g-ring);
-    box-shadow: var(--shadow);
+  /* Tablets and phones: one column, the photo after the introduction. */
+  @media (max-width: 900px) {
+    .care__inner {
+      grid-template-columns: minmax(0, 1fr);
+      grid-template-areas:
+        'intro'
+        'media'
+        'list'
+        'cta';
+    }
+
+    .care__media {
+      justify-self: start;
+    }
+  }
+
+  /* Tablets: a wide photo, not one as tall as the screen. */
+  @media (min-width: 561px) and (max-width: 900px) {
+    .care__media {
+      aspect-ratio: var(--ratio-wide, 16 / 9);
+      max-height: 380px;
+    }
+  }
+
+  /* Wider tablets: the photo beside the highlights (one column of them) rather than across the whole
+     panel, so it is never shown much larger than the photos the owner uploads. It grows to the
+     highlights' height if they are the taller. */
+  @media (min-width: 701px) and (max-width: 900px) {
+    .care__inner {
+      grid-template-columns: fit-content(50%) minmax(0, 1fr);
+      grid-template-areas:
+        'intro intro'
+        'list media'
+        'cta cta';
+    }
+
+    .care__media {
+      align-self: stretch;
+      justify-self: end;
+    }
+
+    .care__list {
+      grid-template-columns: minmax(0, 1fr);
+    }
   }
 
   .testimonials {
