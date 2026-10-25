@@ -7,8 +7,16 @@ import { branchPhotos, shortName, telHref } from '../data/branches';
 interface Props {
   branch: Branch;
   index?: number;
+  /** How wide the photo is drawn (the card less its border and 16px padding), for its `sizes`. The
+      default fits `.grid--3` in a `.container` (one card a row below 560px, two below 880px, then
+      three of at most 377px); pass your own if the cards sit in another layout, such as a strip. */
+  sizes?: string;
 }
-const { branch, index = 0 } = Astro.props;
+const {
+  branch,
+  index = 0,
+  sizes = '(max-width: 559.98px) calc(100vw - 66px), (max-width: 640px) calc(50vw - 62px), (max-width: 879.98px) calc(50vw - 66px), (max-width: 1219.98px) calc(33.3vw - 63px), 344px',
+} = Astro.props;
 const tones = ['navy', 'green', 'coral', 'sky', 'sun'];
 const tone = tones[index % tones.length];
 const cover = branchPhotos(branch.slug)[0];
@@ -18,7 +26,7 @@ const cover = branchPhotos(branch.slug)[0];
   <div class="branch-card__media">
     {
       cover ? (
-        <Image src={cover} alt={`Inside ${branch.name}`} widths={[400, 640, 800]} sizes="(max-width: 700px) 100vw, 380px" />
+        <Image src={cover} alt={`Inside ${branch.name}`} widths={[400, 640, 800, 1000]} sizes={sizes} />
       ) : (
         <div class="branch-card__art" aria-hidden="true">
           <Icon name="Building2" size={44} strokeWidth={1.6} />
@@ -47,10 +55,12 @@ const cover = branchPhotos(branch.slug)[0];
       )
     }
   </ul>
+  {/* "View branch" and a round call button, on one row however narrow the card or wide the theme's
+      font. "branch-card" tells the call log (scripts/call-log.ts) that a call came from a branch card. */}
   <div class="branch-card__actions">
-    <a class="btn btn--sm" href={`/branch/${branch.slug}`}>View branch</a>
-    <a class="btn btn--sm btn--ghost" href={telHref(branch.phone)} aria-label={`Call ${branch.name}`}>
-      <Icon name="Phone" size={16} /> Call
+    <a class="btn btn--sm branch-card__view" href={`/branch/${branch.slug}`}>View branch</a>
+    <a class="btn btn--sm btn--ghost branch-card__call" href={telHref(branch.phone)} aria-label={`Call ${branch.name}`}>
+      <Icon name="Phone" size={18} />
     </a>
   </div>
 </article>
@@ -127,11 +137,13 @@ const cover = branchPhotos(branch.slug)[0];
   .branch-card .muted {
     margin-bottom: 12px;
   }
+  /* The facts sit with the buttons at the foot of the card, so they line up across a row even when
+     a name or an area takes two lines in one card and one line in the next. */
   .branch-card__facts {
     display: flex;
     flex-wrap: wrap;
     gap: 8px 18px;
-    margin: 0 0 18px;
+    margin: auto 0 18px;
     padding: 0;
     list-style: none;
     font-weight: 700;
@@ -143,12 +155,27 @@ const cover = branchPhotos(branch.slug)[0];
     gap: 6px;
   }
   .branch-card__facts :global(svg) {
+    flex: none;
     color: var(--badge-fg);
   }
   .branch-card__actions {
     display: flex;
-    flex-wrap: wrap;
-    gap: 8px;
+    align-items: center;
+    gap: 10px;
     margin-top: auto;
+  }
+  .branch-card__facts + .branch-card__actions {
+    margin-top: 0;
+  }
+  .branch-card__view {
+    flex: 1;
+    min-width: 0;
+    padding-inline: 12px;
+    white-space: nowrap;
+  }
+  .branch-card__call {
+    flex: none;
+    width: 40px;
+    padding: 0;
   }
 </style>

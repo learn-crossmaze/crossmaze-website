@@ -6,10 +6,13 @@ import SectionHeading from '../components/SectionHeading.astro';
 import ProgramCard from '../components/ProgramCard.astro';
 import BranchCard from '../components/BranchCard.astro';
 import EnquiryForm from '../components/EnquiryForm.astro';
+import FormSection from '../components/FormSection.astro';
+import StepList from '../components/StepList.astro';
 import FloatingShapes from '../components/FloatingShapes.astro';
 import AboutStory from '../components/AboutStory.astro';
 import Steps from '../components/Steps.astro';
 import FacilityStrip from '../components/FacilityStrip.astro';
+import Strip from '../components/Strip.astro';
 import PostCard from '../components/blog/PostCard.astro';
 import { posts } from '../data/blog';
 import { site, coreValues, dayRoutine, admissionSteps } from '../data/site';
@@ -22,6 +25,16 @@ const [heroMain, ...heroSmall] = site.hero.photos;
 // How many photos the banner shows (the big one plus up to two small ones), for its tablet layout.
 const heroCount = Math.min(site.hero.photos.length, 3);
 const tones = ['navy', 'green', 'coral', 'sky', 'sun', 'navy'];
+
+// Programs, testimonials and branches: a grid of cards (.grid--3) from 700px up, a swipe strip of 76vw
+// cards on phones. How wide the cards' photos are drawn, for their `sizes`: the strip's card, then two
+// cards a row (until the grid is 840px wide), then three in the container, less the card's 1px border
+// (and, for a branch, its 16px padding).
+const stripBelow = '700px';
+const programSizes =
+  '(max-width: 699.98px) calc(76vw - 2px), (max-width: 879.98px) calc(50vw - 34px), (max-width: 1219.98px) calc(33.3vw - 31px), 376px';
+const branchSizes =
+  '(max-width: 699.98px) calc(76vw - 34px), (max-width: 879.98px) calc(50vw - 66px), (max-width: 1219.98px) calc(33.3vw - 63px), 344px';
 
 // The day care photo keeps its own shape (within 4:3 to 2:1, so an odd upload can't make the panel very
 // tall or a thin strip), and is wider still on tablets so it isn't a screen tall.
@@ -146,9 +159,9 @@ const careCols = daycareHighlights.length === 4 ? 2 : 3;
         />
         <a class="btn btn--ghost" href="/our-programs">All program details</a>
       </div>
-      <div class="grid grid--3">
-        {programs.map((p) => <ProgramCard program={p} />)}
-      </div>
+      <Strip label="programs" below={stripBelow} as="div" listClass="grid grid--3">
+        {programs.map((p) => <ProgramCard program={p} sizes={programSizes} />)}
+      </Strip>
     </div>
   </section>
 
@@ -218,10 +231,10 @@ const careCols = daycareHighlights.length === 4 ? 2 : 3;
 
   {
     testimonials.length > 0 && (
-      <section class="section">
+      <section class="section testimonials">
         <div class="container">
           <SectionHeading eyebrow="Testimonials" title="What parents say" align="center" />
-          <div class="testimonials">
+          <Strip label="testimonials" below={stripBelow} as="div" listClass="grid grid--3">
             {testimonials.map((t) => (
               <figure class="card testimonial">
                 <blockquote>{t.quote}</blockquote>
@@ -231,7 +244,7 @@ const careCols = daycareHighlights.length === 4 ? 2 : 3;
                 </figcaption>
               </figure>
             ))}
-          </div>
+          </Strip>
         </div>
       </section>
     )
@@ -269,47 +282,24 @@ const careCols = daycareHighlights.length === 4 ? 2 : 3;
         />
         <a class="btn btn--ghost" href="/branch">See all branches</a>
       </div>
-      <div class="grid grid--3">
-        {branches.map((b, i) => <BranchCard branch={b} index={i} />)}
-      </div>
+      <Strip label="branches" below={stripBelow} as="div" listClass="grid grid--3">
+        {branches.map((b, i) => <BranchCard branch={b} index={i} sizes={branchSizes} />)}
+      </Strip>
     </div>
   </section>
 
-  <!-- How admission works -->
-  {
-    admissionSteps.length > 0 && (
-      <section class="section" id="admissions">
-        <div class="container">
-          <SectionHeading
-            eyebrow="Admissions"
-            title="Joining Crossmaze is easy"
-            lead="From your first question to your child’s first day, we are with you at every step."
-            align="center"
-          />
-          <Steps items={admissionSteps} numbered />
-          <p class="steps-cta">
-            <a class="btn btn--sun" href="#enquire">Start with an enquiry <Icon name="ArrowRight" size={18} /></a>
-          </p>
-        </div>
-      </section>
-    )
-  }
-
-  <!-- Enquiry -->
-  <section class="section" id="enquire">
-    <div class="container enquire">
-      <div>
-        <span class="eyebrow">Admissions open</span>
-        <h2>Admission enquiry</h2>
-        <p class="lead">
-          Share a few details and our admissions team will call you to answer your questions and set up a visit to your
-          nearest centre.
-        </p>
-        <ul class="check-list">
-          <li><Icon name="Check" size={20} /> Tour the classrooms and Montessori area</li>
-          <li><Icon name="Check" size={20} /> Meet the centre head and teachers</li>
-          <li><Icon name="Check" size={20} /> Find the right program for your child</li>
-        </ul>
+  <!-- Admission enquiry, with how admission works beside the form -->
+  <FormSection
+    id="enquire"
+    eyebrow="Admissions open"
+    title="Admission enquiry"
+    lead="Share a few details and our admissions team will call you to answer your questions and set up a visit to your nearest centre."
+  >
+    {/* The admission steps from the admin panel (left out when there are none), then the call and
+        WhatsApp buttons. #admissions is kept for links to the old "How admission works" section. */}
+    <div class="enquire-aside" id="admissions" slot="aside">
+      <div class:list={['enquire-aside__inner', { 'enquire-aside__inner--steps': admissionSteps.length > 0 }]}>
+        {admissionSteps.length > 0 && <StepList title="How admission works" items={admissionSteps} />}
         <div class="enquire__direct">
           <a class="btn btn--ghost" href={site.phoneHref} data-call-picker><Icon name="Phone" size={18} /> Call your nearest centre</a>
           <a class="btn btn--ghost" href={site.whatsappHref} target="_blank" rel="noopener">
@@ -317,19 +307,12 @@ const careCols = daycareHighlights.length === 4 ? 2 : 3;
           </a>
         </div>
       </div>
-      <div class="card enquire__form">
-        <EnquiryForm id="home-enquiry" />
-      </div>
     </div>
-  </section>
+    <EnquiryForm slot="form" id="home-enquiry" />
+  </FormSection>
 </BaseLayout>
 
 <style>
-  .steps-cta {
-    margin: clamp(32px, 4vw, 44px) 0 0;
-    text-align: center;
-  }
-
   .hero {
     --banner-pad-top: clamp(40px, 6vw, 80px);
     position: relative;
@@ -547,8 +530,9 @@ const careCols = daycareHighlights.length === 4 ? 2 : 3;
 
   /* Day care: the photo beside the heading and introduction only, with the highlights and the button
      running full width below, so the photo never floats beside a much taller column.
-     The glass panel (global.css) is drawn 8px outside the container's edge, so the content is set in
-     by that much plus the panel's own top and bottom padding, to keep it off the panel's sides. */
+     The glass panel and the padding come from global.css (main > section.section--feature > .container):
+     the panel is drawn 8px inside the container's edge, and the content is set in from the glass by
+     --panel-pad, as above and below. */
   .care__inner {
     display: grid;
     grid-template-columns: minmax(0, 1.1fr) minmax(0, 0.9fr);
@@ -558,7 +542,6 @@ const careCols = daycareHighlights.length === 4 ? 2 : 3;
       'cta cta';
     gap: clamp(28px, 3.5vw, 40px) clamp(32px, 5vw, 72px);
     align-items: center;
-    padding-inline: calc(clamp(24px, 4vw, 48px) + 8px);
   }
 
   .care__intro {
@@ -667,14 +650,25 @@ const careCols = daycareHighlights.length === 4 ? 2 : 3;
     }
   }
 
-  .testimonials {
-    columns: 3 300px;
-    column-gap: 20px;
+  /* Quotes are long, so three a row only once the grid is 960px wide (two on tablets, never three
+     narrow columns). */
+  .testimonials :global(.grid--3) {
+    --grid-cols-at: 960px;
   }
 
+  /* Rows of cards as tall as the row's longest quote, with the names lined up along the foot. */
   .testimonial {
-    break-inside: avoid;
-    margin: 0 0 20px;
+    display: flex;
+    flex-direction: column;
+    margin: 0;
+  }
+
+  /* In the phone strip (below 700px, Strip's `below`) each card keeps its own height, so a short quote
+     has no empty glass under it. */
+  @media (max-width: 699.98px) {
+    .testimonial {
+      align-self: start;
+    }
   }
 
   /* A large, soft opening quote mark instead of an icon. */
@@ -695,30 +689,54 @@ const careCols = daycareHighlights.length === 4 ? 2 : 3;
 
   .testimonial figcaption {
     display: grid;
+    margin-top: auto;
     line-height: 1.35;
   }
 
-  .enquire {
+  /* ---------- Admission enquiry (components/FormSection.astro) ----------
+     Beside the form: the admission steps above the call and WhatsApp buttons. Above the form (below
+     1001px, where the aside runs the full width), the steps and the buttons side by side. */
+  .enquire-aside {
+    container-type: inline-size;
+  }
+
+  .enquire-aside__inner {
     display: grid;
-    grid-template-columns: 0.9fr 1.1fr;
-    gap: clamp(32px, 5vw, 64px);
-    align-items: start;
-  }
-
-  @media (max-width: 900px) {
-    .enquire {
-      grid-template-columns: 1fr;
-    }
-  }
-
-  .enquire .check-list {
-    margin-top: 24px;
+    gap: clamp(20px, 2.4vw, 24px);
   }
 
   .enquire__direct {
     display: flex;
     flex-wrap: wrap;
     gap: 10px;
-    margin-top: 28px;
+  }
+
+  /* Beside the form, the small button size (.btn--sm), so the two fit on one line in every theme's font
+     and the intro stays short enough to show whole under the header on a 768px-tall laptop screen. */
+  @media (min-width: 1001px) {
+    .enquire__direct .btn {
+      min-height: 40px;
+      padding: 8px 18px;
+      font-size: 0.95rem;
+    }
+  }
+
+  /* Phones: the two buttons one under the other, the same width. */
+  @container (max-width: 519px) {
+    .enquire__direct .btn {
+      flex: 1 1 auto;
+    }
+  }
+
+  @container (min-width: 680px) {
+    .enquire-aside__inner--steps {
+      grid-template-columns: minmax(0, 1fr) auto;
+      align-items: center;
+      column-gap: clamp(32px, 5vw, 56px);
+    }
+
+    .enquire-aside__inner--steps .enquire__direct {
+      flex-direction: column;
+    }
   }
 </style>

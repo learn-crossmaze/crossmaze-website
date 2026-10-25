@@ -126,13 +126,20 @@ const facts = [
   open.length > 1 && { icon: 'Clock', label: 'Open', hours: open },
 ].filter(Boolean) as { icon: string; label: string; value?: string; href?: string; hours?: { days: string; from: string; to: string }[] }[];
 // All the facts in one row on wide screens, each as wide as its text needs (a long name gets more room
-// than "180 children"); two to a row on tablets (three when there are three) and phones.
+// than "180 children"); two to a row on tablets (three when there are three) and phones. On phones from
+// 381px the two columns share the width the same way, so a centre head's name keeps to one line where
+// it can; narrower, they share it equally, so the opening hours keep to one line.
 const RANGE_CHARS = '9:00 am – 6:00 pm'.length;
 const factChars = (f: (typeof facts)[number]) =>
   Math.max(f.label.length, f.hours ? Math.max(...f.hours.map((h) => (h.days ? h.days.length + 2 : 0) + RANGE_CHARS)) : (f.value ?? '').length);
 const factsCols = facts.map((f) => `minmax(0, ${factChars(f) + 8}fr)`).join(' ');
 const factsMd = facts.length === 3 ? 3 : Math.min(facts.length, 2);
 const factsSm = Math.min(facts.length, 2);
+// On phones the badge sits above the text, so a column needs only the room of its longest text.
+const factsSmCols = Array.from(
+  { length: factsSm },
+  (_, col) => `minmax(0, ${Math.max(...facts.filter((_, i) => i % factsSm === col).map(factChars))}fr)`,
+).join(' ');
 
 // On wide screens the timetable runs in two columns, down the first and then the second. The second
 // starts at the program that makes the two closest in height (a program with more batches is taller);
@@ -203,7 +210,7 @@ const jsonLd = {
               src={cover}
               alt={photoAlt(1)}
               widths={[480, 720, 1000, 1400]}
-              sizes="(max-width: 900px) calc(100vw - 32px), 580px"
+              sizes="(max-width: 760px) calc(100vw - 32px), (max-width: 1219px) calc(50vw - 44px), 580px"
               loading="eager"
             />
             {photos.length > 1 && (
@@ -221,7 +228,10 @@ const jsonLd = {
     facts.length > 0 && (
       <section class="section--tight branch-facts">
         <div class="container">
-          <ul class="facts" style={`--facts-cols: ${factsCols}; --facts-md: ${factsMd}; --facts-sm: ${factsSm}`}>
+          <ul
+            class="facts"
+            style={`--facts-cols: ${factsCols}; --facts-md: ${factsMd}; --facts-sm: ${factsSm}; --facts-sm-cols: ${factsSmCols}`}
+          >
             {facts.map((f) => (
               <li>
                 <span class="icon-badge">
@@ -526,6 +536,8 @@ const jsonLd = {
 
 <style>
   /* ---------- Banner ---------- */
+  /* The text beside the cover photo down to tablets in portrait (761px), so the banner stays about as
+     tall as the text; one column on narrower screens. */
   .branch-hero__inner {
     display: grid;
     grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
@@ -533,7 +545,7 @@ const jsonLd = {
     align-items: center;
   }
 
-  @media (max-width: 900px) {
+  @media (max-width: 760px) {
     .branch-hero__inner {
       grid-template-columns: minmax(0, 1fr);
     }
@@ -584,7 +596,7 @@ const jsonLd = {
   }
 
   /* The cover in its glass frame: 3:2 beside the text (4:3 where the columns are narrow and the text
-     runs longer), and once stacked at most 16:9 and 420px tall, so the banner stays short on tablets. */
+     runs longer), and once stacked at most 16:9 and 420px tall, so the banner stays short. */
   .branch-hero :global(.branch-hero__photo) {
     width: 100%;
     height: auto;
@@ -602,7 +614,7 @@ const jsonLd = {
     }
   }
 
-  @media (max-width: 900px) {
+  @media (max-width: 760px) {
     .branch-hero :global(.branch-hero__photo) {
       aspect-ratio: 16 / 9;
       max-height: 420px;
@@ -645,13 +657,19 @@ const jsonLd = {
 
   @media (max-width: 640px) {
     .facts {
-      grid-template-columns: repeat(var(--facts-sm), minmax(0, 1fr));
+      grid-template-columns: var(--facts-sm-cols);
       gap: 24px 16px;
     }
     .facts li {
       flex-direction: column;
       align-items: flex-start;
       gap: 10px;
+    }
+  }
+
+  @media (max-width: 380px) {
+    .facts {
+      grid-template-columns: repeat(var(--facts-sm), minmax(0, 1fr));
     }
   }
 
@@ -1325,7 +1343,12 @@ const jsonLd = {
     font-weight: 800;
   }
 
+  /* The facts sit with the buttons at the foot of the card, so they line up across a row even when
+     one card's area takes two lines ("SNN Raj Greenbay, / Electronic City") and the next card's one. */
   .other__text {
+    display: flex;
+    flex: 1;
+    flex-direction: column;
     padding-inline: 6px;
   }
 
@@ -1350,7 +1373,7 @@ const jsonLd = {
     display: flex;
     flex-wrap: wrap;
     gap: 6px 16px;
-    margin: 0 0 18px;
+    margin: auto 0 18px;
     padding: 0;
     list-style: none;
     font-size: 0.95rem;

@@ -3,6 +3,7 @@ import BaseLayout from '../layouts/BaseLayout.astro';
 import PageHero from '../components/PageHero.astro';
 import SectionHeading from '../components/SectionHeading.astro';
 import FormSection from '../components/FormSection.astro';
+import StepList from '../components/StepList.astro';
 import CareerForm from '../components/CareerForm.astro';
 import Icon from '../components/Icon.astro';
 import { jobs, perks } from '../data/jobs';
@@ -148,23 +149,14 @@ const emailAt = site.careersEmail.indexOf('@');
     <div class="apply-aside" slot="aside">
       <div class="apply-aside__inner">
         {/* Only what the form and its thank-you message already say. */}
-        <div>
-          <h3 class="apply-next__title">What happens next</h3>
-          <ol class="apply-next">
-            <li class="tone-coral">
-              <span class="apply-next__num">1</span>
-              <span>Fill in the form and upload your resume.</span>
-            </li>
-            <li class="tone-navy">
-              <span class="apply-next__num">2</span>
-              <span>Our team reviews your profile.</span>
-            </li>
-            <li class="tone-green">
-              <span class="apply-next__num">3</span>
-              <span>We get in touch with you.</span>
-            </li>
-          </ol>
-        </div>
+        <StepList
+          title="What happens next"
+          items={[
+            { text: 'Fill in the form and upload your resume.' },
+            { text: 'Our team reviews your profile.' },
+            { text: 'We get in touch with you.' },
+          ]}
+        />
         <a class="card apply-mail tone-coral" href={`mailto:${site.careersEmail}`}>
           <span class="icon-badge">
             <Icon name="Mail" size={22} />
@@ -413,52 +405,6 @@ const emailAt = site.careersEmail.indexOf('@');
     .apply-mail {
       max-width: 28rem;
     }
-  }
-
-  .apply-next__title {
-    margin-bottom: 14px;
-    font-size: 1.15rem;
-  }
-
-  .apply-next {
-    position: relative;
-    display: grid;
-    gap: 14px;
-    margin: 0;
-    padding: 0;
-    list-style: none;
-  }
-
-  /* A dashed path joining the numbers. */
-  .apply-next::before {
-    content: '';
-    position: absolute;
-    top: 16px;
-    bottom: 16px;
-    left: 15px;
-    border-left: 2px dashed color-mix(in srgb, var(--navy) 22%, transparent);
-  }
-
-  .apply-next li {
-    position: relative;
-    display: flex;
-    align-items: center;
-    gap: 14px;
-  }
-
-  .apply-next__num {
-    display: grid;
-    flex: none;
-    place-items: center;
-    width: 32px;
-    height: 32px;
-    border-radius: 50%;
-    background: linear-gradient(135deg, var(--badge-bg) 0%, var(--badge-bg-2) 100%);
-    box-shadow: var(--badge-rim);
-    color: var(--badge-fg);
-    font-family: var(--font-display);
-    font-weight: 600;
-    font-size: 0.95rem;
   }
 
   .apply-mail {

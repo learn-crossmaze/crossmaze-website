@@ -249,7 +249,7 @@ export const sectionsSchema: Field[] = [
     ...iconItem('Step'),
     key: 'admissionSteps',
     label: 'How admission works',
-    help: 'Home and Contact pages, in order. Remove every entry to hide the section.',
+    help: 'Contact page, and numbered beside the enquiry form on the Home page, in order. Remove every entry to hide them.',
   },
   {
     key: 'faqs',
