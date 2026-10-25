@@ -1,0 +1,40 @@
+; crossmaze.in DNS records: the master copy for GoDaddy (README, "Point the domain").
+; This is the zone for evening 1: the records the school uses from Wix's list, with the website still
+; on the old Wix site (Wix's "pointing" values). On evening 2 only the A @ and www rows change, to 199.36.158.100
+; and crossmaze-website.web.app. GoDaddy adds its own NS and SOA, so they are not listed here.
+; Enter these as a GoDaddy DNS template (Name without .crossmaze.in, @ for the domain itself, values
+; without quotes or the final dot), or use Actions > Import Zone File as a fallback (it adds records and
+; fails on conflicts, so first delete every record except GoDaddy's NS, SOA and _domainconnect).
+$ORIGIN crossmaze.in.
+$TTL 3600
+
+; Website (old Wix site until evening 2)
+@                         1800  IN  A      185.230.63.107
+www                       1800  IN  CNAME  pointing.wixdns.net.
+
+; Email: Zoho Mail, Zoho Books and ZeptoMail. Never change these.
+@                         3600  IN  MX     10 mx.zoho.com.
+@                         3600  IN  MX     20 mx2.zoho.com.
+@                         3600  IN  MX     30 mx3.zoho.com.
+@                         3600  IN  TXT    "v=spf1 include:zoho.com include:zohomail.com include:sender.zohobooks.com ~all"
+zoho._domainkey           3600  IN  TXT    "v=DKIM1; k=rsa; p=MIGfMA0GCSqGSIb3DQEBAQUAA4GNADCBiQKBgQCV1kEIYHW+wq8++FTsPHrAPUaevlTNQygNKXJx3aA8EVgXL0nRhXrnFVO1wyXQYGKUbPG/FB8wo/iRM1xoK+uqYKvfs1z64ySYi81bm3MICuhJwN5UAuDJqUhwnMCXJYWDkNzswY53vh3vZl72E7MHD315UelBXtDkmbQPe4zKMQIDAQAB"
+1522905413783._domainkey  3600  IN  TXT    "k=rsa; p=MIGfMA0GCSqGSIb3DQEBAQUAA4GNADCBiQKBgQCr6KMgdxxgg7oT3ulMwPJs9RXgXDrI9UWU118pHEMohl3UbL3Jwp4oxp/9N3thh/3WCJnYV134zbEVolZwqaT3JsFEq/mQ/RpW/JnOZ3rnxqJPurb2bcfJol4SDxiWVObzHX31xnANzFcXnq1/5dMK5QvW4Jh7n0fm4+4ywqiy2QIDAQAB"
+1121755._domainkey        3600  IN  TXT    "k=rsa; p=MIGfMA0GCSqGSIb3DQEBAQUAA4GNADCBiQKBgQDZ9jmeHIUDtxWTinyRDdRvZszNqeTOfRHpNmermpzyVow8Mw5Mc/LTXwRDMpGcxG0gnYdQHSPSihR9r9AaJ4BivT+eboXk8GJO+gu4owmRzASEYvPj0c18sY+BFeL1CrdZJxFKPeTCv59CpI8OpkyJqZ4ZoRxLyZ+YshInReoSAwIDAQAB"
+bounce-zem                3600  IN  CNAME  cluster89.zeptomail.com.
+zb15474756                3600  IN  CNAME  zmverify.zoho.com.
+mail                      3600  IN  CNAME  mail.cs.zohohost.com.
+forms                     3600  IN  CNAME  forms.cs.zohohost.com.
+
+; Email policy: no enforcement, as Wix's record had (that one also sent reports to Wix's supplier)
+_dmarc                    3600  IN  TXT    "v=DMARC1; p=none;"
+
+; LITMUS
+litmus                    3600  IN  CNAME  litmus-prod-crossmaze.web.app.
+staging                   3600  IN  CNAME  litmus-staging-37942.web.app.
+_acme-challenge.staging   3600  IN  TXT    "TEgQsUbU57mZeJL6lOn6PuYBkXDZgGcFasRp3cfIs7g"
+_acme-challenge.app       3600  IN  TXT    "YcFfbe_HSsFPk8u0FwxPib0lKAOixwf1wrJT69jywIQ"
+
+
+; Not copied from Wix: CNAMEs s1._domainkey, s2._domainkey, sel1._domainkey, sel2._domainkey and sg
+; (they only let Wix send newsletters and automatic replies as @crossmaze.in, through SendGrid; Zoho
+; uses none of them), and the _dmarc CNAME to _dmarc.wixemails.com, replaced by the TXT above.

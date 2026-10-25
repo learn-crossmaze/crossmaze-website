@@ -20,6 +20,7 @@ See README.md for how the site, admin panel and LITMUS integration fit together.
 - Timings live on each branch as `batches` (program, name, from/to, days, seats; `src/data/batches.ts`) and are shown only on that branch's page; don't add school-wide timings elsewhere.
 - Branch admins (`branchAdmins/{email}`) may only write their own blog posts (`createdBy`), change `centerHead` and `batches` on their branches and publish. Anything new they should reach needs a rule in `firestore.rules`/`storage.rules`, a test in `tests/rules.test.mjs` and `roles` on its `NAV` entry in `src/admin/AdminApp.tsx`.
 - Don't invent facts about the school (fees, timings, staff, results). Add anything that needs checking to "Please verify before launch" in README.md; facts the school has confirmed (ages on 1 June, CCTV live view for day care parents only…) are under "Confirmed by the school".
+- crossmaze.in's DNS records are listed in `dns/crossmaze.in.zone` (README, "Point the domain"). The Zoho email records there (MX, SPF, DKIM, `bounce-zem`, `mail`…) must never change; keep the file in step with any DNS change.
 
 ## Checks
 
