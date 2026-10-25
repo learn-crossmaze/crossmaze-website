@@ -197,7 +197,7 @@ Wix's own email records are not copied: the CNAMEs `s1._domainkey`, `s2._domaink
 
 **Never** edit the email rows, use Zoho's “Log in to my DNS” (it rewrites them), press **Add Forwarding** at GoDaddy (it moves the nameservers at once and locks the A record), or accept a GoDaddy offer to set up email, a website or a “connection” for crossmaze.in.
 
-**How GoDaddy's record forms work**: **Name** is the part before `.crossmaze.in` (`zoho._domainkey`, `www`…); `@` is the domain itself. Paste values without quotes, without a full stop at the end and without `https://`; an MX's priority goes in its own box. TTL: **1/2 Hour** for the A `@`, www, SPF and litmus rows, **1 Hour** for the rest.
+**How GoDaddy's record forms work**: **Name** is the part before `.crossmaze.in` (`zoho._domainkey`, `www`…); `@` is the domain itself. Paste values without quotes, without a full stop at the end and without `https://`; an MX's priority goes in its own box. TTL: **1/2 Hour** for the A `@` and www rows, **1 Hour** for the rest.
 
 **Before evening 1**
 

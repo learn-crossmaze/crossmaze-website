@@ -16,7 +16,7 @@ www                       1800  IN  CNAME  pointing.wixdns.net.
 @                         3600  IN  MX     10 mx.zoho.com.
 @                         3600  IN  MX     20 mx2.zoho.com.
 @                         3600  IN  MX     30 mx3.zoho.com.
-@                         1800  IN  TXT    "v=spf1 include:zoho.com include:zohomail.com include:sender.zohobooks.com ~all"
+@                         3600  IN  TXT    "v=spf1 include:zoho.com include:zohomail.com include:sender.zohobooks.com ~all"
 zoho._domainkey           3600  IN  TXT    "v=DKIM1; k=rsa; p=MIGfMA0GCSqGSIb3DQEBAQUAA4GNADCBiQKBgQCV1kEIYHW+wq8++FTsPHrAPUaevlTNQygNKXJx3aA8EVgXL0nRhXrnFVO1wyXQYGKUbPG/FB8wo/iRM1xoK+uqYKvfs1z64ySYi81bm3MICuhJwN5UAuDJqUhwnMCXJYWDkNzswY53vh3vZl72E7MHD315UelBXtDkmbQPe4zKMQIDAQAB"
 1522905413783._domainkey  3600  IN  TXT    "k=rsa; p=MIGfMA0GCSqGSIb3DQEBAQUAA4GNADCBiQKBgQCr6KMgdxxgg7oT3ulMwPJs9RXgXDrI9UWU118pHEMohl3UbL3Jwp4oxp/9N3thh/3WCJnYV134zbEVolZwqaT3JsFEq/mQ/RpW/JnOZ3rnxqJPurb2bcfJol4SDxiWVObzHX31xnANzFcXnq1/5dMK5QvW4Jh7n0fm4+4ywqiy2QIDAQAB"
 1121755._domainkey        3600  IN  TXT    "k=rsa; p=MIGfMA0GCSqGSIb3DQEBAQUAA4GNADCBiQKBgQDZ9jmeHIUDtxWTinyRDdRvZszNqeTOfRHpNmermpzyVow8Mw5Mc/LTXwRDMpGcxG0gnYdQHSPSihR9r9AaJ4BivT+eboXk8GJO+gu4owmRzASEYvPj0c18sY+BFeL1CrdZJxFKPeTCv59CpI8OpkyJqZ4ZoRxLyZ+YshInReoSAwIDAQAB"
@@ -29,7 +29,7 @@ forms                     3600  IN  CNAME  forms.cs.zohohost.com.
 _dmarc                    3600  IN  TXT    "v=DMARC1; p=none;"
 
 ; LITMUS
-litmus                    1800  IN  CNAME  litmus-prod-crossmaze.web.app.
+litmus                    3600  IN  CNAME  litmus-prod-crossmaze.web.app.
 staging                   3600  IN  CNAME  litmus-staging-37942.web.app.
 _acme-challenge.staging   3600  IN  TXT    "TEgQsUbU57mZeJL6lOn6PuYBkXDZgGcFasRp3cfIs7g"
 _acme-challenge.app       3600  IN  TXT    "YcFfbe_HSsFPk8u0FwxPib0lKAOixwf1wrJT69jywIQ"
