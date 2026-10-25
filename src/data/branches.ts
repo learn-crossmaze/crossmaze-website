@@ -1,6 +1,6 @@
 // Every Crossmaze centre (content/branches.json, edited from the admin panel).
 // Each entry becomes a page at /branch/<slug>; keep slugs unchanged so old links keep working.
-// A branch's first photo is its cover; the next five fill the gallery.
+// A branch's first photo is its cover; up to nine more fill the gallery, and the album has them all.
 import type { ImageMetadata } from 'astro';
 import { amenityList } from './amenities';
 import { cleanBatches } from './batches';

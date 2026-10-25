@@ -10,6 +10,7 @@ const { variant = 'page' } = Astro.props;
 
 type Shape = {
   size: number;
+  /** Where the shape's top-left corner goes: any CSS length (see the notes on each set below). */
   top: string;
   left: string;
   motion: 'bob' | 'drift' | 'spin';
@@ -18,19 +19,32 @@ type Shape = {
   /** Hidden once the banner stacks into one column (900px and narrower), where it would cover text. */
   hideOnMobile?: boolean;
   /** Where to put the shape in the one-column layout, if different (keeps it clear of the text). */
-  mobile?: { top: string; left: string };
+  mobile?: { top?: string; left?: string };
 };
 
 // A few doodles only, so the banners stay calm and the text has room. Each is drawn by the theme's
 // --doodle-home-1…4 or --doodle-page-1…3 (in Pastel: a cloud, the sun, a balloon and a paper plane).
+
+// Home: placed against the centred content, not the full-width banner, so they keep the same
+// distance from the text at every width however long the owner's hero text gets. Across, 0 is the
+// left edge of the content and 100% its right edge; down, 0 is just below the header and 100% the
+// banner's bottom edge. Each spot leaves room for the doodle's movement (bob: 18px up; drift: 30px
+// left and 40px right). The sizes in use (--w) come from the style below.
 const home: Shape[] = [
-  { size: 120, top: '6%', left: '34%', motion: 'drift', dur: 28, delay: -4, hideOnMobile: true },
-  { size: 58, top: '6%', left: '87%', motion: 'bob', dur: 9, delay: -8 },
-  { size: 50, top: '58%', left: '2%', motion: 'bob', dur: 7, delay: -2, mobile: { top: '47%', left: '86%' } },
-  // In the one-column layout it would sit behind the photos, with only a sliver showing between them.
-  { size: 46, top: '80%', left: '28%', motion: 'drift', dur: 16, delay: -5, hideOnMobile: true },
+  // The big one, from 1181px: beside the end of the title, just clear of the photo column
+  // (.hero__inner in pages/index.astro: columns 1fr 1.05fr with a --col-gap gap). It bobs, as there
+  // is no room there to drift sideways.
+  { size: 120, top: '36px', left: 'calc((100% - var(--col-gap)) / 2.05 + var(--col-gap) - 18px - var(--w))', motion: 'bob', dur: 12, delay: -4 },
+  // Above the right end of the photos; in one column, beside the first line of the title, reaching
+  // a little into the page gutter to keep clear of the line ends.
+  { size: 58, top: '16px', left: 'calc(100% - 40px - var(--w))', motion: 'bob', dur: 9, delay: -8, mobile: { top: 'calc(var(--banner-pad-top) + 4px)', left: 'calc(100% + 6px - var(--w))' } },
+  // From 1360px, in the middle of the page margin on the left (no room for it below that).
+  { size: 50, top: '58%', left: 'calc((var(--room) + var(--w)) / -2)', motion: 'bob', dur: 7, delay: -2 },
+  // In the banner's bottom padding: below the facts, or below the photos in one column.
+  { size: 46, top: 'calc(100% - (var(--pad-b) + var(--w)) / 2)', left: '30%', motion: 'drift', dur: 16, delay: -5, mobile: { left: '16%' } },
 ];
 
+// Inner pages: as percentages of the full-width banner.
 const page: Shape[] = [
   { size: 104, top: '10%', left: '62%', motion: 'drift', dur: 26, delay: -3, mobile: { top: '1%', left: '66%' } },
   { size: 32, top: '18%', left: '90%', motion: 'spin', dur: 20, delay: -2 },
@@ -38,6 +52,20 @@ const page: Shape[] = [
 ];
 
 const shapes = variant === 'home' ? home : page;
+
+const style = (s: Shape, n: number) =>
+  [
+    `--art:var(--doodle-${variant}-${n})`,
+    `--size:${s.size}px`,
+    `--top:${s.top}`,
+    `--left:${s.left}`,
+    `--dur:${s.dur}s`,
+    `--delay:${s.delay}s`,
+    s.mobile?.top && `--top-m:${s.mobile.top}`,
+    s.mobile?.left && `--left-m:${s.mobile.left}`,
+  ]
+    .filter(Boolean)
+    .join(';');
 ---
 
 <div class:list={['fx', `fx--${variant}`]} aria-hidden="true">
@@ -47,7 +75,7 @@ const shapes = variant === 'home' ? home : page;
       shapes.map((s, i) => (
         <span
           class:list={['fx__shape', `fx__shape--${s.motion}`, `fx__shape--${variant}-${i + 1}`, { 'fx__shape--desktop': s.hideOnMobile }]}
-          style={`--art:var(--doodle-${variant}-${i + 1});--size:${s.size}px;--top:${s.top};--left:${s.left};--dur:${s.dur}s;--delay:${s.delay}s${s.mobile ? `;--top-m:${s.mobile.top};--left-m:${s.mobile.left}` : ''}`}
+          style={style(s, i + 1)}
         />
       ))
     }
@@ -84,6 +112,20 @@ const shapes = variant === 'home' ? home : page;
     inset: var(--under-header, 0px) 0 0;
   }
 
+  /* Home: the doodles' box is the centred content (.container), so the places in the list above are
+     measured from the text rather than from the window's edges. The banner still clips them. */
+  .fx--home .fx__shapes {
+    --content-inset: max(var(--gutter), calc(50% - var(--container) / 2));
+    /* Copied from the home banner (pages/index.astro): the gap between text and photos, and the
+       padding under them. */
+    --col-gap: clamp(32px, 5vw, 64px);
+    --pad-b: clamp(48px, 7vw, 96px);
+    /* The page margin beside the content (as for the section doodles in global.css). */
+    --room: calc(50vw - var(--container) / 2);
+    left: var(--content-inset);
+    right: var(--content-inset);
+  }
+
   @keyframes fx-aurora {
     0% {
       transform: translate3d(0, 0, 0) rotate(0deg) scale(1);
@@ -97,10 +139,12 @@ const shapes = variant === 'home' ? home : page;
   }
 
   .fx__shape {
+    /* The size the doodle is drawn at, which the places above can use. */
+    --w: var(--size);
     position: absolute;
     top: var(--top);
     left: var(--left);
-    width: var(--size);
+    width: var(--w);
     aspect-ratio: 1;
     background: var(--art) no-repeat center / contain;
     animation-duration: var(--dur);
@@ -159,31 +203,41 @@ const shapes = variant === 'home' ? home : page;
     }
   }
 
-  /* Home banner, 901–1359px: the two columns leave no room at the left edge, so the doodle there
-     would sit behind the text (it comes back at 1360px, where the page margin opens up, as the
-     section doodles do); the low one moves below the facts, the top-right one up out of the big
-     photo, and the big top one waits until the title is narrow enough to leave room above it. */
-  @media (min-width: 901px) and (max-width: 1359px) {
-    .fx__shape--home-2 {
-      top: 4%;
-    }
-    .fx__shape--home-3 {
-      display: none;
-    }
-    .fx__shape--home-4 {
-      top: 91%;
+  @media (max-width: 760px) {
+    .fx__shape {
+      --w: calc(var(--size) * 0.7);
     }
   }
 
-  @media (min-width: 901px) and (max-width: 1180px) {
+  /* Home banner. The big doodle needs the room the title leaves beside the photos, which opens up
+     at 1181px (a size smaller until the content reaches full width); the one in the left margin
+     needs the margin, from 1360px as for the section doodles; the one below the facts shrinks to
+     fit the bottom padding on narrower screens. */
+  @media (max-width: 1180px) {
     .fx__shape--home-1 {
       display: none;
     }
   }
 
+  @media (max-width: 1219px) {
+    .fx__shape--home-1 {
+      --w: 104px;
+    }
+  }
+
+  @media (max-width: 1359px) {
+    .fx__shape--home-3 {
+      display: none;
+    }
+  }
+
+  .fx__shape--home-4 {
+    --w: min(var(--size), var(--pad-b) - 22px);
+  }
+
   @media (max-width: 760px) {
-    .fx__shape {
-      width: calc(var(--size) * 0.7);
+    .fx__shape--home-4 {
+      --w: min(var(--size) * 0.7, var(--pad-b) - 18px);
     }
   }
 

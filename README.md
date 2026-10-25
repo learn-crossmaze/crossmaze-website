@@ -21,7 +21,7 @@ The URLs match the old site, so existing links and Google results keep working.
 | `/` | Home: hero, stats, about, core values, programs, a day at Crossmaze, day care, facilities, testimonials, branches, how admission works, admission enquiry |
 | `/about` | Who we are, core values, approach, annual-day photos, founders |
 | `/our-programs` | Play Group, Nursery, Junior KG, Senior KG, Day Care, how we teach, a day at Crossmaze, extra-curriculars, FAQs |
-| `/branch` and `/branch/<slug>` | All branches, then one page per branch: photos, facts (including opening hours), programs with their batches and timings, amenities, gallery, centre head, map, enquiry form |
+| `/branch` and `/branch/<slug>` | All branches, then one page per branch: photos, facts (including opening hours), programs with their batches and timings, about the centre with its amenities and centre head, gallery, then the visit details and map beside the enquiry form |
 | `/careers` | Why work with us, open roles, application form with resume upload |
 | `/contact` | Admission enquiry, phone / WhatsApp / email, how admission works, all branch addresses |
 | `/privacy-policy`, `/terms` | Carried over from the old site (`src/pages/*.md`) |

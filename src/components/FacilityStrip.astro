@@ -4,6 +4,7 @@
 // Photos are set per facility in the admin panel (Page sections → Facilities); a facility without a
 // photo shows its icon on a soft tint instead.
 import { Image, getImage } from 'astro:assets';
+import type { ImageMetadata } from 'astro';
 import Icon from './Icon.astro';
 import PhotoAlbum from './PhotoAlbum.astro';
 import { hasImage, image } from '../data/content';
@@ -20,6 +21,22 @@ const withPhotos = cards.filter((c) => c.photo);
 // Without JavaScript a photo link opens the full-size photo.
 const fullSize = await Promise.all(withPhotos.map((c) => getImage({ src: c.photo!, width: 1400, format: 'webp' })));
 const albumIndex = new Map(withPhotos.map((c, i) => [c, i]));
+
+// How wide a photo is drawn, for its `sizes`: the frame's width (the card column, see .strip__track,
+// less the 5px glass ring each side). A photo wider than the 16:10 frame is cropped from a copy as tall
+// as the frame, so wider than it.
+const frameWidths = [
+  ['(max-width: 640px)', '76vw - 10px'],
+  ['(max-width: 961px)', '240px'],
+  ['(max-width: 1307px)', '26vw - 10px'],
+  ['', '330px'],
+];
+function sizesFor(photo: ImageMetadata) {
+  const spill = photo.width / photo.height / (16 / 10);
+  return frameWidths
+    .map(([media, width]) => `${media} ${spill > 1.02 ? `calc((${width}) * ${spill.toFixed(2)})` : width.includes(' ') ? `calc(${width})` : width}`.trim())
+    .join(', ');
+}
 ---
 
 <div class="strip" data-strip>
@@ -36,7 +53,7 @@ const albumIndex = new Map(withPhotos.map((c, i) => [c, i]));
               aria-haspopup="dialog"
             >
               <span class="strip__frame">
-                <Image src={card.photo} alt={card.title} widths={[360, 560, 800]} sizes="(max-width: 640px) 76vw, 340px" />
+                <Image src={card.photo} alt={card.title} widths={[360, 480, 660, 960]} sizes={sizesFor(card.photo)} />
               </span>
               <span class="icon-badge strip__badge">
                 <Icon name={card.icon} size={22} />
@@ -192,7 +209,10 @@ const albumIndex = new Map(withPhotos.map((c, i) => [c, i]));
     box-shadow: var(--shadow-lift);
   }
 
+  /* Every photo, whatever its shape, is cropped from its centre to the same 16:10 frame. The photo is
+     taken out of the grid: as a grid item it would set the row to its own height and lose its bottom. */
   .strip__frame {
+    position: relative;
     display: grid;
     place-items: center;
     aspect-ratio: 16 / 10;
@@ -201,6 +221,8 @@ const albumIndex = new Map(withPhotos.map((c, i) => [c, i]));
   }
 
   .strip__frame :global(img) {
+    position: absolute;
+    inset: 0;
     width: 100%;
     height: 100%;
     object-fit: cover;

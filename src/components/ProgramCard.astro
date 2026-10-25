@@ -5,14 +5,18 @@ import type { Program } from '../data/programs';
 
 interface Props {
   program: Program;
+  /** How wide the card is drawn, for the photo's `sizes`. The default fits `.grid--3` in a `.container`
+      (one column below 552px, two below 880px, then three of at most 378px); pass your own if the
+      cards sit in another layout. */
+  sizes?: string;
 }
-const { program } = Astro.props;
+const { program, sizes = '(max-width: 551px) calc(100vw - 32px), (max-width: 879px) calc(50vw - 28px), (max-width: 1219px) calc(33.4vw - 29px), 378px' } = Astro.props;
 ---
 
 <a class:list={['program-card', 'card', `tone-${program.color}`]} href={`/our-programs#${program.slug}`}>
   <span class="program-card__media">
     <span class="program-card__photo">
-      <Image src={program.photo} alt={program.photoAlt} widths={[360, 560]} sizes="(max-width: 700px) 100vw, 360px" />
+      <Image src={program.photo} alt={program.photoAlt} widths={[400, 600, 800, 1000, 1240]} sizes={sizes} />
     </span>
     <span class="program-card__ages">{program.ages}</span>
   </span>
@@ -40,19 +44,25 @@ const { program } = Astro.props;
     transform: translateY(-3px);
     box-shadow: var(--glass-rim), var(--shadow-lift);
   }
+  /* Every photo, whatever its shape, is cropped from its centre to the same 16:9 box, so the titles
+     line up across a row. The photo is taken out of the flow: as content it would stretch the box
+     to its own height. */
   .program-card__media {
     position: relative;
     display: block;
+    flex: none;
     aspect-ratio: 16 / 9;
     background: linear-gradient(135deg, var(--badge-bg) 0%, var(--badge-bg-2, var(--badge-bg)) 100%);
   }
   /* Clips the photo's hover zoom. */
   .program-card__photo {
-    display: block;
-    height: 100%;
+    position: absolute;
+    inset: 0;
     overflow: hidden;
   }
   .program-card__media :global(img) {
+    position: absolute;
+    inset: 0;
     width: 100%;
     height: 100%;
     object-fit: cover;

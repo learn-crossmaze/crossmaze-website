@@ -1,17 +1,12 @@
 ---
-import { Image } from 'astro:assets';
 import BaseLayout from '../layouts/BaseLayout.astro';
 import PageHero from '../components/PageHero.astro';
 import SectionHeading from '../components/SectionHeading.astro';
 import Icon from '../components/Icon.astro';
 import Steps from '../components/Steps.astro';
+import ProgramDetail from '../components/ProgramDetail.astro';
 import { programs, approach, extracurricular } from '../data/programs';
-import { branches, shortName } from '../data/branches';
 import { site, faqs, dayRoutine } from '../data/site';
-
-// Timings live on each branch's page, so each program links to the centres that run it.
-const centresFor = (slug: string) => branches.filter((b) => b.programs.includes(slug));
-
 ---
 
 <BaseLayout
@@ -35,72 +30,9 @@ const centresFor = (slug: string) => branches.filter((b) => b.programs.includes(
     </nav>
   </PageHero>
 
-  <section class="section section--white">
+  <section class="section programs-section">
     <div class="container programs">
-      {
-        programs.map((p) => (
-          <article id={p.slug} class:list={['program', `tone-${p.color}`]}>
-            <div class="program__media">
-              <Image src={p.photo} alt={p.photoAlt} widths={[480, 720]} sizes="(max-width: 860px) 100vw, 460px" />
-              <span class="icon-badge">
-                <Icon name={p.icon} size={28} />
-              </span>
-            </div>
-            <div class="program__body">
-              <div class="program__meta">
-                <span class="pill">
-                  <Icon name="Baby" size={16} /> {p.ages}
-                </span>
-              </div>
-              <h2>{p.name}</h2>
-              <p class="lead">{p.headline}</p>
-              {p.paragraphs.map((para) => (
-                <p class="muted">{para}</p>
-              ))}
-              <h3 class="program__focus-title">{p.focusTitle}</h3>
-              <ul class="check-list">
-                {p.focus.map((h) => (
-                  <li>
-                    <Icon name="Check" size={20} />
-                    {h}
-                  </li>
-                ))}
-              </ul>
-              {(p.joining || centresFor(p.slug).length > 0) && (
-                <dl class="program__facts card">
-                  {p.joining && (
-                    <div>
-                      <dt>
-                        <Icon name="CalendarCheck" size={18} /> Who can join
-                      </dt>
-                      <dd>{p.joining}</dd>
-                    </div>
-                  )}
-                  {centresFor(p.slug).length > 0 && (
-                    <div>
-                      <dt>
-                        <Icon name="Clock" size={18} /> Timings
-                      </dt>
-                      <dd>
-                        On each centre’s page:{' '}
-                        {centresFor(p.slug).map((b, i) => (
-                          <>
-                            {i > 0 && ', '}
-                            <a href={`/branch/${b.slug}#timings`}>{shortName(b)}</a>
-                          </>
-                        ))}
-                      </dd>
-                    </div>
-                  )}
-                </dl>
-              )}
-              <a class="btn" href={`/contact?program=${encodeURIComponent(p.name)}#enquire`}>
-                Enquire about {p.name}
-              </a>
-            </div>
-          </article>
-        ))
-      }
+      {programs.map((p, i) => <ProgramDetail program={p} flip={i % 2 === 1} />)}
     </div>
   </section>
 
@@ -111,7 +43,7 @@ const centresFor = (slug: string) => branches.filter((b) => b.programs.includes(
         title="Our Foundational Development Program"
         lead="Our thematic approach turns learning into an immersive experience, bringing cognitive, language, personal, social, emotional and physical development together in every theme."
       />
-      <div class="grid grid--4">
+      <div class="grid grid--4 approach">
         {
           approach.map((a) => (
             <div class="card">
@@ -152,7 +84,7 @@ const centresFor = (slug: string) => branches.filter((b) => b.programs.includes(
           lead="Activities that build physical well-being, creativity and confidence, outside the core curriculum."
         />
       </div>
-      <ul class="extra__list">
+      <ul class="grid grid--3 extra__list">
         {
           extracurricular.map((e, i) => (
             <li class:list={['card', `tone-${['sun', 'coral', 'green', 'sky', 'navy', 'sun'][i % 6]}`]}>
@@ -213,130 +145,15 @@ const centresFor = (slug: string) => branches.filter((b) => b.programs.includes(
     text-decoration: none;
   }
 
+  /* The five programs, each on its own glass panel (components/ProgramDetail.astro). */
   .programs {
     display: grid;
-    gap: clamp(56px, 8vw, 96px);
+    gap: clamp(24px, 4vw, 48px);
   }
 
-  .program {
-    display: grid;
-    grid-template-columns: 0.8fr 1.2fr;
-    gap: clamp(28px, 5vw, 64px);
-    align-items: center;
-  }
-
-  .program:nth-child(even) .program__media {
-    order: 2;
-  }
-
-  @media (max-width: 860px) {
-    .program {
-      grid-template-columns: 1fr;
-    }
-    .program:nth-child(even) .program__media {
-      order: 0;
-    }
-  }
-
-  .program__media {
-    position: relative;
-    aspect-ratio: 4 / 3;
-    border-radius: var(--radius-lg);
-    background: linear-gradient(135deg, var(--badge-bg) 0%, var(--badge-bg-2, var(--badge-bg)) 100%);
-  }
-
-  /* At night the glass frame would take on the dark tint behind it and look muddy: let the page
-     show through instead, as round every other photo. */
-  :global(:root[data-mode='dark']) .program__media {
-    background: none;
-  }
-
-  .program__media :global(img) {
-    width: 100%;
-    height: 100%;
-    object-fit: cover;
-    padding: 6px;
-    border-radius: var(--radius-photo);
-    background: var(--g-ring);
-    box-shadow: var(--shadow);
-  }
-
-  .program__media .icon-badge {
-    position: absolute;
-    right: -14px;
-    bottom: -14px;
-    width: 64px;
-    height: 64px;
-    margin: 0;
-    border: 5px solid var(--paper);
-    border-radius: 20px;
-    box-sizing: content-box;
-  }
-
-  @media (max-width: 860px) {
-    .program__media .icon-badge {
-      right: 12px;
-    }
-  }
-
-  .program__focus-title {
-    margin-top: 1.4em;
-    font-size: 1.05rem;
-  }
-
-  .program__meta {
-    display: flex;
-    flex-wrap: wrap;
-    gap: 8px;
-    margin-bottom: 16px;
-  }
-
-  .program__body .check-list {
-    margin: 8px 0 24px;
-  }
-
-  /* Who can join and where to find the timings: a small glass card above the enquire button. */
-  .program__facts {
-    display: grid;
-    gap: 10px;
-    margin: 0 0 28px;
-    padding: 16px 20px;
-    container-type: inline-size;
-  }
-
-  .program__facts div {
-    display: grid;
-    grid-template-columns: 9.5em 1fr;
-    gap: 4px 12px;
-  }
-
-  .program__facts dt {
-    display: flex;
-    align-self: start;
-    align-items: center;
-    gap: 8px;
-    font-weight: 800;
-  }
-
-  .program__facts dt :global(svg) {
-    flex: none;
-    color: var(--badge-fg, var(--navy));
-  }
-
-  .program__facts dd {
-    margin: 0;
-    color: var(--muted);
-  }
-
-  .program__facts dd a {
-    white-space: nowrap;
-  }
-
-  /* A narrow card (phones, and the programs whose text sits in the narrower column) puts each value under its label. */
-  @container (max-width: 460px) {
-    .program__facts div {
-      grid-template-columns: 1fr;
-    }
+  /* Four across only where each card has room for its text (two by two on tablets and small laptops). */
+  .approach {
+    --grid-cols-at: 1060px;
   }
 
   .extra {
@@ -352,10 +169,12 @@ const centresFor = (slug: string) => branches.filter((b) => b.programs.includes(
     }
   }
 
+  /* The shared count-aware grid (global.css), with steps for its narrower column: three in a row from
+     560px (six activities: 3 + 3), then two. */
   .extra__list {
-    display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(min(100%, 170px), 1fr));
-    gap: 16px;
+    --grid-gap: 16px;
+    --grid-cols-at: 560px;
+    --grid-two-at: 300px;
     margin: 0;
     padding: 0;
     list-style: none;
