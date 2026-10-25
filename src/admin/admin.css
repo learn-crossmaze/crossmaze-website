@@ -587,6 +587,12 @@ p > .chip:first-child {
   color: var(--a-muted);
 }
 
+/* A text's length against its soft guide (schemas.ts `suggestMax`): amber once past it. */
+.help.length--over {
+  color: #8a5a00;
+  font-weight: 700;
+}
+
 input:not([type='checkbox']):not([type='file']),
 select,
 textarea {
