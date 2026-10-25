@@ -28,9 +28,11 @@ export function Icon({ name, size = 18, className }: { name: string; size?: numb
 const asObj = (v: Value): Obj => (v && typeof v === 'object' && !Array.isArray(v) ? (v as Obj) : {});
 const asList = <T,>(v: Value): T[] => (Array.isArray(v) ? (v as T[]) : []);
 const asText = (v: Value) => (v == null ? '' : String(v));
-/** An objects field's items, reading any stored as text through the field's `fromText`. */
+/** An objects field's items, reading any stored as text through the field's `fromText` (blank ones are skipped). */
 const itemsOf = (field: Extract<Field, { type: 'objects' }>, v: Value): Obj[] =>
-  asList<Value>(v).map((item) => (typeof item === 'string' && field.fromText ? field.fromText(item) : asObj(item)));
+  asList<Value>(v)
+    .filter((item) => !(field.fromText && typeof item === 'string' && !item.trim()))
+    .map((item) => (typeof item === 'string' && field.fromText ? field.fromText(item) : asObj(item)));
 
 function move<T>(list: T[], from: number, to: number): T[] {
   if (to < 0 || to >= list.length) return list;
@@ -564,16 +566,19 @@ function ImagesField({ folder, value, onChange }: { folder: string; value: strin
   );
 }
 
-/** A form's value as it is stored: the items of objects fields with `toText` become text. */
-export function forStorage(fields: Field[], value: Obj): Obj {
+/**
+ * A form's value as it is stored: the items of objects fields with `toText` become text. With `reread`, items
+ * already stored as text are read and written again too, so two values that read the same compare equal.
+ */
+export function forStorage(fields: Field[], value: Obj, reread = false): Obj {
   const out = { ...value };
   for (const field of fields) {
     if (field.type === 'heading') continue;
     const v = out[field.key];
-    if (field.type === 'group' && v && typeof v === 'object' && !Array.isArray(v)) out[field.key] = forStorage(field.fields, v as Obj);
+    if (field.type === 'group' && v && typeof v === 'object' && !Array.isArray(v)) out[field.key] = forStorage(field.fields, v as Obj, reread);
     else if (field.type === 'objects' && field.toText && Array.isArray(v)) {
       const toText = field.toText;
-      out[field.key] = v.map((item) => (typeof item === 'string' ? item : toText(asObj(item))));
+      out[field.key] = (reread ? itemsOf(field, v) : v).map((item) => (typeof item === 'string' ? item : toText(asObj(item))));
     }
   }
   return out;

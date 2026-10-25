@@ -211,7 +211,7 @@ function ItemEditor({ config, item }: { config: CollectionConfig; item: Item }) 
   const { id, ...stored } = item;
   const [draft, setDraft] = useState<Obj>(stored);
   const [saving, setSaving] = useState(false);
-  const dirty = !same(forStorage(config.schema, draft), stored);
+  const dirty = !same(forStorage(config.schema, draft, true), forStorage(config.schema, stored, true));
   useUnsavedWarning(dirty);
 
   const save = async () => {

@@ -14,14 +14,15 @@ export function DocEditor({ path, title, intro, schema }: { path: string; title:
   const { data, loading, error } = useDoc<Obj>(services.db, path);
   const [draft, setDraft] = useState<Obj | null>(null);
   const [saving, setSaving] = useState(false);
-  const dirty = draft !== null && !same(forStorage(schema, draft), data ?? {});
+  const dirty = draft !== null && !same(forStorage(schema, draft, true), forStorage(schema, data ?? {}, true));
   useUnsavedWarning(dirty);
 
   // Follow the stored document until the editor starts changing things.
   const synced = useRef<Obj | undefined>(undefined);
   useEffect(() => {
     if (loading) return;
-    setDraft((current) => (current === null || same(forStorage(schema, current), synced.current ?? {}) ? (data ?? {}) : current));
+    const previous = synced.current ?? {};
+    setDraft((current) => (current === null || same(forStorage(schema, current, true), forStorage(schema, previous, true)) ? (data ?? {}) : current));
     synced.current = data;
   }, [data, loading]);
 

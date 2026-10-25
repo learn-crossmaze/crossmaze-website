@@ -7,10 +7,15 @@ export interface AboutParagraph {
   text: string;
 }
 
-const blankLine = /\r?\n[ \t]*\r?\n/;
+/** A line with nothing on it but spaces (including non-breaking and zero-width ones). */
+const blankLine = /\r?\n(?:[^\S\r\n]|[​﻿])*\r?\n/;
+/** Ends like a sentence: a full stop, question or exclamation mark or ellipsis, maybe inside quotes or brackets. */
+const sentenceEnd = /[.!?…]["'’”)\]]*$/;
 
-/** Longest subheading the admin accepts; the reader allows a little more for the colon. */
+/** Longest subheading the admin accepts, and the longest first line read as one. */
 export const aboutHeadingMax = 120;
+
+const cleanHeading = (heading: string | undefined) => (heading ?? '').trim().replace(/\s*[:：]$/, '');
 
 export function aboutParagraph(raw: unknown): AboutParagraph {
   if (raw && typeof raw === 'object') {
@@ -21,24 +26,25 @@ export function aboutParagraph(raw: unknown): AboutParagraph {
   const [first = '', ...rest] = value.split(blankLine);
   const body = rest.join('\n\n').trim();
   const line = first.trim();
+  const heading = cleanHeading(line);
   // A short first line on its own, not a sentence, is the subheading (without its colon).
-  if (body && !/\n/.test(line) && line.length <= aboutHeadingMax + 10 && !/[.!?]$/.test(line))
-    return { heading: line.replace(/\s*[:：]$/, ''), text: body };
+  if (body && heading && !/\n/.test(line) && heading.length <= aboutHeadingMax && !sentenceEnd.test(line)) return { heading, text: body };
   return { heading: '', text: value };
 }
 
 /** How an About paragraph is stored: what `aboutParagraph` reads back. */
 export function aboutText(paragraph: Partial<AboutParagraph>): string {
-  const heading = (paragraph.heading ?? '').trim().replace(/\s*[:：]$/, '');
+  const heading = cleanHeading(paragraph.heading);
   const text = (paragraph.text ?? '').trim();
   return heading ? `${heading}:\n\n${text}` : text;
 }
 
 /** Why a paragraph wouldn't be read back as it was written, if it wouldn't. */
 export function aboutProblem(paragraph: Partial<AboutParagraph>): string | undefined {
-  if ((paragraph.heading ?? '').trim().length > aboutHeadingMax) return `Subheading must be ${aboutHeadingMax} characters or fewer`;
-  if (!(paragraph.heading ?? '').trim() && aboutParagraph(paragraph.text ?? '').heading)
-    return 'Its first line would show as a subheading: move it to Subheading, or end it with a full stop';
+  const heading = cleanHeading(paragraph.heading);
+  if (heading.length > aboutHeadingMax) return `Subheading must be ${aboutHeadingMax} characters or fewer`;
+  if (!heading && aboutParagraph(paragraph.text ?? '').heading)
+    return 'Its first line would show as a subheading: move it to Subheading, or remove the blank line after it';
   return undefined;
 }
 
