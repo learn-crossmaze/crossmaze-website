@@ -9,14 +9,22 @@ import { programs } from '../data/programs';
 
 const year = new Date().getFullYear();
 const mascot = image(site.mascot);
+// The 404 page shows the mascot large already, so the footer leaves its small one out there.
+const showMascot = !/^\/404(\.html)?\/?$/.test(Astro.url.pathname);
+// The company name is edited in the admin panel and may already end with a full stop ("… Pvt. Ltd.").
+const legalName = site.legalName.trim();
+const copyright = /[.!?]$/.test(legalName) ? legalName : `${legalName}.`;
 ---
 
 <footer class="site-footer">
   <div class="container">
     <div class="site-footer__grid">
       <div class="site-footer__about">
-        <Logo />
-        <p>
+        <div class="site-footer__brand">
+          <Logo />
+          {showMascot && <Image src={mascot} alt="" width={160} class="site-footer__mascot" />}
+        </div>
+        <p class="site-footer__blurb">
           A Montessori-based preschool and day care helping children in Electronic City and Begur grow into
           confident, curious and kind learners.
         </p>
@@ -34,51 +42,52 @@ const mascot = image(site.mascot);
             <a href={`mailto:${site.admissionsEmail}`}>{site.admissionsEmail}</a>
           </li>
         </ul>
-        <Image src={mascot} alt="" width={140} class="site-footer__mascot" />
       </div>
 
-      <div>
-        <h2 class="site-footer__heading">Explore</h2>
-        <ul class="site-footer__links">
-          {
-            nav.map((item) => (
-              <li>
-                <a href={item.href}>{item.label}</a>
-              </li>
-            ))
-          }
-        </ul>
-      </div>
+      <div class="site-footer__groups">
+        <div class="site-footer__group">
+          <h2 class="site-footer__heading">Explore</h2>
+          <ul class="site-footer__links">
+            {
+              nav.map((item) => (
+                <li>
+                  <a href={item.href}>{item.label}</a>
+                </li>
+              ))
+            }
+          </ul>
+        </div>
 
-      <div>
-        <h2 class="site-footer__heading">Programs</h2>
-        <ul class="site-footer__links">
-          {
-            programs.map((p) => (
-              <li>
-                <a href={`/our-programs#${p.slug}`}>{p.name}</a>
-              </li>
-            ))
-          }
-        </ul>
-      </div>
+        <div class="site-footer__group">
+          <h2 class="site-footer__heading">Programs</h2>
+          <ul class="site-footer__links">
+            {
+              programs.map((p) => (
+                <li>
+                  <a href={`/our-programs#${p.slug}`}>{p.name}</a>
+                </li>
+              ))
+            }
+          </ul>
+        </div>
 
-      <div>
-        <h2 class="site-footer__heading">Our branches</h2>
-        <ul class="site-footer__links">
-          {
-            branches.map((b) => (
-              <li>
-                <a href={`/branch/${b.slug}`}>{shortName(b)}</a>
-              </li>
-            ))
-          }
-        </ul>
+        <div class="site-footer__group site-footer__group--branches">
+          <h2 class="site-footer__heading">Our branches</h2>
+          <ul class="site-footer__links">
+            {
+              branches.map((b) => (
+                <li>
+                  <a href={`/branch/${b.slug}`}>{shortName(b)}</a>
+                </li>
+              ))
+            }
+          </ul>
+        </div>
       </div>
     </div>
 
     <div class="site-footer__bottom">
-      <p>© {year} {site.legalName}. All rights reserved.</p>
+      <p>© {year} {copyright} All rights reserved.</p>
       <ul class="site-footer__social">
         <li><a href="/privacy-policy">Privacy policy</a></li>
         <li><a href="/terms">Terms &amp; conditions</a></li>
@@ -98,7 +107,9 @@ const mascot = image(site.mascot);
 
 <style>
   /* No background of its own: the flowing page gradient continues underneath, and the footer
-     content sits on a liquid-glass panel, so there is no hard colour change. */
+     content sits on a liquid-glass panel, so there is no hard colour change. The panel is inset
+     like the call-out panels (section--feature): its edge sits --panel-edge inside the container's
+     edge, and the content is set in from the glass by --panel-pad on every side. */
   .site-footer {
     position: relative;
     padding-block: 24px 28px;
@@ -106,26 +117,25 @@ const mascot = image(site.mascot);
   }
 
   .site-footer > .container {
+    --footer-edge: var(--panel-edge, 8px);
+    --footer-pad: var(--panel-pad, clamp(24px, 4vw, 48px));
     position: relative;
     isolation: isolate;
-    padding-bottom: 24px;
+    padding: var(--footer-pad) calc(var(--footer-edge) + var(--footer-pad))
+      calc(var(--footer-pad) * 0.75);
   }
 
   .site-footer > .container::before {
     content: '';
     position: absolute;
     z-index: -1;
-    inset: 0 calc(var(--gutter) - min(40px, var(--gutter) - 8px));
+    inset: 0 var(--footer-edge);
     border: 1px solid var(--glass-edge);
     border-radius: 36px;
     background: var(--glass);
     -webkit-backdrop-filter: var(--glass-blur);
     backdrop-filter: var(--glass-blur);
     box-shadow: var(--glass-rim), var(--shadow);
-  }
-
-  .site-footer__grid {
-    padding-top: 48px;
   }
 
   .site-footer a {
@@ -138,36 +148,94 @@ const mascot = image(site.mascot);
     text-decoration: underline;
   }
 
+  /* Wide screens: the about block beside the three link groups and close to their height (the
+     mascot sits beside the logo, not under the contacts). Tablets: the about block on top (its
+     contacts beside the blurb once there is room) and the three groups in one row under it.
+     Phones: Explore and Programs side by side, the branches below in the same two columns. */
   .site-footer__grid {
     display: grid;
+    grid-template-columns: minmax(0, 2fr) minmax(0, 3fr);
     gap: 40px;
-    grid-template-columns: 1.6fr repeat(3, 1fr);
+    align-items: start;
+  }
+
+  /* A column is never narrower than its heading, which stays on one line. */
+  .site-footer__groups {
+    display: grid;
+    grid-template-columns: repeat(3, minmax(min-content, 1fr));
+    gap: 32px 24px;
   }
 
   @media (max-width: 900px) {
     .site-footer__grid {
-      grid-template-columns: 1fr 1fr;
+      grid-template-columns: minmax(0, 1fr);
+      gap: 36px;
     }
+  }
+
+  @media (min-width: 640px) and (max-width: 900px) {
     .site-footer__about {
-      grid-column: 1 / -1;
+      display: grid;
+      grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
+      grid-template-areas:
+        'brand contact'
+        'blurb contact';
+      grid-template-rows: auto 1fr;
+      column-gap: 32px;
+    }
+    .site-footer__brand {
+      grid-area: brand;
+    }
+    .site-footer__blurb {
+      grid-area: blurb;
+    }
+    .site-footer__contact {
+      grid-area: contact;
+      align-self: start;
+      margin-top: 0;
     }
   }
 
   @media (max-width: 480px) {
     .site-footer__grid {
-      grid-template-columns: 1fr;
+      gap: 32px;
+    }
+    .site-footer__groups {
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: 28px 20px;
+    }
+    .site-footer__group--branches {
+      grid-column: 1 / -1;
+    }
+    /* The branches keep the two columns above: down the first column, then the second. */
+    .site-footer__group--branches .site-footer__links {
+      display: block;
+      columns: 2;
+      column-gap: 20px;
+      margin-bottom: -10px;
+    }
+    .site-footer__group--branches .site-footer__links li {
+      break-inside: avoid;
+      padding-bottom: 10px;
     }
   }
 
-  .site-footer__about {
-    position: relative;
+  .site-footer__brand {
+    display: flex;
+    align-items: center;
+    gap: 14px;
   }
 
-  .site-footer__about :global(.site-footer__mascot) {
-    width: 120px;
+  .site-footer__brand > :global(.logo) {
+    flex: 0 1 auto;
+    min-width: 0;
+  }
+
+  .site-footer__brand :global(.site-footer__mascot) {
+    flex: none;
+    width: 64px;
     height: auto;
-    margin-top: 24px;
-    border-radius: 18px;
+    border-radius: 16px;
     /* A light tile in both modes: the drawing has black outlines (a softer tile at night). */
     background: var(--sticker);
     box-shadow: var(--shadow-sm);
@@ -175,8 +243,8 @@ const mascot = image(site.mascot);
   }
 
   /* At night the tile is framed like a photo, so it reads as a sticker, not a stray light box. */
-  :global(:root[data-mode='dark']) .site-footer__about :global(.site-footer__mascot) {
-    border: 4px solid transparent;
+  :global(:root[data-mode='dark']) .site-footer__brand :global(.site-footer__mascot) {
+    border: 3px solid transparent;
     background:
       linear-gradient(var(--sticker), var(--sticker)) padding-box,
       var(--g-ring) border-box;
@@ -184,17 +252,25 @@ const mascot = image(site.mascot);
 
   @keyframes mascot-bob {
     to {
-      transform: translateY(-6px) rotate(-2deg);
+      transform: translateY(-4px) rotate(-3deg);
     }
   }
 
-  .site-footer__about p {
+  @media (max-width: 480px) {
+    .site-footer__brand :global(.site-footer__mascot) {
+      width: 56px;
+      border-radius: 14px;
+    }
+  }
+
+  .site-footer__blurb {
     max-width: 42ch;
-    margin-top: 18px;
+    margin: 16px 0 0;
   }
 
   .site-footer__heading {
     margin-bottom: 14px;
+    white-space: nowrap;
     font-size: 1rem;
     letter-spacing: 0.06em;
     text-transform: uppercase;
@@ -211,12 +287,13 @@ const mascot = image(site.mascot);
 
   .site-footer__links {
     display: grid;
-    gap: 8px;
+    gap: 10px;
   }
 
   .site-footer__contact {
     display: grid;
     gap: 10px;
+    margin-top: 18px;
   }
 
   .site-footer__contact li {
@@ -231,12 +308,16 @@ const mascot = image(site.mascot);
     color: var(--eyebrow-fg);
   }
 
+  .site-footer__contact a {
+    overflow-wrap: anywhere;
+  }
+
   .site-footer__bottom {
     display: flex;
     flex-wrap: wrap;
     justify-content: space-between;
     gap: 12px 24px;
-    margin-top: 48px;
+    margin-top: clamp(32px, 4vw, 48px);
     padding-top: 24px;
     border-top: 1px solid color-mix(in srgb, var(--navy) 10%, transparent);
     font-size: 0.92rem;
@@ -249,6 +330,6 @@ const mascot = image(site.mascot);
   .site-footer__social {
     display: flex;
     flex-wrap: wrap;
-    gap: 18px;
+    gap: 8px 18px;
   }
 </style>

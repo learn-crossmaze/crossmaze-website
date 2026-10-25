@@ -1,0 +1,300 @@
+---
+// A row of cards that scrolls sideways: swipe, scroll or use the arrows. The cards snap into place, the
+// edges fade where there is more to see, and "3 of 12" under the row says where you are (read out to
+// screen readers when it changes). Each arrow press moves on by the cards that fit, at once rather than
+// gliding for visitors who ask for less motion. Without JavaScript the row still scrolls; only the
+// arrows, the fades and the position are left out.
+//
+// The cards are the slot's own elements: <li>s for the default <ul>, anything (articles, figures) with
+// as="div". Put the strip straight in a .container: it runs the full width of the window, with the
+// first card lined up with the page content.
+//
+// Phones-only strip (`below`): from that width up the cards are an ordinary grid, laid out by the
+// classes in `listClass` (.grid--3, .grid--4…); narrower screens get the strip, one card at a time with
+// the next one peeking in.
+//
+//   <Strip label="branches" below="700px" as="div" listClass="grid grid--3">
+//     {branches.map((b, i) => <BranchCard branch={b} index={i} />)}
+//   </Strip>
+//
+// Custom properties, set on the strip with `style` or on any parent:
+//   --strip-card     how wide a card is in the strip (by default clamp(250px, 26vw, 340px), and 76vw on
+//                    phones and in a phones-only strip)
+//   --strip-gap      the space between cards in the strip (24px; 16px on phones and phones-only)
+//   --strip-nav-top  where the arrows' centres sit, from the top of the row (by default the middle of
+//                    the cards); --strip-col is the card width in use, to work it out from
+import Icon from './Icon.astro';
+
+interface Props {
+  /** What the cards are, in the plural and lower case ("facilities"). It names the arrows ("Previous
+      facilities", "More facilities") and the position for screen readers ("4 of 12 facilities"). */
+  label: string;
+  /** A phones-only strip: from this width up (a length such as "700px") the cards are a grid. */
+  below?: string;
+  /** The element that holds the cards: a <ul> of <li>s (the default), an <ol>, or a <div>. */
+  as?: 'ul' | 'ol' | 'div';
+  /** Classes for the element that holds the cards, such as "grid grid--3" for a phones-only strip. */
+  listClass?: string;
+  /** Show the position ("3 of 12") under the row. */
+  count?: boolean;
+  /** Classes and style (custom properties such as --strip-card) for the strip as a whole. */
+  class?: string;
+  style?: string;
+}
+
+const { label, below, as: List = 'ul', listClass, count = true, class: className, style } = Astro.props;
+
+// A media query can't take a prop, so the few rules that make the cards a scrolling row are written out
+// here: for every width, or (phones-only) inside a media query up to just under `below`.
+const length = below?.match(/^(\d+(?:\.\d+)?)(px|em|rem)$/);
+if (below && !length) throw new Error(`Strip: below="${below}" must be a length in px, em or rem`);
+const scope = below ? `[data-strip][data-below="${below}"]` : '[data-strip]:not([data-below])';
+const row = `${scope} > .strip__view > [data-strip-track]`;
+const rules =
+  `${scope}{margin-inline:calc(50% - 50vw)}` +
+  `${row}{display:grid;grid-auto-flow:column;grid-auto-columns:var(--strip-col);grid-template-columns:none;` +
+  'justify-content:normal;gap:var(--strip-space);padding:12px var(--strip-inset) 26px;overflow-x:auto;' +
+  'overscroll-behavior-x:contain;scroll-snap-type:x mandatory;scroll-padding-inline:var(--strip-inset);scrollbar-width:none}' +
+  `${row}::-webkit-scrollbar{display:none}` +
+  `${row} > *{scroll-snap-align:start}`;
+// (rem in a media query is the browser's default font size, as em is.)
+const upTo = length && (length[2] === 'px' ? `${+(Number(length[1]) - 0.02).toFixed(2)}px` : `${+(Number(length[1]) - 0.001).toFixed(3)}em`);
+const css = upTo ? `@media (max-width: ${upTo}){${rules}}` : rules;
+---
+
+<div class:list={['strip', className]} style={style} data-strip data-below={below} data-strip-label={label}>
+  <style is:inline set:html={css}></style>
+  <div class="strip__view">
+    <List class:list={['strip__track', listClass]} role={List === 'div' ? undefined : 'list'} data-strip-track>
+      <slot />
+    </List>
+    <button type="button" class="strip__nav strip__nav--prev" data-strip-prev aria-label={`Previous ${label}`}>
+      <Icon name="ChevronLeft" size={26} />
+    </button>
+    <button type="button" class="strip__nav strip__nav--next" data-strip-next aria-label={`More ${label}`}>
+      <Icon name="ChevronRight" size={26} />
+    </button>
+  </div>
+  {
+    count && (
+      <p class="strip__count" data-strip-count aria-live="polite">
+        <span data-strip-count-shown aria-hidden="true" />
+        <span class="sr-only" data-strip-count-said />
+      </p>
+    )
+  }
+</div>
+
+<script>
+  const reduced = matchMedia('(prefers-reduced-motion: reduce)');
+
+  document.querySelectorAll<HTMLElement>('[data-strip]').forEach((strip) => {
+    const track = strip.querySelector<HTMLElement>('[data-strip-track]')!;
+    const prev = strip.querySelector<HTMLButtonElement>('[data-strip-prev]')!;
+    const next = strip.querySelector<HTMLButtonElement>('[data-strip-next]')!;
+    const shown = strip.querySelector<HTMLElement>('[data-strip-count-shown]');
+    const said = strip.querySelector<HTMLElement>('[data-strip-count-said]');
+    const label = strip.dataset.stripLabel ?? '';
+
+    /** The cards on show (a card can be hidden, as by a filter). */
+    const cards = () => [...track.children].filter((card): card is HTMLElement => card instanceof HTMLElement && card.getClientRects().length > 0);
+
+    function update() {
+      // A phones-only strip is a grid on wider screens: no arrows, fades or position there.
+      const scrolls = getComputedStyle(track).overflowX !== 'visible';
+      const max = track.scrollWidth - track.clientWidth;
+      const atStart = track.scrollLeft <= 4;
+      const atEnd = track.scrollLeft >= max - 4;
+      strip.classList.toggle('is-scrollable', scrolls && max > 4);
+      strip.classList.toggle('at-start', atStart);
+      strip.classList.toggle('at-end', atEnd);
+      // An arrow that is pressed until it runs out hands the keyboard focus to the other one.
+      const focused = document.activeElement;
+      prev.disabled = atStart;
+      next.disabled = atEnd;
+      if (focused === prev && atStart && !atEnd) next.focus({ preventScroll: true });
+      if (focused === next && atEnd && !atStart) prev.focus({ preventScroll: true });
+    }
+
+    /** "3 of 12", or "1–3 of 12" while more than one card is in full view. */
+    function position() {
+      if (!shown || !said || !strip.classList.contains('is-scrollable')) return;
+      const all = cards();
+      const view = track.getBoundingClientRect();
+      let first = -1;
+      let last = -1;
+      let most = 0;
+      let mostSeen = 0;
+      all.forEach((card, i) => {
+        const box = card.getBoundingClientRect();
+        if (box.left >= view.left - 1 && box.right <= view.right + 1) {
+          if (first < 0) first = i;
+          last = i;
+        }
+        const seen = Math.min(box.right, view.right) - Math.max(box.left, view.left);
+        if (seen > mostSeen) [most, mostSeen] = [i, seen];
+      });
+      // A card wider than the window is never in full view: count the one that shows most.
+      if (first < 0) first = last = most;
+      const text = first === last ? `${first + 1} of ${all.length}` : `${first + 1}–${last + 1} of ${all.length}`;
+      if (shown.textContent === text) return;
+      shown.textContent = text;
+      said.textContent = `${first === last ? first + 1 : `${first + 1} to ${last + 1}`} of ${all.length} ${label}`;
+    }
+
+    /** Moves by the cards that fit on screen, so each press shows a fresh set. */
+    function page(direction: number) {
+      const card = cards()[0];
+      if (!card) return;
+      const gap = parseFloat(getComputedStyle(track).columnGap) || 0;
+      const step = card.offsetWidth + gap;
+      const perPage = Math.max(1, Math.floor((track.clientWidth - gap) / step) - 1 || 1);
+      track.scrollBy({ left: direction * perPage * step, behavior: reduced.matches ? 'auto' : 'smooth' });
+    }
+
+    prev.addEventListener('click', () => page(-1));
+    next.addEventListener('click', () => page(1));
+
+    // The arrows and fades follow the scroll frame by frame; the position waits until it settles, so a
+    // screen reader hears where the row stopped rather than every card on the way.
+    let ticking = false;
+    let settle = 0;
+    track.addEventListener(
+      'scroll',
+      () => {
+        clearTimeout(settle);
+        settle = window.setTimeout(position, 150);
+        if (ticking) return;
+        ticking = true;
+        requestAnimationFrame(() => {
+          ticking = false;
+          update();
+        });
+      },
+      { passive: true },
+    );
+    const refresh = () => {
+      update();
+      position();
+    };
+    addEventListener('resize', refresh);
+    if ('ResizeObserver' in window) new ResizeObserver(refresh).observe(track);
+    refresh();
+  });
+</script>
+
+<style>
+  .strip {
+    --strip-inset: max(var(--gutter), calc((100vw - var(--container)) / 2));
+    --strip-col: var(--strip-card, clamp(250px, 26vw, 340px));
+    --strip-space: var(--strip-gap, 24px);
+    position: relative;
+  }
+
+  /* Phones, and a phones-only strip: bigger cards, one at a time, with the next one peeking in. */
+  .strip[data-below] {
+    --strip-col: var(--strip-card, 76vw);
+    --strip-space: var(--strip-gap, 16px);
+  }
+
+  @media (max-width: 640px) {
+    .strip {
+      --strip-col: var(--strip-card, 76vw);
+      --strip-space: var(--strip-gap, 16px);
+    }
+  }
+
+  .strip__view {
+    position: relative;
+  }
+
+  /* As a grid (a phones-only strip on a wider screen) the list is just its cards. */
+  :where(.strip__track) {
+    margin: 0;
+    padding: 0;
+    list-style: none;
+  }
+
+  /* Soft fades at the edges hint that there is more to scroll to. */
+  .strip.is-scrollable .strip__track {
+    -webkit-mask-image: linear-gradient(90deg, transparent 0, #000 var(--strip-inset), #000 calc(100% - var(--strip-inset)), transparent 100%);
+    mask-image: linear-gradient(90deg, transparent 0, #000 var(--strip-inset), #000 calc(100% - var(--strip-inset)), transparent 100%);
+  }
+
+  .strip.is-scrollable.at-start .strip__track {
+    -webkit-mask-image: linear-gradient(90deg, #000 calc(100% - var(--strip-inset)), transparent 100%);
+    mask-image: linear-gradient(90deg, #000 calc(100% - var(--strip-inset)), transparent 100%);
+  }
+
+  .strip.is-scrollable.at-end .strip__track {
+    -webkit-mask-image: linear-gradient(90deg, transparent 0, #000 var(--strip-inset));
+    mask-image: linear-gradient(90deg, transparent 0, #000 var(--strip-inset));
+  }
+
+  .strip__nav {
+    position: absolute;
+    /* The middle of the cards: the row less its 12px top and 26px bottom padding. */
+    top: var(--strip-nav-top, calc(50% - 7px));
+    z-index: 2;
+    display: grid;
+    place-items: center;
+    width: 52px;
+    height: 52px;
+    margin-top: -26px;
+    border: 1px solid var(--glass-edge);
+    border-radius: 50%;
+    background: var(--glass-thick);
+    -webkit-backdrop-filter: var(--glass-blur);
+    backdrop-filter: var(--glass-blur);
+    box-shadow: var(--glass-rim), var(--shadow);
+    color: var(--navy);
+    cursor: pointer;
+    transition:
+      opacity 0.25s ease,
+      transform 0.2s ease;
+  }
+
+  .strip__nav:hover {
+    transform: scale(1.06);
+  }
+
+  .strip__nav:disabled {
+    opacity: 0;
+    pointer-events: none;
+  }
+
+  .strip:not(.is-scrollable) .strip__nav {
+    display: none;
+  }
+
+  .strip__nav--prev {
+    left: max(12px, calc(var(--strip-inset) - 26px));
+  }
+
+  .strip__nav--next {
+    right: max(12px, calc(var(--strip-inset) - 26px));
+  }
+
+  /* The position: quiet text under the row, in the row's bottom padding. */
+  .strip__count {
+    margin: -6px 0 0;
+    font-size: 0.86rem;
+    font-weight: 600;
+    line-height: 1.4;
+    letter-spacing: 0.04em;
+    text-align: center;
+    font-variant-numeric: tabular-nums;
+    color: var(--muted);
+  }
+
+  .strip:not(.is-scrollable) .strip__count {
+    display: none;
+  }
+
+  /* Phones: swipe instead of the arrows. */
+  @media (max-width: 640px) {
+    .strip__nav {
+      display: none;
+    }
+  }
+</style>

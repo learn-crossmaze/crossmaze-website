@@ -26,8 +26,10 @@ const used = Object.keys(categories).filter((c) => posts.some((p) => p.category 
             <span class="icon-badge tone-sky">
               <Icon name="BookOpen" size={26} />
             </span>
-            <h2>Our first stories are on their way</h2>
-            <p class="muted">Check back soon for news, events and tips from Crossmaze.</p>
+            <div>
+              <h2>Our first stories are on their way</h2>
+              <p class="muted">Check back soon for news, events and tips from Crossmaze.</p>
+            </div>
           </div>
         ) : (
           <>
@@ -143,13 +145,32 @@ const used = Object.keys(categories).filter((c) => posts.some((p) => p.category 
     text-align: center;
   }
 
+  /* No posts yet: a calm glass note that starts at the banner's left edge, about as wide as the
+     banner's lead, with its icon beside the text. */
   .blog-empty {
-    max-width: 560px;
-    margin-inline: auto;
-    text-align: center;
+    display: grid;
+    grid-template-columns: auto minmax(0, 1fr);
+    align-items: center;
+    gap: 6px 22px;
+    max-width: 760px;
+    padding: clamp(22px, 3vw, 32px);
   }
 
   .blog-empty .icon-badge {
-    margin-inline: auto;
+    margin: 0;
+  }
+
+  .blog-empty h2 {
+    margin-bottom: 0.3em;
+    font-size: clamp(1.3rem, 2.4vw, 1.6rem);
+  }
+
+  @media (max-width: 480px) {
+    .blog-empty {
+      grid-template-columns: minmax(0, 1fr);
+    }
+    .blog-empty .icon-badge {
+      margin-bottom: 10px;
+    }
   }
 </style>

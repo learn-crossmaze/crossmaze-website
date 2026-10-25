@@ -9,7 +9,18 @@ import { site, coreValues } from '../data/site';
 import { approach } from '../data/programs';
 import { image } from '../data/content';
 
-const moments = site.moments.map((m) => ({ src: image(m.image), alt: m.alt }));
+// "Life at Crossmaze" (admin: Site settings → Life at Crossmaze photos): framed tiles of one shape, the shape
+// most of the photos were taken in, between 4:3 and 3:2, so most are shown whole. A portrait photo is
+// cropped near its top, where the faces usually are.
+const moments = site.moments.map((m) => {
+  const src = image(m.image);
+  return { src, alt: m.alt, shape: src.width / src.height };
+});
+const shapes = moments.map((m) => m.shape).sort((a, b) => a - b);
+const middleShape = shapes.length ? shapes[Math.floor((shapes.length - 1) / 2)]! : 3 / 2;
+const momentRatio = Math.min(Math.max(middleShape, 4 / 3), 3 / 2).toFixed(4);
+// Tile widths: three in a row from 880px (a full container's third at most), two below.
+const momentSizes = '(max-width: 879px) calc(50vw - 26px), (max-width: 1219px) calc(33vw - 26px), 380px';
 const tones = ['navy', 'green', 'coral', 'sky', 'sun', 'navy'];
 ---
 
@@ -59,7 +70,7 @@ const tones = ['navy', 'green', 'coral', 'sky', 'sun', 'navy'];
         title="How children learn at Crossmaze"
         lead="Our Foundational Development Program uses a Montessori-based, thematic approach to build the skills children need for school and for life."
       />
-      <div class="grid grid--2">
+      <div class="grid grid--2 approach-grid">
         {
           approach.map((a) => (
             <div class="approach">
@@ -77,44 +88,52 @@ const tones = ['navy', 'green', 'coral', 'sky', 'sun', 'navy'];
     </div>
   </section>
 
-  <section class="section">
-    <div class="container">
-      <SectionHeading eyebrow="Life at Crossmaze" title="Moments that build confidence" align="center" />
-      <ul class="moments">
-        {
-          moments.map((m) => (
-            <li>
-              <Image src={m.src} alt={m.alt} widths={[300, 500]} sizes="(max-width: 700px) 50vw, 240px" />
-            </li>
-          ))
-        }
-      </ul>
-    </div>
-  </section>
+  {
+    moments.length > 0 && (
+      <section class="section">
+        <div class="container">
+          <SectionHeading eyebrow="Life at Crossmaze" title="Moments that build confidence" align="center" />
+          <ul class="moments grid grid--3" style={`--ratio: ${momentRatio}`}>
+            {
+              moments.map((m) => (
+                <li class="ratio-frame photo-frame photo-frame--sm" style={m.shape < 1 ? '--photo-focus: 50% 25%' : undefined}>
+                  <Image src={m.src} alt={m.alt} widths={[360, 540, 720, 960]} sizes={momentSizes} />
+                </li>
+              ))
+            }
+          </ul>
+        </div>
+      </section>
+    )
+  }
 
-  <section class="section section--white">
-    <div class="container founders">
-      <SectionHeading eyebrow="Leadership" title="Our founders" />
-      <div class="grid grid--2">
-        {
-          site.founders.map((name) => (
-            <div class="card founder">
-              <span class="founder__avatar" aria-hidden="true">
-                {name
-                  .split(' ')
-                  .map((n) => n[0])
-                  .join('')}
-              </span>
-              <div>
-                <h3>{name}</h3>
-                <p class="muted">Co-founder, {site.legalName}</p>
-              </div>
-            </div>
-          ))
-        }
-      </div>
-    </div>
-  </section>
+  {
+    site.founders.length > 0 && (
+      <section class="section section--white">
+        <div class="container founders">
+          <SectionHeading eyebrow="Leadership" title="Our founders" />
+          <div class="card founders__panel">
+            {
+              site.founders.map((name) => (
+                <div class="founder">
+                  <span class="founder__avatar" aria-hidden="true">
+                    {name
+                      .split(' ')
+                      .map((n) => n[0])
+                      .join('')}
+                  </span>
+                  <div>
+                    <h3>{name}</h3>
+                    <p class="muted">Co-founder, {site.legalName}</p>
+                  </div>
+                </div>
+              ))
+            }
+          </div>
+        </div>
+      </section>
+    )
+  }
 
   <section class="section--tight section--feature">
     <div class="container cta">
@@ -131,6 +150,11 @@ const tones = ['navy', 'green', 'coral', 'sky', 'sun', 'navy'];
 </BaseLayout>
 
 <style>
+  /* Two in a row from a 720px grid, where each still has room for its icon beside the text. */
+  .approach-grid {
+    --grid-two-at: 720px;
+  }
+
   .approach {
     display: flex;
     gap: 18px;
@@ -141,55 +165,51 @@ const tones = ['navy', 'green', 'coral', 'sky', 'sun', 'navy'];
     margin: 0;
   }
 
+  /* The photos as a .grid--3: 5 photos show 3 + 2 (4: four in a row), and two in a row on tablets and
+     phones too (2 + 2 + 1, the last one centred). --ratio (on the list) is the tiles' shape. */
   .moments {
-    display: grid;
-    grid-template-columns: repeat(5, 1fr);
-    gap: 14px;
+    --grid-gap: clamp(12px, 1.6vw, 20px);
+    --grid-two-at: 0px;
     margin: 0;
     padding: 0;
     list-style: none;
   }
 
-  @media (max-width: 860px) {
-    .moments {
-      grid-template-columns: repeat(2, 1fr);
-    }
-    .moments li:first-child {
-      grid-column: 1 / -1;
-    }
-  }
-
-  .moments :global(img) {
-    width: 100%;
-    height: 100%;
-    aspect-ratio: 3 / 4;
-    object-fit: cover;
-    border-radius: var(--radius);
-  }
-
-  @media (max-width: 860px) {
-    .moments li:first-child :global(img) {
-      aspect-ratio: 16 / 10;
-    }
-  }
-
-  .founder {
+  .founders__panel {
     display: flex;
+    flex-wrap: wrap;
+    width: fit-content;
+    max-width: 100%;
+    padding: 0;
+    overflow: hidden;
+  }
+
+  /* Each founder beside the next, a hairline between them (and under each row once they wrap); the
+     lines on the panel's edges sit just outside it, out of sight. The avatar and spacing shrink a little
+     on tablets and phones, so a name keeps to one line. */
+  .founder {
+    --avatar: clamp(60px, 7vw, 76px);
+    display: flex;
+    flex: 1 1 320px;
     align-items: center;
-    gap: 20px;
+    gap: clamp(16px, 2vw, 20px);
+    margin: 0 0 -1px -1px;
+    padding: 24px clamp(20px, 2.6vw, 32px) 24px clamp(20px, 2.4vw, 28px);
+    border-left: 1px solid var(--line);
+    border-bottom: 1px solid var(--line);
   }
 
   .founder__avatar {
     display: grid;
     place-items: center;
     flex: none;
-    width: 76px;
-    height: 76px;
+    width: var(--avatar);
+    height: var(--avatar);
     border-radius: 50%;
     background: var(--g-navy);
     color: var(--sun);
     font-family: var(--font-display);
-    font-size: 1.6rem;
+    font-size: calc(var(--avatar) * 0.34);
     font-weight: 600;
   }
 

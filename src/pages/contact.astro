@@ -1,4 +1,5 @@
 ---
+import { Image } from 'astro:assets';
 import BaseLayout from '../layouts/BaseLayout.astro';
 import PageHero from '../components/PageHero.astro';
 import EnquiryForm from '../components/EnquiryForm.astro';
@@ -6,7 +7,23 @@ import Icon from '../components/Icon.astro';
 import SectionHeading from '../components/SectionHeading.astro';
 import Steps from '../components/Steps.astro';
 import { site, admissionSteps } from '../data/site';
-import { branches, shortName, telHref } from '../data/branches';
+import { branches, branchPhotos, shortName, telHref } from '../data/branches';
+
+/** An email split after the @, so that where it must wrap it breaks there, never inside a word. */
+const emailParts = (email: string) => {
+  const at = email.indexOf('@');
+  return at < 0 ? [email, ''] : [email.slice(0, at + 1), email.slice(at + 1)];
+};
+const [admissionsUser, admissionsDomain] = emailParts(site.admissionsEmail);
+const [careUser, careDomain] = emailParts(site.careEmail);
+
+const tones = ['navy', 'green', 'coral', 'sky', 'sun'];
+const branchRows = branches.map((b, i) => ({
+  branch: b,
+  name: shortName(b),
+  cover: branchPhotos(b.slug)[0],
+  tone: tones[i % tones.length],
+}));
 ---
 
 <BaseLayout
@@ -26,33 +43,49 @@ import { branches, shortName, telHref } from '../data/branches';
         <h2>Admission enquiry</h2>
         <EnquiryForm id="contact-enquiry" />
       </div>
+      {/* Beside the form on wide screens, one under another. Under the form (900px and narrower): two to
+          a row, with the address wider than the timings; on phones the four quick ones are small tiles. */}
       <aside class="contact__direct">
-        <a class="direct tone-navy" href={site.phoneHref} data-call-picker>
-          <span class="icon-badge"><Icon name="Phone" size={24} /></span>
-          <span><span class="muted">Call us</span><strong>Your nearest centre</strong></span>
+        <a class="direct direct--quick tone-navy" href={site.phoneHref} data-call-picker>
+          <span class="direct__in">
+            <span class="icon-badge"><Icon name="Phone" size={24} /></span>
+            <span class="direct__text"><span class="muted">Call us</span><strong>Your nearest centre</strong></span>
+          </span>
         </a>
-        <a class="direct tone-green" href={site.whatsappHref} target="_blank" rel="noopener">
-          <span class="icon-badge"><Icon name="MessageCircle" size={24} /></span>
-          <span><span class="muted">Chat on WhatsApp</span><strong>Message us</strong></span>
+        <a class="direct direct--quick tone-green" href={site.whatsappHref} target="_blank" rel="noopener">
+          <span class="direct__in">
+            <span class="icon-badge"><Icon name="MessageCircle" size={24} /></span>
+            <span class="direct__text"><span class="muted">Chat on WhatsApp</span><strong>Message us</strong></span>
+          </span>
         </a>
-        <a class="direct tone-coral" href={`mailto:${site.admissionsEmail}`}>
-          <span class="icon-badge"><Icon name="Mail" size={24} /></span>
-          <span><span class="muted">Email admissions</span><strong>{site.admissionsEmail}</strong></span>
+        <a class="direct direct--quick tone-coral" href={`mailto:${site.admissionsEmail}`}>
+          <span class="direct__in">
+            <span class="icon-badge"><Icon name="Mail" size={24} /></span>
+            <span class="direct__text">
+              <span class="muted">Email admissions</span><strong>{admissionsUser}<wbr />{admissionsDomain}</strong>
+            </span>
+          </span>
         </a>
-        <a class="direct tone-sky" href={`mailto:${site.careEmail}`}>
-          <span class="icon-badge"><Icon name="HandHeart" size={24} /></span>
-          <span><span class="muted">Parent support</span><strong>{site.careEmail}</strong></span>
+        <a class="direct direct--quick tone-sky" href={`mailto:${site.careEmail}`}>
+          <span class="direct__in">
+            <span class="icon-badge"><Icon name="HandHeart" size={24} /></span>
+            <span class="direct__text"><span class="muted">Parent support</span><strong>{careUser}<wbr />{careDomain}</strong></span>
+          </span>
         </a>
-        <div class="direct tone-navy">
-          <span class="icon-badge"><Icon name="MapPin" size={24} /></span>
-          <span>
-            <span class="muted">Address</span>
-            {site.address.map((line, i) => (i === 0 ? <strong>{line}</strong> : <span>{line}</span>))}
+        <div class="direct direct--address tone-navy">
+          <span class="direct__in">
+            <span class="icon-badge"><Icon name="MapPin" size={24} /></span>
+            <span class="direct__text">
+              <span class="muted">Address</span>
+              {site.address.map((line, i) => (i === 0 ? <strong>{line}</strong> : <span>{line}</span>))}
+            </span>
           </span>
         </div>
-        <a class="direct tone-sun" href="#branches">
-          <span class="icon-badge"><Icon name="Clock" size={24} /></span>
-          <span><span class="muted">Timings and batches</span><strong>On each branch’s page</strong></span>
+        <a class="direct direct--timings tone-sun" href="#branches">
+          <span class="direct__in">
+            <span class="icon-badge"><Icon name="Clock" size={24} /></span>
+            <span class="direct__text"><span class="muted">Timings and batches</span><strong>On each branch’s page</strong></span>
+          </span>
         </a>
       </aside>
     </div>
@@ -74,29 +107,73 @@ import { branches, shortName, telHref } from '../data/branches';
     )
   }
 
-  <section class="section" id="branches">
+  <section class="section" id="branches" aria-labelledby="branches-title">
     <div class="container">
-      <h2>Our branches</h2>
-      <div class="grid grid--3 branch-list">
-        {
-          branches.map((b) => (
-            <div class="card">
-              <h3>
-                <a href={`/branch/${b.slug}`}>{shortName(b)}</a>
-              </h3>
-              <p class="line">
-                <Icon name="MapPin" size={18} />
-                <span>
-                  {b.address.join(', ')} – {b.pincode}
-                </span>
-              </p>
-              <p class="line">
-                <Icon name="Phone" size={18} />
-                <a href={telHref(b.phone)}>{b.phone}</a>
-              </p>
-            </div>
-          ))
-        }
+      <SectionHeading
+        eyebrow="Visit a centre"
+        title="Our branches"
+        id="branches-title"
+        lead="Call the centre nearest you, or open its page for its programs, timings and directions."
+      />
+      {/* One glass panel with a row per branch: a small photo, the name and area, the address, the phone
+          number and "View branch". The call log (scripts/call-log.ts) names these calls after the section
+          heading, "Our branches". */}
+      <div class="branches">
+        <ul class="card branches__list">
+          {
+            branchRows.map(({ branch: b, name, cover, tone }) => (
+              <li class:list={['branch-row', `tone-${tone}`]}>
+                <div class="branch-row__media ratio-frame photo-frame photo-frame--sm">
+                  {cover ? (
+                    <Image src={cover} alt={`Inside ${b.name}`} widths={[160, 240, 320]} sizes="(max-width: 759px) 72px, 112px" />
+                  ) : (
+                    <span class="branch-row__art" aria-hidden="true">
+                      <Icon name="Building2" size={28} strokeWidth={1.6} />
+                    </span>
+                  )}
+                </div>
+                <div class="branch-row__name">
+                  <h3>
+                    <a href={`/branch/${b.slug}`}>{name}</a>
+                  </h3>
+                  <p class="muted">{b.area}</p>
+                </div>
+                <p class="branch-row__address">
+                  <Icon name="MapPin" size={18} />
+                  <span>
+                    {/* The address as the school wrote it, line by line, with the PIN code kept on the last line. */}
+                    {b.address.map((line, i) =>
+                      i < b.address.length - 1 ? (
+                        <>
+                          {line}
+                          <br />
+                        </>
+                      ) : (
+                        line
+                      ),
+                    )}
+                    {b.pincode && (
+                      <>
+                        {b.address.length > 0 ? ' ' : ''}
+                        <span class="branch-row__pin">{b.pincode}</span>
+                      </>
+                    )}
+                  </span>
+                </p>
+                <div class="branch-row__actions">
+                  <p class="branch-row__phone">
+                    <Icon name="Phone" size={18} />
+                    <a href={telHref(b.phone)}>{b.phone}</a>
+                  </p>
+                  <a class="btn btn--sm btn--ghost branch-row__view" href={`/branch/${b.slug}`}>
+                    View branch<span class="sr-only">: {name}</span>
+                    <Icon name="ArrowRight" size={16} />
+                  </a>
+                </div>
+              </li>
+            ))
+          }
+        </ul>
       </div>
     </div>
   </section>
@@ -124,16 +201,16 @@ import { branches, shortName, telHref } from '../data/branches';
     font-size: 1.6rem;
   }
 
+  /* ---------- Direct contact: a column beside the form; under it, a grid of six tracks ---------- */
   .contact__direct {
     display: grid;
     gap: 14px;
   }
 
+  /* Each card lays itself out by its own width: the icon beside the text or, when narrow, beside the
+     label with the value under both. */
   .direct {
-    display: flex;
-    align-items: center;
-    gap: 16px;
-    padding: 18px;
+    container-type: inline-size;
     border: 1px solid var(--glass-edge);
     border-radius: var(--radius);
     background: var(--g-card);
@@ -142,7 +219,6 @@ import { branches, shortName, telHref } from '../data/branches';
     box-shadow: var(--glass-rim), var(--shadow-sm);
     color: var(--ink);
     text-decoration: none;
-    overflow-wrap: anywhere;
   }
 
   a.direct:hover {
@@ -150,43 +226,295 @@ import { branches, shortName, telHref } from '../data/branches';
     border-color: var(--tone);
   }
 
+  .direct__in {
+    display: flex;
+    align-items: center;
+    gap: 16px;
+    height: 100%;
+    padding: 18px;
+  }
+
   .direct .icon-badge {
     margin: 0;
     flex: none;
   }
 
-  .direct > span:last-child {
+  .direct__text {
     display: grid;
+    min-width: 0;
     line-height: 1.35;
+    overflow-wrap: break-word;
   }
 
   .direct .muted {
     font-size: 0.88rem;
   }
 
-  .branch-list {
-    margin-top: 24px;
+  /* Under the form: the quick ones two to a row, then the address (two thirds) beside the timings. */
+  @media (max-width: 900px) {
+    .contact__direct {
+      grid-template-columns: repeat(6, minmax(0, 1fr));
+    }
+
+    .direct--quick {
+      grid-column: span 3;
+    }
+
+    .direct--address {
+      grid-column: span 4;
+    }
+
+    .direct--timings {
+      grid-column: span 2;
+    }
   }
 
-  .branch-list h3 a {
+  /* Small tablets and phones: the address and the timings each a row of their own. */
+  @media (max-width: 719px) {
+    .direct--address,
+    .direct--timings {
+      grid-column: 1 / -1;
+    }
+  }
+
+  /* Phones: the four quick ones as small tiles, two to a row. */
+  @media (max-width: 560px) {
+    .contact__direct {
+      gap: 10px;
+    }
+
+    .direct__in {
+      gap: 14px;
+      padding: 14px 16px;
+    }
+
+    .direct .icon-badge {
+      width: 44px;
+      height: 44px;
+      border-radius: 14px;
+    }
+
+    .direct .muted {
+      font-size: 0.84rem;
+    }
+  }
+
+  /* A narrow card (a phone tile, or the timings beside the address on tablets): a smaller icon beside
+     the label, and the value under both. */
+  @container (max-width: 239px) {
+    .direct__in {
+      display: grid;
+      grid-template-columns: auto minmax(0, 1fr);
+      align-items: center;
+      align-content: start;
+      gap: 8px 10px;
+    }
+
+    .direct__text {
+      display: contents;
+    }
+
+    .direct__text > :not(.muted) {
+      grid-column: 1 / -1;
+    }
+
+    /* Beside the taller address, in the middle. */
+    .direct--timings .direct__in {
+      align-content: center;
+    }
+
+    .direct .icon-badge {
+      width: 36px;
+      height: 36px;
+      border-radius: 12px;
+    }
+
+    .direct .icon-badge :global(svg) {
+      width: 20px;
+      height: 20px;
+    }
+  }
+
+  /* ---------- Our branches: a row per branch on one glass panel ---------- */
+  .branches {
+    container-type: inline-size;
+  }
+
+  .branches__list {
+    margin: 0;
+    padding: 4px clamp(16px, 2.6vw, 28px);
+    list-style: none;
+  }
+
+  .branch-row {
+    --rule: color-mix(in srgb, var(--navy) 13%, transparent);
+    display: grid;
+    grid-template-columns: 56px minmax(0, 1fr);
+    grid-template-areas:
+      'media name'
+      'address address'
+      'actions actions';
+    align-items: center;
+    gap: 12px 14px;
+    padding-block: 16px;
+  }
+
+  .branch-row + .branch-row {
+    border-top: 1px solid var(--rule);
+  }
+
+  /* Small photos take smaller corners, so they don't turn into circles. */
+  .branch-row__media {
+    grid-area: media;
+    --ratio: 1;
+    --frame-radius: min(var(--radius-photo-sm), 16px);
+  }
+
+  /* A branch without photos: its colour and a building. */
+  .branch-row__art {
+    position: absolute;
+    inset: var(--frame-pad);
+    display: grid;
+    place-items: center;
+    border-radius: calc(var(--frame-radius) - var(--frame-pad));
+    background: linear-gradient(135deg, var(--badge-bg) 0%, var(--badge-bg-2) 100%);
+    color: var(--badge-fg);
+  }
+
+  .branch-row__name {
+    grid-area: name;
+    min-width: 0;
+  }
+
+  .branch-row h3 {
+    margin: 0 0 2px;
+    font-size: 1.15rem;
+  }
+
+  .branch-row h3 a {
     color: var(--ink);
     text-decoration: none;
   }
 
-  .branch-list h3 a:hover {
+  .branch-row h3 a:hover {
     color: var(--navy);
   }
 
-  .line {
+  .branch-row__name .muted {
+    margin: 0;
+    font-size: 0.92rem;
+    line-height: 1.4;
+  }
+
+  .branch-row__address,
+  .branch-row__phone {
     display: flex;
     gap: 10px;
     align-items: flex-start;
-    margin-bottom: 8px;
+    margin: 0;
+    font-size: 0.95rem;
+    line-height: 1.5;
   }
 
-  .line :global(svg) {
+  .branch-row__address {
+    grid-area: address;
+    overflow-wrap: break-word;
+  }
+
+  .branch-row__address > span {
+    min-width: 0;
+  }
+
+  .branch-row__pin,
+  .branch-row__phone a {
+    white-space: nowrap;
+  }
+
+  .branch-row__address :global(svg),
+  .branch-row__phone :global(svg) {
     flex: none;
-    margin-top: 4px;
+    margin-top: 3px;
     color: var(--coral);
+  }
+
+  .branch-row__actions {
+    grid-area: actions;
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    justify-content: space-between;
+    gap: 8px 10px;
+  }
+
+  .branch-row__phone {
+    align-items: center;
+  }
+
+  .branch-row__phone :global(svg) {
+    margin-top: 0;
+  }
+
+  .branch-row__view {
+    padding-inline: 14px;
+    white-space: nowrap;
+  }
+
+  /* Small phones: no arrow, so the phone number and the button still share a row. */
+  @container (max-width: 349px) {
+    .branch-row__view :global(svg) {
+      display: none;
+    }
+  }
+
+  /* From large phones: the phone and "View branch" beside the name, one above the other; the address
+     under them. */
+  @container (min-width: 480px) {
+    .branch-row {
+      grid-template-columns: 72px minmax(0, 1fr) auto;
+      grid-template-areas:
+        'media name actions'
+        '. address address';
+      gap: 10px 18px;
+      padding-block: 20px;
+    }
+
+    .branch-row__actions {
+      flex-direction: column;
+      flex-wrap: nowrap;
+      align-items: stretch;
+      justify-content: center;
+    }
+  }
+
+  /* Tablets: a wider photo, the address under the name, and the phone and "View branch" beside both. */
+  @container (min-width: 720px) {
+    .branch-row {
+      grid-template-columns: 104px minmax(0, 1fr) auto;
+      grid-template-areas:
+        'media name actions'
+        'media address actions';
+      align-items: start;
+      gap: 8px 24px;
+      padding-block: 22px;
+    }
+
+    .branch-row__media {
+      --ratio: 4 / 3;
+      --frame-radius: var(--radius-photo-sm);
+    }
+
+    .branch-row__actions {
+      align-self: center;
+    }
+  }
+
+  /* Wide: the address in a column of its own. */
+  @container (min-width: 900px) {
+    .branch-row {
+      grid-template-columns: 112px minmax(0, 0.75fr) minmax(0, 1.3fr) auto;
+      grid-template-areas: 'media name address actions';
+      align-items: center;
+      gap: 0 28px;
+    }
   }
 </style>

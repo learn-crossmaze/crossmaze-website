@@ -1,4 +1,14 @@
 ---
+// The banner at the top of an inner page: breadcrumbs, eyebrow, title and lead, over the animated
+// wash and doodles (FloatingShapes.astro). Anything in the default slot (a jump list, buttons) follows.
+//
+// A long lead (more than LONG_LEAD characters, such as the About page's promise from the admin panel)
+// gets its own layout, so the banner doesn't grow into a tall block of text with an empty right half:
+//  - Wide screens (from 901px): the title (with its breadcrumbs, eyebrow and anything in the slot) on
+//    the left and the whole lead on the right in a reading column, level with the title. The doodles
+//    move to the band above the lead, and to the page margin where there is one.
+//  - Narrower: one column as usual, with the lead at body-text size and tighter spacing.
+// The owner's text is never shortened. Short leads keep the usual one-column banner.
 import FloatingShapes from './FloatingShapes.astro';
 
 interface Props {
@@ -8,9 +18,23 @@ interface Props {
   crumbs?: { label: string; href?: string }[];
 }
 const { eyebrow, title, lead, crumbs = [] } = Astro.props;
+
+/** Leads longer than this (about three lines across a wide banner) use the two-column layout. */
+const LONG_LEAD = 220;
+const text = lead?.trim() ?? '';
+const long = text.length > LONG_LEAD;
+const hasExtra = Astro.slots.has('default');
+
+// In a long lead the first sentence is set in the text colour (the rest stays muted), so the reader
+// has a way in. The words are the owner's as written: it only splits at the end of a real sentence
+// (not after an abbreviation such as "Dr."), and only when that sentence is a smaller part of the lead.
+const firstSentence = /^(.{40,}?(?<!\b(?:Mr|Mrs|Ms|Dr|St|Jr|Sr|No|vs|etc|e\.g|i\.e))[.!?]["”’)]?)\s+(?=["“‘(]?[A-Z])/s;
+const split = long ? firstSentence.exec(text) : null;
+const leadIn = split && split[1].length <= text.length * 0.6 ? split[1] : undefined;
+const leadRest = split ? text.slice(split[0].length) : '';
 ---
 
-<section class="page-hero">
+<section class:list={['page-hero', { 'page-hero--long': long }]}>
   <FloatingShapes />
   <div class="container">
     {
@@ -29,7 +53,124 @@ const { eyebrow, title, lead, crumbs = [] } = Astro.props;
     }
     {eyebrow && <span class="eyebrow">{eyebrow}</span>}
     <h1 set:html={title} />
-    {lead && <p class="lead">{lead}</p>}
-    <slot />
+    {lead && <p class="lead">{leadIn ? <><span class="lead__in">{leadIn}</span> {leadRest}</> : lead}</p>}
+    {
+      long ? (
+        hasExtra && (
+          <div class="page-hero__extra">
+            <slot />
+          </div>
+        )
+      ) : (
+        <slot />
+      )
+    }
   </div>
 </section>
+
+<style>
+  /* ---------- Long lead ---------- */
+  .page-hero--long .lead {
+    margin-bottom: 0;
+  }
+
+  .lead__in {
+    color: var(--ink);
+  }
+
+  @media (min-width: 901px) {
+    /* The breadcrumbs run across the top; below them the title (and anything slotted, such as
+       buttons) on the left and the lead on the right, starting level with the title. The rows above
+       the lead keep about the height of the breadcrumbs and the eyebrow even when a page has neither,
+       so the lead never rises into the doodles' band (below). */
+    .page-hero--long .container {
+      display: grid;
+      grid-template-columns: minmax(0, 5fr) minmax(0, 6fr);
+      grid-template-rows: minmax(2.6rem, auto) minmax(2rem, auto) auto 1fr;
+      grid-template-areas:
+        'crumbs crumbs'
+        'eyebrow .'
+        'title lead'
+        'extra lead';
+      column-gap: clamp(40px, 5vw, 72px);
+      align-items: start;
+    }
+
+    .page-hero--long nav {
+      grid-area: crumbs;
+    }
+
+    .page-hero--long .eyebrow {
+      grid-area: eyebrow;
+      justify-self: start;
+    }
+
+    .page-hero--long h1 {
+      grid-area: title;
+      max-width: none;
+      margin-bottom: 0;
+    }
+
+    .page-hero--long .page-hero__extra {
+      grid-area: extra;
+    }
+
+    /* A calm reading column: a little smaller than a short lead, with room between the lines. Its
+       first line sits about level with the top of the title's capitals. */
+    .page-hero--long .lead {
+      grid-area: lead;
+      padding-top: 0.35em;
+      font-size: clamp(1.0625rem, 1.35vw, 1.1875rem);
+      line-height: 1.7;
+    }
+
+    /* The doodles (FloatingShapes.astro) usually sit in the empty right half, where the lead now is.
+       Here the cloud and the star float in the band above the lead (beside the breadcrumbs and the
+       eyebrow, which keep to the left), and the balloon in the right-hand page margin where there is
+       one. The cloud's right-hand spot leaves room for its 40px drift. */
+    .page-hero--long :global(.fx__shape) {
+      --inset: max(var(--gutter), calc(50% - var(--container) / 2));
+    }
+
+    .page-hero--long :global(.fx__shape--page-1) {
+      top: calc(var(--banner-pad-top) - 40px);
+      left: calc(100% - var(--inset) - var(--w) - 40px);
+    }
+
+    .page-hero--long :global(.fx__shape--page-2) {
+      top: calc(var(--banner-pad-top) - 24px);
+      left: 50%;
+    }
+
+    .page-hero--long :global(.fx__shape--page-3) {
+      top: 45%;
+      left: calc(100% - (var(--inset) + var(--w)) / 2);
+    }
+  }
+
+  @media (min-width: 901px) and (max-width: 1359px) {
+    .page-hero--long :global(.fx__shape--page-3) {
+      display: none;
+    }
+  }
+
+  /* One column: the whole lead at body-text size, closer to the title and to the section below. */
+  @media (max-width: 900px) {
+    .page-hero--long {
+      padding-bottom: clamp(24px, 4vw, 40px);
+    }
+
+    .page-hero--long h1 {
+      margin-bottom: 0.4em;
+    }
+
+    .page-hero--long .lead {
+      font-size: 1.0625rem;
+      line-height: 1.6;
+    }
+
+    .page-hero--long .page-hero__extra {
+      margin-top: 4px;
+    }
+  }
+</style>
