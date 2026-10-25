@@ -45,18 +45,9 @@
   },
   "promise": "Crossmaze is a secure, caring and nurturing space where children thrive and learn at their own pace. As an inclusive learning centre, we build warm, positive connections between children, parents and staff, and we are deeply committed to a safe, supportive environment where every child is cherished and respected.",
   "about": [
-    {
-      "heading": "",
-      "text": "Crossmaze is an interactive place of learning where children grow and excel while following their own interests. Children under five understand the world best through what they see and do, so we teach in a practical, hands-on way, and what they learn visually stays with them. Every child is special, and our wide range of activities and learning materials helps us lay a strong foundation for each one."
-    },
-    {
-      "heading": "",
-      "text": "Good preschooling is the first milestone in a child’s growth. Our learning program is designed to close the achievement gap and help every child succeed, because a strong, positive self-image is the best preparation for success."
-    },
-    {
-      "heading": "",
-      "text": "Every activity at Crossmaze gives children a chance to build confidence and feel good about themselves. With steady encouragement from their teachers, our children develop a positive self-image and grow into confident individuals."
-    }
+    "Crossmaze is an interactive place of learning where children grow and excel while following their own interests. Children under five understand the world best through what they see and do, so we teach in a practical, hands-on way, and what they learn visually stays with them. Every child is special, and our wide range of activities and learning materials helps us lay a strong foundation for each one.",
+    "Good preschooling is the first milestone in a child’s growth. Our learning program is designed to close the achievement gap and help every child succeed, because a strong, positive self-image is the best preparation for success.",
+    "Every activity at Crossmaze gives children a chance to build confidence and feel good about themselves. With steady encouragement from their teachers, our children develop a positive self-image and grow into confident individuals."
   ],
   "aboutPhoto": {
     "image": "photos/teacher-flashcards.jpg",

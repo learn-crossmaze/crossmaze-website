@@ -2,7 +2,7 @@ import { useEffect, useState } from 'react';
 import { addDoc, collection, deleteDoc, doc, getDoc, setDoc, writeBatch } from 'firebase/firestore';
 import { clean, markChanged, same, useCollection, useImageUrl, type WithId } from '../data';
 import { slugify, type CollectionConfig } from '../schemas';
-import { Icon, SchemaForm, formProblem } from './fields';
+import { Icon, SchemaForm, forStorage, formProblem } from './fields';
 import { ErrorBox, PageHeader, SITE_URL, Spinner, errorText, useSession, useToast, useUnsavedWarning } from './ui';
 
 type Obj = Record<string, unknown>;
@@ -211,7 +211,7 @@ function ItemEditor({ config, item }: { config: CollectionConfig; item: Item }) 
   const { id, ...stored } = item;
   const [draft, setDraft] = useState<Obj>(stored);
   const [saving, setSaving] = useState(false);
-  const dirty = !same(draft, stored);
+  const dirty = !same(forStorage(config.schema, draft), stored);
   useUnsavedWarning(dirty);
 
   const save = async () => {
@@ -222,7 +222,7 @@ function ItemEditor({ config, item }: { config: CollectionConfig; item: Item }) 
     }
     setSaving(true);
     try {
-      await setDoc(doc(services.db, config.name, id), clean(draft));
+      await setDoc(doc(services.db, config.name, id), clean(forStorage(config.schema, draft)));
       await markChanged(services.db, email);
       toast('ok', 'Saved. Press Publish when you’re ready to update the website.');
     } catch (e) {

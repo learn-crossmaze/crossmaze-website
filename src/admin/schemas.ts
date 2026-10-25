@@ -4,7 +4,7 @@ import { amenityList, iconChoices } from '../data/amenities';
 import { darkModes, themes, themeModes, weekdays } from '../data/themes';
 import { categories, templates } from '../data/blogOptions';
 import { endsAfterStart, formatTime, seatLabels } from '../data/batches';
-import { aboutParagraph } from '../data/about';
+import { aboutHeadingMax, aboutParagraph, aboutProblem, aboutText } from '../data/about';
 
 export interface Option {
   value: string;
@@ -44,7 +44,7 @@ export type Field =
   /**
    * `summary` is the field shown on each collapsed item, or a function of the item (`text(key)` gives a
    * field's value as shown); `check` returns what is wrong with an item, which stops it being saved;
-   * `fromText` reads an item still stored as plain text (the list's older shape) into its fields.
+   * with `toText`, the items are saved as text (which `fromText` reads back into their fields).
    */
   | (Base & {
       type: 'objects';
@@ -53,6 +53,7 @@ export type Field =
       summary?: string | ((item: Record<string, unknown>, text: (key: string) => string) => string);
       check?: (item: Record<string, unknown>) => string | undefined;
       fromText?: (text: string) => Record<string, unknown>;
+      toText?: (item: Record<string, unknown>) => string;
     })
   | { type: 'heading'; label: string; help?: string; key?: undefined };
 
@@ -184,10 +185,13 @@ export const siteSchema: Field[] = [
     type: 'objects',
     itemLabel: 'Paragraph',
     summary: (_, text) => text('heading') || text('text'),
+    // Stored as text ("Subheading:", a blank line, the paragraph) so every version of the site reads it.
     fromText: (text) => ({ ...aboutParagraph(text) }),
+    toText: (item) => aboutText(aboutParagraph(item)),
+    check: (item) => aboutProblem(aboutParagraph(item)),
     help: 'Home and About pages.',
     fields: [
-      { key: 'heading', label: 'Subheading', type: 'text', help: 'Shown above the paragraph. Leave empty for none.' },
+      { key: 'heading', label: 'Subheading', type: 'text', maxLength: aboutHeadingMax, help: 'Shown above the paragraph. Leave empty for none.' },
       { key: 'text', label: 'Paragraph', type: 'textarea', rows: 6, required: true, help: 'Leave a blank line to start a new paragraph.' },
     ],
   },

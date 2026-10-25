@@ -28,7 +28,7 @@ export function Icon({ name, size = 18, className }: { name: string; size?: numb
 const asObj = (v: Value): Obj => (v && typeof v === 'object' && !Array.isArray(v) ? (v as Obj) : {});
 const asList = <T,>(v: Value): T[] => (Array.isArray(v) ? (v as T[]) : []);
 const asText = (v: Value) => (v == null ? '' : String(v));
-/** An objects field's items, reading any still stored as plain text through the field's `fromText`. */
+/** An objects field's items, reading any stored as text through the field's `fromText`. */
 const itemsOf = (field: Extract<Field, { type: 'objects' }>, v: Value): Obj[] =>
   asList<Value>(v).map((item) => (typeof item === 'string' && field.fromText ? field.fromText(item) : asObj(item)));
 
@@ -562,6 +562,21 @@ function ImagesField({ folder, value, onChange }: { folder: string; value: strin
       />
     </div>
   );
+}
+
+/** A form's value as it is stored: the items of objects fields with `toText` become text. */
+export function forStorage(fields: Field[], value: Obj): Obj {
+  const out = { ...value };
+  for (const field of fields) {
+    if (field.type === 'heading') continue;
+    const v = out[field.key];
+    if (field.type === 'group' && v && typeof v === 'object' && !Array.isArray(v)) out[field.key] = forStorage(field.fields, v as Obj);
+    else if (field.type === 'objects' && field.toText && Array.isArray(v)) {
+      const toText = field.toText;
+      out[field.key] = v.map((item) => (typeof item === 'string' ? item : toText(asObj(item))));
+    }
+  }
+  return out;
 }
 
 /** What stops a form being saved, as one message: required fields left empty, then items that fail their `check`. */

@@ -174,7 +174,7 @@ import jobsJson from '../../content/jobs.json';
 import testimonialsJson from '../../content/testimonials.json';
 import postsJson from '../../content/posts.json';
 
-// The About paragraphs may still be in their older plain-text shape (src/data/about.ts).
+// The About paragraphs are stored as text, each with its subheading (src/data/about.ts).
 export const siteContent: SiteContent = { ...(siteJson as Omit<SiteContent, 'about'>), about: aboutParagraphs((siteJson as { about?: unknown }).about) };
 export const sectionsContent = sectionsJson as SectionsContent;
 export const programsContent = programsJson as ProgramContent[];
