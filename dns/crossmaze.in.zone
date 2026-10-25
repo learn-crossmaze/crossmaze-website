@@ -4,7 +4,7 @@
 ; and crossmaze-website.web.app. GoDaddy adds its own NS and SOA, so they are not listed here.
 ; Enter these as a GoDaddy DNS template (Name without .crossmaze.in, @ for the domain itself, values
 ; without quotes or the final dot), or use Actions > Import Zone File as a fallback (it adds records and
-; fails on conflicts, so first delete GoDaddy's default A @ and www CNAME).
+; fails on conflicts, so first delete every record except GoDaddy's NS, SOA and _domainconnect).
 $ORIGIN crossmaze.in.
 $TTL 3600
 
