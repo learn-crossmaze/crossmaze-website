@@ -181,8 +181,8 @@ Then go to `/admin`, choose **Create an account** with one of the `ADMIN_EMAILS`
 
 crossmaze.in is registered at **GoDaddy**, but its DNS (the records saying where the website and the email live) is run by **Wix**: GoDaddy points the domain at Wix's nameservers `ns6.wixdns.net` and `ns7.wixdns.net`. The move happens in two separate evenings, so only one thing changes at a time:
 
-1. **Evening 1: DNS moves to GoDaddy.** The records the school uses, rebuilt at GoDaddy; the website still shows the old Wix site.
-2. **Evening 2 (2 days to 2 weeks later): the website moves.** Two records at GoDaddy change to the new site.
+1. **Evening 1: DNS moves to GoDaddy** (done 25 October 2026). The records the school uses, rebuilt at GoDaddy; the website still shows the old Wix site.
+2. **Evening 2 (2 days to 2 weeks later): the website moves** (done 26 October 2026: www.crossmaze.in served the new site with its own certificate about 30 minutes after the change, and crossmaze.in forwarded to it a few minutes later). Two records at GoDaddy change to the new site.
 
 The email is on **Zoho** (US data centre, zoho.com) and keeps working throughout: its records are copied exactly and never edited. **`www.crossmaze.in` is the main address**; `crossmaze.in` redirects to it, as it does today. The site, sitemap and LITMUS already use www, so no code changes at the switch. Old Wix addresses that people or search engines know are redirected in `firebase.json` (`/home`, the Wix sitemaps, `/admission`, `/transport`, `/onboarding`, `/onboarding-staff`), and the Google, Bing and Facebook verification tags from the Wix home page are in `BaseLayout.astro`, so those accounts stay verified. The old Wix parent feedback forms (`/feedback`, `/feedback/ptm`, `/feedback/sports-day`…) and transport requests go to LITMUS's parent portal, its staff forms (`/feedback/employee`, employee onboarding) to the staff portal, and its back-office pages (`/admin/…`, `/documents`, payments) to LITMUS's sign-in; `www.crossmaze.in/admin` itself becomes the website's admin panel.
 
@@ -342,7 +342,7 @@ On 26 October 2026 the school also confirmed:
   - **Progress**: how parents hear how their child is doing (app updates, parent-teacher meetings, report cards).
   - **Joining mid-year**: which classes take children partway through the year; whether day care can start any time.
   - **Day care's visiting instructors** (art, craft, dance; "additional charges may apply") and **"qualified staff"** on Play Group: still offered, and do all teachers hold the early-childhood certificate the careers page asks for (NTT, Montessori, ECE or CIDTT)?
-- [ ] **Domain move** (step 6 under One-time setup): the Wix data exports, the Wix plan's end date, Wix's emails to parents switched off (step 2), the GoDaddy DNS template checked against `dns/crossmaze.in.zone`, and Authorized domains in Firebase, before each evening. Wix can only be removed or cancelled two weeks after evening 2.
+- [ ] **Leaving Wix** (from 9 November 2026, two weeks after evening 2; step 6 under One-time setup): first export what the old Wix site holds (Forms submissions, including the old parent feedback forms, Contacts and the CMS collections), then remove the domain from Wix and cancel the Wix plan. Until then keep the plan and leave Wix's domain settings alone: changing GoDaddy's A `@` and `www` rows back to `185.230.63.107` and `pointing.wixdns.net` is the undo.
 - [ ] **Firebase project ID**: `.firebaserc` and the workflow use `crossmaze-website`. If the console shows a different ID, update both.
 
 ## Credits
