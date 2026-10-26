@@ -9,7 +9,11 @@
       { "regex": "^/(?:fullscreen-page|popup-[a-z0-9-]+)$", "destination": "/", "type": 301 },
       { "regex": "^/(?:sitemap|pages-sitemap|dynamic-[a-z0-9_-]+-sitemap)\\.xml$", "destination": "/sitemap-index.xml", "type": 301 },
       { "regex": "^/(?:admission|transport|onboarding|feedback/transport)$", "destination": "https://litmus.crossmaze.in/parents", "type": 301 },
-      { "source": "/onboarding-staff", "destination": "https://litmus.crossmaze.in/staff", "type": 301 }
+      { "source": "/onboarding-staff", "destination": "https://litmus.crossmaze.in/staff", "type": 301 },
+      { "regex": "^/(?:feedback(?:/(?:ptm|annual-day|sports-day|graduates))?|transportrequests(?:/[0-9a-f-]+)?)$", "destination": "https://litmus.crossmaze.in/parents", "type": 301 },
+      { "regex": "^/(?:feedback/(?:employee|separations)|(?:employee-onboard|employee-offboard|employees-compliance-profile)/[^/]+)$", "destination": "https://litmus.crossmaze.in/staff", "type": 301 },
+      { "regex": "^/(?:documents|record-payment/[^/]+|admin/.+)$", "destination": "https://litmus.crossmaze.in/", "type": 301 },
+      { "source": "/favicon.ico", "destination": "/favicon.png", "type": 301 }
     ],
     "rewrites": [
       {

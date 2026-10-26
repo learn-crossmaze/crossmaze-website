@@ -1,0 +1,12 @@
+{
+  "id": "2026-10-26-whatsapp-number",
+  "description": "WhatsApp number changed to +91 72599 21508, the number on the old site's WhatsApp button (confirmed by the school)",
+  "changes": [
+    {
+      "doc": "content/site",
+      "field": "whatsapp",
+      "from": "917204021508",
+      "to": "917259921508"
+    }
+  ]
+}
