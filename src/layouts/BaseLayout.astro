@@ -10,7 +10,7 @@ import Icon from '../components/Icon.astro';
 import { site } from '../data/site';
 import { branches, shortName } from '../data/branches';
 import { hasImage, image } from '../data/content';
-import { cleanPath } from '../utils';
+import { cleanPath, jsonScript } from '../utils';
 import { doodleCss } from '../components/doodles';
 import { themes, themeSettings, fontsHref } from '../data/themes';
 
@@ -224,7 +224,7 @@ const themeConfig = {
     </script>
     <noscript><link rel="stylesheet" href={fontsHref(themes[0].fonts)} /></noscript>
 
-    {structuredData.map((data) => <script type="application/ld+json" set:html={JSON.stringify(data)} />)}
+    {structuredData.map((data) => <script type="application/ld+json" set:html={jsonScript(data)} />)}
     <style is:inline set:html={doodleCss}></style>
   </head>
   <body>
@@ -240,7 +240,7 @@ const themeConfig = {
       <Icon name="MessageCircle" size={26} />
     </a>
 
-    <script type="application/json" id="cm-call-numbers" set:html={JSON.stringify(callNumbers)} />
+    <script type="application/json" id="cm-call-numbers" set:html={jsonScript(callNumbers)} />
     <script>
       import '../scripts/motion';
       import '../scripts/call-log';
