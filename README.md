@@ -238,7 +238,7 @@ Wix's own email records are not copied: the CNAMEs `s1._domainkey`, `s2._domaink
 19. Email: from an outside Gmail, write to admission@, care@ and admin@crossmaze.in and reply from Zoho. In Gmail on a computer, open each **reply that came from Zoho** → **⋮** → **Show original**: SPF, DKIM and DMARC should say PASS. Zoho Admin → Email Configuration: Verify on MX, SPF and DKIM.
 20. Google Search Console: submit `https://www.crossmaze.in/sitemap-index.xml`. Update the website link on each centre's Google Business Profile, Facebook and Instagram. Update `dns/crossmaze.in.zone` with the two new website rows and the Firebase TXT records.
 
-**Leaving Wix** (at least two weeks after evening 2): Wix → Domains → crossmaze.in → **Remove from Wix**, then cancel the Premium plan (and any other Wix subscription, such as business email). Nothing changes at GoDaddy: Wix's own records were never copied there.
+**Leaving Wix** (done 26 October 2026, the evening of the switch; the plan was at least two weeks after evening 2): Wix → Domains → crossmaze.in → **Remove from Wix**, then cancel the Premium plan (and any other Wix subscription, such as business email). Nothing changes at GoDaddy: Wix's own records were never copied there.
 
 ## LITMUS integration
 
@@ -342,7 +342,7 @@ On 26 October 2026 the school also confirmed:
   - **Progress**: how parents hear how their child is doing (app updates, parent-teacher meetings, report cards).
   - **Joining mid-year**: which classes take children partway through the year; whether day care can start any time.
   - **Day care's visiting instructors** (art, craft, dance; "additional charges may apply") and **"qualified staff"** on Play Group: still offered, and do all teachers hold the early-childhood certificate the careers page asks for (NTT, Montessori, ECE or CIDTT)?
-- [ ] **Leaving Wix** (from 9 November 2026, two weeks after evening 2; step 6 under One-time setup): first export what the old Wix site holds (Forms submissions, including the old parent feedback forms, Contacts and the CMS collections), then remove the domain from Wix and cancel the Wix plan. Until then keep the plan and leave Wix's domain settings alone: changing GoDaddy's A `@` and `www` rows back to `185.230.63.107` and `pointing.wixdns.net` is the undo.
+- [x] **Leaving Wix** (26 October 2026): the domain was removed from Wix the evening of the switch, the old Wix site stays on its free Wix address with search engines turned off (SEO Settings → Hide Site), and its form submissions and contacts remain in its Wix dashboard. Moving the website back to Wix is no longer possible through GoDaddy alone.
 - [ ] **Firebase project ID**: `.firebaserc` and the workflow use `crossmaze-website`. If the console shows a different ID, update both.
 
 ## Credits
