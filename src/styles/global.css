@@ -92,7 +92,6 @@
   --glass-sheet: rgb(255 255 255 / 94%); /* nearly opaque glass: the phone menu */
   --badge-rim: inset 0 1px 0 rgb(255 255 255 / 80%), inset 0 0 0 1px rgb(255 255 255 / 50%);
   --scrim: color-mix(in srgb, var(--ink) 30%, transparent); /* dims the page behind a pop-up */
-  --sticker: #ffffff; /* the light tile the mascot drawing sits on */
   --field-dash: color-mix(in srgb, var(--navy) 28%, #fff); /* the file drop area's dashed edge */
   --success-fg: #1e6b31;
   --error-fg: #a3301e;
@@ -125,6 +124,11 @@
 
   --container: 1180px;
   --gutter: 20px;
+  /* Glass panels drawn round a .container's content (the call-outs below): the panel's edge sits
+     --panel-edge inside the container's edge, and the content is set in from the glass by
+     --panel-pad on every side, so text never runs close to the panel's edge. */
+  --panel-edge: 8px;
+  --panel-pad: clamp(24px, 4vw, 48px);
   --header-h: 72px;
   /* The header floats this far below the top of the window. */
   --header-gap: 10px;
@@ -213,13 +217,11 @@
 
   /* The chrome at night, from the theme's own tokens (so themes.css needn't set these). Rims and
      edges glint faintly instead of shining white; the phone menu is the smoky glass made nearly
-     opaque; pop-ups dim the page rather than wash it out; the mascot drawing (black outlines) sits
-     on a soft tile of the theme's light text colour rather than bright white. */
+     opaque; pop-ups dim the page rather than wash it out. */
   --glass-shine: rgb(255 255 255 / 14%);
   --glass-sheet: rgb(var(--glass-rgb) / 96%);
   --badge-rim: inset 0 1px 0 rgb(255 255 255 / 14%), inset 0 0 0 1px rgb(255 255 255 / 7%);
   --scrim: rgb(0 0 0 / 42%);
-  --sticker: color-mix(in srgb, var(--ink) 80%, var(--sun-100));
   --field-dash: color-mix(in srgb, var(--navy) 40%, transparent);
   --success-fg: var(--green-fg);
   --error-fg: var(--coral-fg);
@@ -518,13 +520,20 @@ main > section.no-shapes::before {
 }
 
 /* Call-outs (day care, calls to action) sit on a floating glass panel rather than a
-   full-width band, so the page gradient still flows around them without hard edges. */
+   full-width band, so the page gradient still flows around them without hard edges.
+   The panel is drawn just inside the container's edge (8px from the window on phones and tablets,
+   12px outside the other sections' content on wide screens) and reaches --panel-pad above and
+   below the content; the content is set in by the same amount from the panel's sides, so the
+   padding is even all round. */
+main > section.section--feature > .container {
+  padding-inline: calc(var(--panel-edge) + var(--panel-pad));
+}
+
 main > section.section--feature > .container::before {
-  --panel-pad: clamp(24px, 4vw, 48px);
   content: '';
   position: absolute;
   z-index: -1;
-  inset: calc(-1 * var(--panel-pad)) calc(var(--gutter) - min(var(--panel-pad), var(--gutter) - 8px));
+  inset: calc(-1 * var(--panel-pad)) var(--panel-edge);
   border: 1px solid var(--glass-edge);
   border-radius: 36px;
   background: var(--g-panel);
@@ -887,6 +896,49 @@ main > section.section--tight.section--feature {
   background: linear-gradient(135deg, var(--badge-bg, var(--navy-50)) 0%, var(--badge-bg-2, var(--navy-100)) 100%);
   box-shadow: var(--badge-rim);
   color: var(--badge-fg, var(--navy));
+}
+
+/* Icon cards on phones (core values, perks, how we teach…): a card in one of the shared grids that
+   starts with an icon badge and a heading becomes a compact row, with the badge beside the title
+   and text and tighter padding, so a list of six takes about half the height. Nothing is cut off:
+   the text wraps onto as many lines as it needs. They stay one per row up to 560px. */
+@media (max-width: 560px) {
+  .grid:has(> .card > .icon-badge + h3) {
+    --grid-gap: 12px;
+    --grid-two-at: 560px;
+  }
+
+  .grid > .card:has(> .icon-badge + h3) {
+    display: grid;
+    grid-template-columns: auto minmax(0, 1fr);
+    align-items: start;
+    column-gap: 14px;
+    padding: 16px 18px 18px;
+    border-radius: var(--radius);
+  }
+
+  .grid > .card:has(> .icon-badge + h3) > * {
+    grid-column: 2;
+  }
+
+  .grid > .card:has(> .icon-badge + h3) > .icon-badge {
+    grid-column: 1;
+    grid-row: 1 / span 2;
+    width: 44px;
+    height: 44px;
+    margin: 0;
+    border-radius: 14px;
+  }
+
+  .grid > .card:has(> .icon-badge + h3) > h3 {
+    margin: 0 0 4px;
+    font-size: 1.12rem;
+  }
+
+  .grid > .card:has(> .icon-badge + h3) > p {
+    font-size: 0.97rem;
+    line-height: 1.5;
+  }
 }
 
 .tone-sun {

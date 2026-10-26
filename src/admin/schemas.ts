@@ -22,7 +22,8 @@ interface Base {
 
 export type Field =
   | (Base & { type: 'text' | 'email' | 'tel' | 'url'; placeholder?: string; maxLength?: number })
-  | (Base & { type: 'textarea'; rows?: number })
+  /** `suggestMax`: a soft length guide; the form shows the count against it, and never stops a save. */
+  | (Base & { type: 'textarea'; rows?: number; suggestMax?: number })
   | (Base & { type: 'number' })
   | (Base & { type: 'date' })
   /** A time of day, stored as "09:00". */
@@ -68,8 +69,9 @@ const colorOptions: Option[] = [
 const amenityOptions: Option[] = Object.entries(amenityList).map(([value, a]) => ({ value, label: a.label }));
 const themeOptions: Option[] = themes.map((t) => ({ value: t.id, label: t.label }));
 
-const photoFields = (folder: string): Field[] => [
-  { key: 'image', label: 'Photo', type: 'image', folder, required: true },
+/** `help`: what kind of photo works best there. */
+const photoFields = (folder: string, help?: string): Field[] => [
+  { key: 'image', label: 'Photo', type: 'image', folder, required: true, help },
   { key: 'alt', label: 'Description', type: 'text', help: 'Describes the photo for screen readers and Google.' },
 ];
 
@@ -98,7 +100,6 @@ export const siteSchema: Field[] = [
   { key: 'tagline', label: 'Tagline', type: 'text' },
   { key: 'description', label: 'Description for Google', type: 'textarea', rows: 3, help: 'About 150 characters. Shown in search results.' },
   { key: 'logo', label: 'Logo', type: 'image', folder: 'brand', required: true, help: 'A wide PNG with a transparent background works best.' },
-  { key: 'mascot', label: 'Mascot / footer illustration', type: 'image', folder: 'brand' },
 
   { type: 'heading', label: 'Contact details' },
   { key: 'phone', label: 'Phone number', type: 'tel', required: true },
@@ -161,10 +162,10 @@ export const siteSchema: Field[] = [
     fields: [
       { key: 'titleStart', label: 'Heading', type: 'text' },
       { key: 'titleHighlight', label: 'Underlined part of the heading', type: 'text' },
-      { key: 'lead', label: 'Introduction', type: 'textarea', rows: 3 },
+      { key: 'lead', label: 'Introduction', type: 'textarea', rows: 3, suggestMax: 300 },
       { key: 'badgeValue', label: 'Badge number', type: 'text', help: 'E.g. 1000+. Leave empty to hide the badge.' },
       { key: 'badgeLabel', label: 'Badge text', type: 'text' },
-      { key: 'photos', label: 'Photos', type: 'objects', itemLabel: 'Photo', summary: 'alt', fields: photoFields('home'), help: 'The first is the large photo; the next two appear below it.' },
+      { key: 'photos', label: 'Photos', type: 'objects', itemLabel: 'Photo', summary: 'alt', fields: photoFields('home', 'A landscape photo at least 1280 pixels wide looks sharp.'), help: 'The first is the large photo; the next two appear beside or below it.' },
     ],
   },
   {
@@ -178,7 +179,7 @@ export const siteSchema: Field[] = [
       { key: 'label', label: 'Label', type: 'text', required: true },
     ],
   },
-  { key: 'promise', label: 'Our promise', type: 'textarea', rows: 4, help: 'Also used as the About page introduction.' },
+  { key: 'promise', label: 'Our promise', type: 'textarea', rows: 4, suggestMax: 550, help: 'Also used as the About page introduction.' },
   {
     key: 'about',
     label: 'About us paragraphs',
@@ -192,10 +193,10 @@ export const siteSchema: Field[] = [
     help: 'Home and About pages.',
     fields: [
       { key: 'heading', label: 'Subheading', type: 'text', maxLength: aboutHeadingMax, help: 'Shown above the paragraph. Leave empty for none.' },
-      { key: 'text', label: 'Paragraph', type: 'textarea', rows: 6, required: true, help: 'Leave a blank line to start a new paragraph.' },
+      { key: 'text', label: 'Paragraph', type: 'textarea', rows: 6, required: true, suggestMax: 700, help: 'Leave a blank line to start a new paragraph.' },
     ],
   },
-  { key: 'aboutPhoto', label: 'About us photo', type: 'group', fields: photoFields('home') },
+  { key: 'aboutPhoto', label: 'About us photo', type: 'group', fields: photoFields('home', 'A landscape photo at least 1200 pixels wide looks sharp.') },
   {
     key: 'quote',
     label: 'Quote',
@@ -205,10 +206,10 @@ export const siteSchema: Field[] = [
       { key: 'author', label: 'Author', type: 'text' },
     ],
   },
-  { key: 'daycarePhoto', label: 'Day care photo', type: 'group', fields: photoFields('home') },
+  { key: 'daycarePhoto', label: 'Day care photo', type: 'group', fields: photoFields('home', 'A landscape photo at least 1200 pixels wide looks sharp.') },
 
   { type: 'heading', label: 'About page' },
-  { key: 'moments', label: '“Life at Crossmaze” photos', type: 'objects', itemLabel: 'Photo', summary: 'alt', fields: photoFields('about') },
+  { key: 'moments', label: '“Life at Crossmaze” photos', type: 'objects', itemLabel: 'Photo', summary: 'alt', fields: photoFields('about', 'Landscape photos (3:2 or 4:3) at least 1000 pixels wide look sharp. A portrait photo is cropped to the same shape, near its top.') },
   { key: 'founders', label: 'Founders', type: 'list', itemLabel: 'Name' },
   { key: 'foundedYear', label: 'Year founded', type: 'number' },
 ];
@@ -248,7 +249,7 @@ export const sectionsSchema: Field[] = [
     ...iconItem('Step'),
     key: 'admissionSteps',
     label: 'How admission works',
-    help: 'Home and Contact pages, in order. Remove every entry to hide the section.',
+    help: 'Contact page, and numbered beside the enquiry form on the Home page, in order. Remove every entry to hide them.',
   },
   {
     key: 'faqs',
@@ -394,7 +395,7 @@ export const jobSchema: Field[] = [
 ];
 
 export const testimonialSchema: Field[] = [
-  { key: 'quote', label: 'Quote', type: 'textarea', rows: 5, required: true },
+  { key: 'quote', label: 'Quote', type: 'textarea', rows: 5, required: true, suggestMax: 400 },
   { key: 'name', label: 'Parent names', type: 'text', required: true },
   { key: 'detail', label: 'Detail', type: 'text', placeholder: 'Parents of …' },
 ];

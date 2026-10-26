@@ -140,12 +140,20 @@ export function FieldEditor({ field, value, onChange }: { field: Exclude<Field, 
           />
         </Row>
       );
-    case 'textarea':
+    case 'textarea': {
+      const length = asText(value).trim().length;
+      const over = field.suggestMax !== undefined && length > field.suggestMax;
       return (
         <Row label={field.label} help={field.help} required={field.required} htmlFor={id}>
           <textarea id={id} rows={field.rows ?? 4} value={asText(value)} onChange={(e) => onChange(e.target.value)} />
+          {field.suggestMax !== undefined && (
+            <p className={over ? 'help length length--over' : 'help length'}>
+              {length} characters · about {field.suggestMax} or fewer reads best here
+            </p>
+          )}
         </Row>
       );
+    }
     case 'number':
       return (
         <Row label={field.label} help={field.help} required={field.required} htmlFor={id}>

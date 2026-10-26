@@ -1,36 +1,320 @@
 ---
+// The privacy policy and terms (src/pages/*.md). The text starts at the banner's left edge in a
+// comfortable reading width. With three or more sections, an "On this page" list made from the
+// ## headings helps readers find a part of a long policy:
+//  - from 1100px: a glass card beside the text that stays in view while the text scrolls;
+//  - narrower: a folded glass card above the text, opened with a tap.
+// Jumps scroll smoothly (html's scroll-behavior in global.css), and instantly for reduced motion.
 import BaseLayout from './BaseLayout.astro';
 import PageHero from '../components/PageHero.astro';
+import Icon from '../components/Icon.astro';
 
 interface Props {
   frontmatter: { title: string; description: string };
+  /** Astro passes a Markdown page's headings (with their ids) to its layout. */
+  headings?: { depth: number; slug: string; text: string }[];
 }
-const { frontmatter } = Astro.props;
+const { frontmatter, headings = [] } = Astro.props;
+const contents = headings.filter((h) => h.depth === 2);
+const hasContents = contents.length >= 3;
 ---
 
 <BaseLayout title={frontmatter.title} description={frontmatter.description}>
-  <PageHero title={frontmatter.title} crumbs={[{ label: frontmatter.title }]} />
-  <section class="section section--white">
-    <div class="container prose">
-      <slot />
+  <PageHero title={frontmatter.title} lead={frontmatter.description} crumbs={[{ label: frontmatter.title }]} />
+  <section class="section section--tight legal">
+    <div class:list={['container', 'legal__inner', { 'legal__inner--contents': hasContents }]}>
+      {
+        hasContents && (
+          <details class="legal-toc legal-toc--top">
+            <summary>
+              <span class="legal-toc__title">On this page</span>
+              <span class="legal-toc__count">{contents.length} sections</span>
+              <Icon name="ChevronDown" size={18} />
+            </summary>
+            <nav aria-label="On this page">
+              <ul>
+                {contents.map((h) => (
+                  <li>
+                    <a href={`#${h.slug}`}>{h.text}</a>
+                  </li>
+                ))}
+              </ul>
+            </nav>
+          </details>
+        )
+      }
+      <div class="prose">
+        <slot />
+      </div>
+      {
+        hasContents && (
+          <aside class="legal__side">
+            <nav class="legal-toc legal-toc--side" aria-labelledby="legal-toc-title" data-legal-toc>
+              <p class="legal-toc__title" id="legal-toc-title">
+                On this page
+              </p>
+              <ul>
+                {contents.map((h) => (
+                  <li>
+                    <a href={`#${h.slug}`}>{h.text}</a>
+                  </li>
+                ))}
+              </ul>
+            </nav>
+          </aside>
+        )
+      }
     </div>
   </section>
 </BaseLayout>
 
-<style>
-  .prose {
-    max-width: 780px;
-    color: var(--muted);
+<script>
+  // Marks the section being read in the side list: the last heading that has reached the top of the
+  // window (under the floating header). At the end of the page, where the last headings can't scroll up
+  // that far, it is the one jumped to if it is in view, or else the last one in view. Only a colour
+  // changes, and a list too long for the window scrolls itself, at once, to keep that entry in view.
+  const toc = document.querySelector<HTMLElement>('[data-legal-toc]');
+  if (toc) {
+    const links = [...toc.querySelectorAll<HTMLAnchorElement>('a[href^="#"]')];
+    const targets = links.map((a) => document.getElementById(decodeURIComponent(a.hash.slice(1))));
+    let queued = false;
+    let shown = -1;
+    const update = () => {
+      queued = false;
+      if (toc.offsetParent === null) return; // hidden: the folded list above the text shows instead
+      const root = document.documentElement;
+      const line = (parseFloat(getComputedStyle(root).scrollPaddingTop) || 0) + 32;
+      let current = -1;
+      targets.forEach((t, i) => {
+        if (t && t.getBoundingClientRect().top <= line) current = i;
+      });
+      if (scrollY + innerHeight >= root.scrollHeight - 2) {
+        let last = current;
+        targets.forEach((t, i) => {
+          if (t && i > current && t.getBoundingClientRect().top < innerHeight) last = i;
+        });
+        const jumped = links.findIndex((a) => a.hash === location.hash);
+        current = jumped >= Math.max(current, 0) && jumped <= last ? jumped : last;
+      }
+      links.forEach((a, i) => {
+        if (i === current) a.setAttribute('aria-current', 'true');
+        else a.removeAttribute('aria-current');
+      });
+      if (current === shown) return;
+      shown = current;
+      const link = links[current];
+      if (!link || toc.scrollHeight <= toc.clientHeight) return;
+      const box = toc.getBoundingClientRect();
+      const item = link.getBoundingClientRect();
+      if (item.bottom > box.bottom - 12) toc.scrollTop += item.bottom - box.bottom + 12;
+      else if (item.top < box.top + 12) toc.scrollTop -= box.top + 12 - item.top;
+    };
+    const queue = () => {
+      if (queued) return;
+      queued = true;
+      requestAnimationFrame(update);
+    };
+    addEventListener('scroll', queue, { passive: true });
+    addEventListener('resize', queue);
+    addEventListener('hashchange', queue); // a jump at the end of the page doesn't scroll
+    update();
   }
+</script>
+
+<style>
+  /* The banner above has its own bottom padding, so the text starts right under it. Sections clip
+     their doodle with overflow: hidden (global.css), which would stop the side list from staying
+     in view; clip does the same clipping without that side effect. */
+  .legal {
+    padding-top: 0;
+    overflow: clip;
+  }
+
+  .prose {
+    max-width: 68ch;
+    color: var(--muted);
+    overflow-wrap: break-word;
+  }
+
+  .prose > :global(:first-child) {
+    margin-top: 0;
+  }
+
   .prose :global(h2) {
     margin-top: 1.8em;
-    font-size: 1.5rem;
+    font-size: clamp(1.3rem, 2.4vw, 1.5rem);
     color: var(--ink);
   }
+
   .prose :global(strong) {
     color: var(--ink);
   }
+
   .prose :global(li) {
     margin-bottom: 0.4em;
+  }
+
+  /* ---------- On this page ---------- */
+  .legal-toc {
+    border: 1px solid var(--glass-edge);
+    border-radius: var(--radius-card);
+    background: var(--glass);
+    -webkit-backdrop-filter: var(--glass-blur);
+    backdrop-filter: var(--glass-blur);
+    box-shadow: var(--glass-rim), var(--shadow-sm);
+  }
+
+  /* The small label, like the eyebrow above a heading. */
+  .legal-toc__title {
+    margin: 0;
+    color: var(--eyebrow-fg);
+    font-family: var(--font-display);
+    font-weight: 600;
+    font-size: 0.82rem;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+  }
+
+  .legal-toc ul {
+    display: grid;
+    gap: 2px;
+    margin: 0;
+    padding: 0;
+    list-style: none;
+  }
+
+  .legal-toc li {
+    margin: 0;
+    break-inside: avoid;
+  }
+
+  .legal-toc a {
+    display: block;
+    padding: 6px 12px;
+    border-radius: 10px;
+    color: var(--ink);
+    font-weight: 700;
+    font-size: 0.95rem;
+    line-height: 1.35;
+    text-decoration: none;
+  }
+
+  .legal-toc a:hover {
+    color: var(--navy);
+    background: color-mix(in srgb, var(--navy) 7%, transparent);
+  }
+
+  /* Folded above the text (narrow screens). */
+  .legal-toc--top {
+    max-width: 68ch;
+    margin-bottom: clamp(28px, 4vw, 40px);
+  }
+
+  .legal-toc--top summary {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    min-height: 52px;
+    padding: 12px 20px;
+    border-radius: inherit;
+    list-style: none;
+    cursor: pointer;
+  }
+
+  .legal-toc--top summary::-webkit-details-marker {
+    display: none;
+  }
+
+  .legal-toc__count {
+    margin-left: auto;
+    color: var(--muted);
+    font-size: 0.92rem;
+  }
+
+  .legal-toc--top summary :global(svg) {
+    flex: none;
+    color: var(--navy);
+    transition: transform 0.2s ease;
+  }
+
+  .legal-toc--top[open] summary :global(svg) {
+    transform: rotate(180deg);
+  }
+
+  .legal-toc--top nav {
+    padding: 0 8px 14px;
+  }
+
+  @media (min-width: 600px) {
+    .legal-toc--top ul {
+      display: block;
+      columns: 2;
+      column-gap: 8px;
+    }
+    .legal-toc--top li + li {
+      margin-top: 2px;
+    }
+  }
+
+  /* Beside the text (wide screens): stays in view under the floating header, never reaching the
+     WhatsApp button at the bottom of the window. */
+  .legal__side {
+    display: none;
+  }
+
+  @media (min-width: 1100px) {
+    .legal__inner--contents {
+      display: grid;
+      grid-template-columns: minmax(0, 68ch) minmax(240px, 300px);
+      justify-content: space-between;
+      column-gap: 48px;
+      align-items: start;
+    }
+
+    .legal__inner--contents .prose {
+      grid-column: 1;
+      grid-row: 1;
+    }
+
+    .legal-toc--top {
+      display: none;
+    }
+
+    .legal__side {
+      display: block;
+      grid-column: 2;
+      grid-row: 1;
+      align-self: stretch;
+    }
+
+    .legal-toc--side {
+      --toc-top: calc(var(--header-gap) + var(--header-h) + 24px);
+      position: sticky;
+      top: var(--toc-top);
+      display: grid;
+      gap: 10px;
+      max-height: calc(100vh - var(--toc-top) - 96px);
+      overflow-y: auto;
+      overscroll-behavior: contain;
+      padding: 20px 12px 14px;
+    }
+
+    .legal-toc--side .legal-toc__title {
+      padding-inline: 12px;
+    }
+
+    .legal-toc--side a {
+      color: var(--muted);
+    }
+
+    .legal-toc--side a:hover {
+      color: var(--navy);
+    }
+
+    /* The section being read. */
+    .legal-toc--side a[aria-current] {
+      color: var(--navy);
+      background: color-mix(in srgb, var(--navy) 9%, transparent);
+    }
   }
 </style>

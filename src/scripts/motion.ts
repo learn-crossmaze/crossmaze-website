@@ -42,21 +42,36 @@ function setupReveal() {
   // Hidden through CSS (screen only), so printing still shows everything.
   for (const el of targets) el.dataset.reveal = 'pending';
 
+  const reveal = (el: HTMLElement, fade: boolean) => {
+    el.dataset.reveal = 'done';
+    if (!fade) return;
+    const delay = Math.min(order.get(el) ?? 0, 5) * 70;
+    el.animate(
+      [
+        { opacity: 0, transform: 'translateY(22px) scale(0.98)' },
+        { opacity: 1, transform: 'none' },
+      ],
+      { duration: 650, delay, easing: 'cubic-bezier(.2,.7,.2,1)', fill: 'backwards' },
+    );
+  };
+
   const observer = new IntersectionObserver(
     (entries) => {
       for (const entry of entries) {
-        if (!entry.isIntersecting) continue;
         const el = entry.target as HTMLElement;
-        observer.unobserve(el);
-        const delay = Math.min(order.get(el) ?? 0, 5) * 70;
-        el.dataset.reveal = 'done';
-        el.animate(
-          [
-            { opacity: 0, transform: 'translateY(22px) scale(0.98)' },
-            { opacity: 1, transform: 'none' },
-          ],
-          { duration: 650, delay, easing: 'cubic-bezier(.2,.7,.2,1)', fill: 'backwards' },
-        );
+        if (!entry.isIntersecting || el.dataset.reveal !== 'pending') continue;
+        // A card in a row that scrolls sideways (Strip.astro) brings the rest of the row with it, so a
+        // card swiped in later is already there rather than blank for a moment. Decided now, not at
+        // load: a phones-only strip is a grid on wider screens, and a phone can be turned. If some of
+        // the row was on screen at load (as a grid), the cards still to come just appear.
+        const track = el.parentElement!;
+        const row = track.matches('[data-strip-track]') && getComputedStyle(track).overflowX !== 'visible';
+        const cards = row ? targets.filter((t) => t.parentElement === track && t.dataset.reveal === 'pending') : [el];
+        const fade = !row || [...track.children].every((c) => !c.matches(REVEAL) || cards.includes(c as HTMLElement));
+        for (const card of cards) {
+          observer.unobserve(card);
+          reveal(card, fade);
+        }
       }
     },
     { rootMargin: '0px 0px -8% 0px' },

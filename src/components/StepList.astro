@@ -1,0 +1,134 @@
+---
+// A short numbered list of steps joined by a dashed path, compact enough for the column beside a form:
+// "How admission works" beside the home page's enquiry form and "What happens next" beside the careers
+// form. (Steps.astro is the full-width row of icon steps, on /contact and for "A day at Crossmaze".)
+//
+// A step is a line of text, or a title with a line of text under it (the admission steps from the
+// admin panel). Any number of steps works; the numbers take turns through the tone colours.
+//
+//   <StepList title="What happens next" items={[{ text: 'Fill in the form.' }, { text: 'We call you.' }]} />
+interface Props {
+  items: { title?: string; text?: string }[];
+  /** A heading above the list (an h3). */
+  title?: string;
+}
+
+const { items, title } = Astro.props;
+const tones = ['coral', 'navy', 'green', 'sky', 'sun'];
+const titled = items.some((step) => step.title);
+---
+
+<div class="step-list">
+  {title && <h3 class="step-list__title">{title}</h3>}
+  <ol class:list={['step-list__items', { 'step-list__items--titled': titled }]}>
+    {
+      items.map((step, i) => (
+        <li class={`tone-${tones[i % tones.length]}`}>
+          <span class="step-list__num">{i + 1}</span>
+          {titled ? (
+            <span class="step-list__body">
+              {step.title && <strong class="step-list__name">{step.title}</strong>}
+              {step.text && <span class="step-list__text">{step.text}</span>}
+            </span>
+          ) : (
+            <span>{step.text}</span>
+          )}
+        </li>
+      ))
+    }
+  </ol>
+</div>
+
+<style>
+  .step-list__title {
+    margin-bottom: 14px;
+    font-size: 1.15rem;
+  }
+
+  .step-list__items {
+    --step-gap: 14px;
+    position: relative;
+    display: grid;
+    gap: var(--step-gap);
+    margin: 0;
+    padding: 0;
+    list-style: none;
+  }
+
+  /* A dashed path joining the numbers. */
+  .step-list__items::before {
+    content: '';
+    position: absolute;
+    top: 16px;
+    bottom: 16px;
+    left: 15px;
+    border-left: 2px dashed color-mix(in srgb, var(--navy) 22%, transparent);
+  }
+
+  .step-list__items li {
+    position: relative;
+    display: flex;
+    align-items: center;
+    gap: 14px;
+  }
+
+  /* The number in its tone, deepened towards --contrast-mix (darker by day, lighter at night) so even
+     the paler tones read clearly on their tint. */
+  .step-list__num {
+    display: grid;
+    flex: none;
+    place-items: center;
+    width: 32px;
+    height: 32px;
+    border-radius: 50%;
+    background: linear-gradient(135deg, var(--badge-bg) 0%, var(--badge-bg-2) 100%);
+    box-shadow: var(--badge-rim);
+    color: color-mix(in srgb, var(--badge-fg) 70%, var(--contrast-mix));
+    font-family: var(--font-display);
+    font-weight: 600;
+    font-size: 0.95rem;
+  }
+
+  /* Steps with titles: each number level with its title (a 24px line), the text under the title. These
+     steps are taller and uneven, so the path runs from each number to the next one instead, ending at
+     the last number. */
+  .step-list__items--titled::before {
+    content: none;
+  }
+
+  .step-list__items--titled li {
+    align-items: flex-start;
+  }
+
+  .step-list__items--titled li:not(:last-child)::before {
+    content: '';
+    position: absolute;
+    top: 12px;
+    bottom: calc(-1 * (var(--step-gap) + 12px));
+    left: 15px;
+    border-left: 2px dashed color-mix(in srgb, var(--navy) 22%, transparent);
+  }
+
+  .step-list__items--titled .step-list__num {
+    position: relative;
+    margin-top: -4px;
+  }
+
+  .step-list__body {
+    display: grid;
+    min-width: 0;
+    line-height: 1.5;
+    /* No last line of a single word. */
+    text-wrap: pretty;
+  }
+
+  .step-list__name {
+    font-weight: 800;
+  }
+
+  .step-list__text {
+    color: var(--muted);
+    font-size: 0.92rem;
+    line-height: 1.45;
+  }
+</style>

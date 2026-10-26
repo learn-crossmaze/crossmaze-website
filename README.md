@@ -18,7 +18,7 @@ The URLs match the old site, so existing links and Google results keep working.
 
 | URL | Page |
 | --- | --- |
-| `/` | Home: hero, stats, about, core values, programs, a day at Crossmaze, day care, facilities, testimonials, branches, how admission works, admission enquiry |
+| `/` | Home: hero, stats, about, core values, programs, a day at Crossmaze, day care, facilities, testimonials, latest blog posts, branches, admission enquiry (with how admission works beside the form); on phones the programs, testimonials and branches are swipe strips |
 | `/about` | Who we are, core values, approach, annual-day photos, founders |
 | `/our-programs` | Play Group, Nursery, Junior KG, Senior KG, Day Care, how we teach, a day at Crossmaze, extra-curriculars, FAQs |
 | `/branch` and `/branch/<slug>` | All branches, then one page per branch: photos, facts (including opening hours), programs with their batches and timings, about the centre with its amenities and centre head, gallery, then the visit details and map beside the enquiry form |
@@ -317,6 +317,9 @@ On 19 October 2026 the school confirmed the following, so the site states them. 
 - [ ] **Founders and founding year** (About page) came from public sources.
 - [ ] **Careers email**: currently `admin@crossmaze.in`.
 - [ ] **Facility photos** on the home page came from the old www.crossmaze.in. CCTV surveillance, Fire safe, Parents’ communication app and Trained caregivers are stock photos from Wix’s free media library, which may only be licensed for use on Wix sites: replace them with your own (admin panel → Page sections → Facilities). The school’s own facility photos on the old site were small (555 px wide), so larger originals will look sharper, especially when opened full screen.
+- [ ] **Small photos** look soft on large and high-resolution screens. The day care photo is still the old nap-room picture, only 555 px wide, and the "Life at Crossmaze" photos are 450–500 px wide. Upload larger originals (about 1200 px wide or more; admin panel → Site settings → Day care photo and “Life at Crossmaze” photos). The site picks up the larger sizes by itself.
+- [ ] **Play Group photo description** still says "Colourful indoor play area with rockers and a slide", but the new photo shows children holding paper props. Update it in admin panel → Programs → Play Group → Photo description.
+- [ ] **Home banner badge** "1000+ happy children" repeats the first number in the numbers strip just below it. Give the badge different words, or leave its number empty to hide it (admin panel → Site settings → Top banner).
 - [ ] **Reworded copy** (October 2026): text across the site was rewritten for clarity without changing any facts. The FAQ "How do I apply for admission?" is new.
 - [ ] **A day at Crossmaze** and **How admission works** were written for the new site from what the old site says. Check they match how your centres work (admin panel → Page sections).
 - [ ] **Sample blog posts**: six example posts (one in each design) start as hidden drafts, written from what the site already says plus general parenting tips. Edit and publish the ones you like, and delete the rest (admin panel → Blog).
@@ -330,3 +333,7 @@ On 19 October 2026 the school confirmed the following, so the site states them. 
   - **Day care's visiting instructors** (art, craft, dance; "additional charges may apply") and **"qualified staff"** on Play Group: still offered, and do all teachers hold the early-childhood certificate the careers page asks for (NTT, Montessori, ECE or CIDTT)?
 - [ ] **Domain move** (step 6 under One-time setup): the Wix data exports, the Wix plan's end date, Wix's emails to parents switched off (step 2), the GoDaddy DNS template checked against `dns/crossmaze.in.zone`, and Authorized domains in Firebase, before each evening. Wix can only be removed or cancelled two weeks after evening 2.
 - [ ] **Firebase project ID**: `.firebaserc` and the workflow use `crossmaze-website`. If the console shows a different ID, update both.
+
+## Credits
+
+- **Owl illustration** on the “page not found” page (`src/assets/brand/owl.svg`): “Owl” by anarres, from Openclipart (https://openclipart.org/detail/328460/owl), dedicated to the public domain under CC0 1.0 (https://creativecommons.org/publicdomain/zero/1.0/), so no credit is needed on the site. Only editor metadata was removed and a viewBox added.

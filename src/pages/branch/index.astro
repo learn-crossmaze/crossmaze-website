@@ -4,6 +4,26 @@ import PageHero from '../../components/PageHero.astro';
 import BranchCard from '../../components/BranchCard.astro';
 import Icon from '../../components/Icon.astro';
 import { branches, facilities } from '../../data/branches';
+
+// The facilities in full rows: on each screen (wide from 1141px, phones up to 700px) the first of the
+// column counts that leaves no gap in the last row, else the one with the fewest gaps, never leaving
+// one facility alone under a full row. Twelve go 4 a row on wide screens, 3 on tablets and laptops
+// and 2 on phones; ten go 5 / 2 / 2, nine 3 / 3 / 2, eight 4 / 2 / 2, six 3 / 3 / 2.
+const columnsFor = (n: number, choices: number[]) => {
+  // The empty places in the last row, plus a full row's worth when it holds a single facility.
+  const cost = (cols: number) => {
+    const last = n % cols;
+    return last === 0 ? 0 : cols - last + (last === 1 && n > cols ? cols : 0);
+  };
+  return Math.min(n, choices.reduce((best, cols) => (cost(cols) < cost(best) ? cols : best)));
+};
+const facilityCols = {
+  lg: columnsFor(facilities.length, [4, 3, 5]),
+  md: columnsFor(facilities.length, [3, 2]),
+  sm: columnsFor(facilities.length, [2]),
+};
+// The badges take the same colours as the facility cards on the home page (FacilityStrip.astro).
+const tones = ['coral', 'sun', 'green', 'sky', 'navy'];
 ---
 
 <BaseLayout
@@ -17,7 +37,8 @@ import { branches, facilities } from '../../data/branches';
     crumbs={[{ label: 'Branches' }]}
   />
 
-  <section class="section section--white">
+  {/* The cards start just under the banner, so they read as its list. */}
+  <section class="section section--tight branch-list">
     <div class="container">
       <div class="grid grid--3">
         {branches.map((b, i) => <BranchCard branch={b} index={i} />)}
@@ -25,48 +46,141 @@ import { branches, facilities } from '../../data/branches';
     </div>
   </section>
 
-  <section class="section--tight">
-    <div class="container">
-      <h2 class="amen-title">Our facilities</h2>
-      <ul class="amen">
-        {
-          facilities.map((f) => (
-            <li>
-              <span class="icon-badge">
-                <Icon name={f.icon} size={22} />
-              </span>
-              {f.title}
-            </li>
-          ))
-        }
-      </ul>
-    </div>
-  </section>
+  {
+    facilities.length > 0 && (
+      <section class="section--tight branch-facilities" aria-labelledby="facilities-title">
+        <div class="container">
+          <div class="card facilities">
+            <h2 class="facilities__title" id="facilities-title">
+              Our facilities
+            </h2>
+            <ul
+              class="facilities__list"
+              style={`--cols-lg: ${facilityCols.lg}; --cols-md: ${facilityCols.md}; --cols-sm: ${facilityCols.sm}`}
+            >
+              {facilities.map((f, i) => (
+                <li class={`tone-${tones[i % tones.length]}`}>
+                  <span class="icon-badge">
+                    <Icon name={f.icon} size={22} />
+                  </span>
+                  <span class="facilities__name">{f.title}</span>
+                </li>
+              ))}
+            </ul>
+          </div>
+        </div>
+      </section>
+    )
+  }
 </BaseLayout>
 
 <style>
-  .amen-title {
-    font-size: 1.6rem;
+  /* The banner's own bottom padding is the gap above the cards (a little more, so a card's hover
+     shadow isn't cut off). */
+  .branch-list {
+    padding-top: clamp(16px, 2vw, 24px);
   }
-  .amen {
+
+  /* The space under the cards is the gap above the facilities (a little more, so the panel's shadow
+     isn't cut off). */
+  .branch-facilities {
+    padding-top: 16px;
+  }
+
+  /* ---------- Our facilities: one glass panel, the facilities in full rows ---------- */
+  .facilities {
+    padding: clamp(22px, 3.4vw, 40px);
+  }
+
+  .facilities__title {
+    margin-bottom: clamp(18px, 2.4vw, 28px);
+    font-size: clamp(1.4rem, 2.4vw, 1.75rem);
+  }
+
+  .facilities__list {
     display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(min(100%, 220px), 1fr));
-    gap: 12px;
-    margin: 24px 0 0;
+    grid-template-columns: repeat(var(--cols-lg), minmax(0, 1fr));
+    gap: 18px clamp(16px, 2.4vw, 32px);
+    margin: 0;
     padding: 0;
     list-style: none;
   }
-  .amen li {
+
+  /* Fewer columns below 1141px, where four would leave a long name such as "Parents' communication
+     app" three lines. */
+  @media (max-width: 1140px) {
+    .facilities__list {
+      grid-template-columns: repeat(var(--cols-md), minmax(0, 1fr));
+    }
+  }
+
+  /* Two up to 700px, where three would leave a long word such as "communication" wider than its
+     column. */
+  @media (max-width: 700px) {
+    .facilities__list {
+      grid-template-columns: repeat(var(--cols-sm), minmax(0, 1fr));
+    }
+  }
+
+  @media (max-width: 560px) {
+    .facilities__list {
+      gap: 14px 12px;
+    }
+  }
+
+  /* Each facility: its badge beside the name, which wraps into even lines when it needs two. */
+  .facilities__list li {
     display: flex;
     align-items: center;
-    gap: 12px;
+    gap: 14px;
+    min-width: 0;
     font-weight: 700;
+    line-height: 1.3;
   }
-  .amen .icon-badge {
-    margin: 0;
+
+  .facilities__list .icon-badge {
+    flex: none;
     width: 44px;
     height: 44px;
-    border-radius: 12px;
-    background: var(--g-glass);
+    margin: 0;
+    border-radius: 14px;
+  }
+
+  /* A word too long for its column (as on the narrowest phones) is hyphenated or, where a browser doesn't
+     hyphenate, broken anywhere rather than running out of the panel. */
+  .facilities__name {
+    min-width: 0;
+    text-wrap: balance;
+    -webkit-hyphens: auto;
+    hyphens: auto;
+    overflow-wrap: anywhere;
+  }
+
+  /* Phones: two columns of icons (without their badges, as with the amenities on a branch page) and
+     names, so a long word such as "communication" still fits its column. */
+  @media (max-width: 560px) {
+    .facilities {
+      padding: 20px 18px;
+    }
+
+    .facilities__list li {
+      align-items: flex-start;
+      gap: 8px;
+      font-size: 0.94rem;
+    }
+
+    .facilities__list .icon-badge {
+      width: auto;
+      height: auto;
+      margin-top: 1px;
+      border-radius: 0;
+      background: none;
+      box-shadow: none;
+    }
+
+    .facilities__list .icon-badge :global(svg) {
+      width: 19px;
+      height: 19px;
+    }
   }
 </style>

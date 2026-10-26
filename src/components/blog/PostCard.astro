@@ -37,7 +37,7 @@ const Heading = headingLevel;
   <div class="post-card__body">
     <Heading class="post-card__title"><a href={postUrl(post)}>{post.title}</a></Heading>
     <p class="post-card__summary">{post.summary}</p>
-    <PostMeta post={post} noAuthor />
+    <PostMeta post={post} noAuthor class="post-card__meta" />
     {
       featured && (
         <a class="btn btn--sm post-card__more" href={postUrl(post)} tabindex="-1" aria-hidden="true">
@@ -113,6 +113,10 @@ const Heading = headingLevel;
     font-size: 1.22rem;
   }
 
+  .post-card__body :global(.post-card__meta) {
+    margin-top: auto;
+  }
+
   .post-card__title a {
     color: var(--ink);
     text-decoration: none;
@@ -130,8 +134,9 @@ const Heading = headingLevel;
     z-index: 1;
   }
 
+  /* A stretched card keeps its summary at three lines and puts the date at the bottom. */
   .post-card__summary {
-    flex: 1;
+    flex: none;
     margin: 0;
     color: var(--muted);
     display: -webkit-box;

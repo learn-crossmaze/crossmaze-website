@@ -1,0 +1,23 @@
+<!-- "Owl" by anarres, https://openclipart.org/detail/328460/owl (file: https://openclipart.org/download/328460). SPDX-License-Identifier: CC0-1.0. Copyright: anarres, Openclipart (CC0 1.0 public domain dedication). Editor metadata removed and a viewBox added; the drawing is unchanged. -->
+<svg xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" viewBox="-10 -10 960.81482 1085.2672">
+  <g transform="translate(601.91125,604.858)">
+    <g transform="matrix(1.7722506,0,0,1.7722506,-1311.999,-740.39631)" style="stroke-width:0.56425434">
+      <path style="fill:none;stroke:#916d5d;stroke-width:4.51403475;stroke-linecap:round;stroke-linejoin:bevel;stroke-miterlimit:4;stroke-dasharray:none;stroke-opacity:1" d="m 706.84997,593.36852 7.88152,55.70522 -30.25206,18.16967"/>
+      <path style="fill:none;stroke:#916d5d;stroke-width:4.51403475;stroke-linecap:round;stroke-linejoin:bevel;stroke-miterlimit:4;stroke-dasharray:none;stroke-opacity:1" d="m 743.68777,675.28102 -28.95628,-26.20728 43.48093,3.94945"/>
+      <path d="m 635.84972,593.36852 -7.88152,55.70522 30.25206,18.16967" style="fill:none;stroke:#916d5d;stroke-width:4.51403475;stroke-linecap:round;stroke-linejoin:bevel;stroke-miterlimit:4;stroke-dasharray:none;stroke-opacity:1"/>
+      <path d="m 599.01192,675.28102 28.95628,-26.20728 -43.48093,3.94945" style="fill:none;stroke:#916d5d;stroke-width:4.51403475;stroke-linecap:round;stroke-linejoin:bevel;stroke-miterlimit:4;stroke-dasharray:none;stroke-opacity:1"/>
+    </g>
+    <path style="fill:#9a6d5a;stroke-width:1.68102217" d="m 242.91448,-604.858 c 95.34886,221.58124 51.16275,813.67394 -102.32549,850.88321 -76.744125,53.48833 -172.092856,90.6976 -274.41837,90.6976 -99.99995,0 -190.69755,-32.55811 -266.27892,-83.72087 -146.97665,-206.976614 -205.25568,-453.48809 -115.81386,-855.79018 63.95342,31.60463 80.23251,62.99998 117.44178,94.39531 69.30227,-40.46509 176.27896,-52.55812 264.651,-52.55812 90.697601,0 204.650975,27.2093 269.7672,49.53485 37.20936,-31.39531 69.76738,-71.62786 106.97666,-93.4418 z"/>
+    <path style="fill:#734d38;stroke-width:1.68102217" d="m -555.92214,-207.46289 c -129.99993,297.674234 46.04649,437.20905 152.32547,476.74391 39.53487,-99.99995 55.81391,-232.558007 -152.32547,-476.74391 z" id="wing"/>
+    <use style="stroke-width:0.56425434" height="1052.3622" width="744.09448" y="0" x="0" transform="matrix(-1,0,0,1,-263.0077,-4.5094258e-6)" xlink:href="#wing"/>
+    <circle cx="-325.68973" cy="-271.88147" r="195.34872" style="fill:#cdba81;fill-opacity:1;stroke-width:1.31221855"/>
+    <circle cx="-333.82928" cy="-277.23029" r="144.88364" style="fill:#ffffff;stroke-width:1.31221855"/>
+    <circle cx="-336.15482" cy="-265.60239" r="103.48831" style="fill:#1a1a1a;stroke-width:1.31221855"/>
+    <circle cx="-350.10837" cy="-307.46283" r="26.744169" style="fill:#ffffff;stroke-width:1.31221855"/>
+    <circle transform="scale(-1,1)" style="fill:#cdba81;fill-opacity:1;stroke-width:1.31221855" r="195.34872" cy="-271.88147" cx="-58.030869"/>
+    <circle transform="scale(-1,1)" style="fill:#ffffff;stroke-width:1.31221855" r="144.88364" cy="-277.23029" cx="-66.170303"/>
+    <circle style="fill:#1a1a1a;stroke-width:1.31221855" r="103.48831" cy="-265.60239" cx="68.495842"/>
+    <circle style="fill:#ffffff;stroke-width:1.31221855" r="26.744169" cy="-307.46283" cx="54.542397"/>
+    <path d="m -134.39506,-143.28948 c -4.71401,0 -50.80658,-77.98023 -50.80658,-77.98023 0,0 40.85477,-18.39515 52.37792,-18.39515 11.52316,0 51.330354,20.49027 51.330354,20.49027 0,0 -48.187684,76.93269 -52.901694,75.88511 z" style="fill:#d9943c;fill-opacity:1;stroke:none;stroke-width:1.68102217"/>
+  </g>
+</svg>

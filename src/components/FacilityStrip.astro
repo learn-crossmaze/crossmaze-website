@@ -1,12 +1,14 @@
 ---
-// The facilities as a scrolling strip of photo cards (home page). Swipe, scroll sideways or use the
-// arrows; tapping a photo opens it large in the facilities album, with its name and description.
+// The facilities as a scrolling strip of photo cards (home page; the scrolling is Strip's). Swipe,
+// scroll sideways or use the arrows; tapping a photo opens it large in the facilities album, with its
+// name and description.
 // Photos are set per facility in the admin panel (Page sections → Facilities); a facility without a
 // photo shows its icon on a soft tint instead.
 import { Image, getImage } from 'astro:assets';
 import type { ImageMetadata } from 'astro';
 import Icon from './Icon.astro';
 import PhotoAlbum from './PhotoAlbum.astro';
+import Strip from './Strip.astro';
 import { hasImage, image } from '../data/content';
 import type { SectionsContent } from '../data/content';
 
@@ -22,7 +24,7 @@ const withPhotos = cards.filter((c) => c.photo);
 const fullSize = await Promise.all(withPhotos.map((c) => getImage({ src: c.photo!, width: 1400, format: 'webp' })));
 const albumIndex = new Map(withPhotos.map((c, i) => [c, i]));
 
-// How wide a photo is drawn, for its `sizes`: the frame's width (the card column, see .strip__track,
+// How wide a photo is drawn, for its `sizes`: the frame's width (the card width, Strip's --strip-col,
 // less the 5px glass ring each side). A photo wider than the 16:10 frame is cropped from a copy as tall
 // as the frame, so wider than it.
 const frameWidths = [
@@ -39,46 +41,38 @@ function sizesFor(photo: ImageMetadata) {
 }
 ---
 
-<div class="strip" data-strip>
-  <ul class="strip__track" data-strip-track>
-    {
-      cards.map((card) => (
-        <li class:list={['strip__item', `tone-${card.tone}`]}>
-          {card.photo ? (
-            <a
-              class="strip__photo"
-              href={fullSize[albumIndex.get(card)!]!.src}
-              data-album-for="facilities"
-              data-album-open={albumIndex.get(card)}
-              aria-haspopup="dialog"
-            >
-              <span class="strip__frame">
-                <Image src={card.photo} alt={card.title} widths={[360, 480, 660, 960]} sizes={sizesFor(card.photo)} />
-              </span>
-              <span class="icon-badge strip__badge">
-                <Icon name={card.icon} size={22} />
-              </span>
-            </a>
-          ) : (
-            <span class="strip__photo strip__photo--icon">
-              <span class="strip__frame">
-                <Icon name={card.icon} size={56} />
-              </span>
+<Strip label="facilities" style="--strip-nav-top: calc(12px + (var(--strip-col) - 10px) * 10 / 16 / 2 + 5px)">
+  {
+    cards.map((card) => (
+      <li class:list={['facility', `tone-${card.tone}`]}>
+        {card.photo ? (
+          <a
+            class="facility__photo"
+            href={fullSize[albumIndex.get(card)!]!.src}
+            data-album-for="facilities"
+            data-album-open={albumIndex.get(card)}
+            aria-haspopup="dialog"
+          >
+            <span class="facility__frame">
+              <Image src={card.photo} alt={card.title} widths={[360, 480, 660, 960]} sizes={sizesFor(card.photo)} />
             </span>
-          )}
-          <h3 class="strip__title">{card.title}</h3>
-          {card.text && <p class="strip__text muted">{card.text}</p>}
-        </li>
-      ))
-    }
-  </ul>
-  <button type="button" class="strip__nav strip__nav--prev" data-strip-prev aria-label="Previous facilities">
-    <Icon name="ChevronLeft" size={26} />
-  </button>
-  <button type="button" class="strip__nav strip__nav--next" data-strip-next aria-label="More facilities">
-    <Icon name="ChevronRight" size={26} />
-  </button>
-</div>
+            <span class="icon-badge facility__badge">
+              <Icon name={card.icon} size={22} />
+            </span>
+          </a>
+        ) : (
+          <span class="facility__photo facility__photo--icon">
+            <span class="facility__frame">
+              <Icon name={card.icon} size={56} />
+            </span>
+          </span>
+        )}
+        <h3 class="facility__title">{card.title}</h3>
+        {card.text && <p class="facility__text muted">{card.text}</p>}
+      </li>
+    ))
+  }
+</Strip>
 
 {
   withPhotos.length > 0 && (
@@ -92,106 +86,13 @@ function sizesFor(photo: ImageMetadata) {
   )
 }
 
-<script>
-  const reduced = matchMedia('(prefers-reduced-motion: reduce)');
-
-  document.querySelectorAll<HTMLElement>('[data-strip]').forEach((strip) => {
-    const track = strip.querySelector<HTMLElement>('[data-strip-track]')!;
-    const prev = strip.querySelector<HTMLButtonElement>('[data-strip-prev]')!;
-    const next = strip.querySelector<HTMLButtonElement>('[data-strip-next]')!;
-
-    function update() {
-      const max = track.scrollWidth - track.clientWidth;
-      const atStart = track.scrollLeft <= 4;
-      const atEnd = track.scrollLeft >= max - 4;
-      strip.classList.toggle('is-scrollable', max > 4);
-      strip.classList.toggle('at-start', atStart);
-      strip.classList.toggle('at-end', atEnd);
-      prev.disabled = atStart;
-      next.disabled = atEnd;
-    }
-
-    /** Moves by the cards that fit on screen, so each press shows a fresh set. */
-    function page(direction: number) {
-      const card = track.querySelector<HTMLElement>('.strip__item');
-      if (!card) return;
-      const gap = parseFloat(getComputedStyle(track).columnGap) || 0;
-      const step = card.offsetWidth + gap;
-      const perPage = Math.max(1, Math.floor((track.clientWidth - gap) / step) - 1 || 1);
-      track.scrollBy({ left: direction * perPage * step, behavior: reduced.matches ? 'auto' : 'smooth' });
-    }
-
-    prev.addEventListener('click', () => page(-1));
-    next.addEventListener('click', () => page(1));
-
-    let ticking = false;
-    track.addEventListener(
-      'scroll',
-      () => {
-        if (ticking) return;
-        ticking = true;
-        requestAnimationFrame(() => {
-          ticking = false;
-          update();
-        });
-      },
-      { passive: true },
-    );
-    addEventListener('resize', update);
-    update();
-  });
-</script>
-
 <style>
-  .strip {
-    --strip-inset: max(var(--gutter), calc((100vw - var(--container)) / 2));
-    position: relative;
-    /* Full width of the window, with the first card lined up with the page content. */
-    margin-inline: calc(50% - 50vw);
-  }
-
-  .strip__track {
-    display: grid;
-    grid-auto-flow: column;
-    grid-auto-columns: clamp(250px, 26vw, 340px);
-    gap: 24px;
-    margin: 0;
-    padding: 12px var(--strip-inset) 26px;
-    list-style: none;
-    overflow-x: auto;
-    overscroll-behavior-x: contain;
-    scroll-snap-type: x mandatory;
-    scroll-padding-inline: var(--strip-inset);
-    scrollbar-width: none;
-  }
-
-  .strip__track::-webkit-scrollbar {
-    display: none;
-  }
-
-  /* Soft fades at the edges hint that there is more to scroll to. */
-  .strip.is-scrollable .strip__track {
-    -webkit-mask-image: linear-gradient(90deg, transparent 0, #000 var(--strip-inset), #000 calc(100% - var(--strip-inset)), transparent 100%);
-    mask-image: linear-gradient(90deg, transparent 0, #000 var(--strip-inset), #000 calc(100% - var(--strip-inset)), transparent 100%);
-  }
-
-  .strip.is-scrollable.at-start .strip__track {
-    -webkit-mask-image: linear-gradient(90deg, #000 calc(100% - var(--strip-inset)), transparent 100%);
-    mask-image: linear-gradient(90deg, #000 calc(100% - var(--strip-inset)), transparent 100%);
-  }
-
-  .strip.is-scrollable.at-end .strip__track {
-    -webkit-mask-image: linear-gradient(90deg, transparent 0, #000 var(--strip-inset));
-    mask-image: linear-gradient(90deg, transparent 0, #000 var(--strip-inset));
-  }
-
-  .strip__item {
+  .facility {
     display: grid;
     align-content: start;
-    scroll-snap-align: start;
   }
 
-  .strip__photo {
+  .facility__photo {
     position: relative;
     display: block;
     padding: 5px;
@@ -204,14 +105,14 @@ function sizesFor(photo: ImageMetadata) {
       box-shadow 0.3s ease;
   }
 
-  .strip__photo:hover {
+  .facility__photo:hover {
     transform: translateY(-4px);
     box-shadow: var(--shadow-lift);
   }
 
   /* Every photo, whatever its shape, is cropped from its centre to the same 16:10 frame. The photo is
      taken out of the grid: as a grid item it would set the row to its own height and lose its bottom. */
-  .strip__frame {
+  .facility__frame {
     position: relative;
     display: grid;
     place-items: center;
@@ -220,7 +121,7 @@ function sizesFor(photo: ImageMetadata) {
     border-radius: inherit;
   }
 
-  .strip__frame :global(img) {
+  .facility__frame :global(img) {
     position: absolute;
     inset: 0;
     width: 100%;
@@ -229,22 +130,22 @@ function sizesFor(photo: ImageMetadata) {
     transition: transform 0.5s ease;
   }
 
-  .strip__photo:hover :global(img) {
+  .facility__photo:hover :global(img) {
     transform: scale(1.06);
   }
 
-  .strip__photo--icon {
+  .facility__photo--icon {
     cursor: default;
   }
 
-  .strip__photo--icon .strip__frame {
+  .facility__photo--icon .facility__frame {
     background:
       radial-gradient(70% 70% at 30% 25%, rgb(255 255 255 / 75%), transparent 70%),
       linear-gradient(135deg, var(--badge-bg) 0%, var(--badge-bg-2) 100%);
     color: var(--badge-fg);
   }
 
-  .strip__badge {
+  .facility__badge {
     position: absolute;
     left: 18px;
     bottom: -20px;
@@ -255,68 +156,25 @@ function sizesFor(photo: ImageMetadata) {
     border-radius: 14px;
   }
 
-  .strip__title {
+  .facility__title {
     margin: 30px 4px 4px;
     font-size: 1.15rem;
   }
 
-  .strip__photo--icon + .strip__title {
+  .facility__photo--icon + .facility__title {
     margin-top: 16px;
   }
 
-  .strip__text {
+  .facility__text {
     margin: 0 4px;
     font-size: 0.94rem;
     line-height: 1.5;
   }
 
-  .strip__nav {
-    position: absolute;
-    top: calc(12px + (clamp(250px, 26vw, 340px) - 10px) * 10 / 16 / 2 + 5px);
-    z-index: 2;
-    display: grid;
-    place-items: center;
-    width: 52px;
-    height: 52px;
-    margin-top: -26px;
-    border: 1px solid var(--glass-edge);
-    border-radius: 50%;
-    background: var(--glass-thick);
-    -webkit-backdrop-filter: var(--glass-blur);
-    backdrop-filter: var(--glass-blur);
-    box-shadow: var(--glass-rim), var(--shadow);
-    color: var(--navy);
-    cursor: pointer;
-    transition:
-      opacity 0.25s ease,
-      transform 0.2s ease;
-  }
-
-  .strip__nav:hover {
-    transform: scale(1.06);
-  }
-
-  .strip__nav:disabled {
-    opacity: 0;
-    pointer-events: none;
-  }
-
-  .strip:not(.is-scrollable) .strip__nav {
-    display: none;
-  }
-
-  .strip__nav--prev {
-    left: max(12px, calc(var(--strip-inset) - 26px));
-  }
-
-  .strip__nav--next {
-    right: max(12px, calc(var(--strip-inset) - 26px));
-  }
-
   /* Dark mode: the badge's white sticker edge would glare, so its edge is the photo's glass frame
      (over smoky glass, so it stays clear of the photo), and a facility without a photo gets a faint
      highlight instead of a white one. */
-  :global(:root[data-mode='dark']) .strip__badge {
+  :global(:root[data-mode='dark']) .facility__badge {
     border-color: transparent;
     background:
       linear-gradient(135deg, var(--badge-bg) 0%, var(--badge-bg-2) 100%) padding-box,
@@ -324,20 +182,9 @@ function sizesFor(photo: ImageMetadata) {
       var(--glass-thick) border-box;
   }
 
-  :global(:root[data-mode='dark']) .strip__photo--icon .strip__frame {
+  :global(:root[data-mode='dark']) .facility__photo--icon .facility__frame {
     background:
       radial-gradient(70% 70% at 30% 25%, var(--glass-edge), transparent 70%),
       linear-gradient(135deg, var(--badge-bg) 0%, var(--badge-bg-2) 100%);
-  }
-
-  /* Phones: bigger cards that peek in from the edge; swipe instead of the arrows. */
-  @media (max-width: 640px) {
-    .strip__track {
-      grid-auto-columns: 76vw;
-      gap: 16px;
-    }
-    .strip__nav {
-      display: none;
-    }
   }
 </style>

@@ -81,9 +81,7 @@ import { site } from '../data/site';
   <div class="btn-row">
     <button class="btn" type="submit">Submit application</button>
   </div>
-  <p class="form-note">
-    You can also email your resume to <a href={`mailto:${site.careersEmail}`}>{site.careersEmail}</a>.
-  </p>
+  {/* The careers email is shown once, beside the form (the "Prefer email?" card on /careers). */}
 </form>
 
 <script>

@@ -20,7 +20,7 @@ if (!id || !/^[a-z0-9-]+$/.test(id) || !description) {
   process.exit(1);
 }
 
-const IMAGE_FIELDS = new Set(['logo', 'mascot', 'photo', 'photos', 'image', 'aboutPhoto', 'daycarePhoto', 'moments', 'hero.photos', 'centerHead.photo']);
+const IMAGE_FIELDS = new Set(['logo', 'photo', 'photos', 'image', 'aboutPhoto', 'daycarePhoto', 'moments', 'hero.photos', 'centerHead.photo']);
 const SKIP = new Set(['order', 'hidden', 'slug']);
 const COLLECTIONS = { branches: (b) => b.slug, programs: (p) => p.slug, jobs: (j) => j.slug, testimonials: (_, i) => `t${String(i + 1).padStart(3, '0')}` };
 
