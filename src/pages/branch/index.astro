@@ -5,7 +5,7 @@ import BranchCard from '../../components/BranchCard.astro';
 import Icon from '../../components/Icon.astro';
 import { branches, facilities } from '../../data/branches';
 
-// The facilities in full rows: on each screen (wide from 1141px, phones up to 560px) the first of the
+// The facilities in full rows: on each screen (wide from 1141px, phones up to 700px) the first of the
 // column counts that leaves no gap in the last row, else the one with the fewest gaps, never leaving
 // one facility alone under a full row. Twelve go 4 a row on wide screens, 3 on tablets and laptops
 // and 2 on phones; ten go 5 / 2 / 2, nine 3 / 3 / 2, eight 4 / 2 / 2, six 3 / 3 / 2.
@@ -114,9 +114,16 @@ const tones = ['coral', 'sun', 'green', 'sky', 'navy'];
     }
   }
 
-  @media (max-width: 560px) {
+  /* Two up to 700px, where three would leave a long word such as "communication" wider than its
+     column. */
+  @media (max-width: 700px) {
     .facilities__list {
       grid-template-columns: repeat(var(--cols-sm), minmax(0, 1fr));
+    }
+  }
+
+  @media (max-width: 560px) {
+    .facilities__list {
       gap: 14px 12px;
     }
   }
@@ -139,10 +146,14 @@ const tones = ['coral', 'sun', 'green', 'sky', 'navy'];
     border-radius: 14px;
   }
 
+  /* A word too long for its column (as on the narrowest phones) is hyphenated or, where a browser doesn't
+     hyphenate, broken anywhere rather than running out of the panel. */
   .facilities__name {
     min-width: 0;
     text-wrap: balance;
+    -webkit-hyphens: auto;
     hyphens: auto;
+    overflow-wrap: anywhere;
   }
 
   /* Phones: two columns of icons (without their badges, as with the amenities on a branch page) and

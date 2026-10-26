@@ -186,15 +186,19 @@ const emailAt = site.careersEmail.indexOf('@');
 </BaseLayout>
 
 <script>
-  // Clicking "Apply for this role" pre-selects the position without reloading the page.
+  // Clicking "Apply for this role" pre-selects the position without reloading the page. Up to 1000px the
+  // intro and the steps sit above the form (FormSection.astro), so the form itself is scrolled into view
+  // there, with the name field and the position in sight.
+  const stacked = matchMedia('(max-width: 1000px)');
   for (const link of document.querySelectorAll<HTMLAnchorElement>('[data-apply]')) {
     link.addEventListener('click', (event) => {
       const select = document.querySelector<HTMLSelectElement>('#job-role');
       if (!select) return;
       event.preventDefault();
       select.value = link.dataset.apply ?? '';
-      document.querySelector('#apply')?.scrollIntoView();
-      document.querySelector<HTMLInputElement>('#job-name')?.focus({ preventScroll: true });
+      const name = document.querySelector<HTMLInputElement>('#job-name');
+      (stacked.matches ? name?.closest('.card') : document.querySelector('#apply'))?.scrollIntoView();
+      name?.focus({ preventScroll: true });
     });
   }
 </script>

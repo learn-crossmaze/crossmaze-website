@@ -72,6 +72,8 @@ const titled = items.some((step) => step.title);
     gap: 14px;
   }
 
+  /* The number in its tone, deepened towards --contrast-mix (darker by day, lighter at night) so even
+     the paler tones read clearly on their tint. */
   .step-list__num {
     display: grid;
     flex: none;
@@ -81,7 +83,7 @@ const titled = items.some((step) => step.title);
     border-radius: 50%;
     background: linear-gradient(135deg, var(--badge-bg) 0%, var(--badge-bg-2) 100%);
     box-shadow: var(--badge-rim);
-    color: var(--badge-fg);
+    color: color-mix(in srgb, var(--badge-fg) 70%, var(--contrast-mix));
     font-family: var(--font-display);
     font-weight: 600;
     font-size: 0.95rem;

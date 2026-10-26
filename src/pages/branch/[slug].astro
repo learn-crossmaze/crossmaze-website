@@ -569,6 +569,25 @@ const jsonLd = {
     margin-top: 28px;
   }
 
+  /* Beside the photo the three buttons fit on one line only from about 1180px (in the widest fonts).
+     Narrower, they fill the column as a block of two rows: Book a visit and the phone side by side,
+     Directions across under them, rather than a button left alone. In the narrowest columns they are
+     the small size, so the first two still fit side by side. (Without a photo the text has the whole
+     banner, and the buttons keep their own size.) */
+  @media (min-width: 761px) and (max-width: 1180px) {
+    .branch-hero__inner:not(.branch-hero__inner--text) .btn-row > .btn {
+      flex: 1 1 auto;
+    }
+  }
+
+  @media (min-width: 761px) and (max-width: 900px) {
+    .branch-hero__inner:not(.branch-hero__inner--text) .btn-row > .btn {
+      min-height: 40px;
+      padding: 8px 18px;
+      font-size: 0.95rem;
+    }
+  }
+
   .branch-hero__open {
     position: relative;
     display: block;
