@@ -59,7 +59,7 @@ const organization = {
     streetAddress: site.address.slice(0, 2).join(', '),
     addressLocality: 'Bengaluru',
     addressRegion: 'Karnataka',
-    postalCode: '560068',
+    ...(site.addressPincode ? { postalCode: site.addressPincode } : {}),
     addressCountry: 'IN',
   },
   founder: site.founders.map((name) => ({ '@type': 'Person', name })),
