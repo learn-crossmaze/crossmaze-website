@@ -33,7 +33,7 @@ const quoteAfter = Math.min(1, post.sections.length - 1);
             alt={post.coverAlt || post.title}
             widths={[640, 960, 1280, 1600]}
             sizes="(max-width: 1220px) 100vw, 1180px"
-            loading="eager"
+            priority
           />
         )
       }

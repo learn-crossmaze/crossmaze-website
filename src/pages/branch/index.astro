@@ -4,6 +4,11 @@ import PageHero from '../../components/PageHero.astro';
 import BranchCard from '../../components/BranchCard.astro';
 import Icon from '../../components/Icon.astro';
 import { branches, facilities } from '../../data/branches';
+import { site } from '../../data/site';
+
+// "Five centres": the number in words up to twelve.
+const words = ['One', 'Two', 'Three', 'Four', 'Five', 'Six', 'Seven', 'Eight', 'Nine', 'Ten', 'Eleven', 'Twelve'];
+const count = words[branches.length - 1] ?? String(branches.length);
 
 // The facilities in full rows: on each screen (wide from 1141px, phones up to 700px) the first of the
 // column counts that leaves no gap in the last row, else the one with the fewest gaps, never leaving
@@ -27,21 +32,22 @@ const tones = ['coral', 'sun', 'green', 'sky', 'navy'];
 ---
 
 <BaseLayout
-  title="Our Branches"
+  fullTitle={`Preschool & Day Care Centres in Electronic City & Begur | ${site.name}`}
   description="Find your nearest Crossmaze Preschool and Day Care: The Hub in Begur, and Neotown, SNN Greenbay, Neeladri Nagar and Ananth Nagar in Electronic City, Bengaluru."
 >
   <PageHero
     eyebrow="Our branches"
-    title="Five centres, one Crossmaze family"
-    lead="Every centre follows the same curriculum, safety standards and caring approach, so your child gets the Crossmaze experience wherever you are."
+    title={`${count} ${branches.length === 1 ? 'centre' : 'centres'}, one Crossmaze family`}
+    lead="Preschool and day care in Electronic City and Begur, Bengaluru. Every centre follows the same curriculum, safety standards and caring approach, so your child gets the Crossmaze experience wherever you are."
     crumbs={[{ label: 'Branches' }]}
   />
 
-  {/* The cards start just under the banner, so they read as its list. */}
-  <section class="section section--tight branch-list">
+  {/* The cards start just under the banner, so they read as its list: each centre's name is a heading
+      (h2) with its area and short introduction (admin panel → Branches). */}
+  <section class="section section--tight branch-list" aria-label="Our centres">
     <div class="container">
       <div class="grid grid--3">
-        {branches.map((b, i) => <BranchCard branch={b} index={i} />)}
+        {branches.map((b, i) => <BranchCard branch={b} index={i} level={2} showIntro />)}
       </div>
     </div>
   </section>

@@ -1,0 +1,18 @@
+{
+  "id": "2026-10-26-program-also-called",
+  "description": "Junior KG is also called LKG and Senior KG UKG (confirmed by the school on 26 Oct): the new 'Also called' field, shown next to the program's name",
+  "changes": [
+    {
+      "doc": "programs/junior-kg",
+      "field": "alsoCalled",
+      "from": null,
+      "to": "LKG"
+    },
+    {
+      "doc": "programs/senior-kg",
+      "field": "alsoCalled",
+      "from": null,
+      "to": "UKG"
+    }
+  ]
+}

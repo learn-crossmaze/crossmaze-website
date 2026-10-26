@@ -47,7 +47,7 @@ const coverIndex = post.sections.some((s) => s.photo && indexOf(s.photo) === ind
             alt={post.coverAlt || post.title}
             widths={[640, 960, 1280, 1600]}
             sizes="(max-width: 1220px) 100vw, 1180px"
-            loading="eager"
+            priority
           />
           <span class="story-chip">
             <Icon name="Images" size={16} /> {photos.length} photo{photos.length === 1 ? '' : 's'}

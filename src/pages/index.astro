@@ -15,11 +15,23 @@ import FacilityStrip from '../components/FacilityStrip.astro';
 import Strip from '../components/Strip.astro';
 import PostCard from '../components/blog/PostCard.astro';
 import { posts } from '../data/blog';
-import { site, coreValues, dayRoutine, admissionSteps } from '../data/site';
+import { site, orgId, coreValues, dayRoutine, admissionSteps } from '../data/site';
 import { programs, daycareHighlights } from '../data/programs';
 import { branches, facilities } from '../data/branches';
 import { testimonials } from '../data/testimonials';
 import { image } from '../data/content';
+
+// The site's name for Google, shown above its results (WebSite, on the home page only).
+const website = {
+  '@context': 'https://schema.org',
+  '@type': 'WebSite',
+  '@id': `${site.url}/#website`,
+  name: site.fullName,
+  alternateName: site.name,
+  url: `${site.url}/`,
+  inLanguage: 'en-IN',
+  publisher: { '@id': orgId },
+};
 
 const [heroMain, ...heroSmall] = site.hero.photos;
 // How many photos the banner shows (the big one plus up to two small ones), for its tablet layout.
@@ -46,14 +58,20 @@ const careRatioWide = Math.min(Math.max(careShape, 16 / 9), 2.4).toFixed(4);
 const careCols = daycareHighlights.length === 4 ? 2 : 3;
 ---
 
-<BaseLayout>
+<BaseLayout fullTitle={`${site.name} Preschool & Day Care in Electronic City & Begur, Bengaluru`} jsonLd={website}>
   <!-- Hero -->
   <section class="hero">
     <FloatingShapes variant="home" />
     <div class="container hero__inner">
       <div class="hero__copy">
-        <span class="eyebrow"><Icon name="Sparkles" size={18} /> Preschool & Day Care · Bengaluru</span>
-        <h1>{site.hero.titleStart} <span class="squiggle">{site.hero.titleHighlight}</span></h1>
+        {/* What and where, as the first line of the heading (it keeps the eyebrow's look; global.css). */}
+        <h1>
+          <span class="eyebrow">
+            <Icon name="Sparkles" size={18} />
+            <span class="eyebrow__parts"><span>Preschool & Day Care&nbsp;·</span> <span>Electronic City & Begur</span></span>
+          </span>{' '}
+          {site.hero.titleStart} <span class="squiggle">{site.hero.titleHighlight}</span>
+        </h1>
         <p class="lead">{site.hero.lead}</p>
         <div class="btn-row">
           <a class="btn btn--sun" href="#enquire">Book a school visit <Icon name="ArrowRight" size={18} /></a>
@@ -74,7 +92,7 @@ const careCols = daycareHighlights.length === 4 ? 2 : 3;
               alt={heroMain.alt}
               widths={[480, 720, 960, 1280]}
               sizes={`(max-width: 560px) calc(100vw - 32px), (max-width: 900px) ${heroCount > 1 ? 'calc(66vw - 36px)' : 'calc(100vw - 32px)'}, (max-width: 1219px) calc(49vw - 20px), 572px`}
-              loading="eager"
+              priority
             />
           )
         }
@@ -330,6 +348,19 @@ const careCols = daycareHighlights.length === 4 ? 2 : 3;
   @media (max-width: 900px) {
     .hero__inner {
       grid-template-columns: 1fr;
+    }
+  }
+
+  /* The text column is the width the heading's first line (the eyebrow) may take (global.css). */
+  .hero__copy {
+    container-type: inline-size;
+  }
+
+  /* From 1181px the big doodle sits at the top right of the text column (FloatingShapes.astro), level
+     with that line: the line keeps clear of it, its second part moving under the first if need be. */
+  @media (min-width: 1181px) {
+    .hero h1 > .eyebrow {
+      max-width: calc(100cqi - 96px);
     }
   }
 

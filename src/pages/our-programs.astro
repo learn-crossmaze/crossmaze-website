@@ -7,12 +7,17 @@ import Steps from '../components/Steps.astro';
 import ProgramDetail from '../components/ProgramDetail.astro';
 import { programs, approach, extracurricular } from '../data/programs';
 import { site, faqs, dayRoutine } from '../data/site';
+import { listText } from '../utils';
+
+// The programs by the names parents search for: the title uses each one's other name where it has one
+// ("LKG"), the description both ("Junior KG (LKG)").
+const also = (p: (typeof programs)[number]) => p.alsoCalled?.trim();
+const names = listText(programs.map((p) => also(p) || p.name)).replace(/ and ([^,]+)$/, ' & $1');
+const pageTitle = [`${names} in Bengaluru | ${site.name}`, `${names} | ${site.name}`].find((t) => t.length <= 65) ?? `Our Programs | ${site.name}`;
+const description = `${listText(programs.map((p) => (also(p) ? `${p.name} (${also(p)})` : p.name)))} at Crossmaze, Bengaluru. Montessori-based, thematic learning for children aged 2 to 8.`;
 ---
 
-<BaseLayout
-  title="Our Programs"
-  description="Play Group, Nursery, Junior KG, Senior KG and Day Care at Crossmaze, Bengaluru. Montessori-based, thematic learning for children aged 2 to 8."
->
+<BaseLayout fullTitle={pageTitle} description={description}>
   <PageHero
     eyebrow="Our programs"
     title="Learning that grows with your child"

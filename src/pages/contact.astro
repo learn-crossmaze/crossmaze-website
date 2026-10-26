@@ -27,8 +27,8 @@ const branchRows = branches.map((b, i) => ({
 ---
 
 <BaseLayout
-  title="Contact & Admissions"
-  description="Contact Crossmaze Preschool and Day Care for admissions, school visits and enquiries. Call +91 72040 21508 or email admission@crossmaze.in."
+  fullTitle={`Contact & Admissions | ${site.fullName}`}
+  description={`Contact ${site.fullName} for admissions, school visits and enquiries. Call ${site.phone} or email ${site.admissionsEmail}.`}
 >
   <PageHero
     eyebrow="Contact & admissions"

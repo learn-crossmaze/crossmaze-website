@@ -740,6 +740,38 @@ main > section.section--tight.section--feature {
   content: none;
 }
 
+/* The eyebrow as the first line of a page heading (the home and branch banners: what and where), looking
+   just as it does above one: its own line, size and colour (painted over the heading's gradient), as wide
+   as the banner's text column (a container) rather than the heading's narrower measure. */
+h1 > .eyebrow {
+  display: flex;
+  width: max-content;
+  max-width: 100cqi;
+  line-height: 1.4;
+  text-wrap: wrap;
+}
+
+/* Its parts ("Preschool & Day Care ·", "Neotown, Thirupalya, Electronic City · 560099") move onto a new line
+   whole when the line is full, so a line doesn't end partway through a place. A part longer than the line
+   wraps on its own. */
+.eyebrow__parts {
+  display: flex;
+  flex-wrap: wrap;
+  column-gap: 0.4em;
+  min-width: 0;
+}
+
+/* Another name for a program, in brackets after its name ("Junior KG (LKG)"): smaller and quieter than the
+   heading, so the program's own name leads. */
+.also-called {
+  font-family: var(--font-body);
+  font-size: 0.62em;
+  font-weight: 700;
+  letter-spacing: 0.02em;
+  color: var(--muted);
+  white-space: nowrap;
+}
+
 .lead {
   font-size: clamp(1.1rem, 1.6vw, 1.25rem);
   color: var(--muted);

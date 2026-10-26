@@ -11,15 +11,20 @@ import {
   branches,
   amenityList,
   branchPhotos,
+  branchGeo,
+  branchId,
+  branchPlace,
+  branchUrl,
   headPhoto,
   shortName as toShortName,
   telHref,
   type Branch,
 } from '../../data/branches';
 import TimeRange from '../../components/TimeRange.astro';
-import { dayRuns, openingHoursSpecification, openingTimes, seatLabels } from '../../data/batches';
+import { dayRuns, formatRange, openingHoursSpecification, openingTimes, seatLabels } from '../../data/batches';
 import { programs } from '../../data/programs';
-import { site } from '../../data/site';
+import { site, orgId } from '../../data/site';
+import { breadcrumbList, listText, type Crumb } from '../../utils';
 
 export function getStaticPaths() {
   return branches.map((branch) => ({ params: { slug: branch.slug }, props: { branch } }));
@@ -153,16 +158,43 @@ for (let k = offered.length - 2; k >= 1; k--) if (imbalance(k) < imbalance(secon
 const tones = ['navy', 'green', 'coral', 'sky', 'sun'];
 const otherCards = others.map((b, i) => ({ branch: b, cover: branchPhotos(b.slug)[0], tone: tones[(i + 1) % tones.length] }));
 
+// What Google shows for the page, from what the page itself says: the service and the place in the title
+// (unless the admin panel gives one: Branches → Title in Google), and in the description the programs, the
+// opening hours (as in the facts above the timetable, when they are one range) and the phone number.
+const place = branchPlace(branch);
+const pageTitle = branch.seoTitle?.trim() || `Preschool & Day Care in ${place} | ${site.name}`;
+// The classes (youngest first, as in the admin panel) as a range when there are three or more, then day
+// care by name: "Play Group to Senior KG and Day Care".
+const care = offered.filter((p) => p.slug === 'day-care').map((p) => p.name);
+const classes = offered.filter((p) => p.slug !== 'day-care').map((p) => p.name);
+const programsText = listText([...(classes.length >= 3 ? [`${classes[0]} to ${classes.at(-1)}`] : classes), ...care]);
+const hoursText = open.length === 1 ? `, open ${open[0]!.days ? `${open[0]!.days}, ` : ''}${formatRange(open[0]!.from, open[0]!.to)}` : '';
+const pageDescription = [
+  `${care.length ? 'Play school and day care' : 'Play school'} in ${place}, Bengaluru${programsText ? `: ${programsText}${hoursText}` : ''}.`,
+  branch.phone && `Call ${branch.phone}.`,
+]
+  .filter(Boolean)
+  .join(' ');
+
+// The breadcrumbs as shown in the banner, and the same for search engines.
+const crumbs: Crumb[] = [{ label: 'Home', href: '/' }, { label: 'Branches', href: '/branch' }, { label: shortName }];
+
+const geo = branchGeo(branch);
 const jsonLd = {
   '@context': 'https://schema.org',
   // Preschool, and as day care a local business, for which Google shows opening hours.
   '@type': ['Preschool', 'ChildCare'],
+  '@id': branchId(branch),
   name: branch.name,
-  url: new URL(`/branch/${branch.slug}`, site.url).href,
+  ...(branch.intro ? { description: branch.intro } : {}),
+  url: branchUrl(branch),
   telephone: branch.phone,
   email: branch.email,
-  ...(cover ? { image: new URL(fullSize[0]!.src, site.url).href } : {}),
-  parentOrganization: { '@type': 'Organization', name: site.fullName, url: site.url },
+  // The cover and the next photos (Google prefers a few).
+  ...(cover ? { image: fullSize.slice(0, 4).map((p) => new URL(p.src, site.url).href) } : {}),
+  parentOrganization: { '@type': 'Preschool', '@id': orgId, name: site.fullName, url: site.url },
+  ...(geo ? { geo } : {}),
+  hasMap: directions,
   ...(hours.length ? { openingHoursSpecification: hours } : {}),
   address: {
     '@type': 'PostalAddress',
@@ -175,24 +207,24 @@ const jsonLd = {
 };
 ---
 
-<BaseLayout
-  title={`${shortName} Branch`}
-  description={`${branch.name}: preschool and day care in ${branch.area}, Bengaluru ${branch.pincode}. Play Group, Nursery, Junior KG, Senior KG and Day Care.`}
-  jsonLd={jsonLd}
->
+<BaseLayout fullTitle={pageTitle} description={pageDescription} image={cover} jsonLd={[jsonLd, breadcrumbList(crumbs, site.url)]}>
   <section class="page-hero branch-hero">
     <FloatingShapes />
     <div class:list={['container', 'branch-hero__inner', { 'branch-hero__inner--text': !cover }]}>
-      <div>
+      <div class="branch-hero__text">
         <nav aria-label="Breadcrumb">
           <ol class="breadcrumbs">
-            <li><a href="/">Home</a></li>
-            <li><a href="/branch">Branches</a></li>
-            <li><span aria-current="page">{shortName}</span></li>
+            {crumbs.map((c) => <li>{c.href ? <a href={c.href}>{c.label}</a> : <span aria-current="page">{c.label}</span>}</li>)}
           </ol>
         </nav>
-        <span class="eyebrow">{branch.area} · {branch.pincode}</span>
-        <h1>{heroTitle}</h1>
+        {/* What and where, as the first line of the heading (it keeps the eyebrow's look; global.css). */}
+        <h1>
+          <span class="eyebrow">
+            {/* No-break spaces keep each "·" with the word before it, and the PIN code with the last word of the place. */}
+            <span class="eyebrow__parts"><span>Preschool & Day Care&nbsp;·</span> <span>{place}&nbsp;·&nbsp;{branch.pincode}</span></span>
+          </span>{' '}
+          {heroTitle}
+        </h1>
         <p class="lead">{branch.intro}</p>
         <div class="btn-row">
           <a class="btn btn--sun" href="#enquire">Book a visit</a>
@@ -211,7 +243,7 @@ const jsonLd = {
               alt={photoAlt(1)}
               widths={[480, 720, 1000, 1400]}
               sizes="(max-width: 760px) calc(100vw - 32px), (max-width: 1219px) calc(50vw - 44px), 580px"
-              loading="eager"
+              priority
             />
             {photos.length > 1 && (
               <span class="branch-hero__count">
@@ -559,6 +591,11 @@ const jsonLd = {
   /* The page set's big drifting doodle would sit behind the photo and poke out above its frame. */
   .branch-hero :global(.fx__shape--page-1) {
     display: none;
+  }
+
+  /* The text column is the width the heading's first line (the eyebrow) may take (global.css). */
+  .branch-hero__text {
+    container-type: inline-size;
   }
 
   .branch-hero h1 {

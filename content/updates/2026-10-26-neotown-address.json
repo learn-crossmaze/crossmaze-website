@@ -1,0 +1,26 @@
+{
+  "id": "2026-10-26-neotown-address",
+  "description": "Neotown's address names its building, Kusumkunj (as in the main address), and Neotown is in Electronic City, near Thirupalya (confirmed by the school on 26 Oct)",
+  "changes": [
+    {
+      "doc": "branches/crossmaze-neotown",
+      "field": "area",
+      "from": "Neotown, Thirupalya",
+      "to": "Neotown, Thirupalya, Electronic City"
+    },
+    {
+      "doc": "branches/crossmaze-neotown",
+      "field": "address",
+      "from": [
+        "Site No. 3/4, opposite GM Infinite, Phase 1",
+        "Neotown, Thirupalya",
+        "Bengaluru, Karnataka"
+      ],
+      "to": [
+        "Kusumkunj, Site No. 3/4, opposite G.M. Infinite, Phase 1",
+        "Neotown, Thirupalya, Electronic City",
+        "Bengaluru, Karnataka"
+      ]
+    }
+  ]
+}

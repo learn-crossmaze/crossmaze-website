@@ -55,7 +55,7 @@ const sizes =
         <Icon name="Baby" size={16} />
         {p.ages}
       </span>
-      <h2>{p.name}</h2>
+      <h2>{p.name}{p.alsoCalled?.trim() && <> <span class="also-called">({p.alsoCalled.trim()})</span></>}</h2>
       {p.headline && <p class="lead program__headline">{p.headline}</p>}
     </div>
     {first && <p class="program__first">{first}</p>}

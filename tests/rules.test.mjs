@@ -113,6 +113,8 @@ test('branch admins change only their own centre head and batches', async () => 
   await assertFails(updateDoc(doc(db, 'branches/crossmaze-neotown'), { batches: [batch], programs: ['nursery'] }));
   await assertFails(updateDoc(doc(db, 'branches/crossmaze-the-hub'), { batches: [batch] }));
   await assertFails(updateDoc(doc(db, 'branches/crossmaze-neotown'), { phone: '999' }));
+  // The page's title in Google (Branches → Title in Google) is for full admins only.
+  await assertFails(updateDoc(doc(db, 'branches/crossmaze-neotown'), { seoTitle: 'Preschool in Neotown | Crossmaze' }));
   await assertFails(updateDoc(doc(db, 'branches/crossmaze-neotown'), { centerHead: { name: 'X', bio: [], photo: '', extra: 1 } }));
   await assertFails(updateDoc(doc(db, 'branches/crossmaze-neotown'), { centerHead: 'X' }));
   await assertFails(setDoc(doc(db, 'branches/crossmaze-neotown'), { name: 'Neotown', centerHead: { name: 'X', bio: [], photo: '' } }));

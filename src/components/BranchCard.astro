@@ -11,12 +11,19 @@ interface Props {
       default fits `.grid--3` in a `.container` (one card a row below 560px, two below 880px, then
       three of at most 377px); pass your own if the cards sit in another layout, such as a strip. */
   sizes?: string;
+  /** The centre's short introduction under its area (the Branches page). */
+  showIntro?: boolean;
+  /** The heading level of the centre's name: 2 where the cards are the page's main list (the Branches page). */
+  level?: 2 | 3;
 }
 const {
   branch,
   index = 0,
   sizes = '(max-width: 559.98px) calc(100vw - 66px), (max-width: 640px) calc(50vw - 62px), (max-width: 879.98px) calc(50vw - 66px), (max-width: 1219.98px) calc(33.3vw - 63px), 344px',
+  showIntro = false,
+  level = 3,
 } = Astro.props;
+const Name = level === 2 ? 'h2' : 'h3';
 const tones = ['navy', 'green', 'coral', 'sky', 'sun'];
 const tone = tones[index % tones.length];
 const cover = branchPhotos(branch.slug)[0];
@@ -35,8 +42,9 @@ const cover = branchPhotos(branch.slug)[0];
     }
     <span class="branch-card__pin"><Icon name="MapPin" size={16} /> {branch.pincode}</span>
   </div>
-  <h3><a href={`/branch/${branch.slug}`}>{shortName(branch)}</a></h3>
+  <Name class="branch-card__name"><a href={`/branch/${branch.slug}`}>{shortName(branch)}</a></Name>
   <p class="muted">{branch.area}</p>
+  {showIntro && branch.intro && <p class="branch-card__intro">{branch.intro}</p>}
   <ul class="branch-card__facts">
     {
       branch.carpetArea && (
@@ -127,15 +135,28 @@ const cover = branchPhotos(branch.slug)[0];
     font-weight: 800;
     color: var(--ink);
   }
-  .branch-card h3 a {
+  /* The name looks the same as an h2 (the Branches page) as it does as an h3, without the page headings'
+     gradient. */
+  .branch-card__name {
+    margin-bottom: 0.35em;
+    font-size: 1.3rem;
+    background: none;
+    color: var(--ink);
+  }
+  .branch-card__name a {
     color: var(--ink);
     text-decoration: none;
   }
-  .branch-card h3 a:hover {
+  .branch-card__name a:hover {
     color: var(--navy);
   }
   .branch-card .muted {
     margin-bottom: 12px;
+  }
+  .branch-card__intro {
+    margin: -2px 0 18px;
+    font-size: 0.97rem;
+    line-height: 1.55;
   }
   /* The facts sit with the buttons at the foot of the card, so they line up across a row even when
      a name or an area takes two lines in one card and one line in the next. */
