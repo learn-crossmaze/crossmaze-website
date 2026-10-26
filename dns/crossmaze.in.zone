@@ -1,16 +1,20 @@
 ; crossmaze.in DNS records: the master copy for GoDaddy (README, "Point the domain").
-; This is the zone for evening 1: the records the school uses from Wix's list, with the website still
-; on the old Wix site (Wix's "pointing" values). On evening 2 only the A @ and www rows change, to 199.36.158.100
-; and crossmaze-website.web.app. GoDaddy adds its own NS and SOA, so they are not listed here.
+; The records the school uses from Wix's list (evening 1, 25 October 2026), with the website on Firebase
+; Hosting since evening 2 (26 October 2026): A @ and www changed from Wix's "pointing" values (185.230.63.107
+; and pointing.wixdns.net, the values to go back to if the move is ever undone), and Firebase's two TXT rows
+; were added. GoDaddy adds its own NS and SOA, so they are not listed here.
 ; Enter these as a GoDaddy DNS template (Name without .crossmaze.in, @ for the domain itself, values
 ; without quotes or the final dot), or use Actions > Import Zone File as a fallback (it adds records and
 ; fails on conflicts, so first delete every record except GoDaddy's NS, SOA and _domainconnect).
 $ORIGIN crossmaze.in.
 $TTL 3600
 
-; Website (old Wix site until evening 2)
-@                         1800  IN  A      185.230.63.107
-www                       1800  IN  CNAME  pointing.wixdns.net.
+; Website: Firebase Hosting (crossmaze.in redirects to www). The hosting-site TXT proves the domain is the
+; school's and lets Firebase renew its certificates: keep it for good, in a row of its own beside the SPF.
+@                         1800  IN  A      199.36.158.100
+www                       1800  IN  CNAME  crossmaze-website.web.app.
+@                         3600  IN  TXT    "hosting-site=crossmaze-website"
+_acme-challenge           3600  IN  TXT    "_wO6LejjY873ANA5HERQW_GfI4-wbVnW3teBdlC1a-8"
 
 ; Email: Zoho Mail, Zoho Books and ZeptoMail. Never change these.
 @                         3600  IN  MX     10 mx.zoho.com.
