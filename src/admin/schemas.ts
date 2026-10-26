@@ -30,6 +30,7 @@ export type Field =
   | (Base & { type: 'time' })
   /** The blog post design picker (src/data/blogOptions.ts). */
   | (Base & { type: 'template' })
+  /** A switch, saved as true or false. */
   | (Base & { type: 'boolean' })
   /**
    * `emptyLabel` names the empty choice (default "Choose…"); `optionsFrom: 'programs'` lists the programs,
@@ -45,7 +46,8 @@ export type Field =
   /**
    * `summary` is the field shown on each collapsed item, or a function of the item (`text(key)` gives a
    * field's value as shown); `check` returns what is wrong with an item, which stops it being saved;
-   * with `toText`, the items are saved as text (which `fromText` reads back into their fields).
+   * `fromText` reads an item stored as text into its fields; with `toText`, the items are saved as text,
+   * and without it, items read from text are saved as objects.
    */
   | (Base & {
       type: 'objects';
@@ -210,7 +212,29 @@ export const siteSchema: Field[] = [
 
   { type: 'heading', label: 'About page' },
   { key: 'moments', label: '“Life at Crossmaze” photos', type: 'objects', itemLabel: 'Photo', summary: 'alt', fields: photoFields('about', 'Landscape photos (3:2 or 4:3) at least 1000 pixels wide look sharp. A portrait photo is cropped to the same shape, near its top.') },
-  { key: 'founders', label: 'Founders', type: 'list', itemLabel: 'Name' },
+  {
+    key: 'showFounders',
+    label: 'Show the founders on the About page',
+    type: 'boolean',
+    help: 'While this is off, the founders are left out of the website entirely, including what search engines read. Fill them in below, then switch this on and publish.',
+  },
+  {
+    key: 'founders',
+    label: 'Founders',
+    type: 'objects',
+    itemLabel: 'Founder',
+    summary: 'name',
+    // Founders used to be stored as just a name: they open with that name, and are saved with their details.
+    fromText: (name) => ({ name: name.trim() }),
+    help: 'In the order the About page shows them.',
+    fields: [
+      { key: 'name', label: 'Name', type: 'text', required: true },
+      { key: 'role', label: 'Role', type: 'text', placeholder: 'Co-founder', help: 'Shown under the name. Leave empty for none.' },
+      { key: 'photo', label: 'Photo', type: 'image', folder: 'about', help: 'A square portrait at least 300 pixels wide looks sharp. Without a photo, their initials are shown.' },
+      { key: 'photoAlt', label: 'Photo description', type: 'text', help: 'Describes the photo for screen readers and Google. Leave empty to use their name.' },
+      { key: 'about', label: 'About', type: 'textarea', rows: 5, suggestMax: 400, help: 'A few lines about them. Leave a blank line to start a new paragraph.' },
+    ],
+  },
   { key: 'foundedYear', label: 'Year founded', type: 'number' },
 ];
 

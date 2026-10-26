@@ -8,6 +8,7 @@
 import type { ImageMetadata } from 'astro';
 import { aboutParagraphs, type AboutParagraph } from './about';
 import type { Batch } from './batches';
+import { founders, type Founder } from './founders';
 import type { ThemeSettings } from './themes';
 
 const images = import.meta.glob<{ default: ImageMetadata }>('../assets/**/*.{jpg,jpeg,png,webp,gif,avif}', {
@@ -59,7 +60,10 @@ export interface SiteContent {
   stats: { value: string; label: string }[];
   daycarePhoto: Photo;
   moments: Photo[];
-  founders: string[];
+  /** Every founder with a name; legacy entries (just a name) are read as founders (src/data/founders.ts). */
+  founders: Founder[];
+  /** Whether the About page (and what search engines read) shows the founders. Off unless set. */
+  showFounders: boolean;
   foundedYear: number;
   social: { label: string; href: string }[];
   /** Colour theme settings; see src/data/themes.ts. */
@@ -173,8 +177,15 @@ import jobsJson from '../../content/jobs.json';
 import testimonialsJson from '../../content/testimonials.json';
 import postsJson from '../../content/posts.json';
 
-// The About paragraphs are stored as text, each with its subheading (src/data/about.ts).
-export const siteContent: SiteContent = { ...(siteJson as Omit<SiteContent, 'about'>), about: aboutParagraphs((siteJson as { about?: unknown }).about) };
+// The About paragraphs are stored as text, each with its subheading (src/data/about.ts); the founders may be
+// names or objects (src/data/founders.ts), and showFounders is missing from older copies.
+const siteRaw = siteJson as unknown as Omit<SiteContent, 'about' | 'founders' | 'showFounders'> & { about?: unknown; founders?: unknown; showFounders?: unknown };
+export const siteContent: SiteContent = {
+  ...siteRaw,
+  about: aboutParagraphs(siteRaw.about),
+  founders: founders(siteRaw.founders),
+  showFounders: siteRaw.showFounders === true,
+};
 export const sectionsContent = sectionsJson as SectionsContent;
 export const programsContent = programsJson as ProgramContent[];
 export const branchesContent = branchesJson as BranchContent[];

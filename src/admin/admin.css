@@ -637,6 +637,48 @@ textarea:focus {
   accent-color: var(--a-navy);
 }
 
+/* A boolean field (schemas.ts): an on/off switch. */
+.switch input {
+  flex: none;
+  appearance: none;
+  position: relative;
+  width: 40px;
+  height: 22px;
+  margin: 0;
+  border-radius: 999px;
+  background: #c3c8d8;
+  cursor: pointer;
+  transition: background-color 0.15s ease;
+}
+
+.switch input::before {
+  content: '';
+  position: absolute;
+  top: 3px;
+  left: 3px;
+  width: 16px;
+  height: 16px;
+  border-radius: 50%;
+  background: #fff;
+  box-shadow: 0 1px 2px rgb(19 26 58 / 25%);
+  transition: transform 0.15s ease;
+}
+
+.switch input:checked {
+  background: var(--a-navy);
+}
+
+.switch input:checked::before {
+  transform: translateX(18px);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .switch input,
+  .switch input::before {
+    transition: none;
+  }
+}
+
 .checks {
   display: grid;
   grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));

@@ -7,7 +7,9 @@ import SectionHeading from '../components/SectionHeading.astro';
 import Icon from '../components/Icon.astro';
 import { site, coreValues } from '../data/site';
 import { approach } from '../data/programs';
-import { image } from '../data/content';
+import { hasImage, image } from '../data/content';
+import { blocksOf } from '../data/about';
+import { initials } from '../data/founders';
 
 // "Life at Crossmaze" (admin: Site settings → Life at Crossmaze photos): framed tiles of one shape, the shape
 // most of the photos were taken in, between 4:3 and 3:2, so most are shown whole. A portrait photo is
@@ -22,6 +24,17 @@ const momentRatio = Math.min(Math.max(middleShape, 4 / 3), 3 / 2).toFixed(4);
 // Tile widths: three in a row from 880px (a full container's third at most), two below.
 const momentSizes = '(max-width: 879px) calc(50vw - 26px), (max-width: 1219px) calc(33vw - 26px), 380px';
 const tones = ['navy', 'green', 'coral', 'sky', 'sun', 'navy'];
+
+// "Our founders" (admin: Site settings → About page), only while "Show the founders on the About page" is on
+// (site.founders is empty until then). A glass card each: the portrait in a round photo frame, or their
+// initials, the name, the role if one is given, and a few lines about them. One founder has a card of their
+// own, centred; two sit side by side, four two by two, and three (or more) three in a row on wide screens.
+// The cards' class names (.people, .person) don't say "founder": the page's styles are in its HTML even while
+// the section is left out, and nothing there should name the founders.
+const founders = site.founders.map((f) => {
+  const photo = hasImage(f.photo) ? image(f.photo) : undefined;
+  return { ...f, photo, portrait: photo ? photo.width < photo.height : false, about: blocksOf(f.about) };
+});
 ---
 
 <BaseLayout
@@ -108,28 +121,36 @@ const tones = ['navy', 'green', 'coral', 'sky', 'sun', 'navy'];
   }
 
   {
-    site.founders.length > 0 && (
-      <section class="section section--white">
-        <div class="container founders">
-          <SectionHeading eyebrow="Leadership" title="Our founders" />
-          <div class="card founders__panel">
+    founders.length > 0 && (
+      <section class="section section--white" aria-labelledby="founders-title">
+        <div class="container">
+          <SectionHeading eyebrow="Leadership" title={founders.length === 1 ? 'Our founder' : 'Our founders'} align="center" id="founders-title" />
+          <ul class:list={['people', founders.length === 1 ? 'people--one' : ['grid', founders.length === 3 || founders.length > 4 ? 'grid--3' : 'grid--2']]}>
             {
-              site.founders.map((name) => (
-                <div class="founder">
-                  <span class="founder__avatar" aria-hidden="true">
-                    {name
-                      .split(' ')
-                      .map((n) => n[0])
-                      .join('')}
-                  </span>
-                  <div>
-                    <h3>{name}</h3>
-                    <p class="muted">Co-founder, {site.legalName}</p>
+              founders.map((f) => (
+                <li class="card person">
+                  <div class="person__top">
+                    {f.photo ? (
+                      <span class="person__photo ratio-frame photo-frame photo-frame--sm" style={f.portrait ? '--photo-focus: 50% 25%' : undefined}>
+                        <Image src={f.photo} alt={f.photoAlt || f.name} widths={[96, 192, 288]} sizes="96px" />
+                      </span>
+                    ) : (
+                      <span class="person__photo photo-frame photo-frame--sm" aria-hidden="true">
+                        <span class="person__initials">{initials(f.name)}</span>
+                      </span>
+                    )}
+                    <div class="person__who">
+                      <h3>{f.name}</h3>
+                      {f.role && <p class="person__role">{f.role}</p>}
+                    </div>
                   </div>
-                </div>
+                  {f.about.map((p) => (
+                    <p class="person__about">{p}</p>
+                  ))}
+                </li>
               ))
             }
-          </div>
+          </ul>
         </div>
       </section>
     )
@@ -175,46 +196,105 @@ const tones = ['navy', 'green', 'coral', 'sky', 'sun', 'navy'];
     list-style: none;
   }
 
-  .founders__panel {
-    display: flex;
-    flex-wrap: wrap;
-    width: fit-content;
-    max-width: 100%;
+  .people {
+    margin: 0;
     padding: 0;
-    overflow: hidden;
+    list-style: none;
   }
 
-  /* Each founder beside the next, a hairline between them (and under each row once they wrap); the
-     lines on the panel's edges sit just outside it, out of sight. The avatar and spacing shrink a little
-     on tablets and phones, so a name keeps to one line. */
-  .founder {
-    --avatar: clamp(60px, 7vw, 76px);
+  .people--one {
+    max-width: 600px;
+    margin-inline: auto;
+  }
+
+  /* Three founders (or five or more): three in a row only on a 1100px grid, where each card has room for
+     a few lines about them; two and one centred below that, and one a row under 640px. */
+  .people.grid--3 {
+    --grid-cols-at: 1100px;
+    --grid-two-at: 640px;
+  }
+
+  .person {
+    --portrait: clamp(76px, 8vw, 96px);
+    container-type: inline-size;
+    padding: clamp(22px, 2.6vw, 30px);
+    overflow-wrap: break-word;
+  }
+
+  /* The portrait beside the name and role: centred on them while they are shorter than it, level with
+     the name's first line when they are longer. */
+  .person__top {
     display: flex;
-    flex: 1 1 320px;
-    align-items: center;
-    gap: clamp(16px, 2vw, 20px);
-    margin: 0 0 -1px -1px;
-    padding: 24px clamp(20px, 2.6vw, 32px) 24px clamp(20px, 2.4vw, 28px);
-    border-left: 1px solid var(--line);
-    border-bottom: 1px solid var(--line);
+    align-items: flex-start;
+    gap: clamp(14px, 1.8vw, 20px);
   }
 
-  .founder__avatar {
+  .person__who {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    min-width: 0;
+    min-height: var(--portrait);
+  }
+
+  /* A narrower card (three in a row, or two on a small tablet) puts the portrait above the name, so the
+     name and role have the card's full width and keep each word whole. */
+  @container (width < 340px) {
+    .person__top {
+      flex-direction: column;
+    }
+
+    .person__who {
+      min-height: 0;
+    }
+  }
+
+  .person__top:not(:last-child) {
+    margin-bottom: 18px;
+  }
+
+  /* The portrait in the site's photo frame, made round; the initials sit in the same ring. */
+  .person__photo {
+    --ratio: 1;
+    --frame-radius: 50%;
+    display: grid;
+    flex: none;
+    width: var(--portrait);
+    aspect-ratio: 1;
+  }
+
+  .person__initials {
     display: grid;
     place-items: center;
-    flex: none;
-    width: var(--avatar);
-    height: var(--avatar);
+    width: 100%;
+    height: 100%;
     border-radius: 50%;
     background: var(--g-navy);
     color: var(--sun);
     font-family: var(--font-display);
-    font-size: calc(var(--avatar) * 0.34);
+    font-size: calc(var(--portrait) * 0.32);
+    font-weight: 600;
+    letter-spacing: 0.02em;
+  }
+
+  .person h3 {
+    margin: 0;
+    font-size: clamp(1.2rem, 1.8vw, 1.4rem);
+  }
+
+  .person__role {
+    margin: 0.25em 0 0;
+    color: var(--muted);
     font-weight: 600;
   }
 
-  .founder p {
-    margin: 0;
+  .person__about {
+    margin: 0 0 0.8em;
+    color: var(--muted);
+  }
+
+  .person__about:last-child {
+    margin-bottom: 0;
   }
 
   .cta {
