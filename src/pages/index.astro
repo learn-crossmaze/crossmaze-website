@@ -64,11 +64,11 @@ const careCols = daycareHighlights.length === 4 ? 2 : 3;
     <FloatingShapes variant="home" />
     <div class="container hero__inner">
       <div class="hero__copy">
-        {/* What and where, as the first line of the heading (it keeps the eyebrow's look; global.css). */}
+        {/* What and where, as the first lines of the heading (they keep the eyebrow's look; global.css). */}
         <h1>
           <span class="eyebrow">
             <Icon name="Sparkles" size={18} />
-            <span class="eyebrow__parts"><span>Preschool & Day Care&nbsp;·</span> <span>Electronic City & Begur</span></span>
+            <span class="eyebrow__parts"><span>Preschool & Day Care<span class="sr-only">,</span></span> <span>Electronic City & Begur</span></span>
           </span>{' '}
           {site.hero.titleStart} <span class="squiggle">{site.hero.titleHighlight}</span>
         </h1>
@@ -351,16 +351,30 @@ const careCols = daycareHighlights.length === 4 ? 2 : 3;
     }
   }
 
-  /* The text column is the width the heading's first line (the eyebrow) may take (global.css). */
+  /* The text column is the width the heading's first lines (the eyebrow) may take (global.css). */
   .hero__copy {
     container-type: inline-size;
   }
 
   /* From 1181px the big doodle sits at the top right of the text column (FloatingShapes.astro), level
-     with that line: the line keeps clear of it, its second part moving under the first if need be. */
+     with those lines: they keep clear of it, wrapping if need be. */
   @media (min-width: 1181px) {
     .hero h1 > .eyebrow {
       max-width: calc(100cqi - 96px);
+    }
+  }
+
+  /* In one column the small doodle sits at their right end instead (58px, 41px from 760px, reaching 6px
+     into the gutter): they keep clear of it in the same way. */
+  @media (max-width: 900px) {
+    .hero h1 > .eyebrow {
+      max-width: calc(100cqi - 60px);
+    }
+  }
+
+  @media (max-width: 760px) {
+    .hero h1 > .eyebrow {
+      max-width: calc(100cqi - 44px);
     }
   }
 

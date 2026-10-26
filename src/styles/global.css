@@ -740,25 +740,37 @@ main > section.section--tight.section--feature {
   content: none;
 }
 
-/* The eyebrow as the first line of a page heading (the home and branch banners: what and where), looking
-   just as it does above one: its own line, size and colour (painted over the heading's gradient), as wide
-   as the banner's text column (a container) rather than the heading's narrower measure. */
+/* The eyebrow as the first lines of a page heading (the home and branch banners: what and where), looking
+   just as it does above one: its own lines, size and colour (painted over the heading's gradient), as wide
+   as the banner's text column (a container) rather than the heading's narrower measure. The dot or icon
+   sits by the first line. */
 h1 > .eyebrow {
   display: flex;
+  align-items: flex-start;
   width: max-content;
   max-width: 100cqi;
   line-height: 1.4;
   text-wrap: wrap;
 }
 
-/* Its parts ("Preschool & Day Care ·", "Neotown, Thirupalya, Electronic City · 560099") move onto a new line
-   whole when the line is full, so a line doesn't end partway through a place. A part longer than the line
-   wraps on its own. */
+h1 > .eyebrow::before {
+  margin-top: calc((1.4em - 7px) / 2);
+}
+
+h1 > .eyebrow > svg {
+  flex: none;
+  margin-top: calc((1.4em - 18px) / 2);
+}
+
+/* Its parts ("Preschool & Day Care", "Neotown, Thirupalya, Electronic City · 560099"), one under the other
+   at every width. Side by side, whether they fit on one line would depend on which font has loaded, and a
+   late web font would move the page below as the line rewrapped. A part longer than the line wraps on its
+   own, anywhere if it must. */
 .eyebrow__parts {
   display: flex;
-  flex-wrap: wrap;
-  column-gap: 0.4em;
+  flex-direction: column;
   min-width: 0;
+  overflow-wrap: anywhere;
 }
 
 /* Another name for a program, in brackets after its name ("Junior KG (LKG)"): smaller and quieter than the

@@ -161,8 +161,15 @@ const otherCards = others.map((b, i) => ({ branch: b, cover: branchPhotos(b.slug
 // What Google shows for the page, from what the page itself says: the service and the place in the title
 // (unless the admin panel gives one: Branches → Title in Google), and in the description the programs, the
 // opening hours (as in the facts above the timetable, when they are one range) and the phone number.
+// Google shows about 60 characters of a title, so a long area keeps only its first and last parts there
+// ("Neotown, Thirupalya, Electronic City" → "Neotown, Electronic City"); the description keeps all of it.
 const place = branchPlace(branch);
-const pageTitle = branch.seoTitle?.trim() || `Preschool & Day Care in ${place} | ${site.name}`;
+const titleFor = (where: string) => `Preschool & Day Care in ${where} | ${site.name}`;
+const placeParts = place.split(/\s*,\s*/);
+const defaultTitle = titleFor(place).length > 65 && placeParts.length > 2 ? titleFor(`${placeParts[0]}, ${placeParts.at(-1)}`) : titleFor(place);
+const pageTitle = branch.seoTitle?.trim() || defaultTitle;
+// The place as the heading shows it: when the line wraps, each part ("Electronic City") stays whole.
+const placeLine = placeParts.map((part) => part.replace(/\s+/g, '\u00a0')).join(', ');
 // The classes (youngest first, as in the admin panel) as a range when there are three or more, then day
 // care by name: "Play Group to Senior KG and Day Care".
 const care = offered.filter((p) => p.slug === 'day-care').map((p) => p.name);
@@ -217,11 +224,11 @@ const jsonLd = {
             {crumbs.map((c) => <li>{c.href ? <a href={c.href}>{c.label}</a> : <span aria-current="page">{c.label}</span>}</li>)}
           </ol>
         </nav>
-        {/* What and where, as the first line of the heading (it keeps the eyebrow's look; global.css). */}
+        {/* What and where, as the first lines of the heading (they keep the eyebrow's look; global.css). */}
         <h1>
           <span class="eyebrow">
-            {/* No-break spaces keep each "·" with the word before it, and the PIN code with the last word of the place. */}
-            <span class="eyebrow__parts"><span>Preschool & Day Care&nbsp;·</span> <span>{place}&nbsp;·&nbsp;{branch.pincode}</span></span>
+            {/* No-break spaces keep the "·" and the PIN code with the last part of the place. */}
+            <span class="eyebrow__parts"><span>Preschool & Day Care<span class="sr-only">,</span></span> <span>{placeLine}&nbsp;·&nbsp;{branch.pincode}</span></span>
           </span>{' '}
           {heroTitle}
         </h1>
@@ -593,7 +600,7 @@ const jsonLd = {
     display: none;
   }
 
-  /* The text column is the width the heading's first line (the eyebrow) may take (global.css). */
+  /* The text column is the width the heading's first lines (the eyebrow) may take (global.css). */
   .branch-hero__text {
     container-type: inline-size;
   }
