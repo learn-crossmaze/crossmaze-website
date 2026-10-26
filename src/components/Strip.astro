@@ -57,9 +57,15 @@ const rules =
   'overscroll-behavior-x:contain;scroll-snap-type:x mandatory;scroll-padding-inline:var(--strip-inset);scrollbar-width:none}' +
   `${row}::-webkit-scrollbar{display:none}` +
   `${row} > *{scroll-snap-align:start}`;
+// A phones-only strip's cards also lose their hover lift in the row, which clips what spills out under
+// it (the lift's soft shadow would end in a hard line), and a lone card takes the whole width.
+const phoneRules = below
+  ? `${row} > .card:hover{transform:none;box-shadow:var(--glass-rim),var(--shadow-sm)}` +
+    `${row}:has(> :only-child){grid-auto-columns:100%}`
+  : '';
 // (rem in a media query is the browser's default font size, as em is.)
 const upTo = length && (length[2] === 'px' ? `${+(Number(length[1]) - 0.02).toFixed(2)}px` : `${+(Number(length[1]) - 0.001).toFixed(3)}em`);
-const css = upTo ? `@media (max-width: ${upTo}){${rules}}` : rules;
+const css = upTo ? `@media (max-width: ${upTo}){${rules}${phoneRules}}` : rules;
 ---
 
 <div class:list={['strip', className]} style={style} data-strip data-below={below} data-strip-label={label}>
@@ -154,6 +160,21 @@ const css = upTo ? `@media (max-width: ${upTo}){${rules}}` : rules;
 
     prev.addEventListener('click', () => page(-1));
     next.addEventListener('click', () => page(1));
+
+    // The browser leaves a card the keyboard reaches where it is if any of it shows: bring it into
+    // full view, lined up where the cards snap. (Not for a click or tap, which would move the card
+    // away from under the pointer.)
+    track.addEventListener('focusin', (event) => {
+      const target = event.target as HTMLElement;
+      if (!strip.classList.contains('is-scrollable') || !target.matches(':focus-visible')) return;
+      const card = cards().find((c) => c.contains(target));
+      if (!card) return;
+      const inset = parseFloat(getComputedStyle(track).scrollPaddingLeft) || 0;
+      const view = track.getBoundingClientRect();
+      const box = card.getBoundingClientRect();
+      if (box.left >= view.left + inset - 1 && box.right <= view.right - inset + 1) return;
+      track.scrollBy({ left: box.left - view.left - inset, behavior: reduced.matches ? 'auto' : 'smooth' });
+    });
 
     // The arrows and fades follow the scroll frame by frame; the position waits until it settles, so a
     // screen reader hears where the row stopped rather than every card on the way.
@@ -291,10 +312,14 @@ const css = upTo ? `@media (max-width: ${upTo}){${rules}}` : rules;
     display: none;
   }
 
-  /* Phones: swipe instead of the arrows. */
+  /* Phones, and a phones-only strip (which only scrolls below `below`): swipe instead of the arrows. */
   @media (max-width: 640px) {
     .strip__nav {
       display: none;
     }
+  }
+
+  .strip[data-below] .strip__nav {
+    display: none;
   }
 </style>

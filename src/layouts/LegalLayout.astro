@@ -70,24 +70,44 @@ const hasContents = contents.length >= 3;
 
 <script>
   // Marks the section being read in the side list: the last heading that has reached the top of the
-  // window (under the floating header). Only a colour changes, so nothing moves.
+  // window (under the floating header). At the end of the page, where the last headings can't scroll up
+  // that far, it is the one jumped to if it is in view, or else the last one in view. Only a colour
+  // changes, and a list too long for the window scrolls itself, at once, to keep that entry in view.
   const toc = document.querySelector<HTMLElement>('[data-legal-toc]');
   if (toc) {
     const links = [...toc.querySelectorAll<HTMLAnchorElement>('a[href^="#"]')];
     const targets = links.map((a) => document.getElementById(decodeURIComponent(a.hash.slice(1))));
     let queued = false;
+    let shown = -1;
     const update = () => {
       queued = false;
       if (toc.offsetParent === null) return; // hidden: the folded list above the text shows instead
-      const line = (parseFloat(getComputedStyle(document.documentElement).scrollPaddingTop) || 0) + 32;
+      const root = document.documentElement;
+      const line = (parseFloat(getComputedStyle(root).scrollPaddingTop) || 0) + 32;
       let current = -1;
       targets.forEach((t, i) => {
         if (t && t.getBoundingClientRect().top <= line) current = i;
       });
+      if (scrollY + innerHeight >= root.scrollHeight - 2) {
+        let last = current;
+        targets.forEach((t, i) => {
+          if (t && i > current && t.getBoundingClientRect().top < innerHeight) last = i;
+        });
+        const jumped = links.findIndex((a) => a.hash === location.hash);
+        current = jumped >= Math.max(current, 0) && jumped <= last ? jumped : last;
+      }
       links.forEach((a, i) => {
         if (i === current) a.setAttribute('aria-current', 'true');
         else a.removeAttribute('aria-current');
       });
+      if (current === shown) return;
+      shown = current;
+      const link = links[current];
+      if (!link || toc.scrollHeight <= toc.clientHeight) return;
+      const box = toc.getBoundingClientRect();
+      const item = link.getBoundingClientRect();
+      if (item.bottom > box.bottom - 12) toc.scrollTop += item.bottom - box.bottom + 12;
+      else if (item.top < box.top + 12) toc.scrollTop -= box.top + 12 - item.top;
     };
     const queue = () => {
       if (queued) return;
@@ -96,6 +116,7 @@ const hasContents = contents.length >= 3;
     };
     addEventListener('scroll', queue, { passive: true });
     addEventListener('resize', queue);
+    addEventListener('hashchange', queue); // a jump at the end of the page doesn't scroll
     update();
   }
 </script>

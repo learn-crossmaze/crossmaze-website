@@ -651,9 +651,15 @@ const careCols = daycareHighlights.length === 4 ? 2 : 3;
   }
 
   /* Quotes are long, so three a row only once the grid is 960px wide (two on tablets, never three
-     narrow columns). */
+     narrow columns), and never four, whatever the count (.grid--3 takes four a row for 4 or 7 cards):
+     four quotes are two rows of two. */
   .testimonials :global(.grid--3) {
+    --grid-cols: 3;
     --grid-cols-at: 960px;
+  }
+
+  .testimonials :global(.grid--3:has(> :nth-child(4):last-child)) {
+    --grid-cols: 2;
   }
 
   /* Rows of cards as tall as the row's longest quote, with the names lined up along the foot. */
@@ -661,14 +667,6 @@ const careCols = daycareHighlights.length === 4 ? 2 : 3;
     display: flex;
     flex-direction: column;
     margin: 0;
-  }
-
-  /* In the phone strip (below 700px, Strip's `below`) each card keeps its own height, so a short quote
-     has no empty glass under it. */
-  @media (max-width: 699.98px) {
-    .testimonial {
-      align-self: start;
-    }
   }
 
   /* A large, soft opening quote mark instead of an icon. */

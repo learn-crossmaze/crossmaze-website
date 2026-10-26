@@ -182,7 +182,7 @@ const jsonLd = {
 >
   <section class="page-hero branch-hero">
     <FloatingShapes />
-    <div class="container branch-hero__inner">
+    <div class:list={['container', 'branch-hero__inner', { 'branch-hero__inner--text': !cover }]}>
       <div>
         <nav aria-label="Breadcrumb">
           <ol class="breadcrumbs">
@@ -543,6 +543,11 @@ const jsonLd = {
     grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
     gap: clamp(28px, 5vw, 64px);
     align-items: center;
+  }
+
+  /* A branch without photos yet: the text alone, across the banner. */
+  .branch-hero__inner--text {
+    grid-template-columns: minmax(0, 1fr);
   }
 
   @media (max-width: 760px) {

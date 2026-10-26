@@ -204,39 +204,6 @@ const emailAt = site.careersEmail.indexOf('@');
     margin-top: 28px;
   }
 
-  /* ---------- Why work with us ---------- */
-  .perks {
-    container-type: inline-size;
-  }
-
-  /* One card a row (phones): the badge beside the title and text, about half as tall. */
-  @container (max-width: 519px) {
-    .perk {
-      display: grid;
-      grid-template-columns: auto minmax(0, 1fr);
-      column-gap: 16px;
-      padding: 20px;
-    }
-
-    .perk .icon-badge {
-      grid-row: span 2;
-      width: 46px;
-      height: 46px;
-      margin: 0;
-    }
-
-    .perk h3 {
-      align-self: center;
-      margin: 0 0 4px;
-      font-size: 1.12rem;
-    }
-
-    .perk p {
-      grid-column: 2;
-      line-height: 1.55;
-    }
-  }
-
   /* ---------- Current openings ---------- */
   .jobs__list {
     display: grid;

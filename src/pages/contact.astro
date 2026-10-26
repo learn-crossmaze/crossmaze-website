@@ -363,21 +363,24 @@ const branchRows = branches.map((b, i) => ({
     border-top: 1px solid var(--rule);
   }
 
-  /* Small photos take smaller corners, so they don't turn into circles. */
+  /* Small photos take smaller corners, so they don't turn into circles: one radius in every theme, as
+     a theme's --radius-photo-sm can be four corners, which min() and calc() can't take. */
   .branch-row__media {
     grid-area: media;
     --ratio: 1;
-    --frame-radius: min(var(--radius-photo-sm), 16px);
+    --frame-radius: 16px;
   }
 
-  /* A branch without photos: its colour and a building. */
+  /* A branch without photos: its colour and a building, inside the frame's ring as a photo is (its
+     padding shows the ring, and the browser rounds the colour inside it). */
   .branch-row__art {
     position: absolute;
-    inset: var(--frame-pad);
+    inset: 0;
     display: grid;
     place-items: center;
-    border-radius: calc(var(--frame-radius) - var(--frame-pad));
-    background: linear-gradient(135deg, var(--badge-bg) 0%, var(--badge-bg-2) 100%);
+    padding: var(--frame-pad);
+    border-radius: inherit;
+    background: linear-gradient(135deg, var(--badge-bg) 0%, var(--badge-bg-2) 100%) content-box;
     color: var(--badge-fg);
   }
 
