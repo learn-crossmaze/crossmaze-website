@@ -194,9 +194,23 @@ export function FieldEditor({ field, value, onChange }: { field: Exclude<Field, 
       );
     case 'boolean':
       return (
-        <label className="check">
-          <input type="checkbox" checked={Boolean(value)} onChange={(e) => onChange(e.target.checked)} /> {field.label}
-        </label>
+        <div className="field">
+          <label className="check switch">
+            <input
+              type="checkbox"
+              role="switch"
+              checked={value === true}
+              aria-describedby={field.help ? `${id}-help` : undefined}
+              onChange={(e) => onChange(e.target.checked)}
+            />
+            {field.label}
+          </label>
+          {field.help && (
+            <p className="help" id={`${id}-help`}>
+              {field.help}
+            </p>
+          )}
+        </div>
       );
     case 'select':
       return (
@@ -575,8 +589,10 @@ function ImagesField({ folder, value, onChange }: { folder: string; value: strin
 }
 
 /**
- * A form's value as it is stored: the items of objects fields with `toText` become text. With `reread`, items
- * already stored as text are read and written again too, so two values that read the same compare equal.
+ * A form's value as it is stored: the items of objects fields with `toText` become text, and items stored as
+ * text in a field without `toText` (`fromText` only) become objects; switches are true or false. With
+ * `reread`, items already stored as text are read and written again too, so two values that read the same
+ * compare equal.
  */
 export function forStorage(fields: Field[], value: Obj, reread = false): Obj {
   const out = { ...value };
@@ -587,7 +603,8 @@ export function forStorage(fields: Field[], value: Obj, reread = false): Obj {
     else if (field.type === 'objects' && field.toText && Array.isArray(v)) {
       const toText = field.toText;
       out[field.key] = (reread ? itemsOf(field, v) : v).map((item) => (typeof item === 'string' ? item : toText(asObj(item))));
-    }
+    } else if (field.type === 'objects' && field.fromText && Array.isArray(v)) out[field.key] = itemsOf(field, v);
+    else if (field.type === 'boolean') out[field.key] = v === true;
   }
   return out;
 }

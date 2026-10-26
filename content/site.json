@@ -100,9 +100,22 @@
       "alt": "Children dressed as bees at the annual day"
     }
   ],
+  "showFounders": false,
   "founders": [
-    "Manushree Chaturvedi",
-    "Abhishek Jain"
+    {
+      "name": "Manushree Chaturvedi",
+      "role": "",
+      "photo": "",
+      "photoAlt": "",
+      "about": ""
+    },
+    {
+      "name": "Abhishek Jain",
+      "role": "",
+      "photo": "",
+      "photoAlt": "",
+      "about": ""
+    }
   ],
   "foundedYear": 2018,
   "social": [

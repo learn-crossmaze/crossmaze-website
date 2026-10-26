@@ -19,7 +19,7 @@ The URLs match the old site, so existing links and Google results keep working.
 | URL | Page |
 | --- | --- |
 | `/` | Home: hero, stats, about, core values, programs, a day at Crossmaze, day care, facilities, testimonials, latest blog posts, branches, admission enquiry (with how admission works beside the form); on phones the programs, testimonials and branches are swipe strips |
-| `/about` | Who we are, core values, approach, annual-day photos, founders |
+| `/about` | Who we are, core values, approach, annual-day photos, and the founders once they are switched on in the admin panel |
 | `/our-programs` | Play Group, Nursery, Junior KG, Senior KG, Day Care, how we teach, a day at Crossmaze, extra-curriculars, FAQs |
 | `/branch` and `/branch/<slug>` | All branches, then one page per branch: photos, facts (including opening hours), programs with their batches and timings, about the centre with its amenities and centre head, gallery, then the visit details and map beside the enquiry form |
 | `/careers` | Why work with us, open roles, application form with resume upload |
@@ -33,7 +33,7 @@ Go to **www.crossmaze.in/admin** and sign in (until the domain moves, step 6 bel
 
 | Section | What you can change |
 | --- | --- |
-| Site settings | Logo, school name, phone, WhatsApp, emails, address, social links, colour theme, home-page banner, numbers strip, about paragraphs (each with an optional subheading), quote, photos |
+| Site settings | Logo, school name, phone, WhatsApp, emails, address, social links, colour theme, home-page banner, numbers strip, about paragraphs (each with an optional subheading), quote, photos, founders (see below) |
 | Branches | Add, hide, reorder or delete branches; name, address, map, phone, size, capacity, amenities, programs offered, timings and batches (see below), photos (first = cover; the page shows six, and all of them open in a swipeable album), centre head with photo and bio |
 | Programs | Add, hide, reorder; name, age group, who can join (e.g. “2 years or older on 1 June”), icon, colour, photo, description, focus list (timings are set per branch) |
 | Jobs | Open positions on the careers page |
@@ -63,6 +63,10 @@ Go to **www.crossmaze.in/admin** and sign in (until the domain moves, step 6 bel
 A post has an opening paragraph, then **sections** (a heading, text and an optional photo each), an optional highlighted quote, key points, author and button. In the text, leave a blank line between paragraphs, start lines with “- ” for bullet points, and use `**bold**`, `_italic_` and `[link text](/contact)`.
 
 New posts start **hidden**. Each hidden post has a private **preview link** (at the top of the post in the admin panel) that shows it after you press **Publish**, so you can check it before anyone else sees it. When it's ready, untick “Hide from website” and press **Publish**. The blog is at /blog, the newest three posts show on the home page, and “Blog” appears in the menu once a post is published.
+
+### Founders
+
+**Site settings → About page → Founders** lists the founders, each with a name, a role (such as "Co-founder"; leave it empty for none), a photo (a square portrait works best; without one, their initials are shown), a photo description and a few lines about them. They appear on the About page, a card each, and in what search engines read about the school, only while **Show the founders on the About page** is switched on; while it is off (as it is now) the website leaves them out entirely. Founders entered before this editor existed are just names: they open in it with that name, and are saved with their details from the next save on.
 
 ### Timings and batches
 
@@ -291,6 +295,7 @@ FIREBASE_STORAGE_BUCKET=demo-crossmaze.appspot.com ADMIN_EMAILS=you@example.com 
 - `content/*.json` is what the site is built from. `src/data/*.ts` loads it; image fields are paths under `src/assets/`.
 - `scripts/sync-content.mjs` runs before every deploy. It pulls Firestore content into those JSON files and downloads new photos into `src/assets/cms/`, which isn't committed. Astro then resizes the photos and converts them to WebP.
 - A field that's new in `content/site.json` or `content/sections.json` (such as a new page section) is copied into Firestore on the next deploy from `main`, so it appears in the admin panel. Pull-request previews use the repository's copy without writing to Firestore.
+- Founders (`founders` in `content/site.json`) used to be a list of names, and the live database keeps those names until Site settings is next saved. A name is read as a founder with only a name by the site (`src/data/founders.ts`), the admin panel (the field's `fromText` in `src/admin/schemas.ts`) and `scripts/sync-content.mjs`, so both shapes work. A content update that changes the founders compares them the same way (a name, a founder saved without its empty fields and the repository's copy with every field all match), so it applies unless someone has changed them in the admin panel. `showFounders` was added later too: deploys from `main` copy it into Firestore switched off.
 - **Changing existing copy from the repository** (reworded text, a corrected phone number) needs a content update, because the live text is in Firestore and each deploy overwrites `content/*.json` with it. Edit the JSON, then run `node scripts/content-update.mjs <id> "<what changed>"` before committing (it compares with the last commit; pass another git ref as a third argument, e.g. `origin/main`). It writes `content/updates/<id>.json`, one entry per changed field. Pull-request previews show the change without saving it. The next deploy from `main` saves it to Firestore once, and only where Firestore still has the old text, so anything edited in the admin panel is kept. The deploy log lists what was updated and what was kept. Photos inside a list that changes as a whole (such as each facility's photo) are included and copied to Cloud Storage when the update is saved; other photo fields and new items, such as a branch or a job, are added in the admin panel.
 - `scripts/report-publish.mjs` tells the admin panel whether a deploy succeeded.
 - Colour themes: the tokens in `src/styles/global.css` are Pastel Glass; `src/styles/themes.css` overrides them for the other themes, and `src/data/themes.ts` lists each theme's fonts and browser-bar colours. A script at the top of `layouts/BaseLayout.astro` picks the theme and light or dark (`<html data-theme="…" data-mode="light|dark">`) in the browser before the page is drawn. Dark colours: `:root[data-mode='dark']` in global.css (Pastel Glass at night, plus the smoky glass and shadows every theme shares) and `:root[data-theme='…'][data-mode='dark']` in themes.css, which must re-set every colour token the theme's light block sets.
@@ -316,14 +321,13 @@ On 26 October 2026 the school also confirmed:
 - **WhatsApp**: +91 72599 21508, the number on the old site's WhatsApp button. The main phone stays +91 72040 21508.
 - **Enquiries** go to LITMUS, which sends the email alerts.
 - **Feedback** from parents goes through the LITMUS parents portal; the old Wix feedback addresses redirect there.
-- **Founders** are not shown on the website for now; they can be filled in (with photos and a few lines each) and switched on in the admin panel later.
+- **Founders** are not shown on the website for now. They can be filled in later (admin panel → Site settings → About page: each founder's name, role, photo and a few lines), then switched on with **Show the founders on the About page** and published.
 
 ## Please verify before launch
 
 - [ ] **Branch phone numbers, addresses and map pins** come from the branch records behind the old www.crossmaze.in: The Hub +91 72040 21508, Neotown +91 73380 45201, SNN Greenbay +91 72595 10758, Neeladri Nagar +91 97409 21508 and Ananth Nagar +91 87225 70895. Call each number once to check it reaches the right centre. Neeladri Nagar's address changed from "Malligue Residency, 16th Cross Road" to "128, Gargeshwari, 13th Cross Road", as on the old site.
 - [ ] **Main phone**: +91 72040 21508 (The Hub's number). It is the number search engines show, and what Call buttons dial if the centre picker can't open (admin panel → Site settings).
 - [ ] **Careers email**: now `career@crossmaze.in` (set in the admin panel). Send it one test email to make sure that mailbox exists in Zoho.
-- [ ] **Functions and database rules**: run `npx firebase-tools deploy --only firestore,storage,functions` from `main` (step 3 under One-time setup). On 26 October the live ones still answered as before 18 October (so the batch a parent picks on a branch page is dropped from the enquiry, and branch admins may not get their access): pull `main` first, then deploy, and check the output says the functions were updated.
 - [ ] **Small photos** look soft on large and high-resolution screens. The day care photo is still the old nap-room picture, only 555 px wide, some "Life at Crossmaze" photos are 450–500 px wide, and so are the school’s own facility photos from the old site (555 px; admin panel → Page sections → Facilities), which also open full screen. Upload larger originals (about 1200 px wide or more; admin panel → Site settings → Day care photo and “Life at Crossmaze” photos). The site picks up the larger sizes by itself.
 - [ ] **Play Group photo description** still says "Colourful indoor play area with rockers and a slide", but the new photo shows children holding paper props. Update it in admin panel → Programs → Play Group → Photo description.
 - [ ] **Home banner badge** "1000+ happy children" repeats the first number in the numbers strip just below it. Give the badge different words, or leave its number empty to hide it (admin panel → Site settings → Top banner).

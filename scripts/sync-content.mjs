@@ -58,6 +58,8 @@ async function mapImages(kind, item, fn) {
     copy.aboutPhoto = await photo(copy.aboutPhoto);
     copy.daycarePhoto = await photo(copy.daycarePhoto);
     copy.moments = await each(copy.moments, photo);
+    // Founders stored as just a name (text) have no photo.
+    copy.founders = await each(copy.founders, async (f) => (f?.photo ? { ...f, photo: await fn(f.photo) } : f));
   } else if (kind === 'sections') {
     copy.facilities = await each(copy.facilities, async (f) => (f?.image ? { ...f, image: await fn(f.image) } : f));
   } else if (kind === 'programs') {
@@ -132,6 +134,15 @@ async function seed(db, bucket) {
 /** Fills in anything an editor left empty so a half-finished entry can't break the build. */
 const list = (value) => (Array.isArray(value) ? value.filter((v) => v !== null && v !== undefined && v !== '') : []);
 const text = (value) => (typeof value === 'string' ? value : value == null ? '' : String(value));
+/**
+ * The founders with a name, each with every field (src/data/founders.ts). Older entries are just a name
+ * (text), and the admin panel saves a founder without the fields left empty.
+ */
+const founders = (value) =>
+  list(value)
+    .map((f) => (f && typeof f === 'object' ? f : { name: f }))
+    .map((f) => ({ name: text(f.name).trim(), role: text(f.role).trim(), photo: text(f.photo).trim(), photoAlt: text(f.photoAlt).trim(), about: text(f.about).trim() }))
+    .filter((f) => f.name);
 
 const normalize = {
   site: (s) => ({
@@ -140,7 +151,8 @@ const normalize = {
     about: list(s.about),
     stats: list(s.stats),
     social: list(s.social),
-    founders: list(s.founders),
+    founders: founders(s.founders),
+    showFounders: s.showFounders === true,
     moments: list(s.moments).filter((m) => m.image),
     hero: { ...s.hero, photos: list(s.hero?.photos).filter((p) => p.image) },
   }),
@@ -246,6 +258,12 @@ const unstored = (v) =>
         ? Object.fromEntries(Object.entries(v).map(([k, x]) => [k, unstored(x)]))
         : v;
 const samePhotos = (a, b) => same(unstored(a), unstored(b));
+/**
+ * Fields stored in more than one shape, compared as the site reads them: an update made from the
+ * repository's copy (founders with every field) must still find the live value it was made from (names, or
+ * founders saved by the admin panel without their empty fields).
+ */
+const comparable = { 'content/site founders': (v) => (Array.isArray(v) ? founders(v) : v) };
 const getPath = (obj, dotted) => dotted.split('.').reduce((o, k) => (o == null ? undefined : o[k]), obj);
 function setPath(obj, dotted, value) {
   const keys = dotted.split('.');
@@ -299,9 +317,10 @@ class ContentUpdates {
       update.changes.forEach((change, i) => {
         if (change.doc !== docPath) return;
         report.seen.add(i);
-        const now = getPath(data, change.field) ?? null;
-        if (samePhotos(now, change.to)) report.current += 1;
-        else if (samePhotos(now, change.from)) {
+        const as = comparable[`${docPath} ${change.field}`] ?? ((v) => v);
+        const now = as(getPath(data, change.field) ?? null);
+        if (samePhotos(now, as(change.to))) report.current += 1;
+        else if (samePhotos(now, as(change.from))) {
           setPath(data, change.field, change.to);
           const fields = this.writes.get(docPath) ?? {};
           fields[change.field] = change.to;

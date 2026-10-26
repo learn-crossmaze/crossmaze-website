@@ -9,7 +9,7 @@ import CallPicker from '../components/CallPicker.astro';
 import Icon from '../components/Icon.astro';
 import { site } from '../data/site';
 import { branches, shortName } from '../data/branches';
-import { image } from '../data/content';
+import { hasImage, image } from '../data/content';
 import { cleanPath } from '../utils';
 import { doodleCss } from '../components/doodles';
 import { themes, themeSettings, fontsHref } from '../data/themes';
@@ -43,6 +43,15 @@ const ogImage = shareImage
   : new URL('/og-image.jpg', Astro.site ?? site.url).href;
 // Google's copy of the logo follows the one set in the admin panel.
 const schemaLogo = await getImage({ src: image(site.logo), width: 600, format: 'png' });
+// The founders, only while the admin panel shows them (site.founders is empty until then).
+const founders = await Promise.all(
+  site.founders.map(async (f) => ({
+    '@type': 'Person',
+    name: f.name,
+    ...(f.role ? { jobTitle: f.role } : {}),
+    ...(hasImage(f.photo) ? { image: new URL((await getImage({ src: image(f.photo), width: 400, format: 'jpg' })).src, site.url).href } : {}),
+  })),
+);
 
 const organization = {
   '@context': 'https://schema.org',
@@ -62,7 +71,7 @@ const organization = {
     ...(site.addressPincode ? { postalCode: site.addressPincode } : {}),
     addressCountry: 'IN',
   },
-  founder: site.founders.map((name) => ({ '@type': 'Person', name })),
+  ...(founders.length ? { founder: founders } : {}),
   sameAs: site.social.map((s) => s.href),
 };
 const structuredData = [organization, ...(jsonLd ? (Array.isArray(jsonLd) ? jsonLd : [jsonLd]) : [])];

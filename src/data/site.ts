@@ -6,6 +6,9 @@ const digits = (value: string) => value.replace(/[^\d]/g, '');
 
 export const site = {
   ...siteContent,
+  // Only while "Show the founders on the About page" is on (admin: Site settings → About page); until then the
+  // website leaves the founders out entirely, including the Organization search engines read (BaseLayout).
+  founders: siteContent.showFounders ? siteContent.founders : [],
   phoneHref: `tel:+${digits(siteContent.phone)}`,
   whatsappHref: `https://wa.me/${digits(siteContent.whatsapp || siteContent.phone)}`,
 };
