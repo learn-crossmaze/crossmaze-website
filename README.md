@@ -309,18 +309,22 @@ On 19 October 2026 the school confirmed the following, so the site states them. 
 - **CCTV and the app**: every centre has CCTV, but the live view is for **day care parents only**. The Crossmaze Care parents' app is for every parent at every centre.
 - **Senior KG**: no claim about school boards (State, CBSE, ICSE).
 
+On 26 October 2026 the school also confirmed:
+
+- **Timings and batches** on the branch pages are correct.
+- **Facility photos**: the four stock photos (CCTV surveillance, Fire safe, Parents’ communication app, Trained caregivers) are licensed; the school bought them.
+- **WhatsApp**: +91 72599 21508, the number on the old site's WhatsApp button. The main phone stays +91 72040 21508.
+- **Enquiries** go to LITMUS, which sends the email alerts.
+- **Feedback** from parents goes through the LITMUS parents portal; the old Wix feedback addresses redirect there.
+- **Founders** are not shown on the website for now; they can be filled in (with photos and a few lines each) and switched on in the admin panel later.
+
 ## Please verify before launch
 
 - [ ] **Branch phone numbers, addresses and map pins** come from the branch records behind the old www.crossmaze.in: The Hub +91 72040 21508, Neotown +91 73380 45201, SNN Greenbay +91 72595 10758, Neeladri Nagar +91 97409 21508 and Ananth Nagar +91 87225 70895. Call each number once to check it reaches the right centre. Neeladri Nagar's address changed from "Malligue Residency, 16th Cross Road" to "128, Gargeshwari, 13th Cross Road", as on the old site.
-- [ ] **Main phone and WhatsApp**: +91 72040 21508 (The Hub's number). It is the WhatsApp number, the number search engines show, and what Call buttons dial if the centre picker can't open (admin panel → Site settings). The old Wix site's WhatsApp button used +91 72599 21508: check which number parents should reach.
-- [ ] **Timings and batches**: every branch starts with preschool 9:00 am – 12:30 pm and day care 9:00 am – 6:00 pm, which came from public listings, not the old site, and no days. Enter each branch's real batches and days (admin panel → Branches → Timings and batches, or the branch admin under Your branch).
-- [ ] **Founders and founding year** (About page) came from public sources. The old site named no founders, and the company's public records (MCA, via tofler.in) list Manushree and Tanushree Chaturvedi as directors, not Abhishek Jain: confirm the names (admin panel → Site settings → Founders; an empty list hides the section).
+- [ ] **Main phone**: +91 72040 21508 (The Hub's number). It is the number search engines show, and what Call buttons dial if the centre picker can't open (admin panel → Site settings).
 - [ ] **Careers email**: now `career@crossmaze.in` (set in the admin panel). Send it one test email to make sure that mailbox exists in Zoho.
-- [ ] **Main address PIN code** (admin panel → Site settings): the main address is now the Neotown centre, but the PIN code is still Begur's 560068. Set it to 560099; search engines read it.
-- [ ] **Functions and database rules**: run `npx firebase-tools deploy --only firestore,storage,functions` from `main` (step 3 under One-time setup). The ones running today predate 18 October, so the batch a parent picks on a branch page is dropped from the enquiry, and branch admins may not get their access.
-- [ ] **Enquiries reach someone**: the new site sends no email alerts (the Wix form did). Press **Send test** on the admin panel's LITMUS page and make sure someone watches enquiries in LITMUS or the admin panel's Submissions.
-- [ ] **Facility photos** on the home page came from the old www.crossmaze.in. CCTV surveillance, Fire safe, Parents’ communication app and Trained caregivers are stock photos from Wix’s free media library, which may only be licensed for use on Wix sites: replace them with your own (admin panel → Page sections → Facilities). The school’s own facility photos on the old site were small (555 px wide), so larger originals will look sharper, especially when opened full screen.
-- [ ] **Small photos** look soft on large and high-resolution screens. The day care photo is still the old nap-room picture, only 555 px wide, and the "Life at Crossmaze" photos are 450–500 px wide. Upload larger originals (about 1200 px wide or more; admin panel → Site settings → Day care photo and “Life at Crossmaze” photos). The site picks up the larger sizes by itself.
+- [ ] **Functions and database rules**: run `npx firebase-tools deploy --only firestore,storage,functions` from `main` (step 3 under One-time setup). On 26 October the live ones still answered as before 18 October (so the batch a parent picks on a branch page is dropped from the enquiry, and branch admins may not get their access): pull `main` first, then deploy, and check the output says the functions were updated.
+- [ ] **Small photos** look soft on large and high-resolution screens. The day care photo is still the old nap-room picture, only 555 px wide, some "Life at Crossmaze" photos are 450–500 px wide, and so are the school’s own facility photos from the old site (555 px; admin panel → Page sections → Facilities), which also open full screen. Upload larger originals (about 1200 px wide or more; admin panel → Site settings → Day care photo and “Life at Crossmaze” photos). The site picks up the larger sizes by itself.
 - [ ] **Play Group photo description** still says "Colourful indoor play area with rockers and a slide", but the new photo shows children holding paper props. Update it in admin panel → Programs → Play Group → Photo description.
 - [ ] **Home banner badge** "1000+ happy children" repeats the first number in the numbers strip just below it. Give the badge different words, or leave its number empty to hide it (admin panel → Site settings → Top banner).
 - [ ] **Reworded copy** (October 2026): text across the site was rewritten for clarity without changing any facts. The FAQ "How do I apply for admission?" is new.

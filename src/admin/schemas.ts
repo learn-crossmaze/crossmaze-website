@@ -103,7 +103,7 @@ export const siteSchema: Field[] = [
 
   { type: 'heading', label: 'Contact details' },
   { key: 'phone', label: 'Phone number', type: 'tel', required: true },
-  { key: 'whatsapp', label: 'WhatsApp number', type: 'tel', help: 'With country code, e.g. 917204021508. Leave empty to use the phone number.' },
+  { key: 'whatsapp', label: 'WhatsApp number', type: 'tel', help: 'With country code, e.g. 917259921508. Leave empty to use the phone number.' },
   { key: 'admissionsEmail', label: 'Admissions email', type: 'email' },
   { key: 'careEmail', label: 'Parent support email', type: 'email' },
   { key: 'careersEmail', label: 'Careers email', type: 'email' },
