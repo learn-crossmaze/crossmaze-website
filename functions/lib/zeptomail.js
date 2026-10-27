@@ -1,17 +1,29 @@
-// Sends email through ZeptoMail (Zoho's email-sending service), for the website's alerts to admins.
+// Sends email through Zoho CPaaS (Zoho's email-sending service, called ZeptoMail until 2026), for the
+// website's alerts to admins.
 //
 // Settings live in Firestore at private/zeptomail (edited in the admin panel → Email alerts):
 //   { enabled: boolean, url: string, token: string, fromAddress: string, fromName?: string }
-// url is the ZeptoMail API address for the account's data centre (https://api.zeptomail.com/v1.1/email
-// for the US one); token is a Send Mail token from ZeptoMail (Mail Agents → SMTP/API → API), with or
-// without its "Zoho-enczapikey " prefix; fromAddress must be on a domain verified in ZeptoMail.
+// url is the API address for the account's data centre (https://cpaas.zoho.com/v1.1/email for the US
+// one; ZeptoMail's api.zeptomail.* addresses still work); token is the Agent's API key (Agents → SMTP/API
+// → API Setup), with or without its "Zoho-enczapikey " prefix; fromAddress must be on a verified domain.
 
-export const DEFAULT_URL = 'https://api.zeptomail.com/v1.1/email';
+export const DEFAULT_URL = 'https://cpaas.zoho.com/v1.1/email';
 const TIMEOUT_MS = 10000;
+// Its API hosts, one per data centre: cpaas.zoho.* now, api.zeptomail.* from before the rename.
+const API_HOST = /^(cpaas\.zoho|api\.zeptomail)\.(com|in|eu|com\.au|jp|ca|sa|com\.cn)$/;
 
-/** A ZeptoMail API address (one of its data centres), or a local one for tests. */
-export const isZeptoUrl = (url) =>
-  /^(https:\/\/api\.zeptomail\.(com|in|eu|com\.au|jp|ca|sa|com\.cn)\/|http:\/\/(localhost|127\.0\.0\.1)[:/])/.test(url ?? '');
+/** A Zoho CPaaS (or ZeptoMail) API address, or a local one for tests. */
+export function isZeptoUrl(url) {
+  let parsed;
+  try {
+    parsed = new URL(url ?? '');
+  } catch {
+    return false;
+  }
+  if (parsed.username || parsed.password) return false;
+  if (parsed.protocol === 'https:') return API_HOST.test(parsed.hostname);
+  return parsed.protocol === 'http:' && (parsed.hostname === '127.0.0.1' || parsed.hostname === 'localhost');
+}
 
 /**
  * Sends one email.
@@ -22,7 +34,7 @@ export const isZeptoUrl = (url) =>
  */
 export async function sendEmail(config, message, fetchImpl = fetch) {
   if (!config?.enabled || !config.token || !config.fromAddress || !message.to.length) return { status: 'not_configured' };
-  if (!isZeptoUrl(config.url || DEFAULT_URL)) return { status: 'failed', error: 'The ZeptoMail API address is not a ZeptoMail one' };
+  if (!isZeptoUrl(config.url || DEFAULT_URL)) return { status: 'failed', error: 'The API address is not a Zoho CPaaS one' };
 
   const token = config.token.trim();
   const body = {
@@ -45,10 +57,12 @@ export async function sendEmail(config, message, fetchImpl = fetch) {
     });
     if (res.ok) return { status: 'sent', httpStatus: res.status };
     const answer = await res.json().catch(() => ({}));
-    const detail = answer?.error?.details?.[0]?.message || answer?.error?.message;
-    return { status: 'failed', httpStatus: res.status, error: `ZeptoMail answered HTTP ${res.status}${detail ? `: ${detail}` : ''}` };
+    // Errors come as { error: { message, details: [{ message }] } } (as ZeptoMail sent them, still used for
+    // a bad key) or { data: { error_code, message }, message: 'error' } (Zoho CPaaS's documented form).
+    const detail = answer?.error?.details?.[0]?.message || answer?.error?.message || (Array.isArray(answer?.data) ? undefined : answer?.data?.message);
+    return { status: 'failed', httpStatus: res.status, error: `Zoho CPaaS answered HTTP ${res.status}${detail ? `: ${detail}` : ''}` };
   } catch (err) {
     const message = err instanceof Error ? err.message : String(err);
-    return { status: 'failed', error: message.includes('timeout') ? 'ZeptoMail did not answer in time' : message };
+    return { status: 'failed', error: message.includes('timeout') ? 'Zoho CPaaS did not answer in time' : message };
   }
 }

@@ -5,7 +5,7 @@
 //                      visitor straight away. Also records taps on the website's call and WhatsApp
 //                      buttons (body.event "contact") for the admin panel's Calls page.
 //   forwardSubmission  When a submission is saved, sends it to LITMUS. If LITMUS can't take it, the
-//                      full admins get an email with its details (ZeptoMail, private/zeptomail).
+//                      full admins get an email with its details (Zoho CPaaS, private/zeptomail).
 //   resendSubmissions  Admin panel: send selected (or all unsent) submissions to LITMUS again.
 //   testLitmus         Admin panel: send a test payload with the saved LITMUS settings.
 //   testEmailAlert     Admin panel: send a test alert email to the admin who asks.
@@ -287,7 +287,7 @@ export const testLitmus = onCall(async (request) => {
 export const testEmailAlert = onCall(async (request) => {
   const email = await assertAdmin(db, request);
   const config = await emailConfig();
-  if (!config?.token || !config.fromAddress) throw new HttpsError('failed-precondition', 'Save a ZeptoMail token and a From address first.');
+  if (!config?.token || !config.fromAddress) throw new HttpsError('failed-precondition', 'Save an API key and a From address first.');
   return sendEmail({ ...config, enabled: true }, { to: [email], ...testEmail(email) });
 });
 

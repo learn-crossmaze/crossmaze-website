@@ -26,12 +26,22 @@ test('does nothing until it is set up', async () => {
   assert.deepEqual(await sendEmail({ enabled: true, token: 't', fromAddress: 'a@b.c' }, { ...message, to: [] }), { status: 'not_configured' });
 });
 
-test('only sends to ZeptoMail', async () => {
+test('only sends to Zoho CPaaS (or ZeptoMail, its old name)', async () => {
+  assert.equal(isZeptoUrl('https://cpaas.zoho.com/v1.1/email'), true);
+  assert.equal(isZeptoUrl('https://cpaas.zoho.in/v1.1/email'), true);
+  assert.equal(isZeptoUrl('https://cpaas.zoho.com.au/v1.1/email'), true);
   assert.equal(isZeptoUrl('https://api.zeptomail.com/v1.1/email'), true);
   assert.equal(isZeptoUrl('https://api.zeptomail.in/v1.1/email'), true);
+  assert.equal(isZeptoUrl('https://api.zeptomail.com.au/v1.1/email'), true);
   assert.equal(isZeptoUrl('https://evil.example.com/v1.1/email'), false);
   assert.equal(isZeptoUrl('https://api.zeptomail.com.evil.example/x'), false);
-  assert.equal(isZeptoUrl('https://api.zeptomail.com.au/v1.1/email'), true);
+  assert.equal(isZeptoUrl('https://cpaas.zoho.com.evil.example/x'), false);
+  assert.equal(isZeptoUrl('https://zoho.com/v1.1/email'), false);
+  assert.equal(isZeptoUrl('http://cpaas.zoho.com/v1.1/email'), false);
+  assert.equal(isZeptoUrl('https://user@cpaas.zoho.com/v1.1/email'), false);
+  assert.equal(isZeptoUrl('http://localhost:@evil.example/v1.1/email'), false);
+  assert.equal(isZeptoUrl('not a url'), false);
+  assert.equal(isZeptoUrl(undefined), false);
   const result = await sendEmail({ enabled: true, url: 'https://evil.example.com/', token: 't', fromAddress: 'a@b.c' }, message);
   assert.equal(result.status, 'failed');
 });
@@ -57,13 +67,22 @@ test('posts the email with the token', async () => {
   }
 });
 
-test('reports ZeptoMail errors', async () => {
-  const zepto = await fakeZepto(401, { error: { code: 'TM_3201', message: 'Conditions not met', details: [{ message: 'Invalid API Token found' }] } });
+test('reports Zoho CPaaS errors', async () => {
+  // What a bad key gets (checked against cpaas.zoho.com in October 2026).
+  const zepto = await fakeZepto(401, { error: { code: 'TM_4001', details: [{ code: 'SERR_157', message: 'Invalid API Token found' }], message: 'Access Denied' } });
   try {
     const result = await sendEmail({ enabled: true, url: zepto.url, token: 'bad', fromAddress: 'a@b.c' }, message);
-    assert.deepEqual(result, { status: 'failed', httpStatus: 401, error: 'ZeptoMail answered HTTP 401: Invalid API Token found' });
+    assert.deepEqual(result, { status: 'failed', httpStatus: 401, error: 'Zoho CPaaS answered HTTP 401: Invalid API Token found' });
   } finally {
     zepto.server.close();
+  }
+  // Zoho CPaaS's documented error form.
+  const cpaas = await fakeZepto(400, { data: { error_code: 'TM_3004', message: 'Invalid request' }, message: 'error' });
+  try {
+    const result = await sendEmail({ enabled: true, url: cpaas.url, token: 't', fromAddress: 'a@b.c' }, message);
+    assert.deepEqual(result, { status: 'failed', httpStatus: 400, error: 'Zoho CPaaS answered HTTP 400: Invalid request' });
+  } finally {
+    cpaas.server.close();
   }
   const down = await sendEmail({ enabled: true, url: 'http://127.0.0.1:9/v1.1/email', token: 't', fromAddress: 'a@b.c' }, message);
   assert.equal(down.status, 'failed');
