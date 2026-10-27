@@ -1195,11 +1195,15 @@ main > :is(.hero, .page-hero):first-child {
   color: var(--error-fg);
 }
 
-/* While a form sends (src/scripts/forms.ts): a bar above the button that fills as a resume uploads, then
-   sweeps until the school's system has the details, with a line saying what is happening. */
+/* While a form sends (src/scripts/forms.ts): beside the button where there is room (below it on phones), a bar
+   that fills as a resume uploads, then sweeps until the school's system has the details, with a line saying
+   what is happening. */
 .form-progress {
   display: grid;
+  flex: 1 1 12rem;
+  align-self: center;
   gap: 8px;
+  min-width: 0;
 }
 
 .form-progress[hidden] {
@@ -1223,10 +1227,18 @@ main > :is(.hero, .page-hero):first-child {
   transition: width 0.2s ease;
 }
 
-/* Waiting for the answer: a short bar sweeping across (with reduced motion it stays at the start). */
+/* Waiting for the answer: a short bar sweeping across; with reduced motion, a soft full bar instead (a still
+   short one would read as stuck at a third). */
 .form-progress[data-mode='waiting'] .form-progress__bar {
   width: 35%;
   animation: form-progress-sweep 1.4s ease-in-out infinite;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .form-progress[data-mode='waiting'] .form-progress__bar {
+    width: 100%;
+    opacity: 0.5;
+  }
 }
 
 @keyframes form-progress-sweep {
@@ -1243,14 +1255,17 @@ main > :is(.hero, .page-hero):first-child {
   justify-content: space-between;
   gap: 12px;
   margin: 0;
-  font-size: 0.92rem;
+  font-size: 0.86rem;
   font-weight: 600;
   color: var(--muted);
 }
 
-/* The fields can't be changed while their details are on the way. */
-form[aria-busy='true'] :is(input, select, textarea) {
-  pointer-events: none;
+.form-progress__percent {
+  font-variant-numeric: tabular-nums;
+}
+
+/* The fields rest (disabled by the script) while their details are on the way. */
+form[data-sending] :is(input, select, textarea) {
   opacity: 0.6;
 }
 

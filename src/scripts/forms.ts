@@ -9,8 +9,9 @@
 // same JSON body as { name, data } with the contents base64-encoded.
 //
 // Sending can take several seconds (the function waits until LITMUS has the details, and a resume has to
-// upload first), so the button shows a spinner and a bar above it says what is happening: how much of the
-// resume has uploaded, then that the details are on their way.
+// upload first), so the button shows a spinner and a bar beside it says what is happening: how much of the
+// resume has uploaded, then that the details are on their way. The messages are kept short so the bar stays
+// one line high and nothing moves while it changes.
 
 const endpoint = import.meta.env.PUBLIC_FORM_ENDPOINT || '/api/submit';
 
@@ -59,7 +60,7 @@ function checkFile(input: HTMLInputElement) {
   input.setCustomValidity(message);
 }
 
-/** The bar and the line of words above the submit button while the form sends (global.css). */
+/** The bar and the line of words beside the submit button while the form sends (global.css). */
 function progressFor(form: HTMLFormElement) {
   let box = form.querySelector<HTMLElement>('.form-progress');
   if (!box) {
@@ -69,9 +70,7 @@ function progressFor(form: HTMLFormElement) {
     box.innerHTML =
       '<div class="form-progress__track" role="progressbar" aria-label="Sending"><span class="form-progress__bar"></span></div>' +
       '<p class="form-progress__text"><span role="status"></span><span class="form-progress__percent" aria-hidden="true"></span></p>';
-    const buttons = form.querySelector('.btn-row');
-    if (buttons) buttons.before(box);
-    else form.append(box);
+    (form.querySelector('.btn-row') ?? form).append(box);
   }
   const panel = box;
   const track = panel.querySelector<HTMLElement>('.form-progress__track')!;
@@ -177,10 +176,17 @@ for (const form of document.querySelectorAll<HTMLFormElement>('form[data-cm-form
     const lastStatus = form.querySelector<HTMLElement>('.form-status');
     if (lastStatus) lastStatus.hidden = true;
 
-    // Busy until the answer comes: the button spins, the fields rest, and the bar says what is happening.
+    // Busy until the answer comes: the button spins (keeping its width), the fields are locked (the details
+    // are already taken; fields that were disabled anyway, like a hidden batch choice, stay so), and the bar
+    // says what is happening. The busy state is on the button, not the form, so the bar's words are announced.
     sending = true;
-    form.setAttribute('aria-busy', 'true');
+    form.dataset.sending = '';
+    const locked = [...form.querySelectorAll<HTMLInputElement | HTMLSelectElement | HTMLTextAreaElement>('input, select, textarea')].filter(
+      (field) => !field.disabled,
+    );
+    for (const field of locked) field.disabled = true;
     if (button) {
+      button.style.minWidth = `${button.getBoundingClientRect().width}px`;
       button.disabled = true;
       button.setAttribute('aria-busy', 'true');
       button.textContent = 'Sending…';
@@ -190,21 +196,23 @@ for (const form of document.querySelectorAll<HTMLFormElement>('form[data-cm-form
     const waitForAnswer = () => {
       if (answering) return;
       answering = true;
-      progress.waiting(`Sending your ${what} to our team…`);
-      slow = window.setTimeout(() => progress.waiting('Almost there. This can take a few seconds, so please keep this page open.'), 6000);
+      progress.waiting(`Sending your ${what}…`);
+      slow = window.setTimeout(() => progress.waiting('Almost there, please wait…'), 6000);
     };
     const done = () => {
       window.clearTimeout(slow);
       progress.hide();
       sending = false;
-      form.removeAttribute('aria-busy');
+      delete form.dataset.sending;
+      for (const field of locked) field.disabled = false;
       if (button) {
         button.disabled = false;
         button.removeAttribute('aria-busy');
         button.textContent = buttonText;
+        button.style.minWidth = '';
       }
     };
-    if (attached.length) progress.uploading('Uploading your resume…', 0);
+    if (attached.length) progress.uploading('Uploading resume…', 0);
     else waitForAnswer();
 
     try {
@@ -221,7 +229,7 @@ for (const form of document.querySelectorAll<HTMLFormElement>('form[data-cm-form
     try {
       const { ok, status, result } = await post(JSON.stringify(payload), (fraction) => {
         if (!attached.length || answering) return;
-        if (fraction < 1) progress.uploading('Uploading your resume…', fraction);
+        if (fraction < 1) progress.uploading('Uploading resume…', fraction);
         else waitForAnswer();
       });
       done();
