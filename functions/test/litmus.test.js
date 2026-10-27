@@ -10,14 +10,14 @@ const payload = buildPayload('abc123', {
   createdAt: new Date('2026-10-07T10:00:00Z'),
 });
 
-function fakeLitmus(status) {
+function fakeLitmus(status, delayMs = 0) {
   const received = [];
   const server = createServer((req, res) => {
     let body = '';
     req.on('data', (c) => (body += c));
     req.on('end', () => {
       received.push({ headers: req.headers, body: JSON.parse(body) });
-      res.writeHead(status, { 'Content-Type': 'application/json' }).end('{"received":true}');
+      setTimeout(() => res.writeHead(status, { 'Content-Type': 'application/json' }).end('{"received":true}'), delayMs);
     });
   });
   return new Promise((resolve) => server.listen(0, '127.0.0.1', () => resolve({ server, received, url: `http://127.0.0.1:${server.address().port}/intake` })));
@@ -55,6 +55,17 @@ test('reports failures from LITMUS', async () => {
   server.close();
   assert.equal(r.status, 'failed');
   assert.equal(r.httpStatus, 500);
+});
+
+test('waits as long as it is told to', async () => {
+  const { server, url } = await fakeLitmus(200, 300);
+  try {
+    assert.deepEqual(await sendToLitmus({ enabled: true, url }, payload, fetch, 100), { status: 'failed', error: 'LITMUS did not answer in time' });
+    assert.equal((await sendToLitmus({ enabled: true, url }, payload, fetch, 2000)).status, 'sent');
+  } finally {
+    server.closeAllConnections();
+    server.close();
+  }
 });
 
 test('reports unreachable LITMUS', async () => {

@@ -1155,9 +1155,25 @@ a.item-main:hover strong {
   align-items: start;
 }
 
+/* Cards may shrink below their longest line (a code sample scrolls, a long email wraps) instead of widening the page. */
+.detail-grid > * {
+  min-width: 0;
+}
+
 @media (max-width: 900px) {
   .detail-grid {
     grid-template-columns: 1fr;
+  }
+}
+
+.recipients {
+  overflow-wrap: anywhere;
+}
+
+/* LITMUS: the sample for the LITMUS team takes the width it needs where there's room (the settings keep 320px). */
+@media (min-width: 901px) {
+  .detail-grid--sample {
+    grid-template-columns: minmax(320px, 1fr) minmax(0, max-content);
   }
 }
 

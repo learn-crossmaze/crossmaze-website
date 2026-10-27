@@ -36,7 +36,8 @@ X-Crossmaze-Submission-Id: 9fQx2kL…          (same id on every retry)
 Job applications send: name, phone, email, position, branch,
 experience, qualification, resume_link, about.
 Reply with any 2xx status to confirm. Anything else is retried every
-30 minutes (up to 6 times) and shown as "LITMUS failed" in Submissions.`;
+30 minutes (up to 6 times), shown as "LITMUS failed" in Submissions,
+and emailed to the admins (admin panel → Email alerts).`;
 
 export function LitmusPage() {
   const { services } = useSession();
@@ -90,7 +91,7 @@ export function LitmusPage() {
     <>
       <PageHeader
         title="LITMUS"
-        intro="Every admission enquiry and job application from the website is saved in Submissions and also sent to LITMUS using these settings."
+        intro="Every admission enquiry and job application from the website is saved in Submissions and then sent to LITMUS using these settings. If LITMUS can’t take one, the admins get an email (Email alerts)."
         actions={
           <>
             <button className="btn btn-light" onClick={runTest} disabled={busy !== null || dirty || !saved.url}>
@@ -102,7 +103,7 @@ export function LitmusPage() {
           </>
         }
       />
-      <div className="detail-grid">
+      <div className="detail-grid detail-grid--sample">
         <div className="card">
           <label className="check">
             <input type="checkbox" checked={draft.enabled} onChange={(e) => setDraft({ ...draft, enabled: e.target.checked })} />

@@ -32,6 +32,9 @@ forms                     3600  IN  CNAME  forms.cs.zohohost.com.
 ; Email policy: no enforcement, as Wix's record had (that one also sent reports to Wix's supplier)
 _dmarc                    3600  IN  TXT    "v=DMARC1; p=none;"
 
+; Google Search Console: proves the domain is the school's (Domain property, added 27 October 2026). Keep it.
+@                         3600  IN  TXT    "google-site-verification=eLgEnaAvTmy-PG4ujUPwGDQBXLsy_9uRn-oo1E6ToIQ"
+
 ; LITMUS
 litmus                    3600  IN  CNAME  litmus-prod-crossmaze.web.app.
 staging                   3600  IN  CNAME  litmus-staging-37942.web.app.
