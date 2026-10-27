@@ -34,6 +34,18 @@ export const shortName = (branch: Branch) => branch.name.replace(/^Crossmaze\s*[
 export const telHref = (phone: string) => `tel:${phone.replace(/[^\d+]/g, '')}`;
 
 /**
+ * The centre's WhatsApp number as WhatsApp links want it (country code and digits, "917338045201"): its
+ * WhatsApp number, else its phone number, with India's 91 added to a 10-digit number. Empty when it has neither.
+ */
+export function whatsappNumber(branch: Branch) {
+  const digits = (branch.whatsapp?.trim() || branch.phone || '').replace(/\D/g, '');
+  return digits.length === 10 ? `91${digits}` : digits;
+}
+
+/** A chat with the centre on WhatsApp; empty when it has no number. */
+export const whatsappHref = (branch: Branch) => (whatsappNumber(branch) ? `https://wa.me/${whatsappNumber(branch)}` : '');
+
+/**
  * Where the centre is, as its page names it for search: its area (or its short name when the area is empty),
  * with ", Electronic City" added when the address is in Electronic City but the area doesn't say so
  * ("Neeladri Nagar, Electronic City"). Its parts are always separated by ", ".

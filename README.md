@@ -33,8 +33,8 @@ Go to **www.crossmaze.in/admin** and sign in (until the domain moves, step 6 bel
 
 | Section | What you can change |
 | --- | --- |
-| Site settings | Logo, school name, phone, WhatsApp, emails, address, social links, colour theme, home-page banner, numbers strip, about paragraphs (each with an optional subheading), quote, photos, founders (see below) |
-| Branches | Add, hide, reorder or delete branches; name, area, short introduction (also shown on the Branches page), **Title in Google** (see [Search](#search-seo)), address, map, phone, size, capacity, amenities, programs offered, timings and batches (see below), photos (first = cover; the page shows six, and all of them open in a swipeable album), centre head with photo and bio |
+| Site settings | Logo, school name, phone, emails, address, social links, colour theme, home-page banner, numbers strip, about paragraphs (each with an optional subheading), quote, photos, founders (see below) |
+| Branches | Add, hide, reorder or delete branches; name, area, short introduction (also shown on the Branches page), **Title in Google** (see [Search](#search-seo)), address, map, phone, **WhatsApp number** (empty: the phone; see below), size, capacity, amenities, programs offered, timings and batches (see below), photos (first = cover; the page shows six, and all of them open in a swipeable album), centre head with photo and bio |
 | Programs | Add, hide, reorder; name, **Also called** (another name parents know it by, shown in brackets after the name on Our Programs and the program cards: “Junior KG (LKG)”; empty for none), age group, who can join (e.g. “2 years or older on 1 June”), icon, colour, photo, description, focus list (timings are set per branch) |
 | Jobs | Open positions on the careers page |
 | Testimonials | Parent quotes on the home page |
@@ -86,11 +86,15 @@ Add one on **Admins → Branch admins**: their email and the branches they look 
 
 Branch admins need the database rules and functions from step 3 below (`npx firebase-tools deploy --only firestore,storage,functions`). Until those are deployed, a branch admin who signs in sees “No access yet”.
 
+### WhatsApp
+
+There is no school-wide WhatsApp number: each centre has its own (**Branches → WhatsApp number**, with the country code, e.g. 917338045201; empty uses the centre's phone number). The WhatsApp buttons on the home page, Contact and the round green button in the corner open a list of the centres, like the call buttons do, so parents pick theirs. On a centre's own page the green button opens a chat with that centre straight away.
+
 ### Calls
 
 A website can't see who phoned or whether the call got through: tapping a call button just hands the number to the phone's dialler. What the **Calls** page shows is every tap on a call or WhatsApp button, with:
 
-- the centre whose number was tapped, and where (the page, and the spot on it, such as a branch card or the “Call a centre” pop-up);
+- the centre whose number was tapped, and where (the page, and the spot on it, such as a branch card or the “Call a centre” or “WhatsApp a centre” pop-up);
 - the kind of device (phone, tablet or computer);
 - how the visit started: a search (google.com), a social site, an ad (`utm_` tags or Google Ads), or “Direct”.
 
@@ -339,14 +343,17 @@ On 26 October 2026 the school also confirmed:
 
 - **Timings and batches** on the branch pages are correct.
 - **Facility photos**: the four stock photos (CCTV surveillance, Fire safe, Parents’ communication app, Trained caregivers) are licensed; the school bought them.
-- **WhatsApp**: +91 72599 21508, the number on the old site's WhatsApp button.
 - **Enquiries** go to LITMUS, which sends the email alerts.
 - **Feedback** from parents goes through the LITMUS parents portal; the old Wix feedback addresses redirect there.
 - **Founders** are not shown on the website for now. They can be filled in later (admin panel → Site settings → About page: each founder's name, role, photo and a few lines), then switched on with **Show the founders on the About page** and published.
 
 Later on 26 October 2026 the school confirmed:
 
-- **Main phone and WhatsApp**: +91 72599 21508 for both (admin panel → Site settings). It is the number search engines show for the school, and what Call buttons dial if the centre picker can't open. Each centre keeps its own number.
+- **Main phone**: +91 72599 21508 (admin panel → Site settings). It is the number search engines show for the school, and what Call buttons dial if the centre picker can't open. Each centre keeps its own number.
+
+On 27 October 2026 the school asked for:
+
+- **WhatsApp per centre**: no common WhatsApp number (+91 72599 21508 is no longer used for WhatsApp). The WhatsApp buttons ask which centre, and a centre's own page goes straight to that centre (see [WhatsApp](#whatsapp)).
 - **Main address**: the Neotown centre, in the **Kusumkunj** building: Kusumkunj, Site No 3/4, opposite G.M. Infinite, Thirupalya, Neotown, PIN 560099 (Site settings → Main address). Neotown's own address names the building too.
 - **Neotown** is in **Electronic City**, near Thirupalya, in the **Kusumkunj** building (Site No. 3/4, opposite G.M. Infinite, Phase 1, as on the old site).
 - **LKG and UKG**: Junior KG is also called LKG, and Senior KG UKG (admin panel → Programs → Also called). The programs keep their names, which the batches refer to.
@@ -354,6 +361,7 @@ Later on 26 October 2026 the school confirmed:
 ## Please verify before launch
 
 - [ ] **Branch phone numbers, addresses and map pins** come from the branch records behind the old www.crossmaze.in: The Hub +91 72040 21508, Neotown +91 73380 45201, SNN Greenbay +91 72595 10758, Neeladri Nagar +91 97409 21508 and Ananth Nagar +91 87225 70895. Call each number once to check it reaches the right centre. Neeladri Nagar's address changed from "Malligue Residency, 16th Cross Road" to "128, Gargeshwari, 13th Cross Road", as on the old site.
+- [ ] **WhatsApp at each centre**: until a centre has its own **WhatsApp number** (admin panel → Branches), its WhatsApp button uses the centre's phone number. Check that each of the five numbers above is on WhatsApp (or WhatsApp Business), or enter the right one.
 - [ ] **Careers email**: now `career@crossmaze.in` (set in the admin panel). Send it one test email to make sure that mailbox exists in Zoho.
 - [ ] **Small photos** look soft on large and high-resolution screens. The day care photo is still the old nap-room picture, only 555 px wide, some "Life at Crossmaze" photos are 450–500 px wide, and so are the school’s own facility photos from the old site (555 px; admin panel → Page sections → Facilities), which also open full screen. Upload larger originals (about 1200 px wide or more; admin panel → Site settings → Day care photo and “Life at Crossmaze” photos). The site picks up the larger sizes by itself.
 - [ ] **Play Group photo description** still says "Colourful indoor play area with rockers and a slide", but the new photo shows children holding paper props. Update it in admin panel → Programs → Play Group → Photo description.

@@ -10,7 +10,6 @@ export const site = {
   // website leaves the founders out entirely, including the Organization search engines read (BaseLayout).
   founders: siteContent.showFounders ? siteContent.founders : [],
   phoneHref: `tel:+${digits(siteContent.phone)}`,
-  whatsappHref: `https://wa.me/${digits(siteContent.whatsapp || siteContent.phone)}`,
 };
 
 /** The school in structured data (BaseLayout): each centre, the website and the blog point at it by this id. */

@@ -39,7 +39,6 @@ export interface SiteContent {
   url: string;
   logo: string;
   phone: string;
-  whatsapp: string;
   admissionsEmail: string;
   careEmail: string;
   careersEmail: string;
@@ -121,6 +120,8 @@ export interface BranchContent {
   pincode: string;
   mapQuery: string;
   phone: string;
+  /** The centre's WhatsApp number with country code; empty to use its phone number. */
+  whatsapp?: string;
   email: string;
   centerHead?: { name: string; bio: string[]; photo?: string };
   carpetArea?: string;

@@ -8,7 +8,7 @@ import Footer from '../components/Footer.astro';
 import CallPicker from '../components/CallPicker.astro';
 import Icon from '../components/Icon.astro';
 import { site, orgId } from '../data/site';
-import { branches, branchId, branchUrl, shortName } from '../data/branches';
+import { branches, branchId, branchUrl, shortName, whatsappNumber } from '../data/branches';
 import { hasImage, image } from '../data/content';
 import { cleanPath, jsonScript } from '../utils';
 import { doodleCss } from '../components/doodles';
@@ -27,17 +27,19 @@ interface Props {
   type?: 'website' | 'article';
   /** Keeps the page out of search results (blog draft previews). */
   noindex?: boolean;
+  /** A branch page's own WhatsApp chat: its WhatsApp button opens it straight away instead of the list of centres. */
+  whatsappHref?: string;
 }
 
-const { title, fullTitle, description = site.description, jsonLd, image: shareImage, type = 'website', noindex = false } = Astro.props;
+const { title, fullTitle, description = site.description, jsonLd, image: shareImage, type = 'website', noindex = false, whatsappHref } = Astro.props;
 
 // Which centre each phone number on the site belongs to (last 10 digits), so the call log
 // (scripts/call-log.ts) can say which centre a visitor tried to call.
 const last10 = (phone: string) => phone.replace(/\D/g, '').slice(-10);
 const callNumbers = Object.fromEntries([
   [last10(site.phone), 'Main number'],
-  ...(site.whatsapp ? [[last10(site.whatsapp), 'Main number']] : []),
   ...branches.filter((b) => b.phone).map((b) => [last10(b.phone), shortName(b)]),
+  ...branches.filter((b) => whatsappNumber(b)).map((b) => [last10(whatsappNumber(b)), shortName(b)]),
 ]);
 // The short name as the suffix, so the words that say what the page is about have the room.
 const pageTitle = fullTitle?.trim() || (title ? `${title} | ${site.name}` : site.fullName);
@@ -254,10 +256,20 @@ const themeConfig = {
     </main>
     <Footer />
     <CallPicker />
+    <CallPicker channel="whatsapp" />
 
-    <a class="whatsapp-fab" href={site.whatsappHref} target="_blank" rel="noopener" aria-label="Chat with us on WhatsApp">
-      <Icon name="MessageCircle" size={26} />
-    </a>
+    {/* On a branch page, a chat with that centre; elsewhere the list of centres (CallPicker.astro). */}
+    {
+      whatsappHref ? (
+        <a class="whatsapp-fab" href={whatsappHref} target="_blank" rel="noopener" aria-label="Chat with this centre on WhatsApp">
+          <Icon name="MessageCircle" size={26} />
+        </a>
+      ) : (
+        <a class="whatsapp-fab" href="/branch" data-whatsapp-picker aria-label="Chat with your nearest centre on WhatsApp">
+          <Icon name="MessageCircle" size={26} />
+        </a>
+      )
+    }
 
     <script type="application/json" id="cm-call-numbers" set:html={jsonScript(callNumbers)} />
     <script>

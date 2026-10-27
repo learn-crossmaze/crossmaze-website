@@ -18,6 +18,7 @@ import {
   headPhoto,
   shortName as toShortName,
   telHref,
+  whatsappHref,
   type Branch,
 } from '../../data/branches';
 import TimeRange from '../../components/TimeRange.astro';
@@ -225,7 +226,13 @@ const jsonLd = {
 };
 ---
 
-<BaseLayout fullTitle={pageTitle} description={pageDescription} image={cover} jsonLd={[jsonLd, breadcrumbList(crumbs, site.url)]}>
+<BaseLayout
+  fullTitle={pageTitle}
+  description={pageDescription}
+  image={cover}
+  jsonLd={[jsonLd, breadcrumbList(crumbs, site.url)]}
+  whatsappHref={whatsappHref(branch)}
+>
   <section class="page-hero branch-hero">
     <FloatingShapes />
     <div class:list={['container', 'branch-hero__inner', { 'branch-hero__inner--text': !cover }]}>
