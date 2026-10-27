@@ -46,10 +46,12 @@ const titleId = `${channel}-picker-title`;
       {
         items.map(({ branch: b, href, number }, i) => (
           <li data-slug={b.slug}>
+            {/* data-branch tells the call log (scripts/call-log.ts) which centre was chosen; a centre without a
+                phone of its own is offered the main number, which the log keeps as "Main number". */}
             <a
               class:list={['call-picker__branch', `tone-${tones[i % tones.length]}`]}
               href={href}
-              data-branch={shortName(b)}
+              data-branch={whatsapp || b.phone ? shortName(b) : undefined}
               {...(whatsapp ? { target: '_blank', rel: 'noopener' } : {})}
             >
               <span class="icon-badge">
