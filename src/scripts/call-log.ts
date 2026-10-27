@@ -79,7 +79,8 @@ function send(data: Record<string, string>) {
   fetch(endpoint, { method: 'POST', body, keepalive: true }).catch(() => {});
 }
 
-// Where the "Call a centre" pop-up was opened from, so a call made from it says so.
+// Where the "Call a centre" or "WhatsApp a centre" pop-up was opened from, so a call or chat started
+// from it says so.
 let pickerFrom = '';
 
 // On window, so it runs after the pop-up's own handler: a click that only opens the pop-up has
@@ -87,7 +88,7 @@ let pickerFrom = '';
 window.addEventListener('click', (event) => {
   const link = (event.target as Element | null)?.closest?.('a[href]');
   if (!(link instanceof HTMLAnchorElement)) return;
-  if (link.matches('[data-call-picker]')) pickerFrom = placeOf(link);
+  if (link.matches('[data-call-picker], [data-whatsapp-picker]')) pickerFrom = placeOf(link);
   if (event.defaultPrevented) return;
 
   const href = link.getAttribute('href') ?? '';
@@ -96,14 +97,15 @@ window.addEventListener('click', (event) => {
   const number = href.replace(/\?.*$/, '').replace(/\D/g, '');
   // A "share on WhatsApp" link (wa.me/?text=…) has no number: it isn't someone contacting a centre.
   if (!number) return;
-  const inPicker = Boolean(link.closest('.call-picker'));
+  const picker = link.closest('.call-picker');
+  const pickerName = picker?.id === 'whatsapp-picker' ? '“WhatsApp a centre” pop-up' : '“Call a centre” pop-up';
 
   send({
     channel,
     number,
     branch: numbers[number.slice(-10)] ?? '',
     page: location.pathname,
-    place: inPicker ? `“Call a centre” pop-up${pickerFrom ? ` (opened from ${pickerFrom})` : ''}` : placeOf(link),
+    place: picker ? `${pickerName}${pickerFrom ? ` (opened from ${pickerFrom})` : ''}` : placeOf(link),
     source: visit.source,
     visit: visit.id,
     device: device(),

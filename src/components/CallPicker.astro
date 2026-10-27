@@ -1,106 +1,136 @@
 ---
-// "Which centre should we call?" Every general call button (marked data-call-picker) opens this
-// list of branches instead of dialling one number, so parents reach their nearest centre.
-// On a branch page that branch is listed first; otherwise the centre the visitor called last is.
-// Without JavaScript the buttons fall back to their own tel: link.
+// "Which centre?" Every general call button (marked data-call-picker) and WhatsApp button (marked
+// data-whatsapp-picker) opens a list of branches instead of using one number, so parents reach their
+// nearest centre; BaseLayout has one of each. On a branch page that branch is listed first; otherwise
+// the centre the visitor called or messaged last is. Without JavaScript the buttons fall back to their
+// own link: the main number for calls, the Branches page for WhatsApp.
 import Icon from './Icon.astro';
 import { site } from '../data/site';
-import { branches, shortName, telHref } from '../data/branches';
+import { branches, shortName, telHref, whatsappHref } from '../data/branches';
 
+interface Props {
+  channel?: 'phone' | 'whatsapp';
+}
+
+const { channel = 'phone' } = Astro.props;
+const whatsapp = channel === 'whatsapp';
 const tones = ['navy', 'green', 'coral', 'sky', 'sun'];
+// Each centre with the link and number this list offers; a centre with no WhatsApp number isn't offered.
+const items = branches
+  .map((b) => {
+    const phone = b.phone || site.phone;
+    return whatsapp
+      ? { branch: b, href: whatsappHref(b), number: b.whatsapp?.trim() || b.phone }
+      : { branch: b, href: telHref(phone), number: phone };
+  })
+  .filter((item) => item.href);
+const titleId = `${channel}-picker-title`;
 ---
 
-<dialog class="call-picker" id="call-picker" aria-labelledby="call-picker-title">
+<dialog
+  class:list={['call-picker', { 'call-picker--whatsapp': whatsapp }]}
+  id={whatsapp ? 'whatsapp-picker' : 'call-picker'}
+  data-picker={channel}
+  aria-labelledby={titleId}
+>
   <div class="call-picker__panel">
-    <button type="button" class="call-picker__close" data-call-picker-close aria-label="Close">
+    <button type="button" class="call-picker__close" data-picker-close aria-label="Close">
       <Icon name="X" size={22} />
     </button>
-    <span class="call-picker__icon"><Icon name="Phone" size={26} /></span>
-    <h2 id="call-picker-title">Call your nearest Crossmaze</h2>
-    <p class="muted">Choose the centre closest to you and we’ll connect you straight to them.</p>
+    <span class="call-picker__icon"><Icon name={whatsapp ? 'MessageCircle' : 'Phone'} size={26} /></span>
+    <h2 id={titleId}>{whatsapp ? 'WhatsApp your nearest Crossmaze' : 'Call your nearest Crossmaze'}</h2>
+    <p class="muted">
+      {whatsapp ? 'Choose the centre closest to you and we’ll open a chat with them on WhatsApp.' : 'Choose the centre closest to you and we’ll connect you straight to them.'}
+    </p>
     <ul class="call-picker__list">
       {
-        branches.map((b, i) => {
-          const phone = b.phone || site.phone;
-          return (
-            <li data-slug={b.slug}>
-              <a class:list={['call-picker__branch', `tone-${tones[i % tones.length]}`]} href={telHref(phone)}>
-                <span class="icon-badge">
-                  <Icon name="MapPin" size={22} />
+        items.map(({ branch: b, href, number }, i) => (
+          <li data-slug={b.slug}>
+            <a
+              class:list={['call-picker__branch', `tone-${tones[i % tones.length]}`]}
+              href={href}
+              {...(whatsapp ? { target: '_blank', rel: 'noopener' } : {})}
+            >
+              <span class="icon-badge">
+                <Icon name="MapPin" size={22} />
+              </span>
+              <span class="call-picker__name">
+                <strong>
+                  {shortName(b)} <span class="call-picker__tag" hidden />
+                </strong>
+                <span class="muted">
+                  {b.area}
+                  {b.pincode && ` · ${b.pincode}`}
                 </span>
-                <span class="call-picker__name">
-                  <strong>
-                    {shortName(b)} <span class="call-picker__tag" hidden />
-                  </strong>
-                  <span class="muted">
-                    {b.area}
-                    {b.pincode && ` · ${b.pincode}`}
-                  </span>
-                </span>
-                <span class="call-picker__phone">
-                  <Icon name="Phone" size={18} />
-                  <span>{phone}</span>
-                </span>
-              </a>
-            </li>
-          );
-        })
+              </span>
+              <span class="call-picker__phone">
+                <Icon name={whatsapp ? 'MessageCircle' : 'Phone'} size={18} />
+                <span>{number}</span>
+              </span>
+            </a>
+          </li>
+        ))
       }
     </ul>
   </div>
 </dialog>
 
 <script>
-  const dialog = document.querySelector<HTMLDialogElement>('#call-picker');
-  const KEY = 'crossmaze-call-branch';
+  // One script for both lists (Astro runs a component's script once however many times it's used).
+  const pickers = [...document.querySelectorAll<HTMLDialogElement>('dialog[data-picker]')];
+  const settings = {
+    phone: { trigger: '[data-call-picker]', key: 'crossmaze-call-branch', before: 'Called before' },
+    whatsapp: { trigger: '[data-whatsapp-picker]', key: 'crossmaze-whatsapp-branch', before: 'Messaged before' },
+  };
 
-  const remembered = () => {
+  const remembered = (key: string) => {
     try {
-      return localStorage.getItem(KEY);
+      return localStorage.getItem(key);
     } catch {
       return null;
     }
   };
 
-  /** Lists the most likely centre first: the branch page being viewed, else the last one called. */
-  function putPreferredFirst() {
-    if (!dialog) return;
+  /** Lists the most likely centre first: the branch page being viewed, else the last one chosen. */
+  function putPreferredFirst(dialog: HTMLDialogElement, key: string, before: string) {
     const list = dialog.querySelector('.call-picker__list');
     const onPage = location.pathname.match(/^\/branch\/([^/]+)/)?.[1];
-    const slug = onPage ?? remembered();
+    const slug = onPage ?? remembered(key);
     dialog.querySelectorAll<HTMLElement>('.call-picker__tag').forEach((tag) => (tag.hidden = true));
     const item = slug ? dialog.querySelector<HTMLElement>(`li[data-slug="${CSS.escape(slug)}"]`) : null;
     if (!list || !item) return;
     list.prepend(item);
     const tag = item.querySelector<HTMLElement>('.call-picker__tag');
     if (tag) {
-      tag.textContent = onPage ? 'This centre' : 'Called before';
+      tag.textContent = onPage ? 'This centre' : before;
       tag.hidden = false;
     }
   }
 
-  if (dialog && typeof dialog.showModal === 'function') {
+  for (const dialog of pickers) {
+    if (typeof dialog.showModal !== 'function') continue;
+    const { trigger, key, before } = settings[dialog.dataset.picker === 'whatsapp' ? 'whatsapp' : 'phone'];
+
     document.addEventListener('click', (event) => {
-      const trigger = (event.target as Element).closest('[data-call-picker]');
-      if (!trigger) return;
+      if (!(event.target as Element).closest(trigger)) return;
       event.preventDefault();
-      putPreferredFirst();
+      putPreferredFirst(dialog, key, before);
       dialog.showModal();
     });
 
     dialog.addEventListener('click', (event) => {
       const target = event.target as Element;
       // A click on the dimmed backdrop lands on the <dialog> itself.
-      if (target === dialog || target.closest('[data-call-picker-close]')) {
+      if (target === dialog || target.closest('[data-picker-close]')) {
         dialog.close();
         return;
       }
       const branch = target.closest<HTMLAnchorElement>('.call-picker__branch');
       if (branch) {
         try {
-          localStorage.setItem(KEY, branch.closest('li')?.dataset.slug ?? '');
+          localStorage.setItem(key, branch.closest('li')?.dataset.slug ?? '');
         } catch {
-          // Private browsing: nothing to remember, the call still goes through.
+          // Private browsing: nothing to remember, the call or chat still goes ahead.
         }
         setTimeout(() => dialog.close(), 300);
       }
@@ -179,6 +209,12 @@ const tones = ['navy', 'green', 'coral', 'sky', 'sun'];
     background: var(--g-navy);
     color: #fff;
     box-shadow: 0 12px 24px -12px color-mix(in srgb, var(--navy) 70%, transparent);
+  }
+
+  /* The WhatsApp list's badge in WhatsApp's green, like the WhatsApp button. */
+  .call-picker--whatsapp .call-picker__icon {
+    background: var(--g-whatsapp);
+    box-shadow: 0 12px 24px -12px rgb(37 211 102 / 70%);
   }
 
   .call-picker h2 {

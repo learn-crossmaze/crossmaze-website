@@ -105,7 +105,6 @@ export const siteSchema: Field[] = [
 
   { type: 'heading', label: 'Contact details' },
   { key: 'phone', label: 'Phone number', type: 'tel', required: true },
-  { key: 'whatsapp', label: 'WhatsApp number', type: 'tel', help: 'With country code, e.g. 917259921508. Leave empty to use the phone number.' },
   { key: 'admissionsEmail', label: 'Admissions email', type: 'email' },
   { key: 'careEmail', label: 'Parent support email', type: 'email' },
   { key: 'careersEmail', label: 'Careers email', type: 'email' },
@@ -365,6 +364,12 @@ export const branchSchema: Field[] = [
   { key: 'pincode', label: 'PIN code', type: 'text' },
   { key: 'mapQuery', label: 'Google Maps search', type: 'text', help: 'Where the map points: the centre’s coordinates (latitude,longitude, e.g. 12.8598,77.6131) or what to search on Google Maps.' },
   { key: 'phone', label: 'Phone', type: 'tel' },
+  {
+    key: 'whatsapp',
+    label: 'WhatsApp number',
+    type: 'tel',
+    help: 'With country code, e.g. 917338045201. The website’s WhatsApp buttons open a chat with this number. Leave it empty to use the phone number above.',
+  },
   { key: 'email', label: 'Email', type: 'email' },
 
   { type: 'heading', label: 'Facts and facilities' },
@@ -568,6 +573,7 @@ export const collections: Record<CollectionConfig['name'], CollectionConfig> = {
       pincode: '',
       mapQuery: '',
       phone: '',
+      whatsapp: '',
       email: '',
       amenities: Object.keys(amenityList).filter((k) => k !== 'outdoorPlay' && k !== 'transport'),
       programs: [],
