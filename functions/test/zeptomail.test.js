@@ -78,7 +78,7 @@ test('the LITMUS failure email has the details', () => {
     error: 'LITMUS answered HTTP 503',
   });
   assert.equal(email.subject, 'Admission enquiry not sent to LITMUS: Priya <Sharma> (Neotown)');
-  assert.match(email.text, /couldn't be sent to LITMUS \(LITMUS answered HTTP 503\)/);
+  assert.match(email.text, /^An admission enquiry from the website couldn't be sent to LITMUS \(LITMUS answered HTTP 503\)/);
   assert.match(email.text, /Parent name: Priya <Sharma>\nPhone: 98765 43210\nChild name: Anya\nBranch: Crossmaze – Neotown\nMessage: Line 1\nLine 2/);
   assert.match(email.text, /Admin panel: https:\/\/www\.crossmaze\.in\/admin#\/submissions/);
   assert.match(email.html, /Priya &lt;Sharma&gt;/);
@@ -87,7 +87,9 @@ test('the LITMUS failure email has the details', () => {
 
   const job = litmusFailureEmail({ id: 'x', type: 'job_application', data: { name: 'Asha', resume_link: 'https://files/x', resume_file: 'cv.pdf' } });
   assert.equal(job.subject, 'Job application not sent to LITMUS: Asha');
-  assert.match(job.text, /Resume link: https:\/\/files\/x\nresume file: cv\.pdf/);
+  assert.match(job.text, /^A job application from the website/);
+  assert.match(job.text, /Resume link: https:\/\/files\/x\nPage: \//);
+  assert.doesNotMatch(job.text, /cv\.pdf/);
 
   assert.match(testEmail('me@crossmaze.in').text, /sent to me@crossmaze\.in/);
 });

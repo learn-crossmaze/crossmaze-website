@@ -1155,10 +1155,19 @@ a.item-main:hover strong {
   align-items: start;
 }
 
+/* Cards may shrink below their longest line (a code sample scrolls, a long email wraps) instead of widening the page. */
+.detail-grid > * {
+  min-width: 0;
+}
+
 @media (max-width: 900px) {
   .detail-grid {
     grid-template-columns: 1fr;
   }
+}
+
+.recipients {
+  overflow-wrap: anywhere;
 }
 
 .details {

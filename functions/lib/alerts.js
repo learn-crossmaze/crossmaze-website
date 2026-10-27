@@ -20,11 +20,15 @@ export function litmusFailureEmail(submission) {
   const where = data.branch ? ` (${data.branch.replace(/^Crossmaze\s*[–-]\s*/, '')})` : '';
   // The form's fields in its own order, with their labels; anything else after them.
   const labels = form?.fields ?? {};
-  const keys = [...Object.keys(labels).filter((k) => data[k]), ...Object.keys(data).filter((k) => !(k in labels) && data[k])];
+  // (The resume's file name is left out: its link is there.)
+  const keys = [
+    ...Object.keys(labels).filter((k) => data[k]),
+    ...Object.keys(data).filter((k) => !(k in labels) && !k.endsWith('_file') && data[k]),
+  ];
   const rows = keys.map((k) => [labels[k]?.label ?? k.replace(/_/g, ' '), data[k]]);
 
   const subject = `${kind} not sent to LITMUS: ${who}${where}`;
-  const intro = `A ${kind.toLowerCase()} from the website couldn't be sent to LITMUS${submission.error ? ` (${submission.error})` : ''}. It is saved in the admin panel, and the website tries again every 30 minutes, so please follow it up from these details meanwhile.`;
+  const intro = `${/^[aeiou]/i.test(kind) ? 'An' : 'A'} ${kind.toLowerCase()} from the website couldn't be sent to LITMUS${submission.error ? ` (${submission.error})` : ''}. It is saved in the admin panel, and the website tries again every 30 minutes, so please follow it up from these details meanwhile.`;
   const text = [
     intro,
     '',

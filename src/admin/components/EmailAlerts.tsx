@@ -52,7 +52,10 @@ export function EmailAlertsPage() {
     }
     setBusy('save');
     try {
-      await setDoc(doc(services.db, 'private/zeptomail'), { ...draft, token: draft.token.trim() });
+      // Saved as trimmed, and the form shows what was saved (else it stays "unsaved").
+      const next = { ...draft, token: draft.token.trim() };
+      await setDoc(doc(services.db, 'private/zeptomail'), next);
+      setDraft(next);
       toast('ok', draft.enabled ? 'Saved. Admins will get an email if a submission can’t be sent to LITMUS.' : 'Saved. Email alerts are switched off.');
     } catch (e) {
       toast('error', errorText(e));
@@ -150,7 +153,7 @@ export function EmailAlertsPage() {
           {admins === undefined ? (
             <Spinner />
           ) : admins.length ? (
-            <ul>
+            <ul className="recipients">
               {admins.map((a) => (
                 <li key={a}>{a}</li>
               ))}

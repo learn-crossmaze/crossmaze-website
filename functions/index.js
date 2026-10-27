@@ -45,6 +45,8 @@ const githubRef = defineString('GITHUB_REF', { default: 'main' });
 const RATE_LIMIT = { max: 8, windowMs: 60 * 60 * 1000 };
 const CALL_RATE_LIMIT = { max: 30, windowMs: 60 * 60 * 1000 };
 const MAX_LITMUS_ATTEMPTS = 6;
+// Nobody waits for the background sends (forwardSubmission, retryLitmus), so a slow LITMUS gets longer.
+const BACKGROUND_LITMUS_TIMEOUT_MS = 20 * 1000;
 // A submission still "pending" after this long was never tried (its forwardSubmission didn't run).
 const PENDING_GRACE_MS = 10 * 60 * 1000;
 
@@ -55,8 +57,9 @@ const emailConfig = async () => (await db.doc('private/zeptomail').get()).data()
  * Sends one stored submission to LITMUS and records the outcome on the document.
  * @param {FirebaseFirestore.DocumentSnapshot} snap
  * @param {Awaited<ReturnType<typeof litmusConfig>>} config
+ * @param {number} [timeoutMs] how long to wait for LITMUS
  */
-async function forward(snap, config) {
+async function forward(snap, config, timeoutMs) {
   const doc = snap.data();
   if (!doc) return 'missing';
   const payload = buildPayload(snap.id, {
@@ -65,7 +68,7 @@ async function forward(snap, config) {
     page: doc.page,
     createdAt: doc.createdAt?.toDate?.(),
   });
-  const result = await sendToLitmus(config, payload);
+  const result = await sendToLitmus(config, payload, fetch, timeoutMs);
   await snap.ref.update({
     'litmus.status': result.status,
     'litmus.lastAttemptAt': FieldValue.serverTimestamp(),
@@ -186,7 +189,7 @@ export const submit = onRequest({ cors: true, memory: '256MiB', timeoutSeconds: 
 export const forwardSubmission = onDocumentCreated({ document: 'submissions/{id}', timeoutSeconds: 60 }, async (event) => {
   if (!event.data) return;
   try {
-    await forward(event.data, await litmusConfig());
+    await forward(event.data, await litmusConfig(), BACKGROUND_LITMUS_TIMEOUT_MS);
   } catch (err) {
     // The submission stays "pending"; retryLitmus tries it again.
     logger.error('Forwarding to LITMUS crashed', { id: event.params.id, err });
@@ -323,18 +326,18 @@ export const publishSite = onCall({ secrets: [githubToken] }, async (request) =>
   return { ok: true, actionsUrl };
 });
 
-export const retryLitmus = onSchedule({ schedule: 'every 30 minutes', timeoutSeconds: 300 }, async () => {
+export const retryLitmus = onSchedule({ schedule: 'every 30 minutes', timeoutSeconds: 900 }, async () => {
   const config = await litmusConfig();
   if (!config?.enabled || !config.url) return;
   const failed = await db.collection('submissions').where('litmus.status', '==', 'failed').limit(50).get();
   for (const snap of failed.docs) {
-    if ((snap.get('litmus.attempts') ?? 0) < MAX_LITMUS_ATTEMPTS) await forward(snap, config);
+    if ((snap.get('litmus.attempts') ?? 0) < MAX_LITMUS_ATTEMPTS) await forward(snap, config, BACKGROUND_LITMUS_TIMEOUT_MS);
   }
   // Ones saved a while ago but never tried.
   const pending = await db.collection('submissions').where('litmus.status', '==', 'pending').limit(50).get();
   for (const snap of pending.docs) {
     const created = snap.get('createdAt')?.toMillis?.() ?? 0;
-    if (Date.now() - created > PENDING_GRACE_MS) await forward(snap, config);
+    if (Date.now() - created > PENDING_GRACE_MS) await forward(snap, config, BACKGROUND_LITMUS_TIMEOUT_MS);
   }
 });
 

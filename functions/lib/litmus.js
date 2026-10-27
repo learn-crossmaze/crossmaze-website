@@ -6,6 +6,7 @@
 // an X-Crossmaze-Submission-Id header LITMUS can use to ignore duplicates on retries.
 
 export const SITE = 'www.crossmaze.in';
+// How long to wait for LITMUS by default (an admin is waiting); the background sends wait longer.
 const TIMEOUT_MS = 8000;
 
 /**
@@ -28,9 +29,10 @@ export function buildPayload(id, submission) {
  * @param {{ enabled?: boolean, url?: string, headerName?: string, headerValue?: string } | undefined} config
  * @param {ReturnType<typeof buildPayload>} payload
  * @param {typeof fetch} [fetchImpl]
+ * @param {number} [timeoutMs]
  * @returns {Promise<{ status: 'sent' | 'failed' | 'not_configured', httpStatus?: number, error?: string, response?: string }>}
  */
-export async function sendToLitmus(config, payload, fetchImpl = fetch) {
+export async function sendToLitmus(config, payload, fetchImpl = fetch, timeoutMs = TIMEOUT_MS) {
   if (!config?.enabled || !config.url) return { status: 'not_configured' };
 
   /** @type {Record<string, string>} */
@@ -46,7 +48,7 @@ export async function sendToLitmus(config, payload, fetchImpl = fetch) {
       method: 'POST',
       headers,
       body: JSON.stringify(payload),
-      signal: AbortSignal.timeout(TIMEOUT_MS),
+      signal: AbortSignal.timeout(timeoutMs),
     });
     const response = (await res.text().catch(() => '')).slice(0, 500);
     if (res.ok) return { status: 'sent', httpStatus: res.status, response };
