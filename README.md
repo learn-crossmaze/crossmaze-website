@@ -322,7 +322,7 @@ What the code does, from the content in the admin panel:
 
 What stays with the school (the website can't do these):
 
-- **Google Search Console** (the property verified through the old Wix tag, kept in `BaseLayout.astro`): submit `https://www.crossmaze.in/sitemap-index.xml`, ask Google to recrawl the home page and the branch pages after a deploy (URL Inspection → Request indexing), and check a branch page and a blog post in Google's Rich Results Test.
+- **Google Search Console** (the property verified through the old Wix tag, kept in `BaseLayout.astro`, and since 27 October 2026 a Domain property verified by the `google-site-verification` TXT row in `dns/crossmaze.in.zone`): submit `https://www.crossmaze.in/sitemap-index.xml`, ask Google to recrawl the home page and the branch pages after a deploy (URL Inspection → Request indexing), and check a branch page and a blog post in Google's Rich Results Test.
 - **Google Business Profiles**: one per centre, claimed and verified by the school, with the same name, address and phone as its branch page, and the branch page as its website.
 - **Directories** (Justdial, cretaclass and others) that still give an old address or number, such as Neeladri Nagar's old Malligue Residency address and +91 99020 68692, which the site doesn't use: ask them to correct it.
 - **Opening hours for Google**: tick the days of every batch at a centre (Branches → Timings and batches); until then its page gives Google no opening hours.
