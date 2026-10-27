@@ -103,7 +103,7 @@ export function LitmusPage() {
           </>
         }
       />
-      <div className="detail-grid">
+      <div className="detail-grid detail-grid--sample">
         <div className="card">
           <label className="check">
             <input type="checkbox" checked={draft.enabled} onChange={(e) => setDraft({ ...draft, enabled: e.target.checked })} />

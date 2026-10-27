@@ -1170,6 +1170,13 @@ a.item-main:hover strong {
   overflow-wrap: anywhere;
 }
 
+/* LITMUS: the sample for the LITMUS team takes the width it needs where there's room (the settings keep 320px). */
+@media (min-width: 901px) {
+  .detail-grid--sample {
+    grid-template-columns: minmax(320px, 1fr) minmax(0, max-content);
+  }
+}
+
 .details {
   display: grid;
   gap: 14px;
