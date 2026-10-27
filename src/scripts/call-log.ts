@@ -103,7 +103,7 @@ window.addEventListener('click', (event) => {
   send({
     channel,
     number,
-    branch: numbers[number.slice(-10)] ?? '',
+    branch: link.dataset.branch || (numbers[number.slice(-10)] ?? ''),
     page: location.pathname,
     place: picker ? `${pickerName}${pickerFrom ? ` (opened from ${pickerFrom})` : ''}` : placeOf(link),
     source: visit.source,

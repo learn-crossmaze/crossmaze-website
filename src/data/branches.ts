@@ -35,11 +35,23 @@ export const telHref = (phone: string) => `tel:${phone.replace(/[^\d+]/g, '')}`;
 
 /**
  * The centre's WhatsApp number as WhatsApp links want it (country code and digits, "917338045201"): its
- * WhatsApp number, else its phone number, with India's 91 added to a 10-digit number. Empty when it has neither.
+ * WhatsApp number, else its phone number, however it was typed ("+91 73380 45201", "073380 45201",
+ * "0091 73380 45201", "7338045201"; a 10-digit number gets India's 91). Empty when it has neither.
  */
 export function whatsappNumber(branch: Branch) {
-  const digits = (branch.whatsapp?.trim() || branch.phone || '').replace(/\D/g, '');
-  return digits.length === 10 ? `91${digits}` : digits;
+  const raw = (/\d/.test(branch.whatsapp ?? '') ? branch.whatsapp! : branch.phone || '').trim();
+  const international = raw.startsWith('+');
+  let digits = raw.replace(/\D/g, '');
+  if (digits.startsWith('00')) digits = digits.slice(2);
+  else if (!international) digits = digits.replace(/^0+/, '');
+  if (digits.length === 13 && digits.startsWith('910')) digits = `91${digits.slice(3)}`;
+  return !international && digits.length === 10 ? `91${digits}` : digits;
+}
+
+/** That number as the site shows phone numbers: "+91 73380 45201". */
+export function whatsappLabel(branch: Branch) {
+  const n = whatsappNumber(branch);
+  return n.length === 12 && n.startsWith('91') ? `+91 ${n.slice(2, 7)} ${n.slice(7)}` : n && `+${n}`;
 }
 
 /** A chat with the centre on WhatsApp; empty when it has no number. */

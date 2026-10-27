@@ -6,7 +6,7 @@
 // own link: the main number for calls, the Branches page for WhatsApp.
 import Icon from './Icon.astro';
 import { site } from '../data/site';
-import { branches, shortName, telHref, whatsappHref } from '../data/branches';
+import { branches, shortName, telHref, whatsappHref, whatsappLabel } from '../data/branches';
 
 interface Props {
   channel?: 'phone' | 'whatsapp';
@@ -20,7 +20,7 @@ const items = branches
   .map((b) => {
     const phone = b.phone || site.phone;
     return whatsapp
-      ? { branch: b, href: whatsappHref(b), number: b.whatsapp?.trim() || b.phone }
+      ? { branch: b, href: whatsappHref(b), number: whatsappLabel(b) }
       : { branch: b, href: telHref(phone), number: phone };
   })
   .filter((item) => item.href);
@@ -46,9 +46,12 @@ const titleId = `${channel}-picker-title`;
       {
         items.map(({ branch: b, href, number }, i) => (
           <li data-slug={b.slug}>
+            {/* data-branch tells the call log (scripts/call-log.ts) which centre was chosen; a centre without a
+                phone of its own is offered the main number, which the log keeps as "Main number". */}
             <a
               class:list={['call-picker__branch', `tone-${tones[i % tones.length]}`]}
               href={href}
+              data-branch={whatsapp || b.phone ? shortName(b) : undefined}
               {...(whatsapp ? { target: '_blank', rel: 'noopener' } : {})}
             >
               <span class="icon-badge">
@@ -94,10 +97,11 @@ const titleId = `${channel}-picker-title`;
   /** Lists the most likely centre first: the branch page being viewed, else the last one chosen. */
   function putPreferredFirst(dialog: HTMLDialogElement, key: string, before: string) {
     const list = dialog.querySelector('.call-picker__list');
-    const onPage = location.pathname.match(/^\/branch\/([^/]+)/)?.[1];
-    const slug = onPage ?? remembered(key);
+    const find = (slug: string | null | undefined) => (slug ? dialog.querySelector<HTMLElement>(`li[data-slug="${CSS.escape(slug)}"]`) : null);
     dialog.querySelectorAll<HTMLElement>('.call-picker__tag').forEach((tag) => (tag.hidden = true));
-    const item = slug ? dialog.querySelector<HTMLElement>(`li[data-slug="${CSS.escape(slug)}"]`) : null;
+    // The branch page's centre, if this list has it (a centre with no WhatsApp number isn't in that list).
+    const onPage = find(location.pathname.match(/^\/branch\/([^/]+)/)?.[1]);
+    const item = onPage ?? find(remembered(key));
     if (!list || !item) return;
     list.prepend(item);
     const tag = item.querySelector<HTMLElement>('.call-picker__tag');

@@ -368,7 +368,7 @@ export const branchSchema: Field[] = [
     key: 'whatsapp',
     label: 'WhatsApp number',
     type: 'tel',
-    help: 'With country code, e.g. 917338045201. The website’s WhatsApp buttons open a chat with this number. Leave it empty to use the phone number above.',
+    help: 'With the country code, e.g. +91 73380 45201. The website’s WhatsApp buttons open a chat with this number. Leave it empty to use the phone number above.',
   },
   { key: 'email', label: 'Email', type: 'email' },
 

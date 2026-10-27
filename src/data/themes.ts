@@ -9,7 +9,7 @@ export const themes = [
   { id: 'ocean', label: 'Ocean Breeze', fonts: 'family=Quicksand:wght@600;700&family=Nunito:wght@400;600;700;800', color: '#0a4f70', dark: '#0b2128' },
   { id: 'crayon', label: 'Crayon Box', fonts: 'family=Grandstander:wght@600;700&family=Nunito:wght@400;600;700;800', color: '#b8261a', dark: '#16152e' },
   { id: 'calm', label: 'Montessori Calm', fonts: 'family=Lexend:wght@400;500;600;700', color: '#3b5537', dark: '#1b1d13' },
-  { id: 'candy', label: 'Candy Pop', fonts: 'family=Sniglet:wght@400;800&family=Nunito:wght@400;600;700;800', color: '#7a0d5c', dark: '#2a0f2c' },
+  { id: 'candy', label: 'Candy Pop', fonts: 'family=Poppins:wght@600;700&family=Nunito:wght@400;600;700;800', color: '#7a0d5c', dark: '#2a0f2c' },
   { id: 'tropical', label: 'Tropical Splash', fonts: 'family=Lilita+One&family=Nunito:wght@400;600;700;800', color: '#004d44', dark: '#0c2427' },
 ] as const;
 
