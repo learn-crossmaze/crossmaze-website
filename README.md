@@ -10,7 +10,7 @@ The website for **Crossmaze Preschool and Day Care**, Bengaluru (www.crossmaze.i
  Admin panel (/admin) ──saves──▶ Firestore + Storage ──Publish──▶ GitHub Actions ──▶ build ──▶ Firebase Hosting
                                                                     (pulls content + photos)
  Website forms ──POST /api/submit──▶ `submit` Cloud Function ──▶ Firestore "submissions" ──▶ `forwardSubmission` ──▶ LITMUS
-                                                                                                      └─ fails ──▶ email to the admins (ZeptoMail)
+                                                                                                      └─ fails ──▶ email to the admins (Zoho CPaaS)
 ```
 
 ## Pages
@@ -44,7 +44,7 @@ Go to **www.crossmaze.in/admin** and sign in (until the domain moves, step 6 bel
 | Blog | Write posts with photos in six designs, keep them as drafts with a private preview link, then publish (see below) |
 | Calls | Every tap on a call or WhatsApp button: which centre, page, device and how the visitor found the site; totals by centre; export to CSV (see below) |
 | LITMUS | Where submissions are sent, its API key, and a **Send test** button |
-| Email alerts | The ZeptoMail settings for the email the full admins get when a submission can't be sent to LITMUS, and a **Send me a test** button (see [Email alerts](#email-alerts-zeptomail)) |
+| Email alerts | The Zoho CPaaS (formerly ZeptoMail) settings for the email the full admins get when a submission can't be sent to LITMUS, and a **Send me a test** button (see [Email alerts](#email-alerts-zoho-cpaas)) |
 | Admins | Who can sign in: full admins, and branch admins (see below) |
 
 **Save** stores a change; it goes live when someone presses **Publish** (top right). Publishing rebuilds the whole site in about 3 minutes, and the Dashboard shows when it's done or if it failed. New branches, programs and jobs start hidden, so you can finish them before unticking “Hide from website”.
@@ -200,8 +200,8 @@ The email is on **Zoho** (US data centre, zoho.com) and keeps working throughout
 | --- | --- |
 | A `@` → `185.230.63.107`, CNAME `www` → `pointing.wixdns.net` | The website: the old Wix site (Wix's values for DNS hosted elsewhere) until evening 2 |
 | MX `@` 10 `mx.zoho.com`, 20 `mx2.zoho.com`, 30 `mx3.zoho.com`; TXT `@` `v=spf1 include:zoho.com include:zohomail.com include:sender.zohobooks.com ~all` | Where email is delivered, and who may send as @crossmaze.in (the only `v=spf1` record) |
-| TXT `zoho._domainkey`, `1522905413783._domainkey`, `1121755._domainkey` | Zoho Mail, Zoho Books and ZeptoMail signature (DKIM) keys |
-| CNAME `bounce-zem`, `zb15474756`, `mail`, `forms` | ZeptoMail bounces, Zoho's domain verification, Zoho webmail and Zoho Forms |
+| TXT `zoho._domainkey`, `1522905413783._domainkey`, `1121755._domainkey` | Zoho Mail, Zoho Books and ZeptoMail (now Zoho CPaaS) signature (DKIM) keys |
+| CNAME `bounce-zem`, `zb15474756`, `mail`, `forms` | ZeptoMail (now Zoho CPaaS) bounces, Zoho's domain verification, Zoho webmail and Zoho Forms |
 | TXT `_dmarc` `v=DMARC1; p=none;` | Email policy: no enforcement, as today |
 | CNAME `litmus`, `staging`; TXT `_acme-challenge.staging`, `_acme-challenge.app` | LITMUS |
 
@@ -276,17 +276,17 @@ The website doesn't wait for LITMUS: `submit` saves the submission (and the resu
 
 The form fields and validation live in `functions/lib/forms.js`; the delivery code is `functions/lib/litmus.js`.
 
-### Email alerts (ZeptoMail)
+### Email alerts (Zoho CPaaS)
 
-When a submission can't be sent to LITMUS, every full admin (admin panel → Admins, not branch admins) gets one email with everything the visitor filled in, the page and a link to Submissions, so the school can call them back while the website keeps trying. It is sent once per submission, not on every retry (again only if that email failed), and the submission's LITMUS card in Submissions says whether the admins were emailed. Alerts go through [ZeptoMail](https://www.zoho.com/zeptomail/), Zoho's service for emails sent by websites and apps. The code is `functions/lib/zeptomail.js` and `functions/lib/alerts.js`.
+When a submission can't be sent to LITMUS, every full admin (admin panel → Admins, not branch admins) gets one email with everything the visitor filled in, the page and a link to Submissions, so the school can call them back while the website keeps trying. It is sent once per submission, not on every retry (again only if that email failed), and the submission's LITMUS card in Submissions says whether the admins were emailed. Alerts go through [Zoho CPaaS](https://www.zoho.com/cpaas/), Zoho's service for emails sent by websites and apps, called ZeptoMail until 2026 (accounts, Agents, keys and verified domains carried over). The code is `functions/lib/zeptomail.js` and `functions/lib/alerts.js`.
 
-To set it up (the school's Zoho account is in the US data centre, so ZeptoMail is at zeptomail.zoho.com):
+To set it up (the school's Zoho account is in the US data centre, so Zoho CPaaS is at cpaas.zoho.com):
 
-1. In ZeptoMail → **Mail Agents**, open the agent (or add one, e.g. `Crossmaze website`) and check that **crossmaze.in** shows as verified under **Domains**. crossmaze.in already has ZeptoMail's records (the `bounce-zem` CNAME and a DKIM key, in `dns/crossmaze.in.zone`), so it should be. If ZeptoMail asks for a record that isn't there, add it at GoDaddy and to `dns/crossmaze.in.zone`, and don't change the existing email records.
-2. In the same agent → **SMTP/API** → **API**, copy the **Send Mail token** (it starts with `Zoho-enczapikey`) and the API address (`https://api.zeptomail.com/v1.1/email`).
-3. In the admin panel → **Email alerts**: tick **Email the admins…**, paste the token, enter the From address (on crossmaze.in, e.g. `noreply@crossmaze.in`) and press **Save**, then **Send me a test**. The test goes to the admin who presses it; check the inbox and the spam folder.
+1. In Zoho CPaaS → **Agents**, open the agent (or add one, e.g. `Crossmaze website`) and check that **crossmaze.in** shows as verified under **Domains**. crossmaze.in already has the records from its ZeptoMail days (the `bounce-zem` CNAME and a DKIM key, in `dns/crossmaze.in.zone`), so it should be. If Zoho CPaaS asks for a record that isn't there, add it at GoDaddy and to `dns/crossmaze.in.zone`, and don't change the existing email records.
+2. In the same agent → **SMTP/API** → **API Setup**, copy the **Agent key** (the API key; a ZeptoMail Send Mail token still works) and the API address (`https://cpaas.zoho.com/v1.1/email`; ZeptoMail's `https://api.zeptomail.com/v1.1/email` also still works).
+3. In the admin panel → **Email alerts**: tick **Email the admins…**, paste the key, enter the From address (on crossmaze.in, e.g. `noreply@crossmaze.in`) and press **Save**, then **Send me a test**. The test goes to the admin who presses it; check the inbox and the spam folder.
 
-The token is kept in Firestore at `private/zeptomail`, which only full admins can read (the website and branch admins can't). With Email alerts off, failures are only shown in Submissions.
+The key is kept in Firestore at `private/zeptomail` (the name from before the rename), which only full admins can read (the website and branch admins can't). With Email alerts off, failures are only shown in Submissions.
 
 ## Developing
 

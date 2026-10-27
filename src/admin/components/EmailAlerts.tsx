@@ -5,7 +5,7 @@ import { same, useDoc } from '../data';
 import { Icon } from './fields';
 import { ErrorBox, PageHeader, Spinner, errorText, useSession, useToast } from './ui';
 
-/** ZeptoMail settings for the emails to admins (functions/lib/zeptomail.js reads the same document). */
+/** Zoho CPaaS (formerly ZeptoMail) settings for the emails to admins (functions/lib/zeptomail.js reads the same document). */
 interface EmailConfig {
   enabled: boolean;
   url: string;
@@ -14,10 +14,19 @@ interface EmailConfig {
   fromName: string;
 }
 
-const EMPTY: EmailConfig = { enabled: false, url: 'https://api.zeptomail.com/v1.1/email', token: '', fromAddress: '', fromName: 'Crossmaze website' };
+const EMPTY: EmailConfig = { enabled: false, url: 'https://cpaas.zoho.com/v1.1/email', token: '', fromAddress: '', fromName: 'Crossmaze website' };
 
-// ZeptoMail's API address for each data centre (keep in step with isZeptoUrl in functions/lib/zeptomail.js).
-const ZEPTO_URL = /^https:\/\/api\.zeptomail\.(com|in|eu|com\.au|jp|ca|sa|com\.cn)\//;
+// The API hosts, one per data centre: cpaas.zoho.* (Canada: cpaas.zohocloud.ca), or api.zeptomail.* from
+// before ZeptoMail became Zoho CPaaS. Keep in step with API_HOST in functions/lib/zeptomail.js.
+const API_HOST = /^(cpaas\.(zoho\.(com|in|eu|com\.au|jp|sa|com\.cn)|zohocloud\.ca)|api\.zeptomail\.(com|in|eu|com\.au|jp|ca|sa|com\.cn))$/;
+const isApiUrl = (url: string) => {
+  try {
+    const parsed = new URL(url);
+    return parsed.protocol === 'https:' && !parsed.username && !parsed.password && API_HOST.test(parsed.hostname);
+  } catch {
+    return false;
+  }
+};
 const EMAIL = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 
 export function EmailAlertsPage() {
@@ -46,8 +55,8 @@ export function EmailAlertsPage() {
 
   const save = async () => {
     if (draft.enabled) {
-      if (!ZEPTO_URL.test(draft.url)) return toast('error', 'The API address must be a ZeptoMail one, such as https://api.zeptomail.com/v1.1/email');
-      if (!draft.token.trim()) return toast('error', 'Paste the Send Mail token from ZeptoMail.');
+      if (!isApiUrl(draft.url)) return toast('error', 'The API address must be a Zoho CPaaS one, such as https://cpaas.zoho.com/v1.1/email');
+      if (!draft.token.trim()) return toast('error', 'Paste the API key from Zoho CPaaS.');
       if (!EMAIL.test(draft.fromAddress)) return toast('error', 'Enter the From address, e.g. noreply@crossmaze.in');
     }
     setBusy('save');
@@ -84,7 +93,7 @@ export function EmailAlertsPage() {
     <>
       <PageHeader
         title="Email alerts"
-        intro="The website thanks visitors as soon as their enquiry or application is saved, then sends it to LITMUS. If LITMUS can’t take it, the full admins get an email with its details, sent through ZeptoMail with these settings."
+        intro="The website thanks visitors as soon as their enquiry or application is saved, then sends it to LITMUS. If LITMUS can’t take it, the full admins get an email with its details, sent through Zoho CPaaS (formerly ZeptoMail) with these settings."
         actions={
           <>
             <button className="btn btn-light" onClick={runTest} disabled={busy !== null || dirty || !saved.token || !saved.fromAddress}>
@@ -103,15 +112,15 @@ export function EmailAlertsPage() {
             Email the admins when a submission can’t be sent to LITMUS
           </label>
           <div className="field">
-            <label htmlFor="zepto-url">ZeptoMail API address</label>
+            <label htmlFor="zepto-url">API address</label>
             <input id="zepto-url" type="url" value={draft.url} onChange={(e) => setDraft({ ...draft, url: e.target.value.trim() })} />
             <p className="help">
-              From ZeptoMail → Mail Agents → your agent → SMTP/API → API. It is https://api.zeptomail.com/v1.1/email for the US data centre
-              (api.zeptomail.in for India, api.zeptomail.eu for Europe).
+              In Zoho CPaaS (cpaas.zoho.com) → Agents → your agent → SMTP/API → API Setup. It is https://cpaas.zoho.com/v1.1/email for the US
+              data centre (cpaas.zoho.in for India, cpaas.zoho.eu for Europe). An older api.zeptomail.com address still works.
             </p>
           </div>
           <div className="field">
-            <label htmlFor="zepto-token">Send Mail token</label>
+            <label htmlFor="zepto-token">API key</label>
             <div className="input-with-btn">
               <input
                 id="zepto-token"
@@ -121,16 +130,16 @@ export function EmailAlertsPage() {
                 value={draft.token}
                 onChange={(e) => setDraft({ ...draft, token: e.target.value })}
               />
-              <button type="button" className="icon-btn" aria-label={reveal ? 'Hide token' : 'Show token'} onClick={() => setReveal(!reveal)}>
+              <button type="button" className="icon-btn" aria-label={reveal ? 'Hide API key' : 'Show API key'} onClick={() => setReveal(!reveal)}>
                 <Icon name={reveal ? 'EyeOff' : 'Eye'} />
               </button>
             </div>
-            <p className="help">On the same ZeptoMail page. Only admins can see this. It is never sent to website visitors.</p>
+            <p className="help">The Agent key on the same page (a ZeptoMail Send Mail token still works). Only admins can see this. It is never sent to website visitors.</p>
           </div>
           <div className="field">
             <label htmlFor="zepto-from">From address</label>
             <input id="zepto-from" type="email" placeholder="noreply@crossmaze.in" value={draft.fromAddress} onChange={(e) => setDraft({ ...draft, fromAddress: e.target.value.trim() })} />
-            <p className="help">An address on a domain verified in ZeptoMail (crossmaze.in).</p>
+            <p className="help">An address on a domain verified in Zoho CPaaS (crossmaze.in).</p>
           </div>
           <div className="field">
             <label htmlFor="zepto-name">From name</label>
@@ -141,7 +150,7 @@ export function EmailAlertsPage() {
             <div className={`test-result ${test.status === 'sent' ? 'ok' : 'bad'}`}>
               <strong>
                 {test.status === 'sent'
-                  ? 'ZeptoMail accepted the test. Check your inbox (and spam) in a minute.'
+                  ? 'Zoho CPaaS accepted the test. Check your inbox (and spam) in a minute.'
                   : (test.error ?? 'The test failed.')}
               </strong>
             </div>
