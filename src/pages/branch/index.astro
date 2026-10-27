@@ -4,7 +4,6 @@ import PageHero from '../../components/PageHero.astro';
 import BranchCard from '../../components/BranchCard.astro';
 import Icon from '../../components/Icon.astro';
 import { branches, facilities } from '../../data/branches';
-import { site } from '../../data/site';
 
 // "Five centres": the number in words up to twelve.
 const words = ['One', 'Two', 'Three', 'Four', 'Five', 'Six', 'Seven', 'Eight', 'Nine', 'Ten', 'Eleven', 'Twelve'];
@@ -32,7 +31,7 @@ const tones = ['coral', 'sun', 'green', 'sky', 'navy'];
 ---
 
 <BaseLayout
-  fullTitle={`Preschool & Day Care Centres in Electronic City & Begur | ${site.name}`}
+  fullTitle="Preschool & Day Care Centres in Electronic City & Begur"
   description="Find your nearest Crossmaze Preschool and Day Care: The Hub in Begur, and Neotown, SNN Greenbay, Neeladri Nagar and Ananth Nagar in Electronic City, Bengaluru."
 >
   <PageHero

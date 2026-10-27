@@ -762,9 +762,9 @@ h1 > .eyebrow > svg {
   margin-top: calc((1.4em - 18px) / 2);
 }
 
-/* Its parts ("Preschool & Day Care", "Neotown, Thirupalya, Electronic City · 560099"), one under the other
+/* Its lines ("Preschool & Day Care", "Neotown, Thirupalya", "Electronic City · 560099"), one under the other
    at every width. Side by side, whether they fit on one line would depend on which font has loaded, and a
-   late web font would move the page below as the line rewrapped. A part longer than the line wraps on its
+   late web font would move the page below as the line rewrapped. A line longer than the column wraps on its
    own, anywhere if it must. */
 .eyebrow__parts {
   display: flex;

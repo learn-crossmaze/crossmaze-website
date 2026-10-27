@@ -34,12 +34,14 @@ export const shortName = (branch: Branch) => branch.name.replace(/^Crossmaze\s*[
 export const telHref = (phone: string) => `tel:${phone.replace(/[^\d+]/g, '')}`;
 
 /**
- * Where the centre is, as its page names it for search: its area, with ", Electronic City" added when the
- * address is in Electronic City but the area doesn't say so ("Neeladri Nagar, Electronic City").
+ * Where the centre is, as its page names it for search: its area (or its short name when the area is empty),
+ * with ", Electronic City" added when the address is in Electronic City but the area doesn't say so
+ * ("Neeladri Nagar, Electronic City"). Its parts are always separated by ", ".
  */
 export function branchPlace(branch: Branch) {
   const ec = /electronic city/i;
-  return !ec.test(branch.area) && branch.address.some((line) => ec.test(line)) ? `${branch.area}, Electronic City` : branch.area;
+  const area = (branch.area ?? '').split(',').map((part) => part.trim()).filter(Boolean).join(', ') || shortName(branch);
+  return !ec.test(area) && branch.address.some((line) => ec.test(line)) ? `${area}, Electronic City` : area;
 }
 
 /** A branch's page, and the centre's id in structured data (its own page, and the school's subOrganization). */

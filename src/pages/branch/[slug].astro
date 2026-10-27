@@ -161,27 +161,38 @@ const otherCards = others.map((b, i) => ({ branch: b, cover: branchPhotos(b.slug
 // What Google shows for the page, from what the page itself says: the service and the place in the title
 // (unless the admin panel gives one: Branches → Title in Google), and in the description the programs, the
 // opening hours (as in the facts above the timetable, when they are one range) and the phone number.
-// Google shows about 60 characters of a title, so a long area keeps only its first and last parts there
-// ("Neotown, Thirupalya, Electronic City" → "Neotown, Electronic City"); the description keeps all of it.
+// Google shows about 60 characters of a title, so one over 65 is shortened, in this order, until it fits: a
+// long area keeps only its first and last parts ("Neotown, Thirupalya, Electronic City" → "Neotown,
+// Electronic City"), the centre's short name stands for the area ("SNN Greenbay, Electronic City"), and
+// last " | Crossmaze" goes (Google shows the site's name above the result anyway).
 const place = branchPlace(branch);
+const placeParts = place.split(', ');
+const lastPart = placeParts.length > 1 ? `, ${placeParts.at(-1)}` : '';
+const wheres = [place, `${placeParts[0]}${lastPart}`, `${shortName}${lastPart}`];
 const titleFor = (where: string) => `Preschool & Day Care in ${where} | ${site.name}`;
-const placeParts = place.split(/\s*,\s*/);
-const defaultTitle = titleFor(place).length > 65 && placeParts.length > 2 ? titleFor(`${placeParts[0]}, ${placeParts.at(-1)}`) : titleFor(place);
+const defaultTitle =
+  wheres.map(titleFor).find((t) => t.length <= 65) ?? `Preschool & Day Care in ${wheres.reduce((a, b) => (b.length < a.length ? b : a))}`;
 const pageTitle = branch.seoTitle?.trim() || defaultTitle;
-// The place as the heading shows it: when the line wraps, each part ("Electronic City") stays whole.
-const placeLine = placeParts.map((part) => part.replace(/\s+/g, '\u00a0')).join(', ');
+// The place as the heading shows it: its last part and the PIN code on a line of their own ("Neotown,
+// Thirupalya" / "Electronic City · 560099"), so the lines break in the same places whichever font is showing
+// (a late web font would otherwise move the page as they rewrapped). Each part stays whole.
+const keepWhole = (part: string) => part.replace(/\s+/g, '\u00a0');
+const placeLines = placeParts.length > 1 ? [placeParts.slice(0, -1).map(keepWhole).join(', '), keepWhole(placeParts.at(-1)!)] : [keepWhole(place)];
 // The classes (youngest first, as in the admin panel) as a range when there are three or more, then day
 // care by name: "Play Group to Senior KG and Day Care".
 const care = offered.filter((p) => p.slug === 'day-care').map((p) => p.name);
 const classes = offered.filter((p) => p.slug !== 'day-care').map((p) => p.name);
 const programsText = listText([...(classes.length >= 3 ? [`${classes[0]} to ${classes.at(-1)}`] : classes), ...care]);
-const hoursText = open.length === 1 ? `, open ${open[0]!.days ? `${open[0]!.days}, ` : ''}${formatRange(open[0]!.from, open[0]!.to)}` : '';
-const pageDescription = [
-  `${care.length ? 'Play school and day care' : 'Play school'} in ${place}, Bengaluru${programsText ? `: ${programsText}${hoursText}` : ''}.`,
-  branch.phone && `Call ${branch.phone}.`,
-]
-  .filter(Boolean)
-  .join(' ');
+const what = care.length ? (classes.length ? 'Play school and day care' : 'Day care') : 'Play school';
+const hoursText = (days: boolean) =>
+  open.length === 1 ? `, open ${days && open[0]!.days ? `${open[0]!.days}, ` : ''}${formatRange(open[0]!.from, open[0]!.to)}` : '';
+const describe = (hours: string) =>
+  [`${what} in ${place}, Bengaluru${programsText ? `: ${programsText}${hours}` : ''}.`, branch.phone && `Call ${branch.phone}.`]
+    .filter(Boolean)
+    .join(' ');
+// Google shows about 160 characters of a description: the days, then the hours, go when it would be longer.
+const descriptions = [describe(hoursText(true)), describe(hoursText(false)), describe('')];
+const pageDescription = descriptions.find((d) => d.length <= 160) ?? descriptions.at(-1)!;
 
 // The breadcrumbs as shown in the banner, and the same for search engines.
 const crumbs: Crumb[] = [{ label: 'Home', href: '/' }, { label: 'Branches', href: '/branch' }, { label: shortName }];
@@ -201,7 +212,7 @@ const jsonLd = {
   ...(cover ? { image: fullSize.slice(0, 4).map((p) => new URL(p.src, site.url).href) } : {}),
   parentOrganization: { '@type': 'Preschool', '@id': orgId, name: site.fullName, url: site.url },
   ...(geo ? { geo } : {}),
-  hasMap: directions,
+  ...(branch.mapQuery?.trim() ? { hasMap: directions } : {}),
   ...(hours.length ? { openingHoursSpecification: hours } : {}),
   address: {
     '@type': 'PostalAddress',
@@ -227,8 +238,16 @@ const jsonLd = {
         {/* What and where, as the first lines of the heading (they keep the eyebrow's look; global.css). */}
         <h1>
           <span class="eyebrow">
-            {/* No-break spaces keep the "·" and the PIN code with the last part of the place. */}
-            <span class="eyebrow__parts"><span>Preschool & Day Care<span class="sr-only">,</span></span> <span>{placeLine}&nbsp;·&nbsp;{branch.pincode}</span></span>
+            {/* One line each (global.css), with commas between them for screen readers and search engines. */}
+            <span class="eyebrow__parts">
+              <span>Preschool & Day Care<span class="sr-only">,</span></span>{' '}
+              {placeLines.slice(0, -1).map((line) => (
+                <>
+                  <span>{line}<span class="sr-only">,</span></span>{' '}
+                </>
+              ))}
+              <span>{placeLines.at(-1)}{branch.pincode && <>&nbsp;·&nbsp;{branch.pincode}</>}</span>
+            </span>
           </span>{' '}
           {heroTitle}
         </h1>
