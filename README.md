@@ -4,12 +4,13 @@ The website for **Crossmaze Preschool and Day Care**, Bengaluru (www.crossmaze.i
 
 - **Website:** a fast static site built with [Astro](https://astro.build), hosted on Firebase Hosting.
 - **Admin panel:** staff sign in with their email and password to edit branches, programs, the logo, contact details, jobs, testimonials and page text, upload photos, and press **Publish**.
-- **Forms → LITMUS:** every admission enquiry and job application is saved in Firebase (so nothing is lost) and forwarded to LITMUS.
+- **Forms → LITMUS:** every admission enquiry and job application is saved in Firebase (so nothing is lost), the visitor is thanked straight away, and it is then forwarded to LITMUS. If LITMUS can't take one, the full admins get an email with its details.
 
 ```
  Admin panel (/admin) ──saves──▶ Firestore + Storage ──Publish──▶ GitHub Actions ──▶ build ──▶ Firebase Hosting
                                                                     (pulls content + photos)
- Website forms ──POST /api/submit──▶ `submit` Cloud Function ──▶ Firestore "submissions" ──▶ LITMUS
+ Website forms ──POST /api/submit──▶ `submit` Cloud Function ──▶ Firestore "submissions" ──▶ `forwardSubmission` ──▶ LITMUS
+                                                                                                      └─ fails ──▶ email to the admins (ZeptoMail)
 ```
 
 ## Pages
@@ -43,6 +44,7 @@ Go to **www.crossmaze.in/admin** and sign in (until the domain moves, step 6 bel
 | Blog | Write posts with photos in six designs, keep them as drafts with a private preview link, then publish (see below) |
 | Calls | Every tap on a call or WhatsApp button: which centre, page, device and how the visitor found the site; totals by centre; export to CSV (see below) |
 | LITMUS | Where submissions are sent, its API key, and a **Send test** button |
+| Email alerts | The ZeptoMail settings for the email the full admins get when a submission can't be sent to LITMUS, and a **Send me a test** button (see [Email alerts](#email-alerts-zeptomail)) |
 | Admins | Who can sign in: full admins, and branch admins (see below) |
 
 **Save** stores a change; it goes live when someone presses **Publish** (top right). Publishing rebuilds the whole site in about 3 minutes, and the Dashboard shows when it's done or if it failed. New branches, programs and jobs start hidden, so you can finish them before unticking “Hide from website”.
@@ -169,6 +171,8 @@ npx firebase-tools deploy --only firestore,storage,functions
 
 Run this again whenever `firestore.rules`, `storage.rules` or anything in `functions/` changes. Website changes deploy automatically (step 5).
 
+The first deploy that includes `forwardSubmission` (the function that sends each saved submission to LITMUS) also sets up Firestore events for the project. If it stops and asks you to retry in a few minutes, wait and run the same command again.
+
 ### 4. GitHub repository settings (Settings → Secrets and variables → Actions)
 
 - **Secret** `FIREBASE_SERVICE_ACCOUNT_CROSSMAZE_WEBSITE`: a service-account key (Firebase console → Project settings → Service accounts → **Generate new private key**; paste the whole JSON file). Then give that account (`firebase-adminsdk-…@crossmaze-website.iam.gserviceaccount.com`) these roles in Google Cloud console → **IAM & Admin → IAM** → pencil icon: **Firebase Admin**, **Cloud Run Viewer** and **API Keys Viewer**. The deploy needs them to read content, download photos and publish the site.
@@ -266,9 +270,23 @@ X-Crossmaze-Submission-Id: 9fQx2kL…        ← same on retries; use it to igno
 }
 ```
 
-Job applications send `name, phone, email, position, branch, experience, qualification, resume_link, resume_file, about`. `resume_link` is a private link to the resume the applicant uploaded (PDF, Word or a photo, up to 5 MB) and `resume_file` is its file name. The file is stored in Cloud Storage under `resumes/`; only admins can open it in the panel, and anyone given the link can download it, so treat the link like the resume itself. Deleting an application in Submissions also deletes its resume. LITMUS should reply with any 2xx status. Failed deliveries are retried every 30 minutes (up to 6 times), shown as “LITMUS failed” in Submissions, and can be resent by hand. Submissions that arrive before LITMUS is set up are kept, and **Send unsent to LITMUS** delivers them later.
+Job applications send `name, phone, email, position, branch, experience, qualification, resume_link, resume_file, about`. `resume_link` is a private link to the resume the applicant uploaded (PDF, Word or a photo, up to 5 MB) and `resume_file` is its file name. The file is stored in Cloud Storage under `resumes/`; only admins can open it in the panel, and anyone given the link can download it, so treat the link like the resume itself. Deleting an application in Submissions also deletes its resume. LITMUS should reply with any 2xx status. Failed deliveries are retried every 30 minutes (up to 6 times), shown as “LITMUS failed” in Submissions, emailed to the full admins (see below), and can be resent by hand. Submissions that arrive before LITMUS is set up are kept, and **Send unsent to LITMUS** delivers them later.
+
+The website doesn't wait for LITMUS: `submit` saves the submission (and the resume) and thanks the visitor at once, and `forwardSubmission` sends it to LITMUS a moment later, when Firestore tells it a submission was saved. A submission still “Sending…” after 10 minutes (if `forwardSubmission` didn't run) is picked up by the 30-minute retry.
 
 The form fields and validation live in `functions/lib/forms.js`; the delivery code is `functions/lib/litmus.js`.
+
+### Email alerts (ZeptoMail)
+
+When a submission can't be sent to LITMUS, every full admin (admin panel → Admins, not branch admins) gets one email with everything the visitor filled in, the page and a link to Submissions, so the school can call them back while the website keeps trying. It is sent once per submission, not on every retry (again only if that email failed), and the submission's LITMUS card in Submissions says whether the admins were emailed. Alerts go through [ZeptoMail](https://www.zoho.com/zeptomail/), Zoho's service for emails sent by websites and apps. The code is `functions/lib/zeptomail.js` and `functions/lib/alerts.js`.
+
+To set it up (the school's Zoho account is in the US data centre, so ZeptoMail is at zeptomail.zoho.com):
+
+1. In ZeptoMail → **Mail Agents**, open the agent (or add one, e.g. `Crossmaze website`) and check that **crossmaze.in** shows as verified under **Domains**. crossmaze.in already has ZeptoMail's records (the `bounce-zem` CNAME and a DKIM key, in `dns/crossmaze.in.zone`), so it should be. If ZeptoMail asks for a record that isn't there, add it at GoDaddy and to `dns/crossmaze.in.zone`, and don't change the existing email records.
+2. In the same agent → **SMTP/API** → **API**, copy the **Send Mail token** (it starts with `Zoho-enczapikey`) and the API address (`https://api.zeptomail.com/v1.1/email`).
+3. In the admin panel → **Email alerts**: tick **Email the admins…**, paste the token, enter the From address (on crossmaze.in, e.g. `noreply@crossmaze.in`) and press **Save**, then **Send me a test**. The test goes to the admin who presses it; check the inbox and the spam folder.
+
+The token is kept in Firestore at `private/zeptomail`, which only full admins can read (the website and branch admins can't). With Email alerts off, failures are only shown in Submissions.
 
 ## Developing
 

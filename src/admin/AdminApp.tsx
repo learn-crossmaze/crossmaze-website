@@ -22,6 +22,7 @@ import { Dashboard, PublishButton } from './components/Dashboard';
 import { SubmissionsPage } from './components/Submissions';
 import { CallsPage } from './components/Calls';
 import { LitmusPage } from './components/Litmus';
+import { EmailAlertsPage } from './components/EmailAlerts';
 import { AdminsPage } from './components/Admins';
 import { CentreHeadPage } from './components/CentreHead';
 
@@ -42,6 +43,7 @@ const NAV: { href: string; icon: string; label: string; roles?: Role[] }[] = [
   { href: '#/submissions', icon: 'Inbox', label: 'Submissions' },
   { href: '#/calls', icon: 'Phone', label: 'Calls' },
   { href: '#/litmus', icon: 'Plug', label: 'LITMUS' },
+  { href: '#/email-alerts', icon: 'Mail', label: 'Email alerts' },
   { href: '#/admins', icon: 'UserCog', label: 'Admins' },
 ];
 
@@ -264,6 +266,8 @@ function Shell() {
         return <CallsPage />;
       case 'litmus':
         return <LitmusPage />;
+      case 'email-alerts':
+        return <EmailAlertsPage />;
       case 'admins':
         return <AdminsPage />;
       case 'centre':

@@ -13,6 +13,8 @@ interface Submission {
   createdAt?: { toDate: () => Date };
   handled?: boolean;
   litmus?: { status: string; attempts?: number; lastError?: string; httpStatus?: number; sentAt?: unknown };
+  /** The email to the admins when it couldn't be sent to LITMUS (functions/index.js alertAdmins). */
+  alert?: { status: 'sending' | 'sent' | 'failed' | 'not_configured'; at?: unknown; error?: string };
   /** Uploaded files (the resume), stored privately in Cloud Storage. */
   files?: { field: string; path: string; name: string }[];
 }
@@ -48,6 +50,13 @@ const LITMUS_LABEL: Record<string, string> = {
   failed: 'LITMUS failed',
   pending: 'Sending…',
   not_configured: 'Not sent (LITMUS not set up)',
+};
+
+const ALERT_LABEL: Record<string, string> = {
+  sending: 'Emailing the admins…',
+  sent: 'The admins were emailed',
+  failed: 'The email to the admins failed',
+  not_configured: 'No email sent (Email alerts are off)',
 };
 
 const nameOf = (s: Submission) => s.data.parent_name || s.data.name || '–';
@@ -269,6 +278,13 @@ function SubmissionDetail({ s, onResend, busy }: { s: Submission; onResend: () =
           {s.litmus?.sentAt != null && <p className="muted">Delivered {formatDate(s.litmus.sentAt)}</p>}
           {s.litmus?.lastError && <p className="error-text">{s.litmus.lastError}</p>}
           {!!s.litmus?.attempts && <p className="muted">Attempts: {s.litmus.attempts}</p>}
+          {s.alert && (
+            <p className={s.alert.status === 'failed' ? 'error-text' : 'muted'}>
+              {ALERT_LABEL[s.alert.status] ?? s.alert.status}
+              {s.alert.status === 'sent' && s.alert.at != null && ` on ${formatDate(s.alert.at)}`}
+              {s.alert.error && `: ${s.alert.error}`}
+            </p>
+          )}
           <button className="btn btn-light btn-sm" disabled={busy} onClick={onResend}>
             <Icon name="RefreshCw" size={16} /> {busy ? 'Sending…' : 'Send to LITMUS again'}
           </button>

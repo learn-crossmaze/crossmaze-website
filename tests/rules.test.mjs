@@ -31,6 +31,7 @@ beforeEach(async () => {
     await setDoc(doc(db, 'submissions/s1'), { type: 'admission_enquiry', data: { phone: '1' } });
     await setDoc(doc(db, 'calls/c1'), { channel: 'phone', number: '7338045201', branch: 'Neotown' });
     await setDoc(doc(db, 'private/litmus'), { url: 'https://x', headerValue: 'secret' });
+    await setDoc(doc(db, 'private/zeptomail'), { enabled: true, token: 'secret', fromAddress: 'noreply@crossmaze.test' });
     await setDoc(doc(db, 'meta/publish'), { status: 'live' });
     await setDoc(doc(db, 'meta/content'), { seededCollections: ['branches'] });
     await setDoc(doc(db, `branchAdmins/${HEAD}`), { email: HEAD, branches: ['crossmaze-neotown'] });
@@ -57,6 +58,8 @@ test('visitors and strangers cannot read or change anything', async () => {
     await assertFails(getDoc(doc(db, 'submissions/s1')));
     await assertFails(getDoc(doc(db, 'calls/c1')));
     await assertFails(getDoc(doc(db, 'private/litmus')));
+    await assertFails(getDoc(doc(db, 'private/zeptomail')));
+    await assertFails(setDoc(doc(db, 'private/zeptomail'), { enabled: true, token: 'mine' }));
     await assertFails(getDocs(collection(db, 'admins')));
     await assertFails(setDoc(doc(db, 'admins/parent@example.test'), { email: 'x' }));
   }
@@ -76,13 +79,15 @@ test('admins can read and delete the call log but not change it', async () => {
   await assertSucceeds(deleteDoc(doc(db, 'calls/c1')));
 });
 
-test('admins can edit content, submissions and LITMUS settings', async () => {
+test('admins can edit content, submissions, LITMUS and email settings', async () => {
   const db = admin().firestore();
   await assertSucceeds(setDoc(doc(db, 'content/site'), { name: 'Crossmaze' }));
   await assertSucceeds(setDoc(doc(db, 'branches/crossmaze-test'), { name: 'Test' }));
   await assertSucceeds(setDoc(doc(db, 'posts/test-post'), { title: 'Test', hidden: true }));
   await assertSucceeds(updateDoc(doc(db, 'submissions/s1'), { handled: true }));
   await assertSucceeds(getDoc(doc(db, 'private/litmus')));
+  await assertSucceeds(getDoc(doc(db, 'private/zeptomail')));
+  await assertSucceeds(setDoc(doc(db, 'private/zeptomail'), { enabled: false, token: 'new', fromAddress: 'noreply@crossmaze.test' }));
   await assertSucceeds(setDoc(doc(db, 'meta/content'), { updatedBy: ADMIN }));
   await assertSucceeds(getDoc(doc(db, 'meta/publish')));
   await assertFails(setDoc(doc(db, 'meta/publish'), { status: 'live' }));
@@ -167,6 +172,8 @@ test('branch admins can see publish status and mark a change, and nothing else',
   await assertFails(getDocs(collection(headUnverified().firestore(), 'programs')));
   await assertFails(getDoc(doc(db, 'submissions/s1')));
   await assertFails(getDoc(doc(db, 'private/litmus')));
+  await assertFails(getDoc(doc(db, 'private/zeptomail')));
+  await assertFails(setDoc(doc(db, 'private/zeptomail'), { enabled: true, token: 'mine' }));
   await assertFails(setDoc(doc(db, 'programs/x'), { name: 'X' }));
   await assertFails(setDoc(doc(db, 'testimonials/x'), { quote: 'X' }));
   await assertFails(updateDoc(doc(db, 'submissions/s1'), { handled: true }));

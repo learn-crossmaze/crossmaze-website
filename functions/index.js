@@ -1,27 +1,34 @@
 // Cloud Functions for www.crossmaze.in
 //
 //   submit             POST /api/submit (Hosting rewrite). Saves a website form submission
-//                      in Firestore (and an attached resume in Cloud Storage), then forwards it
-//                      to LITMUS. Also records taps on the website's call and WhatsApp buttons
-//                      (body.event "contact") for the admin panel's Calls page.
+//                      in Firestore (and an attached resume in Cloud Storage) and answers the
+//                      visitor straight away. Also records taps on the website's call and WhatsApp
+//                      buttons (body.event "contact") for the admin panel's Calls page.
+//   forwardSubmission  When a submission is saved, sends it to LITMUS. If LITMUS can't take it, the
+//                      full admins get an email with its details (ZeptoMail, private/zeptomail).
 //   resendSubmissions  Admin panel: send selected (or all unsent) submissions to LITMUS again.
 //   testLitmus         Admin panel: send a test payload with the saved LITMUS settings.
+//   testEmailAlert     Admin panel: send a test alert email to the admin who asks.
 //   publishSite        Admin panel "Publish" (admins and branch admins): starts the GitHub Actions
 //                      deploy, which pulls the latest content from Firestore and rebuilds the site.
-//   retryLitmus        Every 30 minutes, retries submissions that failed to reach LITMUS.
+//   retryLitmus        Every 30 minutes, retries submissions that failed to reach LITMUS (and any
+//                      that were never tried).
 import { createHash, randomUUID } from 'node:crypto';
 import { initializeApp } from 'firebase-admin/app';
 import { FieldValue, getFirestore } from 'firebase-admin/firestore';
 import { getStorage } from 'firebase-admin/storage';
+import { onDocumentCreated } from 'firebase-functions/firestore';
 import { onCall, onRequest, HttpsError } from 'firebase-functions/https';
 import { onSchedule } from 'firebase-functions/scheduler';
 import { setGlobalOptions } from 'firebase-functions/options';
 import { defineSecret, defineString } from 'firebase-functions/params';
 import { logger } from 'firebase-functions';
 import { assertAdmin } from './lib/admin.js';
+import { litmusFailureEmail, testEmail } from './lib/alerts.js';
 import { deviceOf, validateCall } from './lib/calls.js';
 import { isSpam, validateSubmission } from './lib/forms.js';
 import { buildPayload, sendToLitmus } from './lib/litmus.js';
+import { sendEmail } from './lib/zeptomail.js';
 
 initializeApp();
 const db = getFirestore();
@@ -38,8 +45,11 @@ const githubRef = defineString('GITHUB_REF', { default: 'main' });
 const RATE_LIMIT = { max: 8, windowMs: 60 * 60 * 1000 };
 const CALL_RATE_LIMIT = { max: 30, windowMs: 60 * 60 * 1000 };
 const MAX_LITMUS_ATTEMPTS = 6;
+// A submission still "pending" after this long was never tried (its forwardSubmission didn't run).
+const PENDING_GRACE_MS = 10 * 60 * 1000;
 
 const litmusConfig = async () => (await db.doc('private/litmus').get()).data();
+const emailConfig = async () => (await db.doc('private/zeptomail').get()).data();
 
 /**
  * Sends one stored submission to LITMUS and records the outcome on the document.
@@ -64,8 +74,42 @@ async function forward(snap, config) {
     'litmus.lastError': result.error ?? FieldValue.delete(),
     ...(result.status === 'sent' ? { 'litmus.sentAt': FieldValue.serverTimestamp() } : {}),
   });
-  if (result.status === 'failed') logger.warn('LITMUS delivery failed', { id: snap.id, error: result.error });
+  if (result.status === 'failed') {
+    logger.warn('LITMUS delivery failed', { id: snap.id, error: result.error });
+    // A problem with the email never stops the forwarding (or the retry of the next submission).
+    await alertAdmins(snap, result.error).catch((err) => logger.error('Alert email crashed', { id: snap.id, err }));
+  }
   return result.status;
+}
+
+/**
+ * Emails the full admins that a submission couldn't be sent to LITMUS, with its details, once per
+ * submission (again on a later failure only if that email didn't go out).
+ * @param {FirebaseFirestore.DocumentSnapshot} snap
+ * @param {string | undefined} error
+ */
+async function alertAdmins(snap, error) {
+  // Claimed first, so retries running at the same time don't send it twice (a claim left "sending"
+  // by a crash is taken over after PENDING_GRACE_MS).
+  const claimed = await db.runTransaction(async (tx) => {
+    const current = await tx.get(snap.ref);
+    const status = current.get('alert.status');
+    const stuck = status === 'sending' && Date.now() - (current.get('alert.at')?.toMillis?.() ?? 0) > PENDING_GRACE_MS;
+    if (status && status !== 'failed' && !stuck) return false;
+    tx.update(snap.ref, { 'alert.status': 'sending', 'alert.at': FieldValue.serverTimestamp() });
+    return true;
+  });
+  if (!claimed) return;
+  const [config, admins] = await Promise.all([emailConfig(), db.collection('admins').get()]);
+  const doc = snap.data() ?? {};
+  const message = litmusFailureEmail({ id: snap.id, type: doc.type, data: doc.data, page: doc.page, error });
+  const result = await sendEmail(config, { to: admins.docs.map((admin) => admin.id), ...message });
+  await snap.ref.update({
+    'alert.status': result.status,
+    'alert.at': FieldValue.serverTimestamp(),
+    'alert.error': result.error ?? FieldValue.delete(),
+  });
+  if (result.status === 'failed') logger.error('Alert email failed', { id: snap.id, error: result.error });
 }
 
 /**
@@ -134,14 +178,19 @@ export const submit = onRequest({ cors: true, memory: '256MiB', timeoutSeconds: 
     litmus: { status: 'pending', attempts: 0 },
   });
 
-  try {
-    await forward(await ref.get(), await litmusConfig());
-  } catch (err) {
-    // The submission is saved; the scheduled retry or the admin panel can resend it.
-    logger.error('Forwarding to LITMUS crashed', { id: ref.id, err });
-  }
+  // Saved, so the visitor is thanked now; forwardSubmission sends it on to LITMUS.
   // `files` tells the website which uploads were saved (older versions of this function ignored them).
   res.json({ ok: true, id: ref.id, files: files.map((f) => f.field) });
+});
+
+export const forwardSubmission = onDocumentCreated({ document: 'submissions/{id}', timeoutSeconds: 60 }, async (event) => {
+  if (!event.data) return;
+  try {
+    await forward(event.data, await litmusConfig());
+  } catch (err) {
+    // The submission stays "pending"; retryLitmus tries it again.
+    logger.error('Forwarding to LITMUS crashed', { id: event.params.id, err });
+  }
 });
 
 /**
@@ -232,6 +281,13 @@ export const testLitmus = onCall(async (request) => {
   return sendToLitmus({ ...config, enabled: true }, payload);
 });
 
+export const testEmailAlert = onCall(async (request) => {
+  const email = await assertAdmin(db, request);
+  const config = await emailConfig();
+  if (!config?.token || !config.fromAddress) throw new HttpsError('failed-precondition', 'Save a ZeptoMail token and a From address first.');
+  return sendEmail({ ...config, enabled: true }, { to: [email], ...testEmail(email) });
+});
+
 export const publishSite = onCall({ secrets: [githubToken] }, async (request) => {
   // Branch admins publish too, so their blog posts and centre head changes reach the website.
   const email = await assertAdmin(db, request, { branchAdmins: true });
@@ -273,6 +329,12 @@ export const retryLitmus = onSchedule({ schedule: 'every 30 minutes', timeoutSec
   const failed = await db.collection('submissions').where('litmus.status', '==', 'failed').limit(50).get();
   for (const snap of failed.docs) {
     if ((snap.get('litmus.attempts') ?? 0) < MAX_LITMUS_ATTEMPTS) await forward(snap, config);
+  }
+  // Ones saved a while ago but never tried.
+  const pending = await db.collection('submissions').where('litmus.status', '==', 'pending').limit(50).get();
+  for (const snap of pending.docs) {
+    const created = snap.get('createdAt')?.toMillis?.() ?? 0;
+    if (Date.now() - created > PENDING_GRACE_MS) await forward(snap, config);
   }
 });
 
