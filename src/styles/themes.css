@@ -538,28 +538,22 @@
   --eyebrow-fg: #a3127a;
   --squiggle: #ffd60a;
 
-  --font-display: 'Sniglet', 'Nunito', system-ui, sans-serif;
-  --display-weight: 800;
+  --font-display: 'Poppins', 'Nunito', system-ui, sans-serif;
+  --display-weight: 700;
   --radius-card: 28px;
   --radius-photo: 36px;
   --radius-photo-sm: 26px;
   --shadow-tint: 160 30 120;
 }
 
-/* Sniglet runs wide: page titles are a little smaller, so they wrap like the other themes'. */
+/* Poppins runs wide: page titles are a little smaller, so they wrap like the other themes'. */
 :root[data-theme='candy'] h1 {
   font-size: clamp(2.1rem, 4.9vw, 3.35rem);
 }
 
-/* The home banner title is capped in "ch", which is narrow in Sniglet; allow a little more. */
+/* The home banner title is capped in "ch"; allow a little more for Poppins' wide letters. */
 :root[data-theme='candy'] main .hero h1 {
   max-width: 17ch;
-}
-
-/* Sniglet runs wide: buttons use the bold body font so they stay on one line. */
-:root[data-theme='candy'] .btn {
-  font-family: var(--font-body);
-  font-weight: 800;
 }
 
 /* Candy Pop at night: a deep plum and berry party night, with neon pink, purple, turquoise and lemon. */
@@ -746,7 +740,7 @@
   --shadow-tint: 0 0 0;
 }
 
-/* Small labels in Sniglet stay on one line on phones. */
+/* Small labels in Poppins stay on one line on phones. */
 :root[data-theme='candy'] .eyebrow {
   letter-spacing: 0.04em;
   font-size: 0.76rem;
