@@ -2,6 +2,7 @@
   {
     "slug": "play-group",
     "name": "Play Group",
+    "alsoCalled": "",
     "ages": "2 – 3 years",
     "joining": "2 years or older on 1 June",
     "icon": "Blocks",
@@ -27,6 +28,7 @@
   {
     "slug": "nursery",
     "name": "Nursery",
+    "alsoCalled": "",
     "ages": "3 – 4 years",
     "joining": "3 years or older on 1 June",
     "icon": "Sprout",
@@ -51,6 +53,7 @@
   {
     "slug": "junior-kg",
     "name": "Junior KG",
+    "alsoCalled": "LKG",
     "ages": "4 – 5 years",
     "joining": "4 years or older on 1 June",
     "icon": "Puzzle",
@@ -76,6 +79,7 @@
   {
     "slug": "senior-kg",
     "name": "Senior KG",
+    "alsoCalled": "UKG",
     "ages": "5 – 6 years",
     "joining": "5 years or older on 1 June",
     "icon": "GraduationCap",
@@ -100,6 +104,7 @@
   {
     "slug": "day-care",
     "name": "Day Care",
+    "alsoCalled": "",
     "ages": "2 – 8 years",
     "joining": "2 to 8 years, with or without a Crossmaze class",
     "icon": "Sun",

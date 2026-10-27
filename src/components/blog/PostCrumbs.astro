@@ -1,16 +1,20 @@
 ---
 import type { Post } from '../../data/blog';
+import { site } from '../../data/site';
+import { breadcrumbList, jsonScript, type Crumb } from '../../utils';
 
 interface Props {
   post: Post;
 }
 const { post } = Astro.props;
+// The trail as shown, and the same for search engines (published posts only: drafts stay out of search).
+const trail: Crumb[] = [{ label: 'Home', href: '/' }, { label: 'Blog', href: '/blog' }, { label: post.title }];
+const crumbsLd = post.hidden === true ? '' : jsonScript(breadcrumbList(trail, site.url));
 ---
 
 <nav aria-label="Breadcrumb">
   <ol class="breadcrumbs">
-    <li><a href="/">Home</a></li>
-    <li><a href="/blog">Blog</a></li>
-    <li><span aria-current="page">{post.title}</span></li>
+    {trail.map((c) => <li>{c.href ? <a href={c.href}>{c.label}</a> : <span aria-current="page">{c.label}</span>}</li>)}
   </ol>
+  {crumbsLd && <script type="application/ld+json" set:html={crumbsLd} />}
 </nav>

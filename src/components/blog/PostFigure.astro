@@ -23,7 +23,7 @@ const { photo, alt, caption, wide = false, eager = false, class: className } = A
         alt={alt}
         widths={wide ? [640, 960, 1280, 1600] : [480, 720, 960]}
         sizes={wide ? '(max-width: 1200px) 100vw, 1180px' : '(max-width: 760px) 100vw, 720px'}
-        loading={eager ? 'eager' : 'lazy'}
+        priority={eager}
       />
       {caption && <figcaption>{caption}</figcaption>}
     </figure>

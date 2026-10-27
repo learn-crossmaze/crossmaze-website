@@ -7,15 +7,18 @@ import Header from '../components/Header.astro';
 import Footer from '../components/Footer.astro';
 import CallPicker from '../components/CallPicker.astro';
 import Icon from '../components/Icon.astro';
-import { site } from '../data/site';
-import { branches, shortName } from '../data/branches';
+import { site, orgId } from '../data/site';
+import { branches, branchId, branchUrl, shortName } from '../data/branches';
 import { hasImage, image } from '../data/content';
 import { cleanPath, jsonScript } from '../utils';
 import { doodleCss } from '../components/doodles';
 import { themes, themeSettings, fontsHref } from '../data/themes';
 
 interface Props {
+  /** The page's name; the browser tab and Google show "<title> | Crossmaze". */
   title?: string;
+  /** The whole title instead, for pages whose title names what they offer and where. */
+  fullTitle?: string;
   description?: string;
   jsonLd?: Record<string, unknown> | Record<string, unknown>[];
   /** The picture shown when the page is shared (default: the site's own). */
@@ -26,7 +29,7 @@ interface Props {
   noindex?: boolean;
 }
 
-const { title, description = site.description, jsonLd, image: shareImage, type = 'website', noindex = false } = Astro.props;
+const { title, fullTitle, description = site.description, jsonLd, image: shareImage, type = 'website', noindex = false } = Astro.props;
 
 // Which centre each phone number on the site belongs to (last 10 digits), so the call log
 // (scripts/call-log.ts) can say which centre a visitor tried to call.
@@ -36,13 +39,16 @@ const callNumbers = Object.fromEntries([
   ...(site.whatsapp ? [[last10(site.whatsapp), 'Main number']] : []),
   ...branches.filter((b) => b.phone).map((b) => [last10(b.phone), shortName(b)]),
 ]);
-const pageTitle = title ? `${title} | ${site.fullName}` : `${site.fullName} | Bengaluru`;
+// The short name as the suffix, so the words that say what the page is about have the room.
+const pageTitle = fullTitle?.trim() || (title ? `${title} | ${site.name}` : site.fullName);
 const canonical = new URL(cleanPath(Astro.url.pathname), Astro.site ?? site.url).href;
 const ogImage = shareImage
   ? new URL((await getImage({ src: shareImage, width: 1200, height: 630, fit: 'cover', format: 'jpg' })).src, Astro.site ?? site.url).href
   : new URL('/og-image.jpg', Astro.site ?? site.url).href;
-// Google's copy of the logo follows the one set in the admin panel.
-const schemaLogo = await getImage({ src: image(site.logo), width: 600, format: 'png' });
+// Google's copy of the logo follows the one set in the admin panel. Google wants it at least 112 px tall: a
+// wordmark 1200 px wide is about 150 px tall (never enlarged past the upload).
+const logo = image(site.logo);
+const schemaLogo = await getImage({ src: logo, width: Math.min(logo.width, 1200), format: 'png' });
 // The founders, only while the admin panel shows them (site.founders is empty until then).
 const founders = await Promise.all(
   site.founders.map(async (f) => ({
@@ -53,19 +59,32 @@ const founders = await Promise.all(
   })),
 );
 
+// The main address from Site settings, without the line that is the school's name and without the city
+// and state (addressLocality and addressRegion carry them): "Kusumkunj, Site No 3/4 …, Thirupalya, Neotown".
+const streetAddress = site.address
+  .map((line) => line.trim())
+  .filter((line) => line && !line.startsWith(site.name))
+  .join(', ')
+  .replace(/,?\s*\b(Bengaluru|Bangalore)\b.*$/i, '');
+// The school. Each centre's page describes the centre in full under its own id (branch/[slug].astro), and
+// the website (index.astro) and blog posts point here by @id.
 const organization = {
   '@context': 'https://schema.org',
   '@type': 'Preschool',
+  '@id': orgId,
   name: site.fullName,
+  alternateName: site.name,
   legalName: site.legalName,
+  description: site.description,
   url: site.url,
   telephone: site.phone,
   email: site.admissionsEmail,
   logo: new URL(schemaLogo.src, site.url).href,
-  image: ogImage,
+  image: new URL('/og-image.jpg', site.url).href,
+  subOrganization: branches.map((b) => ({ '@type': 'Preschool', '@id': branchId(b), name: b.name, url: branchUrl(b) })),
   address: {
     '@type': 'PostalAddress',
-    streetAddress: site.address.slice(0, 2).join(', '),
+    streetAddress,
     addressLocality: 'Bengaluru',
     addressRegion: 'Karnataka',
     ...(site.addressPincode ? { postalCode: site.addressPincode } : {}),

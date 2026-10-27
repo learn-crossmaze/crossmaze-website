@@ -13,6 +13,9 @@ export const site = {
   whatsappHref: `https://wa.me/${digits(siteContent.whatsapp || siteContent.phone)}`,
 };
 
+/** The school in structured data (BaseLayout): each centre, the website and the blog point at it by this id. */
+export const orgId = `${siteContent.url}/#organization`;
+
 export const coreValues = sectionsContent.coreValues;
 export const faqs = sectionsContent.faqs;
 export const dayRoutine = sectionsContent.dayRoutine ?? [];

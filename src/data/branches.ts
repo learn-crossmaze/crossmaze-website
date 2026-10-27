@@ -4,7 +4,7 @@
 import type { ImageMetadata } from 'astro';
 import { amenityList } from './amenities';
 import { cleanBatches } from './batches';
-import { branchesContent, hasImage, image, programsContent, sectionsContent, type BranchContent } from './content';
+import { branchesContent, hasImage, image, programsContent, sectionsContent, siteContent, type BranchContent } from './content';
 
 export type Branch = BranchContent;
 
@@ -32,3 +32,26 @@ export function headPhoto(slug: string): ImageMetadata | undefined {
 export const shortName = (branch: Branch) => branch.name.replace(/^Crossmaze\s*[–-]\s*/, '');
 
 export const telHref = (phone: string) => `tel:${phone.replace(/[^\d+]/g, '')}`;
+
+/**
+ * Where the centre is, as its page names it for search: its area (or its short name when the area is empty),
+ * with ", Electronic City" added when the address is in Electronic City but the area doesn't say so
+ * ("Neeladri Nagar, Electronic City"). Its parts are always separated by ", ".
+ */
+export function branchPlace(branch: Branch) {
+  const ec = /electronic city/i;
+  const area = (branch.area ?? '').split(',').map((part) => part.trim()).filter(Boolean).join(', ') || shortName(branch);
+  return !ec.test(area) && branch.address.some((line) => ec.test(line)) ? `${area}, Electronic City` : area;
+}
+
+/** A branch's page, and the centre's id in structured data (its own page, and the school's subOrganization). */
+export const branchUrl = (branch: Branch) => new URL(`/branch/${branch.slug}`, siteContent.url).href;
+export const branchId = (branch: Branch) => `${branchUrl(branch)}#centre`;
+
+/** The map field as coordinates ("12.8598706,77.613154") for structured data; undefined when it is a place search. */
+export function branchGeo(branch: Branch) {
+  const m = /^\s*(-?\d{1,2}(?:\.\d+)?)\s*,\s*(-?\d{1,3}(?:\.\d+)?)\s*$/.exec(branch.mapQuery ?? '');
+  if (!m) return undefined;
+  const [latitude, longitude] = [Number(m[1]), Number(m[2])];
+  return Math.abs(latitude) <= 90 && Math.abs(longitude) <= 180 ? { '@type': 'GeoCoordinates', latitude, longitude } : undefined;
+}

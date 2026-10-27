@@ -350,7 +350,13 @@ export const branchSchema: Field[] = [
   { type: 'heading', label: 'Branch' },
   { key: 'name', label: 'Branch name', type: 'text', required: true, placeholder: 'Crossmaze – Neotown' },
   { key: 'area', label: 'Area', type: 'text', placeholder: 'Neotown, Thirupalya' },
-  { key: 'intro', label: 'Short introduction', type: 'textarea', rows: 2, help: 'Shown at the top of the branch page.' },
+  { key: 'intro', label: 'Short introduction', type: 'textarea', rows: 2, help: 'Shown at the top of the branch page and on the Branches page.' },
+  {
+    key: 'seoTitle',
+    label: 'Title in Google',
+    type: 'text',
+    help: 'The page’s title in Google results and on browser tabs, about 60 characters. Leave it empty for “Preschool & Day Care in <area> | Crossmaze”, made from the Area and the address.',
+  },
   { key: 'description', label: 'About this centre', type: 'list', itemLabel: 'Paragraph', multiline: true },
   { key: 'photos', label: 'Photos', type: 'images', folder: 'branches', help: 'The first photo is the cover; up to nine more fill the gallery, and every photo opens in the album. Use the arrows to reorder.' },
 
@@ -376,6 +382,14 @@ export const branchSchema: Field[] = [
 
 export const programSchema: Field[] = [
   { key: 'name', label: 'Program name', type: 'text', required: true },
+  {
+    key: 'alsoCalled',
+    label: 'Also called',
+    type: 'text',
+    placeholder: 'LKG',
+    maxLength: 30,
+    help: 'Another name parents know it by, shown in brackets after the name on Our Programs and the program cards. It also takes the name’s place in the Our Programs title in Google (Junior KG is “LKG” there), so use one parents search for. Leave it empty for none.',
+  },
   { key: 'ages', label: 'Age group', type: 'text', required: true, placeholder: '2 – 3 years' },
   { key: 'joining', label: 'Who can join', type: 'text', placeholder: '2 years or older on 1 June', help: 'Shown on Our Programs, next to the timings at each centre.' },
   { key: 'icon', label: 'Icon', type: 'icon' },
@@ -548,6 +562,7 @@ export const collections: Record<CollectionConfig['name'], CollectionConfig> = {
       name: '',
       area: '',
       intro: '',
+      seoTitle: '',
       description: [],
       address: [],
       pincode: '',
@@ -569,7 +584,7 @@ export const collections: Record<CollectionConfig['name'], CollectionConfig> = {
     titleField: 'name',
     subtitleField: 'ages',
     slug: { prefix: '', urlPrefix: '/our-programs#' },
-    blank: () => ({ name: '', ages: '', joining: '', icon: 'Star', color: 'navy', photo: '', photoAlt: '', headline: '', summary: '', paragraphs: [], focusTitle: 'Focus areas', focus: [] }),
+    blank: () => ({ name: '', alsoCalled: '', ages: '', joining: '', icon: 'Star', color: 'navy', photo: '', photoAlt: '', headline: '', summary: '', paragraphs: [], focusTitle: 'Focus areas', focus: [] }),
   },
   jobs: {
     name: 'jobs',

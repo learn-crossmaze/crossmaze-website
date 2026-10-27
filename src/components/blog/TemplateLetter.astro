@@ -51,7 +51,7 @@ const quoteAfter = Math.min(0, post.sections.length - 1);
       {
         photo && (
           <figure class="letter__photo">
-            <Image src={photo} alt={post.coverAlt || post.title} widths={[360, 540, 720]} sizes="(max-width: 760px) 100vw, 320px" loading="eager" />
+            <Image src={photo} alt={post.coverAlt || post.title} widths={[360, 540, 720]} sizes="(max-width: 760px) 100vw, 320px" priority />
           </figure>
         )
       }

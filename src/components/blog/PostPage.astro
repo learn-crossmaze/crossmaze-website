@@ -8,7 +8,8 @@ import TemplateStory from './TemplateStory.astro';
 import TemplateTips from './TemplateTips.astro';
 import TemplateNotice from './TemplateNotice.astro';
 import TemplateLetter from './TemplateLetter.astro';
-import { site } from '../../data/site';
+import { getImage } from 'astro:assets';
+import { site, orgId } from '../../data/site';
 import { cover, postUrl, templateOf, type Post } from '../../data/blog';
 
 interface Props {
@@ -19,15 +20,22 @@ const draft = post.hidden === true;
 const photo = cover(post);
 const url = new URL(postUrl(post), Astro.site ?? site.url).href;
 
+// The cover for Google, 1200 px wide (Google wants article images at least that wide); the breadcrumbs'
+// BreadcrumbList is written by PostCrumbs.astro.
+const coverImage = photo && !draft ? new URL((await getImage({ src: photo, width: 1200, height: 675, fit: 'cover', format: 'jpg' })).src, site.url).href : undefined;
+const school = { '@type': 'Preschool', '@id': orgId, name: site.fullName, url: site.url };
+// A post signed by the school ("The Crossmaze team") is the school's in Google's eyes, not a person's.
+const byPerson = !!post.author?.name && !/\bteam\b|crossmaze/i.test(post.author.name);
 const article = {
   '@context': 'https://schema.org',
   '@type': 'BlogPosting',
   headline: post.title,
   description: post.summary,
+  ...(coverImage ? { image: coverImage } : {}),
   datePublished: post.date || undefined,
   mainEntityOfPage: url,
-  author: post.author?.name ? { '@type': 'Person', name: post.author.name } : { '@type': 'Organization', name: site.fullName },
-  publisher: { '@type': 'Organization', name: site.fullName, url: site.url },
+  author: byPerson ? { '@type': 'Person', name: post.author.name, ...(post.author.role ? { jobTitle: post.author.role } : {}) } : school,
+  publisher: school,
 };
 
 const Template = {

@@ -10,14 +10,21 @@
 //  - Narrower: one column as usual, with the lead at body-text size and tighter spacing.
 // The owner's text is never shortened. Short leads keep the usual one-column banner.
 import FloatingShapes from './FloatingShapes.astro';
+import { site } from '../data/site';
+import { breadcrumbList, jsonScript, type Crumb } from '../utils';
 
 interface Props {
   eyebrow?: string;
   title: string;
   lead?: string;
-  crumbs?: { label: string; href?: string }[];
+  /** The steps after Home, the page itself last (no link). */
+  crumbs?: Crumb[];
 }
 const { eyebrow, title, lead, crumbs = [] } = Astro.props;
+// The trail as shown, and the same for search engines (written beside it, inside the breadcrumb nav, so the
+// banner stays the first thing in <main>).
+const trail: Crumb[] = [{ label: 'Home', href: '/' }, ...crumbs];
+const crumbsLd = crumbs.length > 0 ? jsonScript(breadcrumbList(trail, site.url)) : '';
 
 /** Leads longer than this (about three lines across a wide banner) use the two-column layout. */
 const LONG_LEAD = 220;
@@ -41,13 +48,11 @@ const leadRest = split ? text.slice(split[0].length) : '';
       crumbs.length > 0 && (
         <nav aria-label="Breadcrumb">
           <ol class="breadcrumbs">
-            <li>
-              <a href="/">Home</a>
-            </li>
-            {crumbs.map((c) => (
+            {trail.map((c) => (
               <li>{c.href ? <a href={c.href}>{c.label}</a> : <span aria-current="page">{c.label}</span>}</li>
             ))}
           </ol>
+          <script type="application/ld+json" set:html={crumbsLd} />
         </nav>
       )
     }

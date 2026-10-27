@@ -1,0 +1,32 @@
+{
+  "id": "2026-10-26-main-phone-address",
+  "description": "Main phone +91 72599 21508 (also WhatsApp) and main address the Neotown centre, Kusumkunj, PIN 560099, as already set in Site settings (confirmed by the school on 26 Oct)",
+  "changes": [
+    {
+      "doc": "content/site",
+      "field": "phone",
+      "from": "+91 72040 21508",
+      "to": "+91 72599 21508"
+    },
+    {
+      "doc": "content/site",
+      "field": "address",
+      "from": [
+        "Crossmaze Preschool and Day Care – The Hub",
+        "In front of SNN Raj Serenity, Suraksha Nagar",
+        "Yelenahalli, Begur, Bengaluru, Karnataka 560068"
+      ],
+      "to": [
+        "Crossmaze Preschool and Day Care",
+        "Kusumkunj, Site No 3/4 Opposite to G.M. Infinite",
+        "Thirupalya, Neotown, Bangalore - Karnataka"
+      ]
+    },
+    {
+      "doc": "content/site",
+      "field": "addressPincode",
+      "from": "560068",
+      "to": "560099"
+    }
+  ]
+}

@@ -21,7 +21,7 @@ The URLs match the old site, so existing links and Google results keep working.
 | `/` | Home: hero, stats, about, core values, programs, a day at Crossmaze, day care, facilities, testimonials, latest blog posts, branches, admission enquiry (with how admission works beside the form); on phones the programs, testimonials and branches are swipe strips |
 | `/about` | Who we are, core values, approach, annual-day photos, and the founders once they are switched on in the admin panel |
 | `/our-programs` | Play Group, Nursery, Junior KG, Senior KG, Day Care, how we teach, a day at Crossmaze, extra-curriculars, FAQs |
-| `/branch` and `/branch/<slug>` | All branches, then one page per branch: photos, facts (including opening hours), programs with their batches and timings, about the centre with its amenities and centre head, gallery, then the visit details and map beside the enquiry form |
+| `/branch` and `/branch/<slug>` | All branches, each with its area and short introduction, then one page per branch: photos, facts (including opening hours), programs with their batches and timings, about the centre with its amenities and centre head, gallery, then the visit details and map beside the enquiry form |
 | `/careers` | Why work with us, open roles, application form with resume upload |
 | `/contact` | Admission enquiry, phone / WhatsApp / email, how admission works, all branch addresses |
 | `/privacy-policy`, `/terms` | Carried over from the old site (`src/pages/*.md`) |
@@ -34,8 +34,8 @@ Go to **www.crossmaze.in/admin** and sign in (until the domain moves, step 6 bel
 | Section | What you can change |
 | --- | --- |
 | Site settings | Logo, school name, phone, WhatsApp, emails, address, social links, colour theme, home-page banner, numbers strip, about paragraphs (each with an optional subheading), quote, photos, founders (see below) |
-| Branches | Add, hide, reorder or delete branches; name, address, map, phone, size, capacity, amenities, programs offered, timings and batches (see below), photos (first = cover; the page shows six, and all of them open in a swipeable album), centre head with photo and bio |
-| Programs | Add, hide, reorder; name, age group, who can join (e.g. “2 years or older on 1 June”), icon, colour, photo, description, focus list (timings are set per branch) |
+| Branches | Add, hide, reorder or delete branches; name, area, short introduction (also shown on the Branches page), **Title in Google** (see [Search](#search-seo)), address, map, phone, size, capacity, amenities, programs offered, timings and batches (see below), photos (first = cover; the page shows six, and all of them open in a swipeable album), centre head with photo and bio |
+| Programs | Add, hide, reorder; name, **Also called** (another name parents know it by, shown in brackets after the name on Our Programs and the program cards: “Junior KG (LKG)”; empty for none), age group, who can join (e.g. “2 years or older on 1 June”), icon, colour, photo, description, focus list (timings are set per branch) |
 | Jobs | Open positions on the careers page |
 | Testimonials | Parent quotes on the home page |
 | Page sections | Core values, teaching approach, a day at Crossmaze, how admission works, day care highlights, extra-curriculars, facilities (with the photos for the scrolling strip on the home page), careers perks, FAQs |
@@ -294,7 +294,7 @@ FIREBASE_STORAGE_BUCKET=demo-crossmaze.appspot.com ADMIN_EMAILS=you@example.com 
 
 - `content/*.json` is what the site is built from. `src/data/*.ts` loads it; image fields are paths under `src/assets/`.
 - `scripts/sync-content.mjs` runs before every deploy. It pulls Firestore content into those JSON files and downloads new photos into `src/assets/cms/`, which isn't committed. Astro then resizes the photos and converts them to WebP.
-- A field that's new in `content/site.json` or `content/sections.json` (such as a new page section) is copied into Firestore on the next deploy from `main`, so it appears in the admin panel. Pull-request previews use the repository's copy without writing to Firestore.
+- A field that's new in `content/site.json` or `content/sections.json` (such as a new page section) is copied into Firestore on the next deploy from `main`, so it appears in the admin panel. Pull-request previews use the repository's copy without writing to Firestore. A new field on the items of a list (branches, programs, jobs) is not copied: it is empty until someone fills it in the admin panel, unless a content update (below) gives it a value, as `2026-10-26-program-also-called` does for Junior KG's and Senior KG's **Also called** (an update from an empty field applies only while the field has never been set; one cleared in the admin panel counts as edited).
 - Founders (`founders` in `content/site.json`) used to be a list of names, and the live database keeps those names until Site settings is next saved. A name is read as a founder with only a name by the site (`src/data/founders.ts`), the admin panel (the field's `fromText` in `src/admin/schemas.ts`) and `scripts/sync-content.mjs`, so both shapes work. A content update that changes the founders compares them the same way (a name, a founder saved without its empty fields and the repository's copy with every field all match), so it applies unless someone has changed them in the admin panel. `showFounders` was added later too: deploys from `main` copy it into Firestore switched off.
 - **Changing existing copy from the repository** (reworded text, a corrected phone number) needs a content update, because the live text is in Firestore and each deploy overwrites `content/*.json` with it. Edit the JSON, then run `node scripts/content-update.mjs <id> "<what changed>"` before committing (it compares with the last commit; pass another git ref as a third argument, e.g. `origin/main`). It writes `content/updates/<id>.json`, one entry per changed field. Pull-request previews show the change without saving it. The next deploy from `main` saves it to Firestore once, and only where Firestore still has the old text, so anything edited in the admin panel is kept. The deploy log lists what was updated and what was kept. Photos inside a list that changes as a whole (such as each facility's photo) are included and copied to Cloud Storage when the update is saved; other photo fields and new items, such as a branch or a job, are added in the admin panel.
 - `scripts/report-publish.mjs` tells the admin panel whether a deploy succeeded.
@@ -302,6 +302,27 @@ FIREBASE_STORAGE_BUCKET=demo-crossmaze.appspot.com ADMIN_EMAILS=you@example.com 
 - Doodles: each theme draws its own set in `src/components/doodles/<theme>.ts` (the slots are described in `shared.ts`: 4 for the home banner, 3 for other banners, 6 for the sections, and the home title's underline), listed in `themeDoodles` in `src/components/doodles/index.ts`. The build turns every drawing into a small file, `/doodles/<hash>.svg` (named after its content, so it can be cached for good), and the CSS that picks the current theme's set by day or at night. Check a set with `npm run dev` and `?theme=<id>&mode=light|dark`.
 - The admin panel lives in `src/admin/`. Its forms are generated from `src/admin/schemas.ts`, so adding a field there and in `src/data/content.ts` is all it takes.
 - Who can do what is decided by `firestore.rules` and `storage.rules`: full admins are listed in `admins/{email}`, branch admins in `branchAdmins/{email}` (`branches`: the branch slugs whose `centerHead` they may change). Blog posts record their writer in `createdBy`. The panel's menu (`NAV` in `src/admin/AdminApp.tsx`) only hides pages; the rules are what stop a branch admin, so test them with `npm run test:rules`.
+
+## Search (SEO)
+
+What the code does, from the content in the admin panel:
+
+- **Titles** name the service and the place. About 60 characters show in Google.
+  - Home page: “Crossmaze Preschool & Day Care in Electronic City & Begur, Bengaluru”.
+  - Each branch page: “Preschool & Day Care in <area> | Crossmaze”, with “, Electronic City” added when the address is there but the area doesn't say so (the short name stands in for an empty area). A title over 65 characters is shortened until it fits: a long area keeps its first and last parts (“Neotown, Electronic City”), then the short name stands for the area (“SNN Greenbay, Electronic City”), then “ | Crossmaze” goes (Neeladri Nagar). The branch's **Title in Google** overrides all of this.
+  - Branches, Our Programs, About, Careers and Contact have their own titles (“Preschool & Day Care Centres in Electronic City & Begur”, …). Our Programs uses the programs' other names (“LKG”, “UKG”) in place of their names, so an **Also called** should be a name parents search for.
+  - Other pages: “<page> | Crossmaze”.
+- **Descriptions** come from the page's own facts: each branch page's from its area, programs, opening hours (when its facts show one range) and phone, leaving out the days and then the hours when it would be over 160 characters; Contact's from the main phone and admissions email. The home page's is **Site settings → Description for Google** (Google shows about 155 characters of it).
+- **Headings**: on the home and branch pages, the small lines above the title (“Preschool & Day Care”, then the place: “Neotown, Thirupalya” / “Electronic City · 560099”) are part of the page's main heading, which reads “Preschool & Day Care, Neotown, Thirupalya, Electronic City · 560099 Crossmaze – Neotown”. They are one under the other at every width, so the heading doesn't change height when the web font arrives.
+- **Structured data** (what Google reads about the school, `BaseLayout.astro` and the pages): the school (`Preschool`, with its logo, main phone and main address), the website's name (home page), each centre (`Preschool` and `ChildCare`, with its own phone, address, map position, photos and, once every batch has its days, opening hours) linked to the school, the breadcrumbs on every page that shows them, and blog posts with their cover photo. The sitemap (`/sitemap-index.xml`) lists every page.
+
+What stays with the school (the website can't do these):
+
+- **Google Search Console** (the property verified through the old Wix tag, kept in `BaseLayout.astro`): submit `https://www.crossmaze.in/sitemap-index.xml`, ask Google to recrawl the home page and the branch pages after a deploy (URL Inspection → Request indexing), and check a branch page and a blog post in Google's Rich Results Test.
+- **Google Business Profiles**: one per centre, claimed and verified by the school, with the same name, address and phone as its branch page, and the branch page as its website.
+- **Directories** (Justdial, cretaclass and others) that still give an old address or number, such as Neeladri Nagar's old Malligue Residency address and +91 99020 68692, which the site doesn't use: ask them to correct it.
+- **Opening hours for Google**: tick the days of every batch at a centre (Branches → Timings and batches); until then its page gives Google no opening hours.
+- **Description for Google** (Site settings) is 216 characters; Google shows about 155, so a shorter one reads better.
 
 ## Confirmed by the school
 
@@ -318,15 +339,21 @@ On 26 October 2026 the school also confirmed:
 
 - **Timings and batches** on the branch pages are correct.
 - **Facility photos**: the four stock photos (CCTV surveillance, Fire safe, Parents’ communication app, Trained caregivers) are licensed; the school bought them.
-- **WhatsApp**: +91 72599 21508, the number on the old site's WhatsApp button. The main phone stays +91 72040 21508.
+- **WhatsApp**: +91 72599 21508, the number on the old site's WhatsApp button.
 - **Enquiries** go to LITMUS, which sends the email alerts.
 - **Feedback** from parents goes through the LITMUS parents portal; the old Wix feedback addresses redirect there.
 - **Founders** are not shown on the website for now. They can be filled in later (admin panel → Site settings → About page: each founder's name, role, photo and a few lines), then switched on with **Show the founders on the About page** and published.
 
+Later on 26 October 2026 the school confirmed:
+
+- **Main phone and WhatsApp**: +91 72599 21508 for both (admin panel → Site settings). It is the number search engines show for the school, and what Call buttons dial if the centre picker can't open. Each centre keeps its own number.
+- **Main address**: the Neotown centre, in the **Kusumkunj** building: Kusumkunj, Site No 3/4, opposite G.M. Infinite, Thirupalya, Neotown, PIN 560099 (Site settings → Main address). Neotown's own address names the building too.
+- **Neotown** is in **Electronic City**, near Thirupalya, in the **Kusumkunj** building (Site No. 3/4, opposite G.M. Infinite, Phase 1, as on the old site).
+- **LKG and UKG**: Junior KG is also called LKG, and Senior KG UKG (admin panel → Programs → Also called). The programs keep their names, which the batches refer to.
+
 ## Please verify before launch
 
 - [ ] **Branch phone numbers, addresses and map pins** come from the branch records behind the old www.crossmaze.in: The Hub +91 72040 21508, Neotown +91 73380 45201, SNN Greenbay +91 72595 10758, Neeladri Nagar +91 97409 21508 and Ananth Nagar +91 87225 70895. Call each number once to check it reaches the right centre. Neeladri Nagar's address changed from "Malligue Residency, 16th Cross Road" to "128, Gargeshwari, 13th Cross Road", as on the old site.
-- [ ] **Main phone**: +91 72040 21508 (The Hub's number). It is the number search engines show, and what Call buttons dial if the centre picker can't open (admin panel → Site settings).
 - [ ] **Careers email**: now `career@crossmaze.in` (set in the admin panel). Send it one test email to make sure that mailbox exists in Zoho.
 - [ ] **Small photos** look soft on large and high-resolution screens. The day care photo is still the old nap-room picture, only 555 px wide, some "Life at Crossmaze" photos are 450–500 px wide, and so are the school’s own facility photos from the old site (555 px; admin panel → Page sections → Facilities), which also open full screen. Upload larger originals (about 1200 px wide or more; admin panel → Site settings → Day care photo and “Life at Crossmaze” photos). The site picks up the larger sizes by itself.
 - [ ] **Play Group photo description** still says "Colourful indoor play area with rockers and a slide", but the new photo shows children holding paper props. Update it in admin panel → Programs → Play Group → Photo description.

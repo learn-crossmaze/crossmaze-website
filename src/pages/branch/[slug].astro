@@ -11,15 +11,20 @@ import {
   branches,
   amenityList,
   branchPhotos,
+  branchGeo,
+  branchId,
+  branchPlace,
+  branchUrl,
   headPhoto,
   shortName as toShortName,
   telHref,
   type Branch,
 } from '../../data/branches';
 import TimeRange from '../../components/TimeRange.astro';
-import { dayRuns, openingHoursSpecification, openingTimes, seatLabels } from '../../data/batches';
+import { dayRuns, formatRange, openingHoursSpecification, openingTimes, seatLabels } from '../../data/batches';
 import { programs } from '../../data/programs';
-import { site } from '../../data/site';
+import { site, orgId } from '../../data/site';
+import { breadcrumbList, listText, type Crumb } from '../../utils';
 
 export function getStaticPaths() {
   return branches.map((branch) => ({ params: { slug: branch.slug }, props: { branch } }));
@@ -153,16 +158,61 @@ for (let k = offered.length - 2; k >= 1; k--) if (imbalance(k) < imbalance(secon
 const tones = ['navy', 'green', 'coral', 'sky', 'sun'];
 const otherCards = others.map((b, i) => ({ branch: b, cover: branchPhotos(b.slug)[0], tone: tones[(i + 1) % tones.length] }));
 
+// What Google shows for the page, from what the page itself says: the service and the place in the title
+// (unless the admin panel gives one: Branches → Title in Google), and in the description the programs, the
+// opening hours (as in the facts above the timetable, when they are one range) and the phone number.
+// Google shows about 60 characters of a title, so one over 65 is shortened, in this order, until it fits: a
+// long area keeps only its first and last parts ("Neotown, Thirupalya, Electronic City" → "Neotown,
+// Electronic City"), the centre's short name stands for the area ("SNN Greenbay, Electronic City"), and
+// last " | Crossmaze" goes (Google shows the site's name above the result anyway).
+const place = branchPlace(branch);
+const placeParts = place.split(', ');
+const lastPart = placeParts.length > 1 ? `, ${placeParts.at(-1)}` : '';
+const wheres = [place, `${placeParts[0]}${lastPart}`, `${shortName}${lastPart}`];
+const titleFor = (where: string) => `Preschool & Day Care in ${where} | ${site.name}`;
+const defaultTitle =
+  wheres.map(titleFor).find((t) => t.length <= 65) ?? `Preschool & Day Care in ${wheres.reduce((a, b) => (b.length < a.length ? b : a))}`;
+const pageTitle = branch.seoTitle?.trim() || defaultTitle;
+// The place as the heading shows it: its last part and the PIN code on a line of their own ("Neotown,
+// Thirupalya" / "Electronic City · 560099"), so the lines break in the same places whichever font is showing
+// (a late web font would otherwise move the page as they rewrapped). Each part stays whole.
+const keepWhole = (part: string) => part.replace(/\s+/g, '\u00a0');
+const placeLines = placeParts.length > 1 ? [placeParts.slice(0, -1).map(keepWhole).join(', '), keepWhole(placeParts.at(-1)!)] : [keepWhole(place)];
+// The classes (youngest first, as in the admin panel) as a range when there are three or more, then day
+// care by name: "Play Group to Senior KG and Day Care".
+const care = offered.filter((p) => p.slug === 'day-care').map((p) => p.name);
+const classes = offered.filter((p) => p.slug !== 'day-care').map((p) => p.name);
+const programsText = listText([...(classes.length >= 3 ? [`${classes[0]} to ${classes.at(-1)}`] : classes), ...care]);
+const what = care.length ? (classes.length ? 'Play school and day care' : 'Day care') : 'Play school';
+const hoursText = (days: boolean) =>
+  open.length === 1 ? `, open ${days && open[0]!.days ? `${open[0]!.days}, ` : ''}${formatRange(open[0]!.from, open[0]!.to)}` : '';
+const describe = (hours: string) =>
+  [`${what} in ${place}, Bengaluru${programsText ? `: ${programsText}${hours}` : ''}.`, branch.phone && `Call ${branch.phone}.`]
+    .filter(Boolean)
+    .join(' ');
+// Google shows about 160 characters of a description: the days, then the hours, go when it would be longer.
+const descriptions = [describe(hoursText(true)), describe(hoursText(false)), describe('')];
+const pageDescription = descriptions.find((d) => d.length <= 160) ?? descriptions.at(-1)!;
+
+// The breadcrumbs as shown in the banner, and the same for search engines.
+const crumbs: Crumb[] = [{ label: 'Home', href: '/' }, { label: 'Branches', href: '/branch' }, { label: shortName }];
+
+const geo = branchGeo(branch);
 const jsonLd = {
   '@context': 'https://schema.org',
   // Preschool, and as day care a local business, for which Google shows opening hours.
   '@type': ['Preschool', 'ChildCare'],
+  '@id': branchId(branch),
   name: branch.name,
-  url: new URL(`/branch/${branch.slug}`, site.url).href,
+  ...(branch.intro ? { description: branch.intro } : {}),
+  url: branchUrl(branch),
   telephone: branch.phone,
   email: branch.email,
-  ...(cover ? { image: new URL(fullSize[0]!.src, site.url).href } : {}),
-  parentOrganization: { '@type': 'Organization', name: site.fullName, url: site.url },
+  // The cover and the next photos (Google prefers a few).
+  ...(cover ? { image: fullSize.slice(0, 4).map((p) => new URL(p.src, site.url).href) } : {}),
+  parentOrganization: { '@type': 'Preschool', '@id': orgId, name: site.fullName, url: site.url },
+  ...(geo ? { geo } : {}),
+  ...(branch.mapQuery?.trim() ? { hasMap: directions } : {}),
   ...(hours.length ? { openingHoursSpecification: hours } : {}),
   address: {
     '@type': 'PostalAddress',
@@ -175,24 +225,32 @@ const jsonLd = {
 };
 ---
 
-<BaseLayout
-  title={`${shortName} Branch`}
-  description={`${branch.name}: preschool and day care in ${branch.area}, Bengaluru ${branch.pincode}. Play Group, Nursery, Junior KG, Senior KG and Day Care.`}
-  jsonLd={jsonLd}
->
+<BaseLayout fullTitle={pageTitle} description={pageDescription} image={cover} jsonLd={[jsonLd, breadcrumbList(crumbs, site.url)]}>
   <section class="page-hero branch-hero">
     <FloatingShapes />
     <div class:list={['container', 'branch-hero__inner', { 'branch-hero__inner--text': !cover }]}>
-      <div>
+      <div class="branch-hero__text">
         <nav aria-label="Breadcrumb">
           <ol class="breadcrumbs">
-            <li><a href="/">Home</a></li>
-            <li><a href="/branch">Branches</a></li>
-            <li><span aria-current="page">{shortName}</span></li>
+            {crumbs.map((c) => <li>{c.href ? <a href={c.href}>{c.label}</a> : <span aria-current="page">{c.label}</span>}</li>)}
           </ol>
         </nav>
-        <span class="eyebrow">{branch.area} · {branch.pincode}</span>
-        <h1>{heroTitle}</h1>
+        {/* What and where, as the first lines of the heading (they keep the eyebrow's look; global.css). */}
+        <h1>
+          <span class="eyebrow">
+            {/* One line each (global.css), with commas between them for screen readers and search engines. */}
+            <span class="eyebrow__parts">
+              <span>Preschool & Day Care<span class="sr-only">,</span></span>{' '}
+              {placeLines.slice(0, -1).map((line) => (
+                <>
+                  <span>{line}<span class="sr-only">,</span></span>{' '}
+                </>
+              ))}
+              <span>{placeLines.at(-1)}{branch.pincode && <>&nbsp;·&nbsp;{branch.pincode}</>}</span>
+            </span>
+          </span>{' '}
+          {heroTitle}
+        </h1>
         <p class="lead">{branch.intro}</p>
         <div class="btn-row">
           <a class="btn btn--sun" href="#enquire">Book a visit</a>
@@ -211,7 +269,7 @@ const jsonLd = {
               alt={photoAlt(1)}
               widths={[480, 720, 1000, 1400]}
               sizes="(max-width: 760px) calc(100vw - 32px), (max-width: 1219px) calc(50vw - 44px), 580px"
-              loading="eager"
+              priority
             />
             {photos.length > 1 && (
               <span class="branch-hero__count">
@@ -559,6 +617,11 @@ const jsonLd = {
   /* The page set's big drifting doodle would sit behind the photo and poke out above its frame. */
   .branch-hero :global(.fx__shape--page-1) {
     display: none;
+  }
+
+  /* The text column is the width the heading's first lines (the eyebrow) may take (global.css). */
+  .branch-hero__text {
+    container-type: inline-size;
   }
 
   .branch-hero h1 {

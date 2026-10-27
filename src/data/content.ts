@@ -93,6 +93,8 @@ export type ToneColor = 'sun' | 'coral' | 'green' | 'sky' | 'navy';
 export interface ProgramContent {
   slug: string;
   name: string;
+  /** Another name parents know the program by ("LKG" for Junior KG), shown next to its name; empty for none. */
+  alsoCalled?: string;
   ages: string;
   /** Who can join, e.g. "2 years or older on 1 June"; shown on Our Programs. */
   joining?: string;
@@ -112,6 +114,8 @@ export interface BranchContent {
   name: string;
   area: string;
   intro: string;
+  /** The page's title in Google and on browser tabs; empty for "Preschool & Day Care in <area> | Crossmaze". */
+  seoTitle?: string;
   description: string[];
   address: string[];
   pincode: string;
