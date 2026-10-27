@@ -88,7 +88,7 @@ Branch admins need the database rules and functions from step 3 below (`npx fire
 
 ### WhatsApp
 
-There is no school-wide WhatsApp number: each centre has its own (**Branches → WhatsApp number**, with the country code, e.g. 917338045201; empty uses the centre's phone number). The WhatsApp buttons on the home page, Contact and the round green button in the corner open a list of the centres, like the call buttons do, so parents pick theirs. On a centre's own page the green button opens a chat with that centre straight away.
+There is no school-wide WhatsApp number: each centre has its own (**Branches → WhatsApp number**, e.g. +91 73380 45201; empty uses the centre's phone number). However it's typed (with or without +91, a leading 0 or spaces), the site turns it into the right WhatsApp link and shows it like the phone numbers. The WhatsApp buttons on the home page, Contact and the round green button in the corner open a list of the centres, like the call buttons do, so parents pick theirs. On a centre's own page the green button opens a chat with that centre straight away.
 
 ### Calls
 
@@ -350,13 +350,13 @@ On 26 October 2026 the school also confirmed:
 Later on 26 October 2026 the school confirmed:
 
 - **Main phone**: +91 72599 21508 (admin panel → Site settings). It is the number search engines show for the school, and what Call buttons dial if the centre picker can't open. Each centre keeps its own number.
+- **Main address**: the Neotown centre, in the **Kusumkunj** building: Kusumkunj, Site No 3/4, opposite G.M. Infinite, Thirupalya, Neotown, PIN 560099 (Site settings → Main address). Neotown's own address names the building too.
+- **Neotown** is in **Electronic City**, near Thirupalya, in the **Kusumkunj** building (Site No. 3/4, opposite G.M. Infinite, Phase 1, as on the old site).
+- **LKG and UKG**: Junior KG is also called LKG, and Senior KG UKG (admin panel → Programs → Also called). The programs keep their names, which the batches refer to.
 
 On 27 October 2026 the school asked for:
 
 - **WhatsApp per centre**: no common WhatsApp number (+91 72599 21508 is no longer used for WhatsApp). The WhatsApp buttons ask which centre, and a centre's own page goes straight to that centre (see [WhatsApp](#whatsapp)).
-- **Main address**: the Neotown centre, in the **Kusumkunj** building: Kusumkunj, Site No 3/4, opposite G.M. Infinite, Thirupalya, Neotown, PIN 560099 (Site settings → Main address). Neotown's own address names the building too.
-- **Neotown** is in **Electronic City**, near Thirupalya, in the **Kusumkunj** building (Site No. 3/4, opposite G.M. Infinite, Phase 1, as on the old site).
-- **LKG and UKG**: Junior KG is also called LKG, and Senior KG UKG (admin panel → Programs → Also called). The programs keep their names, which the batches refer to.
 
 ## Please verify before launch
 

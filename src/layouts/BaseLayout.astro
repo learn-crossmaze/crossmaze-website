@@ -29,17 +29,21 @@ interface Props {
   noindex?: boolean;
   /** A branch page's own WhatsApp chat: its WhatsApp button opens it straight away instead of the list of centres. */
   whatsappHref?: string;
+  /** That branch's short name, which the call log records for a tap on the button. */
+  whatsappBranch?: string;
 }
 
-const { title, fullTitle, description = site.description, jsonLd, image: shareImage, type = 'website', noindex = false, whatsappHref } = Astro.props;
+const { title, fullTitle, description = site.description, jsonLd, image: shareImage, type = 'website', noindex = false, whatsappHref, whatsappBranch } = Astro.props;
 
 // Which centre each phone number on the site belongs to (last 10 digits), so the call log
-// (scripts/call-log.ts) can say which centre a visitor tried to call.
+// (scripts/call-log.ts) can say which centre a visitor tried to call. Later entries win, so a centre's phone
+// and the main number keep their own names when a WhatsApp number is the same; the lists of centres and the
+// branch page's WhatsApp button name their centre on the link (data-branch) anyway.
 const last10 = (phone: string) => phone.replace(/\D/g, '').slice(-10);
 const callNumbers = Object.fromEntries([
+  ...branches.filter((b) => whatsappNumber(b)).map((b) => [last10(whatsappNumber(b)), shortName(b)]),
   [last10(site.phone), 'Main number'],
   ...branches.filter((b) => b.phone).map((b) => [last10(b.phone), shortName(b)]),
-  ...branches.filter((b) => whatsappNumber(b)).map((b) => [last10(whatsappNumber(b)), shortName(b)]),
 ]);
 // The short name as the suffix, so the words that say what the page is about have the room.
 const pageTitle = fullTitle?.trim() || (title ? `${title} | ${site.name}` : site.fullName);
@@ -261,7 +265,7 @@ const themeConfig = {
     {/* On a branch page, a chat with that centre; elsewhere the list of centres (CallPicker.astro). */}
     {
       whatsappHref ? (
-        <a class="whatsapp-fab" href={whatsappHref} target="_blank" rel="noopener" aria-label="Chat with this centre on WhatsApp">
+        <a class="whatsapp-fab" href={whatsappHref} target="_blank" rel="noopener" data-branch={whatsappBranch} aria-label="Chat with this centre on WhatsApp">
           <Icon name="MessageCircle" size={26} />
         </a>
       ) : (
