@@ -16,9 +16,17 @@ interface EmailConfig {
 
 const EMPTY: EmailConfig = { enabled: false, url: 'https://cpaas.zoho.com/v1.1/email', token: '', fromAddress: '', fromName: 'Crossmaze website' };
 
-// The API address for each data centre: cpaas.zoho.*, or api.zeptomail.* from before ZeptoMail became
-// Zoho CPaaS (keep in step with isZeptoUrl in functions/lib/zeptomail.js).
-const ZEPTO_URL = /^https:\/\/(cpaas\.zoho|api\.zeptomail)\.(com|in|eu|com\.au|jp|ca|sa|com\.cn)\//;
+// The API hosts, one per data centre: cpaas.zoho.* (Canada: cpaas.zohocloud.ca), or api.zeptomail.* from
+// before ZeptoMail became Zoho CPaaS. Keep in step with API_HOST in functions/lib/zeptomail.js.
+const API_HOST = /^(cpaas\.(zoho\.(com|in|eu|com\.au|jp|sa|com\.cn)|zohocloud\.ca)|api\.zeptomail\.(com|in|eu|com\.au|jp|ca|sa|com\.cn))$/;
+const isApiUrl = (url: string) => {
+  try {
+    const parsed = new URL(url);
+    return parsed.protocol === 'https:' && !parsed.username && !parsed.password && API_HOST.test(parsed.hostname);
+  } catch {
+    return false;
+  }
+};
 const EMAIL = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 
 export function EmailAlertsPage() {
@@ -47,7 +55,7 @@ export function EmailAlertsPage() {
 
   const save = async () => {
     if (draft.enabled) {
-      if (!ZEPTO_URL.test(draft.url)) return toast('error', 'The API address must be a Zoho CPaaS one, such as https://cpaas.zoho.com/v1.1/email');
+      if (!isApiUrl(draft.url)) return toast('error', 'The API address must be a Zoho CPaaS one, such as https://cpaas.zoho.com/v1.1/email');
       if (!draft.token.trim()) return toast('error', 'Paste the API key from Zoho CPaaS.');
       if (!EMAIL.test(draft.fromAddress)) return toast('error', 'Enter the From address, e.g. noreply@crossmaze.in');
     }
@@ -122,7 +130,7 @@ export function EmailAlertsPage() {
                 value={draft.token}
                 onChange={(e) => setDraft({ ...draft, token: e.target.value })}
               />
-              <button type="button" className="icon-btn" aria-label={reveal ? 'Hide token' : 'Show token'} onClick={() => setReveal(!reveal)}>
+              <button type="button" className="icon-btn" aria-label={reveal ? 'Hide API key' : 'Show API key'} onClick={() => setReveal(!reveal)}>
                 <Icon name={reveal ? 'EyeOff' : 'Eye'} />
               </button>
             </div>

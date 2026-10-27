@@ -30,6 +30,9 @@ test('only sends to Zoho CPaaS (or ZeptoMail, its old name)', async () => {
   assert.equal(isZeptoUrl('https://cpaas.zoho.com/v1.1/email'), true);
   assert.equal(isZeptoUrl('https://cpaas.zoho.in/v1.1/email'), true);
   assert.equal(isZeptoUrl('https://cpaas.zoho.com.au/v1.1/email'), true);
+  assert.equal(isZeptoUrl('https://cpaas.zohocloud.ca/v1.1/email'), true);
+  assert.equal(isZeptoUrl('https://CPAAS.ZOHO.COM/v1.1/email'), true);
+  assert.equal(isZeptoUrl('https://cpaas.zoho.ca/v1.1/email'), false);
   assert.equal(isZeptoUrl('https://api.zeptomail.com/v1.1/email'), true);
   assert.equal(isZeptoUrl('https://api.zeptomail.in/v1.1/email'), true);
   assert.equal(isZeptoUrl('https://api.zeptomail.com.au/v1.1/email'), true);

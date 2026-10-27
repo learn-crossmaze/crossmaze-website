@@ -9,8 +9,9 @@
 
 export const DEFAULT_URL = 'https://cpaas.zoho.com/v1.1/email';
 const TIMEOUT_MS = 10000;
-// Its API hosts, one per data centre: cpaas.zoho.* now, api.zeptomail.* from before the rename.
-const API_HOST = /^(cpaas\.zoho|api\.zeptomail)\.(com|in|eu|com\.au|jp|ca|sa|com\.cn)$/;
+// Its API hosts, one per data centre: cpaas.zoho.* now (Canada: cpaas.zohocloud.ca), api.zeptomail.* from
+// before the rename. Keep in step with API_HOST in src/admin/components/EmailAlerts.tsx.
+const API_HOST = /^(cpaas\.(zoho\.(com|in|eu|com\.au|jp|sa|com\.cn)|zohocloud\.ca)|api\.zeptomail\.(com|in|eu|com\.au|jp|ca|sa|com\.cn))$/;
 
 /** A Zoho CPaaS (or ZeptoMail) API address, or a local one for tests. */
 export function isZeptoUrl(url) {
