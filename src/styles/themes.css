@@ -556,6 +556,27 @@
   max-width: 17ch;
 }
 
+/* Poppins runs wide: full-size buttons take a little less side room, so pairs of them share a row where they
+   do in the other themes (at 375px, for one). The header's small buttons have room. */
+:root[data-theme='candy'] .btn:not(.btn--sm) {
+  padding-inline: 20px;
+}
+
+/* Contact's list of centres: "View branch" stays beside the phone number on a 390px phone. */
+:root[data-theme='candy'] .branch-row__view {
+  padding-inline: 10px;
+}
+
+/* Poppins is only for bold text here: the quote over the home page's photo (regular weight) is in the body font. */
+:root[data-theme='candy'] .story__glass-quote {
+  font-family: var(--font-body);
+}
+
+/* Job titles break between words that belong together ("Day Care / In-Charge"), not after "In-". */
+:root[data-theme='candy'] .job__title strong {
+  text-wrap: balance;
+}
+
 /* Candy Pop at night: a deep plum and berry party night, with neon pink, purple, turquoise and lemon. */
 :root[data-theme='candy'][data-mode='dark'] {
   --ink: #fdeefa;
