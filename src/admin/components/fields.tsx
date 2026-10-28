@@ -72,6 +72,29 @@ export function SchemaForm({ fields, value, onChange, root }: { fields: Field[];
           <div className="form-heading" key={`h${i}`}>
             <h3>{field.label}</h3>
             {field.help && <p className="help">{field.help}</p>}
+            {field.previews && (
+              <ul className="preview-links">
+                {field.previews.map((p) => (
+                  <li key={p.path}>
+                    <span>{p.label}</span>
+                    {p.bothModes === false ? (
+                      <a href={p.path} target="_blank" rel="noopener">
+                        Open
+                      </a>
+                    ) : (
+                      <>
+                        <a href={`${p.path}&mode=light`} target="_blank" rel="noopener">
+                          Light
+                        </a>
+                        <a href={`${p.path}&mode=dark`} target="_blank" rel="noopener">
+                          Dark
+                        </a>
+                      </>
+                    )}
+                  </li>
+                ))}
+              </ul>
+            )}
           </div>
         ) : (
           <FieldEditor

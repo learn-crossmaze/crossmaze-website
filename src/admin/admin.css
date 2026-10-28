@@ -1506,3 +1506,24 @@ a.item-main:hover strong {
   stroke-width: 1.6;
   stroke-linecap: round;
 }
+
+/* Site settings → Colour theme: a link to each theme, light and dark. */
+.preview-links {
+  display: grid;
+  gap: 6px;
+  margin: 10px 0 0;
+  padding: 0;
+  list-style: none;
+}
+
+.preview-links li {
+  display: grid;
+  grid-template-columns: minmax(0, 12rem) auto auto;
+  justify-content: start;
+  align-items: center;
+  gap: 14px;
+}
+
+.preview-links a {
+  font-weight: 700;
+}
