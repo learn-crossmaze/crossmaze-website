@@ -58,7 +58,8 @@ export type Field =
       fromText?: (text: string) => Record<string, unknown>;
       toText?: (item: Record<string, unknown>) => string;
     })
-  | { type: 'heading'; label: string; help?: string; key?: undefined };
+  /** `previews`: website links to show under the heading, each in its light and dark version (`?mode=`) unless `bothModes` is false. */
+  | { type: 'heading'; label: string; help?: string; previews?: { label: string; path: string; bothModes?: false }[]; key?: undefined };
 
 export const iconOptions: Option[] = iconChoices.map((name) => ({ value: name, label: name }));
 const colorOptions: Option[] = [
@@ -127,8 +128,17 @@ export const siteSchema: Field[] = [
     key: 'theme',
     label: 'Colour theme',
     type: 'group',
-    help: 'Preview any theme on the website by adding ?theme=meadow (or pastel, ocean, crayon, calm) to the address; ?theme=auto goes back to this setting. Changes show after you publish.',
+    help: 'Preview any theme on the website by adding ?theme=meadow (or pastel, ocean, crayon, calm, candy, tropical) to the address; ?theme=auto goes back to this setting. Changes show after you publish.',
     fields: [
+      {
+        type: 'heading',
+        label: 'Preview each theme',
+        help: 'Opens the website in that theme, for this visit only (other visitors still see the setting below). The last link goes back to the setting.',
+        previews: [
+          ...themes.map((t) => ({ label: t.label, path: `/?theme=${t.id}` })),
+          { label: 'Back to the live setting', path: '/?theme=auto&mode=auto', bothModes: false },
+        ],
+      },
       { key: 'mode', label: 'Which theme visitors see', type: 'select', options: themeModes.map((m) => ({ value: m.value, label: m.label })) },
       { key: 'fixed', label: 'Theme', type: 'select', options: themeOptions, help: 'For “The same theme every day”, and the fallback for the other choices.' },
       {
