@@ -48,8 +48,8 @@ const fetchDataUrl = async (url: string) => dataUrl(await (await fetch(url)).blo
 /** The card as a 1080 × 1080 PNG file. An SVG drawn as a picture loads nothing itself, so the fonts and logo go inside it. */
 async function cardPng(o: Occasion, year: number) {
   const [display, text, logo] = await Promise.all([
-    fetchDataUrl('/greetings/card-display.woff2'),
-    fetchDataUrl('/greetings/card-text.woff2'),
+    fetchDataUrl('/fonts/card-display.woff2'),
+    fetchDataUrl('/fonts/card-text.woff2'),
     fetchDataUrl(LOGO),
   ]);
   const defs = `<style>@font-face{font-family:'${CARD_FONTS.display}';src:url(${display}) format('woff2');font-weight:300 700}@font-face{font-family:'${CARD_FONTS.text}';src:url(${text}) format('woff2');font-weight:200 1000}</style>`;

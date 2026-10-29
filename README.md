@@ -315,7 +315,7 @@ On 31 festivals and special days the website greets visitors by itself, with not
 - hide the admissions line;
 - open the preview of every greeting for this year or next (`/greetings?year=2027`; on any page, `?greet=diwali&year=2027` shows that greeting's bar).
 
-**Code:** `src/greetings/` holds the list of days (`occasions.ts`), the words (`text.ts`), the drawings (`designs/`), the card (`card.ts`) and the pop-up (`ui.ts`); the bar is `src/components/Greetings.astro`. The card fonts (Fredoka and Nunito, SIL Open Font License) are in `public/greetings/`.
+**Code:** `src/greetings/` holds the list of days (`occasions.ts`), the words (`text.ts`), the drawings (`designs/`), the card (`card.ts`) and the pop-up (`ui.ts`); the bar is `src/components/Greetings.astro`. The card fonts (Fredoka and Nunito, SIL Open Font License) are in `public/fonts/`.
 
 To add a day:
 1. Add it to `occasions.ts` (a fixed date, or its name as Google's calendar writes it).

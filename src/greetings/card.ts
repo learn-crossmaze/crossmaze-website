@@ -4,7 +4,7 @@
 import { rng } from './palettes';
 import type { Occasion, OccasionText, Palette } from './types';
 
-/** The card's two typefaces (public/greetings/*.woff2): Fredoka for the title, Nunito for the rest. */
+/** The card's two typefaces (public/fonts/*.woff2): Fredoka for the title, Nunito for the rest. */
 export const CARD_FONTS = { display: 'CM Card Display', text: 'CM Card Text' } as const;
 
 /** How wide a piece of text is, in pixels, in the given CSS font. */
