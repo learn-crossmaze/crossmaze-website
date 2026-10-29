@@ -153,5 +153,9 @@
       "sun": "tropical"
     },
     "dark": "device"
+  },
+  "greetings": {
+    "enabled": true,
+    "admissions": true
   }
 }

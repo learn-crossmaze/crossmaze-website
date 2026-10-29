@@ -34,7 +34,7 @@ Go to **www.crossmaze.in/admin** and sign in (until the domain moves, step 6 bel
 
 | Section | What you can change |
 | --- | --- |
-| Site settings | Logo, school name, phone, emails, address, social links, colour theme, home-page banner, numbers strip, about paragraphs (each with an optional subheading), quote, photos, founders (see below) |
+| Site settings | Logo, school name, phone, emails, address, social links, colour theme, [festival greetings](#festival-greetings), home-page banner, numbers strip, about paragraphs (each with an optional subheading), quote, photos, founders (see below) |
 | Branches | Add, hide, reorder or delete branches; name, area, short introduction (also shown on the Branches page), **Title in Google** (see [Search](#search-seo)), address, map, phone, **WhatsApp number** (empty: the phone; see below), size, capacity, amenities, programs offered, timings and batches (see below), photos (first = cover; the page shows six, and all of them open in a swipeable album), centre head with photo and bio |
 | Programs | Add, hide, reorder; name, **Also called** (another name parents know it by, shown in brackets after the name on Our Programs and the program cards: “Junior KG (LKG)”; empty for none), age group, who can join (e.g. “2 years or older on 1 June”), icon, colour, photo, description, focus list (timings are set per branch) |
 | Jobs | Open positions on the careers page |
@@ -287,6 +287,42 @@ To set it up (the school's Zoho account is in the US data centre, so Zoho CPaaS 
 3. In the admin panel → **Email alerts**: tick **Email the admins…**, paste the key, enter the From address (on crossmaze.in, e.g. `noreply@crossmaze.in`) and press **Save**, then **Send me a test**. The test goes to the admin who presses it; check the inbox and the spam folder.
 
 The key is kept in Firestore at `private/zeptomail` (the name from before the rename), which only full admins can read (the website and branch admins can't). With Email alerts off, failures are only shown in Submissions.
+
+## Festival greetings
+
+On 31 festivals and special days the website greets visitors by itself, with nothing to do on the day:
+
+- **National days:** New Year, Republic Day, Independence Day, Gandhi Jayanti, Kannada Rajyotsava.
+- **School and children's days:** Women's Day, World Health Day, Earth Day, Mother's Day, World Environment Day, Father's Day, International Yoga Day, Doctors' Day, National Sports Day, Teachers' Day, Children's Day.
+- **Festivals:** Makar Sankranti and Pongal, Holi, Ugadi, Good Friday, Ram Navami, Mahavir Jayanti, Eid al-Fitr, Raksha Bandhan, Janmashtami, Onam, Ganesh Chaturthi, Dussehra, Diwali, Guru Nanak Jayanti, Christmas.
+
+**What visitors see, only on the day (India's date):**
+- A slim glass bar at the top of every page: the greeting, a short wish and a **See our card** button. Closing it hides it for the rest of the day.
+- The pop-up:
+  - **Left:** that year's card, with **Share on WhatsApp** and **Download**. On phones, sharing sends the picture itself; on computers it opens WhatsApp with a link, and the card can be downloaded.
+  - **Right:** what the day is about, what little ones can learn from it, a **Try this at home** activity, a link to the school's blog post about last year's celebration (when there is one with the festival's name in its title), and **Admissions are open for 2027–28** with a **Book a school visit** button.
+- **The admissions year** works itself out: until October it is the current year, and from November the next one. It is never shown on Good Friday, which has a quiet card and words.
+
+**Every year is different.** Each day has at least two card designs that take turns by year. The arrangement (how many kites, where the balloons are) is worked out from the year, and the colours follow the website's colour theme of the day. Wishes and activities also take turns. Nobody draws or uploads anything: the browser draws the card when the page opens.
+
+**Dates:**
+- Fixed dates and Mother's/Father's Day (second/third Sunday) are worked out by the site.
+- Festivals that move each year come from Google's public calendar of Indian holidays. Every build reads it (`scripts/festival-dates.mjs`) into `src/greetings/dates.json`, which is kept in the repository with dates to 2031. So greetings keep working even if Google can't be reached or nobody publishes for years.
+- Islamic dates (Eid) are provisional until the moon is sighted; a later publish picks up Google's corrected date.
+
+**Settings:** admin panel → Site settings → **Festival greetings**:
+- switch greetings off;
+- hide the admissions line;
+- open the preview of every greeting for this year or next (`/greetings?year=2027`; on any page, `?greet=diwali&year=2027` shows that greeting's bar).
+
+**Code:** `src/greetings/` holds the list of days (`occasions.ts`), the words (`text.ts`), the drawings (`designs/`), the card (`card.ts`) and the pop-up (`ui.ts`); the bar is `src/components/Greetings.astro`. The card fonts (Fredoka and Nunito, SIL Open Font License) are in `public/greetings/`.
+
+To add a day:
+1. Add it to `occasions.ts` (a fixed date, or its name as Google's calendar writes it).
+2. Add its words to `text.ts`.
+3. Add at least two designs to a file in `designs/`.
+
+Link previews when the site is shared keep the usual picture: changing them on the day would need a scheduled rebuild, which would also publish admin edits that were saved but not yet published.
 
 ## Developing
 

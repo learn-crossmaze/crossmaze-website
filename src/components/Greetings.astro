@@ -1,0 +1,361 @@
+---
+// Festival and special-day greetings (src/greetings, README "Festival greetings"): on the day, a slim glass
+// bar at the top of every page, and a pop-up with that year's card, a few words about the day, an activity
+// to try at home and the admissions line. A small inline script below decides, while the page loads, whether
+// today (in India) is one of the days, so the bar is there from the first paint and nothing jumps; the card,
+// words and pop-up load afterwards, only on those days (scripts/greetings.ts).
+import { datesTable } from '../greetings/calendar';
+import dates from '../greetings/dates.json';
+import { occasions } from '../greetings/occasions';
+import { textFor } from '../greetings/text';
+import { posts, postUrl } from '../data/blog';
+import { site } from '../data/site';
+import { jsonScript } from '../utils';
+
+const settings = { admissions: site.greetings?.admissions !== false };
+const thisYear = new Date().getFullYear();
+// Each occasion's date rule; moving festivals as their dates from last year on (enough for years ahead).
+const table = datesTable(dates.events, occasions);
+const schedule = occasions.map((o) => ({
+  id: o.id,
+  solemn: o.solemn ?? false,
+  // The bar's title before the rest loads: the card's title when it doesn't change with the year.
+  title: /\d/.test(textFor(o.id, o.name).title(thisYear)) ? `Happy ${o.name}` : textFor(o.id, o.name).title(thisYear),
+  ...('calendar' in o.when ? { dates: (table[o.id] ?? []).filter((d) => d >= `${thisYear - 1}`) } : o.when),
+}));
+// The school's own blog posts about each occasion ("Diwali at Neotown"), newest first, for "See how our
+// little ones celebrated last year".
+const stories = Object.fromEntries(
+  occasions
+    .map((o) => [
+      o.id,
+      posts
+        .filter((p) => p.date && o.keywords.some((k) => new RegExp(`\\b${k.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')}\\b`, 'i').test(p.title)))
+        .slice(0, 3)
+        .map((p) => ({ url: postUrl(p), title: p.title, date: p.date })),
+    ])
+    .filter(([, list]) => list.length),
+);
+const data = { settings, stories };
+---
+
+<div class="greet-bar" id="greet-bar" hidden>
+  <span class="greet-bar__thumb tone-sun" aria-hidden="true"></span>
+  <b class="greet-bar__title"></b>
+  <span class="greet-bar__line"></span>
+  <button type="button" class="greet-bar__open btn btn--sm btn--sun">See our card</button>
+  <button type="button" class="greet-bar__close" aria-label="Close the greeting">×</button>
+</div>
+<script is:inline define:vars={{ schedule }}>
+  (function () {
+    // Today in India; ?greet=diwali (and &year=2027) previews a greeting on any day.
+    var q = new URLSearchParams(location.search);
+    var parts = new Intl.DateTimeFormat('en-CA', { timeZone: 'Asia/Kolkata', year: 'numeric', month: '2-digit', day: '2-digit' })
+      .format(new Date())
+      .split('-')
+      .map(Number);
+    var y = parts[0], m = parts[1], d = parts[2];
+    var iso = parts[0] + '-' + String(m).padStart(2, '0') + '-' + String(d).padStart(2, '0');
+    var nth = function (year, month, weekday, n) {
+      var first = new Date(Date.UTC(year, month - 1, 1)).getUTCDay();
+      return 1 + ((weekday - first + 7) % 7) + (n - 1) * 7;
+    };
+    var preview = q.get('greet');
+    var today = schedule.filter(function (o) {
+      if (preview) return preview === o.id;
+      if (o.fixed) return o.fixed[0] === m && o.fixed[1] === d;
+      if (o.nth) return o.nth[2] === m && nth(y, o.nth[2], o.nth[1], o.nth[0]) === d;
+      return (o.dates || []).indexOf(iso) >= 0;
+    });
+    if (!today.length) return;
+    try {
+      if (!preview && localStorage.getItem('cm-greet-closed') === iso) return;
+    } catch (e) {}
+    var bar = document.getElementById('greet-bar');
+    var solemn = today.every(function (o) { return o.solemn; });
+    bar.querySelector('.greet-bar__title').textContent =
+      today.length === 1 ? today[0].title + (solemn ? '' : '!') : today.map(function (o) { return o.title.replace(/^Happy /, ''); }).join(' & ') + (solemn ? '' : '!');
+    bar.dataset.ids = today.map(function (o) { return o.id; }).join(',');
+    bar.dataset.year = String(Number(q.get('year')) || y);
+    bar.dataset.today = iso;
+    if (solemn) bar.classList.add('greet-bar--solemn');
+    bar.hidden = false;
+  })();
+</script>
+<script type="application/json" id="greet-data" set:html={jsonScript(data)} />
+<script>
+  import '../scripts/greetings';
+</script>
+
+<style is:global>
+  /* The card's two typefaces, served by the site (public/greetings), so cards look the same everywhere. */
+  @font-face {
+    font-family: 'CM Card Display';
+    src: url('/greetings/card-display.woff2') format('woff2');
+    font-weight: 300 700;
+    font-display: swap;
+  }
+  @font-face {
+    font-family: 'CM Card Text';
+    src: url('/greetings/card-text.woff2') format('woff2');
+    font-weight: 200 1000;
+    font-display: swap;
+  }
+
+  /* ---------- The greeting bar ---------- */
+  .greet-bar {
+    position: relative;
+    z-index: 5;
+    display: flex;
+    align-items: center;
+    gap: 14px;
+    max-width: 1100px;
+    min-height: 66px;
+    margin: 14px auto 0;
+    padding: 10px 12px 10px 12px;
+    border: 1px solid var(--glass-edge);
+    border-radius: 999px;
+    background: var(--glass);
+    -webkit-backdrop-filter: var(--glass-blur);
+    backdrop-filter: var(--glass-blur);
+    box-shadow: var(--shadow-sm), var(--glass-rim);
+    color: var(--ink);
+  }
+  .greet-bar[hidden] {
+    display: none;
+  }
+  .greet-bar__thumb {
+    flex: none;
+    width: 44px;
+    height: 44px;
+    overflow: hidden;
+    border-radius: 12px;
+    background: linear-gradient(135deg, var(--badge-bg), var(--badge-bg-2));
+    box-shadow: var(--shadow-sm);
+  }
+  .greet-bar__thumb img {
+    display: block;
+    width: 100%;
+    height: 100%;
+  }
+  .greet-bar__title {
+    flex: none;
+    font-family: var(--font-display);
+    font-size: 1.12rem;
+    background: var(--g-heading);
+    -webkit-background-clip: text;
+    background-clip: text;
+    color: transparent;
+  }
+  .greet-bar__line {
+    min-width: 0;
+    overflow: hidden;
+    white-space: nowrap;
+    text-overflow: ellipsis;
+    font-weight: 600;
+    opacity: 0.85;
+  }
+  .greet-bar__open {
+    flex: none;
+    margin-left: auto;
+  }
+  .greet-bar__close {
+    flex: none;
+    display: grid;
+    place-items: center;
+    width: 36px;
+    height: 36px;
+    border: 0;
+    border-radius: 50%;
+    background: transparent;
+    color: var(--ink);
+    font-size: 22px;
+    line-height: 1;
+    cursor: pointer;
+  }
+  .greet-bar__close:hover,
+  .greet-bar__close:focus-visible {
+    background: var(--glass);
+  }
+  @media (max-width: 1140px) {
+    .greet-bar {
+      margin-inline: 16px;
+    }
+  }
+  @media (max-width: 640px) {
+    .greet-bar {
+      gap: 10px;
+      min-height: 60px;
+      margin-top: 10px;
+      padding: 8px 6px 8px 8px;
+      border-radius: 22px;
+    }
+    .greet-bar__line {
+      display: none;
+    }
+    .greet-bar__title {
+      flex: 1 1 auto;
+      min-width: 0;
+      font-size: 1rem;
+      white-space: normal;
+    }
+  }
+
+  /* ---------- The pop-up ---------- */
+  .greet-dialog {
+    width: min(1040px, calc(100% - 32px));
+    max-width: none;
+    max-height: calc(100dvh - 32px);
+    padding: 0;
+    border: 1px solid var(--glass-edge);
+    border-radius: 30px;
+    background: var(--glass-thick);
+    -webkit-backdrop-filter: var(--glass-blur);
+    backdrop-filter: var(--glass-blur);
+    box-shadow: var(--shadow-lift), var(--glass-rim);
+    color: var(--ink);
+    overflow: hidden;
+  }
+  .greet-dialog::backdrop {
+    background: rgb(10 15 40 / 45%);
+    -webkit-backdrop-filter: blur(3px);
+    backdrop-filter: blur(3px);
+  }
+  .greet-dialog[open] {
+    animation: greet-in 0.22s ease-out;
+  }
+  @keyframes greet-in {
+    from {
+      opacity: 0;
+      transform: translateY(12px) scale(0.98);
+    }
+  }
+  .greet-dialog__body {
+    position: relative;
+    display: grid;
+    grid-template-columns: minmax(0, 440px) minmax(0, 1fr);
+    gap: 28px;
+    align-items: start;
+    max-height: calc(100dvh - 34px);
+    padding: 18px;
+    overflow: auto;
+  }
+  .greet-dialog__card svg {
+    display: block;
+    width: 100%;
+    height: auto;
+    border-radius: 18px;
+  }
+  .greet-dialog__share {
+    display: flex;
+    gap: 10px;
+    margin-top: 12px;
+  }
+  .greet-dialog__share .btn {
+    flex: 1;
+    justify-content: center;
+    white-space: nowrap;
+  }
+  .greet-dialog__share .greet-wa {
+    border-color: transparent;
+    background: var(--g-whatsapp);
+    color: #fff;
+  }
+  .greet-dialog__text {
+    padding: 6px 48px 4px 0;
+  }
+  .greet-dialog__tabs {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 6px;
+    margin-bottom: 12px;
+  }
+  .greet-dialog .eyebrow {
+    margin: 0;
+  }
+  .greet-dialog h2 {
+    margin: 4px 0 10px;
+    font-family: var(--font-display);
+    font-size: clamp(1.5rem, 1.1rem + 1.4vw, 2rem);
+    line-height: 1.12;
+    background: var(--g-heading);
+    -webkit-background-clip: text;
+    background-clip: text;
+    color: transparent;
+  }
+  .greet-dialog p {
+    margin: 0 0 12px;
+    line-height: 1.55;
+  }
+  .greet-dialog h3 {
+    margin: 16px 0 6px;
+    font-size: 1.05rem;
+  }
+  .greet-dialog__try {
+    padding: 12px 14px;
+    border: 1px solid var(--glass-edge);
+    border-radius: 18px;
+    background: var(--glass);
+  }
+  .greet-dialog__try p {
+    margin: 0;
+  }
+  .greet-dialog__story {
+    display: inline-block;
+    margin-top: 12px;
+    font-weight: 800;
+  }
+  .greet-dialog__admissions {
+    margin-top: 16px;
+    padding: 16px 18px;
+    border: 1px solid var(--glass-edge);
+    border-radius: 22px;
+    background: linear-gradient(120deg, var(--badge-bg), var(--badge-bg-2));
+  }
+  .greet-dialog__admissions b {
+    display: block;
+    margin-bottom: 12px;
+    font-size: 1.1rem;
+  }
+  .greet-dialog__close {
+    position: absolute;
+    top: 12px;
+    right: 12px;
+    z-index: 2;
+    display: grid;
+    place-items: center;
+    width: 40px;
+    height: 40px;
+    border: 1px solid var(--glass-edge);
+    border-radius: 50%;
+    background: var(--glass-thick);
+    color: var(--ink);
+    font-size: 22px;
+    line-height: 1;
+    box-shadow: var(--shadow-sm);
+    cursor: pointer;
+  }
+  .greet-dialog__note {
+    font-size: 0.9rem;
+    opacity: 0.8;
+  }
+  @media (max-width: 760px) {
+    .greet-dialog {
+      width: calc(100% - 24px);
+      border-radius: 24px;
+    }
+    .greet-dialog__body {
+      grid-template-columns: 1fr;
+      gap: 14px;
+      padding: 12px;
+    }
+    .greet-dialog__text {
+      padding: 0 4px 4px;
+    }
+  }
+  @media (prefers-reduced-motion: reduce) {
+    .greet-dialog[open] {
+      animation: none;
+    }
+  }
+</style>

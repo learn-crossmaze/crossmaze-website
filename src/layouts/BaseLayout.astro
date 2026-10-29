@@ -6,6 +6,7 @@ import '../styles/themes.css';
 import Header from '../components/Header.astro';
 import Footer from '../components/Footer.astro';
 import CallPicker from '../components/CallPicker.astro';
+import Greetings from '../components/Greetings.astro';
 import Icon from '../components/Icon.astro';
 import { site, orgId } from '../data/site';
 import { branches, branchId, branchUrl, shortName, whatsappNumber } from '../data/branches';
@@ -256,6 +257,7 @@ const themeConfig = {
     <a class="skip-link" href="#main">Skip to content</a>
     <Header />
     <main id="main">
+      {site.greetings?.enabled !== false && <Greetings />}
       <slot />
     </main>
     <Footer />
