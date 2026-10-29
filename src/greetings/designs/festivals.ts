@@ -436,7 +436,7 @@ const cradle: Design = (r, p) => {
   let s = `<rect x="${n(cx - 290)}" y="70" width="26" height="570" rx="10" fill="${wood}" ${OUTLINE}/><rect x="${n(cx + 264)}" y="70" width="26" height="570" rx="10" fill="${wood}" ${OUTLINE}/>
 <rect x="${n(cx - 310)}" y="56" width="620" height="32" rx="14" fill="${wood}" ${OUTLINE}/>
 <circle cx="${n(cx - 277)}" cy="48" r="16" fill="${GOLD}" ${OUTLINE}/><circle cx="${n(cx + 277)}" cy="48" r="16" fill="${GOLD}" ${OUTLINE}/>`;
-  s += garland(cx - 270, 100, cx + 270, 100, between(r, 30, 45), 11, 21);
+  s += garland(cx - 262, 104, cx + 262, 104, between(r, 28, 40), 9, 27);
   s += `<path d="M${n(cx - 150)} 88 L${n(cx - 175)} 360 M${n(cx + 150)} 88 L${n(cx + 175)} 360" stroke="${GOLD}" stroke-width="6" stroke-dasharray="14 8"/>`;
   s += `<path d="M${n(cx - 220)} 350 Q${n(cx)} 380 ${n(cx + 220)} 350 Q${n(cx + 200)} 520 ${n(cx)} 525 Q${n(cx - 200)} 520 ${n(cx - 220)} 350 Z" fill="${body}" ${OUTLINE}/>
 <path d="M${n(cx - 200)} 400 Q${n(cx)} 440 ${n(cx + 200)} 400" stroke="${trim}" stroke-width="18" fill="none" stroke-linecap="round"/>
@@ -446,23 +446,24 @@ const cradle: Design = (r, p) => {
   s += at(cx - 140, 640, 0.9, lotus(p.acc[0])) + at(cx + 140, 640, 0.9, lotus(p.acc[0]));
   for (let i = 0; i < 4; i++) {
     const side = i % 2 ? 1 : -1;
-    s += flower(cx + side * between(r, 360, 450), between(r, 180, 520), 6, 50, 26, [pick(r, p.acc)], GOLD, r() * 3, 10);
+    s += flower(cx + side * between(r, 370, 440), between(r, 180, 520), 6, 64, 32, [pick(r, p.acc)], GOLD, r() * 3, 10);
   }
   return s;
 };
 
 /** Ram Navami B: a sun rising over a lotus pond, a festive bow and arrows crossed above, garlands. */
 const bowAndSun: Design = (r, p) => {
-  let s = garland(40, 26, 1040, 26, between(r, 10, 16), 20, 19);
+  let s = garland(44, 30, 1036, 30, between(r, 8, 14), 17, 25);
   const sx = between(r, 500, 580);
-  s += sun(sx, 500, 105, GOLD, false);
+  s += sun(sx, 525, 95, GOLD, false);
   // a calm pond the sun rises from: white under the colour so the sun doesn't show through
   s += `<ellipse cx="540" cy="585" rx="505" ry="68" fill="#fff"/><ellipse cx="540" cy="585" rx="500" ry="63" fill="${p.acc[2]}" opacity=".5"/>`;
   for (let i = 0; i < 3; i++) s += `<path d="M${n(between(r, 160, 840))} ${n(570 + 22 * i)} h${n(between(r, 60, 110))}" stroke="#fff" stroke-width="5" stroke-linecap="round" opacity=".85"/>`;
   const lotuses = whole(r, 2, 3), xs = lotuses === 2 ? [250, 830] : [190, 540, 890];
   xs.forEach((x, i) => (s += at(x + between(r, -20, 20), 612, between(r, 0.75, 0.88), lotus(i === 1 ? p.acc[4] : p.acc[0]))));
   // a bow with two arrows crossed behind it, pointing up like an emblem
-  const bx = sx, by = 205, fletch = pick(r, p.acc);
+  const bx = sx, by = 225, fletch = pick(r, p.acc);
+  s += `<g transform="translate(${n(bx)} ${by}) scale(1.3) translate(${n(-bx)} ${-by})">`;
   for (const t of [-30, 30])
     s += at(bx, by, 1, `<path d="M0 118 V-112" stroke="#8d6e63" stroke-width="9" stroke-linecap="round"/>
 <path d="M0 -146 l-18 36 h36 z" fill="${GOLD}" ${OUTLINE}/>
@@ -472,6 +473,7 @@ const bowAndSun: Design = (r, p) => {
 <path d="M${n(bx - 40)} ${by - 118} V${by + 118}" stroke="${p.ink}" stroke-width="3" opacity=".5"/>
 <circle cx="${n(bx - 40)}" cy="${by - 118}" r="10" fill="${GOLD}"/><circle cx="${n(bx - 40)}" cy="${by + 118}" r="10" fill="${GOLD}"/>`;
   s += marigold(bx + 40, by, 24, '#ff8f1f');
+  s += '</g>';
   for (const side of [-1, 1]) s += flower(sx + side * between(r, 290, 360), between(r, 200, 270), 8, 64, 30, [pick(r, p.acc)], GOLD, r() * 3, 13);
   return s;
 };
@@ -496,7 +498,7 @@ const lotusPond: Design = (r, p) => {
   s += at(between(r, 780, 820), 575, 0.8, lotus(p.acc[(p.acc.indexOf(main) + 3) % p.acc.length]));
   const left = r() < 0.5;
   s += at(left ? between(r, 230, 300) : between(r, 780, 850), between(r, 150, 200), 1.2, dove(p), !left);
-  for (let i = 0; i < 4; i++) s += leaf(between(r, 120, 960), between(r, 60, 300), 34, pick(r, [GREEN, LEAF]), between(r, -80, 80));
+  for (let i = 0; i < 3; i++) s += leaf(between(r, 120, 960), between(r, 60, 300), 48, pick(r, [GREEN, LEAF]), between(r, -80, 80));
   return s;
 };
 

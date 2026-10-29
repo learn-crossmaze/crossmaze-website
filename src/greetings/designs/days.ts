@@ -448,7 +448,7 @@ const bigTree: Design = (r, p) => {
   }
   // Birds sit on the top of the canopy.
   const perches = shuffled(r, [[-105, -45 - 108], [105, -45 - 108], [0, -110 - 100], [-175, 55 - 92], [175, 55 - 92]]).slice(0, whole(r, 2, 3));
-  perches.forEach(([dx, dy]) => s += bird(cx + dx, cy + dy + 12, 0.9, dx < 0 ? -1 : 1, pick(r, p.acc.filter((c) => c !== fruit)), p.ink));
+  perches.forEach(([dx, dy]) => s += bird(cx + dx, cy + dy + 12, 0.9, dx < 0 ? -1 : 1, pick(r, p.acc.filter((c) => c !== fruit && !greenish(c))), p.ink));
   // Bees and butterflies in the margins either side of the tree.
   const lx = (cx - 265 + 30) / 2 + 15, rx = (cx + 265 + 1050) / 2 - 15, beeSide = r() < 0.5 ? -1 : 1;
   for (const side of [-1, 1]) {
