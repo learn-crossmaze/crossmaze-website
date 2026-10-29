@@ -376,20 +376,20 @@ const pachadi: Design = (r, p) => {
   let s = garland(50, 28, 540, 34, between(r, 40, 60), 7, 25) + garland(540, 34, 1030, 28, between(r, 40, 60), 7, 25);
   s += marigold(540, 40, 34, '#ffb300');
   const cx = between(r, 520, 560);
-  s += at(cx - 230, 600, 1.15, neem(r, p, 300), false, -10) + at(cx + 250, 600, 1, neem(r, p, 280), true, 12);
+  s += at(cx - 390, 640, 1.15, neem(r, p, between(r, 300, 340)), false, -6) + at(cx + 390, 640, 1.1, neem(r, p, between(r, 280, 320)), true, 6);
   // the bowl
-  s += `<ellipse cx="${n(cx)}" cy="420" rx="190" ry="40" fill="#c58b2c" ${OUTLINE}/>
+  s += `<g transform="translate(${n(cx)} 618) scale(1.22) translate(${n(-cx)} -618)"><ellipse cx="${n(cx)}" cy="420" rx="190" ry="40" fill="#c58b2c" ${OUTLINE}/>
 <path d="M${n(cx - 190)} 420 Q${n(cx - 180)} 580 ${n(cx)} 590 Q${n(cx + 180)} 580 ${n(cx + 190)} 420 Z" fill="#e0a526" ${OUTLINE}/>
 <ellipse cx="${n(cx)}" cy="420" rx="168" ry="30" fill="#b9772e"/>
 <path d="M${n(cx - 150)} 480 Q${n(cx)} 520 ${n(cx + 150)} 480" stroke="${p.acc[0]}" stroke-width="16" fill="none" stroke-linecap="round"/>
 <rect x="${n(cx - 70)}" y="588" width="140" height="30" rx="12" fill="#c58b2c" ${OUTLINE}/>`;
   for (let i = 0; i < 9; i++) s += `<circle cx="${n(cx + between(r, -130, 130))}" cy="${n(420 + between(r, -14, 14))}" r="${n(between(r, 6, 10))}" fill="${pick(r, ['#9ccc65', '#fff4c2', '#6d4c2f', '#ffffff'])}"/>`;
-  for (let i = -1; i <= 1; i++) s += marigold(cx + i * 100, 500 + Math.abs(i) * -8, 16, i ? '#ff8f1f' : '#ffb300');
+  for (let i = -1; i <= 1; i++) s += marigold(cx + i * 100, 500 + Math.abs(i) * -8, 18, i ? '#ff8f1f' : '#ffb300');
+  s += '</g>';
   // mangoes in front
-  const m = whole(r, 2, 3);
-  for (let i = 0; i < m; i++) {
-    const side = i % 2 ? 1 : -1, x = cx + side * (230 + 110 * Math.floor(i / 2)) + between(r, -15, 15);
-    s += at(x, 525, between(r, 0.8, 0.95), mango(i % 2 ? '#8bc34a' : '#9ccc65'), side > 0, between(r, -15, 15));
+  for (let i = 0; i < 2; i++) {
+    const side = i % 2 ? 1 : -1, x = cx + side * between(r, 270, 300);
+    s += at(x, 515, between(r, 1, 1.1), mango(i % 2 ? '#8bc34a' : '#9ccc65'), side > 0, between(r, -15, 15));
   }
   return s;
 };

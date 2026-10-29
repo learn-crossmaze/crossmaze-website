@@ -12,6 +12,12 @@ const CHEEK = '#ff7aa8';
 /** A soft ink outline for white or very pale shapes, which a white outline would lose. */
 const soft = (ink: string, w = 5) => `stroke="${ink}" stroke-opacity=".18" stroke-width="${w}" stroke-linejoin="round"`;
 
+/** True for green and teal colours, which would vanish against leaves. */
+function greenish(hex: string) {
+  const [red, green, blue] = [1, 3, 5].map((i) => parseInt(hex.slice(i, i + 2), 16));
+  return green > red + 30 && green >= blue;
+}
+
 /** The colours of `list` in a random order. */
 function shuffled<T>(r: Rng, list: readonly T[]) {
   const out = [...list];
@@ -435,7 +441,7 @@ const bigTree: Design = (r, p) => {
     s += `<circle cx="${n(cx + dx + between(r, -8, 8))}" cy="${n(cy + dy + between(r, -8, 8))}" r="${n(br + between(r, -6, 6))}" fill="${GREENS[i < 2 ? 1 : i % 2 ? 0 : 2]}" ${OUTLINE}/>`;
   });
   // Fruit or blossoms dotted over the leaves.
-  const fruit = pick(r, p.acc), fruits = whole(r, 6, 8);
+  const fruit = pick(r, p.acc.filter((c) => !greenish(c))), fruits = whole(r, 6, 8);
   for (let i = 0; i < fruits; i++) {
     const a = (2 * Math.PI * i) / fruits + between(r, -0.2, 0.2), d = between(r, 100, 190);
     s += `<circle cx="${n(cx + Math.cos(a) * d * 1.1)}" cy="${n(cy - 20 + Math.sin(a) * d * 0.62)}" r="15" fill="${fruit}" stroke="#fff" stroke-width="4"/>`;
