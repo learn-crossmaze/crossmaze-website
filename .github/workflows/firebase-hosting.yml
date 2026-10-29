@@ -46,6 +46,11 @@ jobs:
         if: env.FIREBASE_SERVICE_ACCOUNT != ''
         run: node scripts/sync-content.mjs ${{ github.event_name != 'pull_request' && '--seed-if-empty --add-missing' || '' }}
 
+      # Festival greetings: the dates of festivals that move each year (Diwali, Eid…) from Google's calendar of
+      # Indian holidays. If Google can't be reached, the copy in the repository (src/greetings/dates.json) is used.
+      - name: Update festival dates
+        run: node scripts/festival-dates.mjs
+
       - run: npm run build
         env:
           PUBLIC_FORM_ENDPOINT: ${{ vars.PUBLIC_FORM_ENDPOINT }}

@@ -67,6 +67,8 @@ export interface SiteContent {
   social: { label: string; href: string }[];
   /** Colour theme settings; see src/data/themes.ts. */
   theme?: Partial<ThemeSettings>;
+  /** Festival and special-day greetings (src/greetings); both on unless switched off. */
+  greetings?: { enabled?: boolean; admissions?: boolean };
 }
 
 export interface IconItem {

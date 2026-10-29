@@ -164,6 +164,30 @@ export const siteSchema: Field[] = [
       },
     ],
   },
+  {
+    key: 'greetings',
+    label: 'Festival greetings',
+    type: 'group',
+    help: 'On 31 festivals and special days (Diwali, Children’s Day, Independence Day…) the website shows a greeting bar with a card to share, a few words about the day and an activity to try at home. Everything is automatic: the dates of festivals that move each year come from Google’s calendar of Indian holidays, and each year gets a new card. Changes show after you publish.',
+    fields: [
+      {
+        type: 'heading',
+        label: 'See every greeting',
+        help: 'Each year’s cards and words, in the website’s colour themes.',
+        previews: [
+          { label: 'This year', path: '/greetings', bothModes: false },
+          { label: 'Next year', path: `/greetings?year=${new Date().getFullYear() + 1}`, bothModes: false },
+        ],
+      },
+      { key: 'enabled', label: 'Show greetings on the website', type: 'boolean' },
+      {
+        key: 'admissions',
+        label: 'Show “Admissions are open” in the greeting',
+        type: 'boolean',
+        help: 'With a “Book a school visit” button. The academic year is worked out by itself (from November it is the next one). Never shown on Good Friday.',
+      },
+    ],
+  },
 
   { type: 'heading', label: 'Home page' },
   {
