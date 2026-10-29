@@ -110,8 +110,8 @@ function toran(r: Rng, y: number, count: number) {
   let s = `<path d="M30 ${n(y)} Q540 ${n(y + 34)} 1050 ${n(y)}" fill="none" stroke="#8d5a3b" stroke-width="5"/>`;
   for (let i = 0; i <= count; i++) {
     const x = 50 + (980 / count) * i, t = (x - 30) / 1020, yy = y + 4 * 34 * t * (1 - t) * 0.5;
-    if (i % 2) s += hangingLeaf(x, yy, between(r, 74, 92), i % 4 === 1 ? GREEN : LEAF, between(r, -6, 6));
-    else s += marigold(x, yy + 14, 20, i % 4 ? '#ff8f1f' : '#ffb300');
+    if (i % 2) s += hangingLeaf(x, yy, between(r, 100, 118), i % 4 === 1 ? GREEN : LEAF, between(r, -6, 6));
+    else s += marigold(x, yy + 16, 27, i % 4 ? '#ff8f1f' : '#ffb300');
   }
   return s;
 }
@@ -218,13 +218,13 @@ const mango = (fill = '#8bc34a', blush = '#cddc39') =>
 
 /** A neem sprig with clusters of tiny white flowers; (0, 0) is the cut end, it grows up. */
 function neem(r: Rng, p: Palette, h: number) {
-  let s = `<path d="M0 0 Q14 ${n(-h * 0.5)} 0 ${-h}" stroke="#6d8b3a" stroke-width="6" fill="none" stroke-linecap="round"/>`;
+  let s = `<path d="M0 0 Q14 ${n(-h * 0.5)} 0 ${-h}" stroke="#6d8b3a" stroke-width="9" fill="none" stroke-linecap="round"/>`;
   for (let i = 1; i <= 4; i++) {
     const y = -h * (i / 5);
-    s += leaf(6, y, 40, i % 2 ? GREEN : LEAF, -20) + leaf(6, y, 40, i % 2 ? LEAF : GREEN, -160);
+    s += leaf(6, y, 58, i % 2 ? GREEN : LEAF, -20) + leaf(6, y, 58, i % 2 ? LEAF : GREEN, -160);
   }
-  for (let i = 0; i < 9; i++)
-    s += `<circle cx="${n(between(r, -26, 26))}" cy="${n(-h - between(r, -6, 40))}" r="7" fill="#fff" ${soft(p, 3)}/>`;
+  for (let i = 0; i < 10; i++)
+    s += `<circle cx="${n(between(r, -34, 34))}" cy="${n(-h - between(r, -10, 50))}" r="11" fill="#fff" ${soft(p, 4)}/>`;
   return s;
 }
 
@@ -250,14 +250,15 @@ const bird = (fill: string, ink: string) =>
 const kites: Design = (r, p) => {
   let s = cloud(between(r, 160, 260), between(r, 170, 230), between(r, 0.7, 0.9)) + cloud(between(r, 800, 920), between(r, 120, 180), between(r, 0.6, 0.8));
   const sx = between(r, 470, 610);
-  s += sun(sx, 520, 95);
+  let strings = '', fly = '';
   const count = whole(r, 4, 5), slots = count === 4 ? [140, 400, 680, 930] : [120, 330, 540, 750, 950];
   slots.forEach((x0, i) => {
-    const x = x0 + between(r, -25, 25), y = (i % 2 ? 230 : 110) + between(r, -15, 25);
+    const x = x0 + between(r, -20, 20), y = (i % 2 ? 200 : 95) + between(r, -8, 12);
     const foot = 60 + (960 / (count - 1)) * i + between(r, -30, 30);
-    s += `<path d="M${n(x)} ${n(y)} Q${n((x + foot) / 2 + between(r, -60, 60))} ${n((y + 650) / 2 + 60)} ${n(foot)} 650" fill="none" stroke="${p.ink}" stroke-width="2.5" opacity=".3"/>`;
-    s += kite(x, y, between(r, 0.6, 0.78), p.acc[i % p.acc.length], pick(r, p.acc), between(r, -22, 22));
+    strings += `<path d="M${n(x)} ${n(y)} Q${n((x + foot) / 2 + between(r, -60, 60))} ${n((y + 650) / 2 + 60)} ${n(foot)} 650" fill="none" stroke="${p.ink}" stroke-width="3" opacity=".3"/>`;
+    fly += kite(x, y, between(r, 1, 1.12), p.acc[i % p.acc.length], pick(r, p.acc), between(r, -20, 20));
   });
+  s += strings + sun(sx, 530, 105) + fly;
   for (let i = 0; i < 3; i++) {
     const bx = between(r, 280, 820), by = between(r, 300, 380);
     s += `<path d="M${n(bx - 18)} ${n(by)} q9 -10 18 0 q9 -10 18 0" fill="none" stroke="${p.ink}" stroke-width="4" stroke-linecap="round" opacity=".45"/>`;
@@ -267,40 +268,37 @@ const kites: Design = (r, p) => {
 
 /** Sankranti B: a pongal pot overflowing with rice on three stones, sugarcane and a kolam. */
 const pongalPot: Design = (r, p) => {
-  const cx = between(r, 500, 580), band = pick(r, p.acc);
-  let s = sun(between(r, 900, 960), between(r, 110, 150), 55);
-  // kolam: dots and loops on the floor
-  const kc = whole(r, 3, 4);
-  for (let i = 0; i < kc; i++) {
-    const kx = (i < kc / 2 ? 110 : 760) + (i % 2) * 160 + between(r, -10, 10), ky = 612;
-    s += `<path d="M${n(kx - 60)} ${ky} Q${n(kx)} ${ky - 40} ${n(kx + 60)} ${ky} Q${n(kx)} ${ky + 40} ${n(kx - 60)} ${ky} Z M${n(kx)} ${ky - 30} Q${n(kx + 40)} ${ky} ${n(kx)} ${ky + 30} Q${n(kx - 40)} ${ky} ${n(kx)} ${ky - 30} Z" fill="none" stroke="${pick(r, p.acc)}" stroke-width="5"/>`;
-    for (const [dx, dy] of [[-30, 0], [30, 0], [0, -14], [0, 14]]) s += `<circle cx="${n(kx + dx)}" cy="${ky + dy}" r="5" fill="${p.ink}" opacity=".5"/>`;
+  const cx = between(r, 510, 570), band = pick(r, p.acc);
+  let s = sun(between(r, 900, 960), between(r, 100, 140), 52);
+  // kolam: loops and dots on the floor at both sides
+  for (const kx of [between(r, 120, 140), between(r, 940, 960)]) {
+    const ky = 600, c = pick(r, p.acc);
+    s += `<path d="M${n(kx - 80)} ${ky} Q${n(kx)} ${ky - 56} ${n(kx + 80)} ${ky} Q${n(kx)} ${ky + 56} ${n(kx - 80)} ${ky} Z" fill="none" stroke="${c}" stroke-width="7"/>
+<path d="M${n(kx)} ${ky - 44} Q${n(kx + 54)} ${ky} ${n(kx)} ${ky + 44} Q${n(kx - 54)} ${ky} ${n(kx)} ${ky - 44} Z" fill="none" stroke="${c}" stroke-width="7"/>`;
+    for (const [dx, dy] of [[-40, 0], [40, 0], [0, -20], [0, 20], [0, 0]]) s += `<circle cx="${n(kx + dx)}" cy="${ky + dy}" r="6" fill="${p.ink}" opacity=".5"/>`;
   }
   // sugarcane leaning on both sides
-  s += at(cx - 210, 640, 1, sugarcane(between(r, 420, 470)), false, -8) + at(cx - 170, 640, 1, sugarcane(between(r, 380, 430), '#8e4b6f'), false, -3);
-  s += at(cx + 210, 640, 1, sugarcane(between(r, 420, 470)), false, 8) + at(cx + 170, 640, 1, sugarcane(between(r, 380, 430), '#8e4b6f'), false, 3);
-  // hint of fire between three stones
-  s += `<path d="M${n(cx - 40)} 610 q20 -46 40 -8 q16 -40 40 8 z" fill="#ffb300" opacity=".85"/>`;
-  for (const dx of [-110, 0, 110]) s += `<ellipse cx="${n(cx + dx)}" cy="618" rx="${dx ? 46 : 38}" ry="26" fill="#a39b93" ${OUTLINE}/>`;
+  s += at(cx - 250, 645, 1, sugarcane(between(r, 430, 470)), false, -9) + at(cx - 205, 645, 1, sugarcane(between(r, 390, 420), '#8e4b6f'), false, -3);
+  s += at(cx + 250, 645, 1, sugarcane(between(r, 430, 470)), false, 9) + at(cx + 205, 645, 1, sugarcane(between(r, 390, 420), '#8e4b6f'), false, 3);
   // the pot
-  const top = 300;
-  s += `<path d="M${n(cx - 72)} ${top + 40} C${n(cx - 200)} ${top + 90} ${n(cx - 180)} 590 ${n(cx)} 594 C${n(cx + 180)} 590 ${n(cx + 200)} ${top + 90} ${n(cx + 72)} ${top + 40} Z" fill="${CLAY}" ${OUTLINE}/>
-<rect x="${n(cx - 80)}" y="${top + 6}" width="160" height="40" rx="10" fill="${CLAY}" ${OUTLINE}/>
-<path d="M${n(cx - 150)} ${top + 150} Q${n(cx)} ${top + 190} ${n(cx + 150)} ${top + 150}" stroke="${band}" stroke-width="26" fill="none" stroke-linecap="round"/>`;
-  for (let i = 0; i < 7; i++) {
-    const x = cx - 120 + 40 * i;
-    s += `<circle cx="${n(x)}" cy="${n(top + 158 + 18 * Math.sin((Math.PI * i) / 6))}" r="6" fill="#fff"/>`;
-  }
-  for (let i = 0; i < 5; i++) {
-    const x = cx - 100 + 50 * i;
-    s += `<path d="M${n(x)} ${top + 230} l14 22 l-14 22 l-14 -22 z" fill="#fff" opacity=".85"/>`;
-  }
+  const top = 250;
+  s += `<path d="M${n(cx - 84)} ${top + 40} C${n(cx - 240)} ${top + 100} ${n(cx - 210)} 590 ${n(cx)} 594 C${n(cx + 210)} 590 ${n(cx + 240)} ${top + 100} ${n(cx + 84)} ${top + 40} Z" fill="${CLAY}" ${OUTLINE}/>
+<rect x="${n(cx - 92)}" y="${top + 6}" width="184" height="44" rx="12" fill="${CLAY}" ${OUTLINE}/>
+<path d="M${n(cx - 175)} ${top + 160} Q${n(cx)} ${top + 205} ${n(cx + 175)} ${top + 160}" stroke="${band}" stroke-width="30" fill="none" stroke-linecap="round"/>`;
+  for (let i = 0; i < 7; i++) s += `<circle cx="${n(cx - 138 + 46 * i)}" cy="${n(top + 168 + 20 * Math.sin((Math.PI * i) / 6))}" r="7" fill="#fff"/>`;
+  for (let i = 0; i < 5; i++) s += `<path d="M${n(cx - 112 + 56 * i)} ${top + 245} l16 24 l-16 24 l-16 -24 z" fill="#fff" opacity=".85"/>`;
   // turmeric leaves tied at the neck
-  s += leaf(cx - 20, top + 30, 110, GREEN, -120) + leaf(cx + 20, top + 30, 110, LEAF, -60) + leaf(cx, top + 30, 96, GREEN, -92);
-  s += `<path d="M${n(cx - 80)} ${top + 38} h160" stroke="${GOLD}" stroke-width="8" stroke-linecap="round"/>`;
-  // rice bubbling over
-  s += `<path d="M${n(cx - 92)} ${top + 10} q-6 -40 30 -38 q10 -36 50 -22 q24 -30 54 -4 q38 -10 40 30 q14 22 -4 34 q4 46 -16 46 q-14 0 -12 -40 q-70 6 -134 2 q4 26 -10 26 q-18 -6 -8 -34 z" fill="#fff" ${soft(p)}/>`;
-  for (let i = 0; i < 6; i++) s += `<ellipse cx="${n(cx - 60 + 24 * i + between(r, -6, 6))}" cy="${n(top - 10 + between(r, -10, 10))}" rx="5" ry="3" fill="${p.ink}" opacity=".12"/>`;
+  s += `<path d="M${n(cx - 92)} ${top + 44} h184" stroke="${GOLD}" stroke-width="9" stroke-linecap="round"/>`;
+  s += leaf(cx - 70, top + 44, 100, GREEN, 150) + leaf(cx + 70, top + 44, 100, LEAF, 30);
+  // sweet rice bubbling over the rim: a white rim of puffs, then the puffs themselves
+  const puffs = [[-80, -4, 34], [-40, -30, 40], [6, -42, 44], [52, -30, 40], [88, -4, 32], [-100, 30, 22], [104, 36, 20]];
+  for (const [dx, dy, R] of puffs) s += `<circle cx="${n(cx + dx)}" cy="${n(top + dy)}" r="${R + 5}" fill="${p.ink}" opacity=".12"/>`;
+  for (const [dx, dy, R] of puffs) s += `<circle cx="${n(cx + dx)}" cy="${n(top + dy)}" r="${R}" fill="#fff"/>`;
+  s += `<rect x="${n(cx - 100)}" y="${top - 10}" width="200" height="34" fill="#fff"/>`;
+  for (let i = 0; i < 7; i++) s += `<ellipse cx="${n(cx - 70 + 23 * i + between(r, -6, 6))}" cy="${n(top - 26 + between(r, -12, 12))}" rx="6" ry="3.5" fill="${p.ink}" opacity=".13"/>`;
+  // three stones with a small glow of fire between them
+  for (const dx of [-60, 60]) s += `<path d="M${n(cx + dx - 18)} 630 q18 -50 36 0 z" fill="#ffb300"/>`;
+  for (const dx of [-120, 0, 120]) s += `<ellipse cx="${n(cx + dx)}" cy="618" rx="${dx ? 50 : 42}" ry="28" fill="#a39b93" ${OUTLINE}/>`;
   return s;
 };
 
@@ -316,7 +314,7 @@ const colourClouds: Design = (r, p) => {
   const balloons = whole(r, 3, 4);
   for (let i = 0; i < balloons; i++) {
     const x = 160 + (760 / (balloons - 1)) * i + between(r, -30, 30), y = i % 2 ? between(r, 560, 600) : between(r, 100, 150);
-    s += at(x, y, between(r, 0.8, 1), waterBalloon(pick(r, p.acc), p.ink), i % 2 === 1, between(r, -12, 12));
+    s += at(x, y, between(r, 1.1, 1.3), waterBalloon(pick(r, p.acc), p.ink), i % 2 === 1, between(r, -12, 12));
   }
   return s;
 };
@@ -324,29 +322,30 @@ const colourClouds: Design = (r, p) => {
 /** Holi B: plates of coloured powder and a playful pichkari spraying droplets. */
 const pichkari: Design = (r, p) => {
   let s = '';
-  const plates = whole(r, 3, 4), x0 = plates === 3 ? 360 : 300, step = plates === 3 ? 230 : 210;
+  const plates = whole(r, 3, 4), x0 = plates === 3 ? 450 : 390, step = plates === 3 ? 240 : 200, rx = plates === 3 ? 105 : 92;
   for (let i = 0; i < plates; i++) {
-    const x = x0 + step * i + between(r, -10, 10), y = 615 - (i % 2) * 20, c = p.acc[(i + 1) % p.acc.length];
-    s += `<ellipse cx="${n(x)}" cy="${n(y)}" rx="95" ry="26" fill="#e0a526" ${OUTLINE}/>
-<path d="M${n(x - 70)} ${n(y - 4)} Q${n(x - 40)} ${n(y - 80)} ${n(x)} ${n(y - 82)} Q${n(x + 40)} ${n(y - 80)} ${n(x + 70)} ${n(y - 4)} Z" fill="${c}" ${OUTLINE}/>
-<circle cx="${n(x + 30)}" cy="${n(y - 2)}" r="7" fill="${c}"/><circle cx="${n(x - 44)}" cy="${n(y + 4)}" r="5" fill="${c}"/>`;
+    const x = x0 + step * i + between(r, -8, 8), y = 618 - (i % 2) * 16, c = p.acc[(i + 1) % p.acc.length];
+    s += `<ellipse cx="${n(x)}" cy="${n(y)}" rx="${rx}" ry="28" fill="#e0a526" ${OUTLINE}/>
+<path d="M${n(x - rx * 0.75)} ${n(y - 4)} Q${n(x - rx * 0.45)} ${n(y - 100)} ${n(x)} ${n(y - 102)} Q${n(x + rx * 0.45)} ${n(y - 100)} ${n(x + rx * 0.75)} ${n(y - 4)} Z" fill="${c}" ${OUTLINE}/>
+<circle cx="${n(x + 34)}" cy="${n(y)}" r="8" fill="${c}"/><circle cx="${n(x - 48)}" cy="${n(y + 6)}" r="6" fill="${c}"/>`;
   }
-  // the pichkari, held at an upward angle on the left
-  const px = 150, py = 520, ang = -between(r, 28, 38), body = pick(r, p.acc), cap = pick(r, p.acc.filter((c) => c !== body));
-  s += at(px, py, 1, `<rect x="-120" y="-10" width="70" height="20" rx="8" fill="${cap}" ${OUTLINE}/>
+  // the pichkari, tilted up on the left, spraying a rainbow arc of drops
+  const px = 190, py = 470, ang = -between(r, 26, 34), sc = 1.35, body = pick(r, p.acc), cap = pick(r, p.acc.filter((c) => c !== body));
+  const a = (ang * Math.PI) / 180, nx = px + Math.cos(a) * 190 * sc, ny = py + Math.sin(a) * 190 * sc;
+  const ex = between(r, 900, 980), ey = between(r, 300, 360), qx = (nx + ex) / 2 + 40, qy = Math.min(ny, ey) - between(r, 220, 280);
+  for (let i = 0; i < 30; i++) {
+    const t = 0.04 + (i / 29) * 0.96, u = 1 - t;
+    const x = u * u * nx + 2 * u * t * qx + t * t * ex, y = u * u * ny + 2 * u * t * qy + t * t * ey;
+    const spread = 10 + t * 26;
+    s += `<circle cx="${n(x + between(r, -spread, spread))}" cy="${n(y + between(r, -spread, spread))}" r="${n(between(r, 11, 18))}" fill="${p.acc[i % p.acc.length]}"/>`;
+  }
+  s += puff(r, ex, ey + 30, 50, pick(r, p.acc));
+  s += at(px, py, sc, `<rect x="-120" y="-10" width="70" height="20" rx="8" fill="${cap}" ${OUTLINE}/>
 <rect x="-150" y="-36" width="34" height="72" rx="16" fill="${cap}" ${OUTLINE}/>
 <rect x="-60" y="-40" width="190" height="80" rx="34" fill="${body}" ${OUTLINE}/>
 <path d="M-24 -38 v76 M20 -38 v76 M64 -38 v76" stroke="#fff" stroke-width="8" opacity=".6"/>
 <path d="M126 -22 l60 14 v16 l-60 14 z" fill="${cap}" ${OUTLINE}/>`, false, ang);
-  // spray of droplets in an arc from the nozzle
-  const a = (ang * Math.PI) / 180, nx = px + Math.cos(a) * 190, ny = py + Math.sin(a) * 190;
-  for (let i = 0; i < 26; i++) {
-    const t = i / 25, d = 40 + t * 700;
-    const x = nx + Math.cos(a) * d * 0.95 + d * 0.25, y = ny + Math.sin(a) * d * 0.9 + t * t * 420 - 20 + between(r, -18, 18);
-    if (x > 1040 || y > 520) break;
-    s += `<circle cx="${n(x)}" cy="${n(y)}" r="${n(between(r, 7, 15) * (1 - t * 0.3))}" fill="${p.acc[i % p.acc.length]}"/>`;
-  }
-  s += puff(r, between(r, 820, 920), between(r, 140, 220), 56, pick(r, p.acc)) + puff(r, between(r, 560, 660), between(r, 70, 110), 36, pick(r, p.acc));
+  for (let i = 0; i < 3; i++) s += star(between(r, 80, 520), between(r, 40, 200), between(r, 14, 20), pick(r, p.acc));
   return s;
 };
 
@@ -354,7 +353,7 @@ const pichkari: Design = (r, p) => {
 
 /** Ugadi A: a mango-leaf toran over a kolam, with raw mangoes and neem flowers. */
 const ugadiKolam: Design = (r, p) => {
-  let s = toran(r, 26, whole(r, 7, 8) * 2);
+  let s = toran(r, 26, whole(r, 6, 7) * 2);
   const cx = 540, cy = 400, petals = pick(r, [6, 8]), rot = r() * Math.PI;
   s += `<path d="M${cx} ${cy - 200} L${cx + 200} ${cy} L${cx} ${cy + 200} L${cx - 200} ${cy} Z" fill="none" stroke="${p.acc[0]}" stroke-width="10" stroke-linejoin="round"/>`;
   s += flower(cx, cy, petals, 170, 66, [p.acc[1], p.acc[3]], GOLD, rot, 34);
@@ -367,15 +366,15 @@ const ugadiKolam: Design = (r, p) => {
     const a = (2 * Math.PI * (i + 0.5)) / 12;
     s += `<circle cx="${n(cx + Math.cos(a) * 160)}" cy="${n(cy + Math.sin(a) * 160)}" r="6" fill="${p.ink}" opacity=".45"/>`;
   }
-  s += at(between(r, 150, 190), 560, 0.9, mango()) + at(between(r, 250, 280), 580, 0.75, mango('#9ccc65'), true);
-  s += at(between(r, 860, 900), 645, 1, neem(r, p, between(r, 220, 260))) + at(between(r, 960, 990), 645, 0.8, neem(r, p, 200), true);
+  s += at(between(r, 150, 180), 520, 1.2, mango()) + at(between(r, 270, 290), 545, 1, mango('#9ccc65'), true, 12);
+  s += at(between(r, 840, 870), 645, 1.2, neem(r, p, between(r, 220, 250)), false, -8) + at(between(r, 960, 980), 645, 1, neem(r, p, 220), true, 8);
   return s;
 };
 
 /** Ugadi B: a bowl of Ugadi pachadi among raw mangoes, neem flowers and marigold swags. */
 const pachadi: Design = (r, p) => {
-  let s = garland(40, 20, 540, 30, between(r, 40, 70), 9) + garland(540, 30, 1040, 20, between(r, 40, 70), 9);
-  s += marigold(540, 40, 28, '#ffb300');
+  let s = garland(50, 28, 540, 34, between(r, 40, 60), 7, 25) + garland(540, 34, 1030, 28, between(r, 40, 60), 7, 25);
+  s += marigold(540, 40, 34, '#ffb300');
   const cx = between(r, 520, 560);
   s += at(cx - 230, 600, 1.15, neem(r, p, 300), false, -10) + at(cx + 250, 600, 1, neem(r, p, 280), true, 12);
   // the bowl
@@ -400,7 +399,7 @@ const pachadi: Design = (r, p) => {
 /** Good Friday A: a plain cross on a gentle hill at dawn, with lilies. */
 const hillCross: Design = (r, p) => {
   const cx = between(r, 500, 580);
-  let s = `<circle cx="${n(cx + between(r, 180, 260))}" cy="430" r="110" fill="${p.acc[1]}" opacity=".7"/><circle cx="${n(cx + 220)}" cy="430" r="150" fill="${p.acc[1]}" opacity=".25"/>`;
+  let s = `<circle cx="${n(cx)}" cy="460" r="230" fill="${p.acc[1]}" opacity=".3"/><circle cx="${n(cx)}" cy="460" r="150" fill="${p.acc[1]}" opacity=".75"/>`;
   s += `<path d="M30 650 Q${n(cx - 200)} 450 ${n(cx)} 470 Q${n(cx + 260)} 480 1050 600 V650 Z" fill="${p.acc[4]}" ${OUTLINE}/>`;
   s += `<rect x="${n(cx - 17)}" y="170" width="34" height="320" rx="6" fill="#a58b73" ${OUTLINE}/><rect x="${n(cx - 92)}" y="250" width="184" height="32" rx="6" fill="#a58b73" ${OUTLINE}/>`;
   for (let i = 0; i < 2; i++) {
@@ -408,8 +407,8 @@ const hillCross: Design = (r, p) => {
     s += `<path d="M${n(bx - 20)} ${n(by)} q10 -11 20 0 q10 -11 20 0" fill="none" stroke="${p.ink}" stroke-width="4" stroke-linecap="round" opacity=".35"/>`;
   }
   const lilies = whole(r, 2, 3);
-  for (let i = 0; i < lilies; i++) s += at(cx - 230 - 90 * i + between(r, -15, 15), 640, between(r, 0.85, 1), lily(p, between(r, 160, 200), 1));
-  s += at(cx + 260 + between(r, -15, 15), 640, 0.95, lily(p, between(r, 160, 190), -1), true);
+  for (let i = 0; i < lilies; i++) s += at(cx - 250 - 100 * i + between(r, -15, 15), 645, between(r, 1, 1.12), lily(p, between(r, 170, 210), 1));
+  s += at(cx + 290 + between(r, -15, 15), 645, 1.05, lily(p, between(r, 170, 200), 1), true);
   return s;
 };
 
@@ -437,14 +436,14 @@ const cradle: Design = (r, p) => {
   let s = `<rect x="${n(cx - 290)}" y="70" width="26" height="570" rx="10" fill="${wood}" ${OUTLINE}/><rect x="${n(cx + 264)}" y="70" width="26" height="570" rx="10" fill="${wood}" ${OUTLINE}/>
 <rect x="${n(cx - 310)}" y="56" width="620" height="32" rx="14" fill="${wood}" ${OUTLINE}/>
 <circle cx="${n(cx - 277)}" cy="48" r="16" fill="${GOLD}" ${OUTLINE}/><circle cx="${n(cx + 277)}" cy="48" r="16" fill="${GOLD}" ${OUTLINE}/>`;
-  s += garland(cx - 270, 96, cx + 270, 96, between(r, 30, 45), 13, 16);
+  s += garland(cx - 270, 100, cx + 270, 100, between(r, 30, 45), 11, 21);
   s += `<path d="M${n(cx - 150)} 88 L${n(cx - 175)} 360 M${n(cx + 150)} 88 L${n(cx + 175)} 360" stroke="${GOLD}" stroke-width="6" stroke-dasharray="14 8"/>`;
   s += `<path d="M${n(cx - 220)} 350 Q${n(cx)} 380 ${n(cx + 220)} 350 Q${n(cx + 200)} 520 ${n(cx)} 525 Q${n(cx - 200)} 520 ${n(cx - 220)} 350 Z" fill="${body}" ${OUTLINE}/>
 <path d="M${n(cx - 200)} 400 Q${n(cx)} 440 ${n(cx + 200)} 400" stroke="${trim}" stroke-width="18" fill="none" stroke-linecap="round"/>
 <path d="M${n(cx - 230)} 346 Q${n(cx)} 330 ${n(cx + 230)} 346" stroke="${GOLD}" stroke-width="14" fill="none" stroke-linecap="round"/>`;
   for (let i = 0; i < 7; i++) s += `<circle cx="${n(cx - 150 + 50 * i)}" cy="${n(458 + 10 * Math.sin((Math.PI * i) / 6))}" r="8" fill="#fff"/>`;
   for (const dx of [-170, 170]) s += marigold(cx + dx, 360, 26, '#ffb300');
-  s += at(cx - 150, 640, 0.75, lotus(p.acc[0])) + at(cx + 150, 640, 0.75, lotus(p.acc[0]));
+  s += at(cx - 140, 640, 0.9, lotus(p.acc[0])) + at(cx + 140, 640, 0.9, lotus(p.acc[0]));
   for (let i = 0; i < 4; i++) {
     const side = i % 2 ? 1 : -1;
     s += flower(cx + side * between(r, 360, 450), between(r, 180, 520), 6, 50, 26, [pick(r, p.acc)], GOLD, r() * 3, 10);
@@ -454,28 +453,26 @@ const cradle: Design = (r, p) => {
 
 /** Ram Navami B: a sun rising over a lotus pond, a festive bow and arrows crossed above, garlands. */
 const bowAndSun: Design = (r, p) => {
-  let s = garland(40, 24, 1040, 24, between(r, 25, 40), 22, 15);
+  let s = garland(40, 26, 1040, 26, between(r, 10, 16), 20, 19);
   const sx = between(r, 500, 580);
-  s += sun(sx, 470, 110, GOLD, false);
-  s += `<path d="M30 520 Q540 490 1050 520 V650 H30 Z" fill="${p.acc[2]}" opacity=".55"/><path d="M30 520 Q540 490 1050 520" fill="none" stroke="#fff" stroke-width="6"/>`;
-  for (let i = 0; i < 3; i++) s += `<path d="M${n(between(r, 100, 900))} ${n(560 + 30 * i)} h${n(between(r, 60, 120))}" stroke="#fff" stroke-width="5" stroke-linecap="round" opacity=".8"/>`;
-  const lotuses = whole(r, 2, 3);
-  for (let i = 0; i < lotuses; i++) {
-    const x = lotuses === 2 ? [230, 850][i] : [180, 540, 900][i];
-    s += at(x + between(r, -20, 20), 610, between(r, 0.7, 0.85), lotus(i === 1 ? p.acc[4] : p.acc[0]));
-  }
-  // bow and two arrows, crossed like an emblem, pointing up
-  const bx = sx, by = 210, bow = '#a0612f';
-  for (const a of [-28, 28])
-    s += at(bx, by, 1, `<path d="M0 120 V-130" stroke="#8d6e63" stroke-width="9" stroke-linecap="round"/>
-<path d="M0 -168 l-16 34 h32 z" fill="${GOLD}" ${OUTLINE}/>
-<path d="M0 104 l-16 22 v-28 l16 -16 l16 16 v28 z" fill="${pick(r, p.acc)}" ${OUTLINE}/>`, false, a);
-  s += `<path d="M${n(bx - 120)} ${by - 110} Q${n(bx + 50)} ${by} ${n(bx - 120)} ${by + 110}" fill="none" stroke="#fff" stroke-width="22" stroke-linecap="round"/>
-<path d="M${n(bx - 120)} ${by - 110} Q${n(bx + 50)} ${by} ${n(bx - 120)} ${by + 110}" fill="none" stroke="${bow}" stroke-width="14" stroke-linecap="round"/>
-<path d="M${n(bx - 120)} ${by - 110} L${n(bx - 120)} ${by + 110}" stroke="${p.ink}" stroke-width="3" opacity=".5"/>
-<circle cx="${n(bx - 120)}" cy="${by - 110}" r="9" fill="${GOLD}"/><circle cx="${n(bx - 120)}" cy="${by + 110}" r="9" fill="${GOLD}"/>`;
-  s += marigold(bx - 34, by, 22, '#ff8f1f');
-  for (const side of [-1, 1]) s += at(sx + side * between(r, 300, 380), between(r, 190, 260), 1, flower(0, 0, 8, 56, 28, [pick(r, p.acc)], GOLD, r() * 3, 12));
+  s += sun(sx, 500, 105, GOLD, false);
+  // a calm pond the sun rises from: white under the colour so the sun doesn't show through
+  s += `<ellipse cx="540" cy="585" rx="505" ry="68" fill="#fff"/><ellipse cx="540" cy="585" rx="500" ry="63" fill="${p.acc[2]}" opacity=".5"/>`;
+  for (let i = 0; i < 3; i++) s += `<path d="M${n(between(r, 160, 840))} ${n(570 + 22 * i)} h${n(between(r, 60, 110))}" stroke="#fff" stroke-width="5" stroke-linecap="round" opacity=".85"/>`;
+  const lotuses = whole(r, 2, 3), xs = lotuses === 2 ? [250, 830] : [190, 540, 890];
+  xs.forEach((x, i) => (s += at(x + between(r, -20, 20), 612, between(r, 0.75, 0.88), lotus(i === 1 ? p.acc[4] : p.acc[0]))));
+  // a bow with two arrows crossed behind it, pointing up like an emblem
+  const bx = sx, by = 205, fletch = pick(r, p.acc);
+  for (const t of [-30, 30])
+    s += at(bx, by, 1, `<path d="M0 118 V-112" stroke="#8d6e63" stroke-width="9" stroke-linecap="round"/>
+<path d="M0 -146 l-18 36 h36 z" fill="${GOLD}" ${OUTLINE}/>
+<path d="M0 84 l-18 -16 v30 l18 16 l18 -16 v-30 z" fill="${fletch}" ${OUTLINE}/>`, false, t);
+  s += `<path d="M${n(bx - 40)} ${by - 118} Q${n(bx + 120)} ${by} ${n(bx - 40)} ${by + 118}" fill="none" stroke="#fff" stroke-width="24" stroke-linecap="round"/>
+<path d="M${n(bx - 40)} ${by - 118} Q${n(bx + 120)} ${by} ${n(bx - 40)} ${by + 118}" fill="none" stroke="#a0612f" stroke-width="15" stroke-linecap="round"/>
+<path d="M${n(bx - 40)} ${by - 118} V${by + 118}" stroke="${p.ink}" stroke-width="3" opacity=".5"/>
+<circle cx="${n(bx - 40)}" cy="${by - 118}" r="10" fill="${GOLD}"/><circle cx="${n(bx - 40)}" cy="${by + 118}" r="10" fill="${GOLD}"/>`;
+  s += marigold(bx + 40, by, 24, '#ff8f1f');
+  for (const side of [-1, 1]) s += flower(sx + side * between(r, 290, 360), between(r, 200, 270), 8, 64, 30, [pick(r, p.acc)], GOLD, r() * 3, 13);
   return s;
 };
 
@@ -498,7 +495,7 @@ const lotusPond: Design = (r, p) => {
   s += at(between(r, 260, 300), 575, 0.8, lotus(p.acc[(p.acc.indexOf(main) + 1) % p.acc.length]));
   s += at(between(r, 780, 820), 575, 0.8, lotus(p.acc[(p.acc.indexOf(main) + 3) % p.acc.length]));
   const left = r() < 0.5;
-  s += at(left ? between(r, 230, 300) : between(r, 780, 850), between(r, 150, 200), 0.9, dove(p), !left);
+  s += at(left ? between(r, 230, 300) : between(r, 780, 850), between(r, 150, 200), 1.2, dove(p), !left);
   for (let i = 0; i < 4; i++) s += leaf(between(r, 120, 960), between(r, 60, 300), 34, pick(r, [GREEN, LEAF]), between(r, -80, 80));
   return s;
 };
@@ -528,17 +525,17 @@ const tortoise = (p: Palette, shell: string) =>
 const kindTree: Design = (r, p) => {
   const tx = between(r, 520, 560);
   let s = grass(r, LEAF, 650);
-  s += `<path d="M${n(tx - 34)} 640 Q${n(tx - 20)} 420 ${n(tx - 10)} 330 h20 Q${n(tx + 20)} 420 ${n(tx + 34)} 640 Z" fill="#8d5a3b" ${OUTLINE}/>`;
-  const blobs = [[0, 210, 150], [-150, 250, 110], [150, 250, 110], [-90, 140, 110], [90, 140, 110], [0, 110, 100]];
+  s += `<path d="M${n(tx - 34)} 640 Q${n(tx - 20)} 440 ${n(tx - 10)} 350 h20 Q${n(tx + 20)} 420 ${n(tx + 34)} 640 Z" fill="#8d5a3b" ${OUTLINE}/>`;
+  const blobs = [[0, 250, 120], [-125, 280, 90], [125, 280, 90], [-75, 190, 90], [75, 190, 90], [0, 160, 85]];
   for (const [dx, y, R] of blobs) s += `<circle cx="${n(tx + dx)}" cy="${y}" r="${R}" fill="#fff"/>`;
   for (const [dx, y, R] of blobs) s += `<circle cx="${n(tx + dx)}" cy="${y}" r="${R - 5}" fill="${GREEN}"/>`;
-  for (let i = 0; i < 6; i++) s += `<circle cx="${n(tx + between(r, -200, 200))}" cy="${n(between(r, 90, 300))}" r="${n(between(r, 12, 20))}" fill="${LEAF}"/>`;
-  const birds = [[-170, 300, false], [130, 170, true], [20, 70, false]] as const;
+  for (let i = 0; i < 6; i++) s += `<circle cx="${n(tx + between(r, -160, 160))}" cy="${n(between(r, 130, 320))}" r="${n(between(r, 12, 20))}" fill="${LEAF}"/>`;
+  const birds = [[-150, 320, false], [110, 200, true], [10, 110, false]] as const;
   birds.forEach(([dx, y, flip], i) => {
-    if (i < 2 || r() < 0.6) s += at(tx + dx + between(r, -10, 10), y, 0.9, bird(p.acc[(i * 2) % p.acc.length], p.ink), flip);
+    if (i < 2 || r() < 0.6) s += at(tx + dx + between(r, -10, 10), y, 1.1, bird(p.acc[(i * 2) % p.acc.length], p.ink), flip);
   });
-  s += at(tx - between(r, 250, 300), 640, between(r, 0.85, 0.95), rabbit(p));
-  s += at(tx + between(r, 230, 290), 640, 0.9, tortoise(p, pick(r, p.acc)), true);
+  s += at(tx - between(r, 270, 310), 640, between(r, 1.2, 1.3), rabbit(p));
+  s += at(tx + between(r, 260, 300), 640, 1.2, tortoise(p, pick(r, p.acc)), true);
   // a little water bowl shared by all
   s += `<ellipse cx="${n(tx)}" cy="632" rx="70" ry="16" fill="#c58b2c" ${OUTLINE}/><ellipse cx="${n(tx)}" cy="626" rx="54" ry="8" fill="${p.acc[2]}" opacity=".8"/>`;
   s += at(tx + 60, 590, 0.6, bird(pick(r, p.acc), p.ink), true);

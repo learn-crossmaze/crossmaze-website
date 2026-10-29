@@ -103,11 +103,11 @@ function drum(x: number, y: number, s: number, body: string, tilt = 0) {
 /** Republic Day A: the flag flying high, tricolour bunting, parade drums and balloons. */
 const flagParade: Design = (r, p) => {
   let s = bunting(30, 22, 1050, 22, TRI, whole(r, 11, 14), 30);
-  const x = between(r, 400, 450), sc = 1.4;
+  const x = between(r, 390, 430), sc = 1.6;
   s += `<path d="M${n(x - 70)} 640 h140 l-16 -34 h-108 z" fill="${STONE}" ${OUTLINE}/>`;
-  s += indianFlag(x, 170, sc);
+  s += indianFlag(x, 112, sc);
   for (const side of [-1, 1]) {
-    const dx = x + 126 + side * between(r, 330, 390);
+    const dx = x + 144 + side * between(r, 340, 390);
     s += drum(dx, 630, between(r, 0.95, 1.1), pick(r, p.acc), between(r, -4, 4));
   }
   for (const [bx, by, c] of [[between(r, 90, 150), between(r, 160, 220), SAFFRON], [between(r, 930, 990), between(r, 160, 220), GREEN]] as const)
@@ -148,16 +148,17 @@ const gate: Design = (r, p) => {
 
 /** Independence Day A: tricolour kites flying high, their strings down to a reel on the grass. */
 const kites: Design = (r, p) => {
-  let s = cloud(between(r, 150, 260), between(r, 120, 170), 0.9) + cloud(between(r, 820, 930), between(r, 90, 140), 0.75);
+  let s = '';
   const reelX = between(r, 480, 600), reelY = 590;
   const count = whole(r, 3, 4);
   const spots: [number, number][] = [];
-  for (let i = 0; i < count; i++) spots.push([150 + (780 / (count - 1)) * i + between(r, -30, 30), between(r, 110, 300) + (i % 2) * 40]);
+  for (let i = 0; i < count; i++) spots.push([170 + (740 / (count - 1)) * i + between(r, -20, 20), between(r, 170, 250) + (i % 2) * 50]);
+  for (let i = 1; i < count; i++) s += cloud((spots[i - 1][0] + spots[i][0]) / 2 + between(r, -15, 15), between(r, 100, 130), count > 3 ? 0.55 : 0.75);
   for (const [x, y] of spots)
     s += `<path d="M${n(x)} ${n(y)} Q${n((x + reelX) / 2 + between(r, -60, 60))} ${n((y + reelY) / 2 + 80)} ${n(reelX)} ${n(reelY - 40)}" fill="none" stroke="${p.ink}" stroke-width="3" opacity=".4"/>`;
   const plain = count - 1 - Math.floor(r() * 2);
   spots.forEach(([x, y], i) => {
-    const tilt = between(r, -18, 18), sc = between(r, 0.9, 1.15);
+    const tilt = between(r, -16, 16), sc = between(r, 1.2, 1.45) - (count - 3) * 0.12;
     s += i % 2 === 0 || i > plain ? tricolourKite(x, y, sc, p.ink, tilt) : kite(x, y, sc, pick(r, p.acc), pick(r, [SAFFRON, GREEN]), tilt);
   });
   s += grass(r, '#5cc98a', 652);
@@ -167,7 +168,6 @@ const kites: Design = (r, p) => {
 <ellipse cx="${n(reelX - 56)}" cy="${n(reelY - 12)}" rx="16" ry="50" fill="${WOOD}" ${OUTLINE}/>
 <ellipse cx="${n(reelX + 56)}" cy="${n(reelY - 12)}" rx="16" ry="50" fill="${WOOD}" ${OUTLINE}/>
 <path d="M${n(reelX - 72)} ${n(reelY - 12)} h-46 M${n(reelX + 72)} ${n(reelY - 12)} h46" stroke="${WOOD_DARK}" stroke-width="14" stroke-linecap="round"/>`;
-  s += indianFlag(between(r, 830, 880), 420, 0.62);
   return s;
 };
 
@@ -280,8 +280,8 @@ const spectacles: Design = (r, p) => {
 <path d="M${n(cx - gap + R)} ${cy - 8} q${n(gap - R)} -30 ${n(2 * (gap - R))} 0" fill="none" stroke="${frame}" stroke-width="10" stroke-linecap="round"/>
 <path d="M${n(cx - gap - 46)} ${cy - 30} a50 50 0 0 1 36 -34 M${n(cx + gap - 46)} ${cy - 30} a50 50 0 0 1 36 -34" fill="none" stroke="#fff" stroke-width="9" stroke-linecap="round" opacity=".9"/>`;
   // The dove, and a few leaves.
-  const dx = between(r, 430, 560), dy = between(r, 190, 220);
-  s += dove(dx, dy, between(r, 0.95, 1.1), p.ink, between(r, -10, 15));
+  const dx = between(r, 420, 540), dy = between(r, 215, 235);
+  s += dove(dx, dy, between(r, 1.2, 1.35), p.ink, between(r, -10, 15));
   for (const side of [-1, 1]) {
     const lx = cx + side * between(r, 360, 420);
     s += `<path d="M${n(lx)} 640 q${n(side * -10)} -70 ${n(side * 10)} -140" fill="none" stroke="#5a8f3a" stroke-width="7" stroke-linecap="round"/>`;
@@ -316,10 +316,10 @@ function dome(x: number, base: number, w: number, fill: string, drumFill: string
 <circle cx="${n(x)}" cy="${n(base - dh - h - 8)}" r="${n(Math.max(7, w * 0.07))}" fill="#ffc93c" stroke="#fff" stroke-width="3"/>`;
 }
 
-/** Rajyotsava A: a Mysuru-palace-like building with domes, Karnataka flags and yellow-red bunting. */
+/** Rajyotsava A: a Mysuru-palace-like building with domes, Karnataka flags, bunting and jasmine. */
 const palace: Design = (r, p) => {
   const cx = between(r, 520, 560), body = '#f2cf96', dark = '#d9a35f', domeC = pick(r, ['#e0533f', '#d84a3a', '#e46a4c']);
-  let s = bunting(30, 22, 1050, 22, [KA_YELLOW, KA_RED], whole(r, 11, 14), 28);
+  let s = '';
   // Main block with a row of arches.
   const arches = pick(r, [5, 7]), left = cx - 330, w = 660, aw = w / arches;
   s += `<rect x="${n(left - 20)}" y="604" width="${n(w + 40)}" height="36" rx="8" fill="${dark}" ${OUTLINE}/>
@@ -327,24 +327,30 @@ const palace: Design = (r, p) => {
 <rect x="${n(left - 12)}" y="428" width="${n(w + 24)}" height="20" rx="6" fill="${dark}" ${OUTLINE}/>`;
   for (let i = 0; i < arches; i++) {
     const ax = left + aw * i + aw / 2, hw = aw * 0.3;
-    s += `<path d="M${n(ax - hw)} 604 V520 A${n(hw)} ${n(hw)} 0 0 1 ${n(ax + hw)} 520 V604 Z" fill="${dark}" stroke="#fff" stroke-width="4"/>`;
+    s += `<path d="M${n(ax - hw)} 604 V530 A${n(hw)} ${n(hw)} 0 0 1 ${n(ax + hw)} 530 V604 Z" fill="${dark}" stroke="#fff" stroke-width="4"/>`;
   }
-  // Side towers and the tall middle tower.
+  // Side towers, with a flag on each dome.
+  const sideTop = 330, sideW = 84, sideTip = sideTop - sideW * 1.43 - 8;
   for (const side of [-1, 1]) {
     const tx = cx + side * 290;
-    s += `<rect x="${n(tx - 48)}" y="300" width="96" height="140" fill="${body}" ${OUTLINE}/>
-<path d="M${n(tx - 22)} 400 V350 a22 22 0 0 1 44 0 V400 Z" fill="${dark}"/>` + dome(tx, 302, 92, domeC, body);
+    s += `<line x1="${n(tx)}" y1="${n(sideTip - 70)}" x2="${n(tx)}" y2="${n(sideTip)}" stroke="#8d6e63" stroke-width="5" stroke-linecap="round"/>` +
+      karnatakaFlag(tx, sideTip - 70, 0.36, 0) +
+      `<rect x="${n(tx - 46)}" y="${sideTop}" width="92" height="${440 - sideTop}" fill="${body}" ${OUTLINE}/>
+<path d="M${n(tx - 20)} 410 V370 a20 20 0 0 1 40 0 V410 Z" fill="${dark}"/>` + dome(tx, sideTop + 2, sideW, domeC, body);
   }
-  const midW = between(r, 150, 170);
-  s += `<rect x="${n(cx - 90)}" y="250" width="180" height="190" fill="${body}" ${OUTLINE}/>
-<rect x="${n(cx - 102)}" y="240" width="204" height="18" rx="6" fill="${dark}" ${OUTLINE}/>
-<path d="M${n(cx - 40)} 440 V340 a40 40 0 0 1 80 0 V440 Z" fill="${dark}" stroke="#fff" stroke-width="4"/>` + dome(cx, 242, midW, domeC, body);
-  const topY = 242 - midW * 0.38 - midW * 1.05 - 16;
-  s += karnatakaFlag(cx, topY - 110, 0.62, 175);
-  for (const side of [-1, 1]) s += karnatakaFlag(cx + side * 290, 302 - 92 * 1.43 - 16 - 70, 0.4, 175);
+  // The tall middle tower, its dome and the big flag.
+  const midTop = 300, midW = between(r, 128, 140), midTip = midTop - midW * 1.43 - 10;
+  s += `<line x1="${n(cx)}" y1="${n(midTip - 90)}" x2="${n(cx)}" y2="${n(midTip)}" stroke="#8d6e63" stroke-width="6" stroke-linecap="round"/>` +
+    karnatakaFlag(cx, midTip - 90, 0.5, 0);
+  s += `<rect x="${n(cx - 88)}" y="${midTop}" width="176" height="${440 - midTop}" fill="${body}" ${OUTLINE}/>
+<rect x="${n(cx - 100)}" y="${midTop - 10}" width="200" height="18" rx="6" fill="${dark}" ${OUTLINE}/>
+<path d="M${n(cx - 38)} 440 V370 a38 38 0 0 1 76 0 V440 Z" fill="${dark}" stroke="#fff" stroke-width="4"/>` + dome(cx, midTop - 8, midW, domeC, body);
+  // Yellow-and-red bunting swags between the towers.
+  const flags = whole(r, 4, 5);
+  s += bunting(cx - 246, sideTop + 30, cx - 100, midTop + 30, [KA_YELLOW, KA_RED], flags, 14) + bunting(cx + 100, midTop + 30, cx + 246, sideTop + 30, [KA_RED, KA_YELLOW], flags, 14);
   // Jasmine strings at the sides.
-  s += jasmineString(between(r, 90, 120), 60, between(r, 200, 300), p.ink, r) + jasmineString(between(r, 960, 990), 60, between(r, 200, 300), p.ink, r);
-  for (let i = 0; i < 3; i++) s += sparkle(between(r, 150, 930), between(r, 90, 200), between(r, 10, 16), pick(r, [KA_YELLOW, ...p.acc]));
+  s += jasmineString(between(r, 70, 100), 40, between(r, 220, 320), p.ink, r) + jasmineString(between(r, 980, 1010), 40, between(r, 220, 320), p.ink, r);
+  for (let i = 0; i < 4; i++) s += sparkle(between(r, 150, 930), between(r, 40, 200), between(r, 10, 16), pick(r, [KA_YELLOW, KA_RED, ...p.acc]));
   return s;
 };
 
@@ -376,9 +382,12 @@ function elephant(x: number, y: number, ink: string, cloth: string, trim: string
   }
   // Head, ear, trunk and a decorated forehead.
   const hx = bx + 200, hy = by - 40;
-  s += `<path d="M${n(hx + 50)} ${n(hy + 30)} Q${n(hx + 110)} ${n(hy + 70)} ${n(hx + 90)} ${n(hy + 150)} Q${n(hx + 84)} ${n(hy + 190)} ${n(hx + 120)} ${n(hy + 200)} Q${n(hx + 150)} ${n(hy + 196)} ${n(hx + 140)} ${n(hy + 170)}" fill="none" stroke="#fff" stroke-width="50" stroke-linecap="round"/>
-<path d="M${n(hx + 50)} ${n(hy + 30)} Q${n(hx + 110)} ${n(hy + 70)} ${n(hx + 90)} ${n(hy + 150)} Q${n(hx + 84)} ${n(hy + 190)} ${n(hx + 120)} ${n(hy + 200)} Q${n(hx + 150)} ${n(hy + 196)} ${n(hx + 140)} ${n(hy + 170)}" fill="none" stroke="${grey}" stroke-width="40" stroke-linecap="round"/>
-<path d="M${n(hx + 70)} ${n(hy + 110)} h24 M${n(hx + 66)} ${n(hy + 140)} h24" stroke="${grey2}" stroke-width="5" stroke-linecap="round"/>
+  const trunk = `M${n(hx + 60)} ${n(hy + 40)} Q${n(hx + 140)} ${n(hy + 70)} ${n(hx + 150)} ${n(hy - 10)} Q${n(hx + 156)} ${n(hy - 70)} ${n(hx + 180)} ${n(hy - 84)}`;
+  s += `<line x1="${n(hx + 186)}" y1="${n(hy - 250)}" x2="${n(hx + 186)}" y2="${n(hy - 40)}" stroke="#8d6e63" stroke-width="8" stroke-linecap="round"/>
+${karnatakaFlag(hx + 186, hy - 250, 0.8, 0)}
+<path d="${trunk}" fill="none" stroke="#fff" stroke-width="50" stroke-linecap="round"/>
+<path d="${trunk}" fill="none" stroke="${grey}" stroke-width="40" stroke-linecap="round"/>
+<path d="M${n(hx + 120)} ${n(hy + 24)} h24 M${n(hx + 130)} ${n(hy - 6)} h22 M${n(hx + 140)} ${n(hy - 36)} h20" stroke="${grey2}" stroke-width="5" stroke-linecap="round"/>
 <circle cx="${n(hx)}" cy="${n(hy)}" r="105" fill="${grey}" ${OUTLINE}/>
 <path d="M${n(hx - 20)} ${n(hy - 70)} Q${n(hx - 130)} ${n(hy - 90)} ${n(hx - 120)} ${n(hy + 20)} Q${n(hx - 110)} ${n(hy + 110)} ${n(hx - 20)} ${n(hy + 70)} Z" fill="${grey2}" ${OUTLINE}/>
 <path d="M${n(hx - 30)} ${n(hy - 50)} Q${n(hx - 100)} ${n(hy - 60)} ${n(hx - 96)} ${n(hy + 14)} Q${n(hx - 88)} ${n(hy + 70)} ${n(hx - 30)} ${n(hy + 48)}" fill="none" stroke="#f4c6c9" stroke-width="10" stroke-linecap="round" opacity=".8"/>
@@ -386,23 +395,20 @@ function elephant(x: number, y: number, ink: string, cloth: string, trim: string
 <circle cx="${n(hx + 56)}" cy="${n(hy - 40)}" r="10" fill="${trim}" stroke="#fff" stroke-width="3"/>
 <circle cx="${n(hx + 40)}" cy="${n(hy + 4)}" r="11" fill="${ink}"/><circle cx="${n(hx + 44)}" cy="${n(hy)}" r="4" fill="#fff"/>
 <circle cx="${n(hx + 20)}" cy="${n(hy + 40)}" r="13" fill="#ff8fa3" opacity=".55"/>
-<path d="M${n(hx + 54)} ${n(hy + 56)} q14 16 34 10" fill="none" stroke="${ink}" stroke-width="6" stroke-linecap="round" opacity=".6"/>
-<path d="M${n(hx + 48)} ${n(hy + 62)} q22 20 50 10 l4 -12 q-24 10 -54 2 z" fill="#fffaf0" stroke="${ink}" stroke-opacity=".2" stroke-width="3"/>`;
+<path d="M${n(hx + 30)} ${n(hy + 62)} q18 18 40 4" fill="none" stroke="${ink}" stroke-width="6" stroke-linecap="round" opacity=".6"/>`;
   return s;
 }
 
 /** Rajyotsava B: a friendly decorated elephant raising Karnataka's flag, with jasmine and bunting. */
 const elephantDay: Design = (r, p) => {
-  const ex = between(r, 220, 280);
+  const ex = between(r, 170, 230);
   let s = bunting(30, 22, 1050, 22, [KA_YELLOW, KA_RED], whole(r, 11, 14), 28);
-  s += sun(between(r, 860, 940), between(r, 150, 190), 46, '#ffc93c', true);
-  // The trunk's tip ends near (ex + 450, 470): a small flag pole held up there.
-  s += karnatakaFlag(ex + 455, 220, 0.85, 300);
+  s += sun(between(r, 130, 190), between(r, 150, 180), 44, '#ffc93c', true);
   s += elephant(ex, 630, p.ink, KA_RED, KA_YELLOW, r);
   s += grass(r, '#7cb342', 652);
   const count = whole(r, 3, 4);
   for (let i = 0; i < count; i++) s += jasmine(between(r, 680, 1020), between(r, 560, 625), between(r, 1.1, 1.4), p.ink, r() * 6);
-  for (let i = 0; i < 2; i++) s += jasmineString(between(r, 60, 100) + i * between(r, 40, 60), 60, between(r, 140, 200), p.ink, r);
+  for (let i = 0; i < 2; i++) s += jasmineString(between(r, 960, 990) + i * 40, 110, between(r, 160, 240), p.ink, r);
   return s;
 };
 
