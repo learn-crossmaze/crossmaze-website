@@ -259,10 +259,6 @@ const kites: Design = (r, p) => {
     fly += kite(x, y, between(r, 1, 1.12), p.acc[i % p.acc.length], pick(r, p.acc), between(r, -20, 20));
   });
   s += strings + sun(sx, 530, 105) + fly;
-  for (let i = 0; i < 3; i++) {
-    const bx = between(r, 280, 820), by = between(r, 300, 380);
-    s += `<path d="M${n(bx - 18)} ${n(by)} q9 -10 18 0 q9 -10 18 0" fill="none" stroke="${p.ink}" stroke-width="4" stroke-linecap="round" opacity=".45"/>`;
-  }
   return s + grass(r, LEAF);
 };
 
@@ -455,15 +451,15 @@ const cradle: Design = (r, p) => {
 const bowAndSun: Design = (r, p) => {
   let s = garland(44, 30, 1036, 30, between(r, 8, 14), 17, 25);
   const sx = between(r, 500, 580);
-  s += sun(sx, 525, 95, GOLD, false);
+  s += sun(sx, 525, 90, GOLD, false);
   // a calm pond the sun rises from: white under the colour so the sun doesn't show through
   s += `<ellipse cx="540" cy="585" rx="505" ry="68" fill="#fff"/><ellipse cx="540" cy="585" rx="500" ry="63" fill="${p.acc[2]}" opacity=".5"/>`;
   for (let i = 0; i < 3; i++) s += `<path d="M${n(between(r, 160, 840))} ${n(570 + 22 * i)} h${n(between(r, 60, 110))}" stroke="#fff" stroke-width="5" stroke-linecap="round" opacity=".85"/>`;
   const lotuses = whole(r, 2, 3), xs = lotuses === 2 ? [250, 830] : [190, 540, 890];
   xs.forEach((x, i) => (s += at(x + between(r, -20, 20), 612, between(r, 0.75, 0.88), lotus(i === 1 ? p.acc[4] : p.acc[0]))));
   // a bow with two arrows crossed behind it, pointing up like an emblem
-  const bx = sx, by = 225, fletch = pick(r, p.acc);
-  s += `<g transform="translate(${n(bx)} ${by}) scale(1.3) translate(${n(-bx)} ${-by})">`;
+  const bx = sx, by = 245, fletch = pick(r, p.acc);
+  s += `<g transform="translate(${n(bx)} ${by}) scale(1.2) translate(${n(-bx)} ${-by})">`;
   for (const t of [-30, 30])
     s += at(bx, by, 1, `<path d="M0 118 V-112" stroke="#8d6e63" stroke-width="9" stroke-linecap="round"/>
 <path d="M0 -146 l-18 36 h36 z" fill="${GOLD}" ${OUTLINE}/>

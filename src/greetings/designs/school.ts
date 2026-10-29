@@ -452,7 +452,13 @@ const roseBalloons: Design = (r, p) => {
 };
 
 export const yogaDay: Design[] = [lotusPond, catStretch];
-export const doctorsDay: Design[] = [stethoHeart, firstAid];
+/** The heart and stethoscope, mirrored in alternate years (a picture with no writing, so it reads either way). */
+const stethoHeartTurned: Design = (r, p) => {
+  const art = stethoHeart(r, p);
+  return r() < 0.5 ? art : `<g transform="translate(1080 0) scale(-1 1)">${art}</g>`;
+};
+
+export const doctorsDay: Design[] = [stethoHeartTurned, firstAid];
 export const sportsDay: Design[] = [trophy, playground];
 export const teachersDay: Design[] = [booksApple, chalkboard];
 export const childrensDay: Design[] = [toyTrain, roseBalloons];
