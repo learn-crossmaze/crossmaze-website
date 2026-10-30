@@ -5,11 +5,13 @@ import { CARD_FONTS, type Measure, renderCard, turn } from './card';
 import { occasionById } from './occasions';
 import { paletteFor } from './palettes';
 import { textFor } from './text';
-import type { Occasion } from './types';
+import { type CardPick, type Occasion, pickKey } from './types';
 
 export interface GreetingData {
   /** `popupAfter`: seconds until the pop-up opens by itself (once a day), or null to wait for a tap. */
   settings: { admissions: boolean; popupAfter: number | null };
+  /** The admin's choices for cards ("diwali-2026"), with pictures as page addresses. */
+  picks: Record<string, CardPick>;
   /** The school's blog posts about each occasion, newest first. */
   stories: Record<string, { url: string; title: string; date: string }[]>;
 }
@@ -33,8 +35,22 @@ async function cardMeasure(): Promise<Measure> {
 }
 
 /** The card as SVG markup, for the page. */
-export async function cardSvg(o: Occasion, year: number, defs = '', logo = LOGO) {
-  return renderCard({ occasion: o, text: textFor(o.id, o.name), year, palette: paletteFor(theme(), o.solemn), logo, measure: await cardMeasure(), defs });
+let picks: Record<string, CardPick> = {};
+const pickFor = (o: Occasion, year: number): CardPick => picks[pickKey(o.id, year)] ?? {};
+
+/** The card as SVG markup, for the page. `photo` replaces the address of the admin's picture, if there is one. */
+export async function cardSvg(o: Occasion, year: number, defs = '', logo = LOGO, photo?: string) {
+  const pick = pickFor(o, year);
+  return renderCard({
+    occasion: o,
+    text: textFor(o.id, o.name),
+    year,
+    palette: paletteFor(theme(), o.solemn),
+    logo,
+    measure: await cardMeasure(),
+    defs,
+    pick: photo && pick.photo ? { ...pick, photo } : pick,
+  });
 }
 
 const dataUrl = (blob: Blob) =>
@@ -48,13 +64,15 @@ const fetchDataUrl = async (url: string) => dataUrl(await (await fetch(url)).blo
 
 /** The card as a 1080 × 1080 PNG file. An SVG drawn as a picture loads nothing itself, so the fonts and logo go inside it. */
 async function cardPng(o: Occasion, year: number) {
-  const [display, text, logo] = await Promise.all([
+  const own = pickFor(o, year).photo;
+  const [display, text, logo, photo] = await Promise.all([
     fetchDataUrl('/fonts/card-display.woff2'),
     fetchDataUrl('/fonts/card-text.woff2'),
     fetchDataUrl(LOGO),
+    own ? fetchDataUrl(own) : undefined,
   ]);
   const defs = `<style>@font-face{font-family:'${CARD_FONTS.display}';src:url(${display}) format('woff2');font-weight:300 700}@font-face{font-family:'${CARD_FONTS.text}';src:url(${text}) format('woff2');font-weight:200 1000}</style>`;
-  const svg = await cardSvg(o, year, defs, logo);
+  const svg = await cardSvg(o, year, defs, logo, photo);
   const img = new Image();
   img.src = URL.createObjectURL(new Blob([svg], { type: 'image/svg+xml' }));
   await img.decode();
@@ -126,6 +144,7 @@ let dialog: HTMLDialogElement | undefined;
 
 /** Opens the pop-up for one or more occasions (tabs switch between them). */
 export async function openGreeting(ids: string[], year: number, today: string, data: GreetingData) {
+  picks = data.picks ?? {};
   const list = ids.map(occasionById).filter((o): o is Occasion => !!o);
   if (!list.length) return;
   if (!dialog) {
@@ -166,6 +185,7 @@ ${textHtml(o, year, today, data)}
 
 /** Fills in the bar once the page has loaded: the card as its picture, and the line of words. */
 export async function setUpBar(bar: HTMLElement, data: GreetingData) {
+  picks = data.picks ?? {};
   const ids = (bar.dataset.ids ?? '').split(',').filter(Boolean);
   const year = Number(bar.dataset.year);
   const today = bar.dataset.today ?? '';
@@ -177,7 +197,9 @@ export async function setUpBar(bar: HTMLElement, data: GreetingData) {
   if (thumb) {
     const img = new Image();
     img.alt = '';
-    img.src = URL.createObjectURL(new Blob([await cardSvg(first, year)], { type: 'image/svg+xml' }));
+    // A picture inside an SVG shown as an image doesn't load, so the admin's own picture is shown as itself.
+    const own = pickFor(first, year).photo;
+    img.src = own ?? URL.createObjectURL(new Blob([await cardSvg(first, year)], { type: 'image/svg+xml' }));
     thumb.replaceChildren(img);
   }
   const open = bar.querySelector<HTMLButtonElement>('.greet-bar__open');

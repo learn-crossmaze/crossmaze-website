@@ -159,6 +159,7 @@
     "admissions": true,
     "popup": true,
     "popupDelay": 5,
-    "off": []
+    "off": [],
+    "picks": {}
   }
 }
