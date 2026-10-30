@@ -173,7 +173,7 @@ export const siteSchema: Field[] = [
       {
         type: 'heading',
         label: 'See every greeting',
-        help: 'Each year’s cards and words, in the website’s colour themes, on the Festival greetings page of this admin panel.',
+        help: 'Each year’s cards and words, in the website’s colour themes, on the Festival greetings page of this admin panel. Untick a day there to skip it.',
         previews: [{ label: 'Every greeting, by year', path: '#/greetings', bothModes: false }],
       },
       { key: 'enabled', label: 'Show greetings on the website', type: 'boolean' },

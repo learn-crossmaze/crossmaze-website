@@ -69,9 +69,10 @@ export interface SiteContent {
   theme?: Partial<ThemeSettings>;
   /**
    * Festival and special-day greetings (src/greetings); on unless switched off. `popup`: the pop-up opens by
-   * itself on the home page, once a day, `popupDelay` seconds after the page loads.
+   * itself on the home page, once a day, `popupDelay` seconds after the page loads. `off`: the days (occasion
+   * ids) switched off in the admin panel's Festival greetings page.
    */
-  greetings?: { enabled?: boolean; admissions?: boolean; popup?: boolean; popupDelay?: number };
+  greetings?: { enabled?: boolean; admissions?: boolean; popup?: boolean; popupDelay?: number; off?: string[] };
 }
 
 export interface IconItem {

@@ -314,7 +314,7 @@ On 31 festivals and special days the website greets visitors by itself, with not
 - switch greetings off;
 - hide the admissions line;
 - stop the card opening by itself on the home page, or change how many seconds it waits;
-- see every greeting for this year or the next two before the day: admin panel → **Festival greetings** (full admins only; there is no public preview, so nobody sees a greeting early).
+- see every greeting for this year or the next two before the day, and untick **Show on the website** for any day the website should skip: admin panel → **Festival greetings** (full admins only; there is no public preview, so nobody sees a greeting early). Like other settings, a change reaches the website when you press **Publish**; there is no nightly job, because each visitor's browser checks the date itself.
 
 **Code:** `src/greetings/` holds the list of days (`occasions.ts`), the words (`text.ts`), the drawings (`designs/`), the card (`card.ts`) and the pop-up (`ui.ts`); the bar is `src/components/Greetings.astro`. The card fonts (Fredoka and Nunito, SIL Open Font License) are in `public/fonts/`.
 

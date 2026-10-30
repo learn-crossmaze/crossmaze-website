@@ -21,7 +21,9 @@ const settings = {
 const thisYear = new Date().getFullYear();
 // Each occasion's date rule; moving festivals as their dates from last year on (enough for years ahead).
 const table = datesTable(dates.events, occasions);
-const schedule = occasions.map((o) => ({
+// Days switched off in the admin panel (Festival greetings) are left out.
+const off = new Set(site.greetings?.off ?? []);
+const schedule = occasions.filter((o) => !off.has(o.id)).map((o) => ({
   id: o.id,
   solemn: o.solemn ?? false,
   // The bar's title before the rest loads: the card's title when it doesn't change with the year.
