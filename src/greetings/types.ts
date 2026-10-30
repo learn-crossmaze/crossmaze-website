@@ -73,8 +73,10 @@ export interface OccasionText {
 export interface CardPick {
   /** Which of the occasion's designs to draw (instead of taking turns by year). */
   design?: number;
-  /** A different arrangement of the drawing ("Try another"). */
+  /** A different arrangement of the drawing (older choices). */
   seed?: number;
+  /** A new drawing from the card maker ("Try another"): its seed (src/greetings/maker.ts). */
+  gen?: number;
   /** The admin's own words for the card, instead of the year's wish. */
   wish?: string;
   /** The admin's own picture instead of a drawing: a Storage path in Firestore, a page address on the website. */

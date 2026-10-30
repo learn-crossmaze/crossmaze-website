@@ -140,8 +140,8 @@ export function GreetingsPage() {
 }
 
 /**
- * One day's card with the buttons to change it: "Try another" (the occasion's other design, or the same one
- * arranged differently), the admin's own words and the admin's own picture. Nothing reaches the website until
+ * One day's card with the buttons to change it: "Try another" (a new drawing from the card maker, made from
+ * the day's own symbols), the admin's own words and the admin's own picture. Nothing reaches the website until
  * "Use this card" (and then Publish); "Back to automatic" forgets the choice.
  */
 function CardEditor({ occasion: o, year, theme, measure, saved }: { occasion: Occasion; year: number; theme: string; measure: Measure; saved?: CardPick }) {
@@ -185,12 +185,8 @@ function CardEditor({ occasion: o, year, theme, measure, saved }: { occasion: Oc
     }
   };
 
-  const tryAnother = () => {
-    const n = o.designs.length;
-    const current = pick.design ?? ((year % n) + n) % n;
-    // The other design each time, arranged afresh; the admin's own words stay.
-    setDraft({ wish: pick.wish, design: (current + 1) % n, seed: 1 + Math.floor(Math.random() * 999999) });
-  };
+  // A brand-new drawing from the card maker (src/greetings/maker.ts) each time; the admin's own words stay.
+  const tryAnother = () => setDraft({ wish: pick.wish, gen: 1 + Math.floor(Math.random() * 999999999) });
   const upload = async (files: FileList | null) => {
     const f = files?.[0];
     if (!f) return;
