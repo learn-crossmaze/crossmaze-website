@@ -10,13 +10,20 @@ import { occasions } from '../greetings/occasions';
 import { textFor } from '../greetings/text';
 import { posts, postUrl } from '../data/blog';
 import { site } from '../data/site';
-import { jsonScript } from '../utils';
+import { cleanPath, jsonScript } from '../utils';
 
-const settings = { admissions: site.greetings?.admissions !== false };
+const delay = Number(site.greetings?.popupDelay);
+const settings = {
+  admissions: site.greetings?.admissions !== false,
+  // The pop-up opens by itself only on the home page; elsewhere it waits for "See our card".
+  popupAfter: site.greetings?.popup !== false && cleanPath(Astro.url.pathname) === '/' ? (delay >= 0 && delay <= 120 ? delay : 5) : null,
+};
 const thisYear = new Date().getFullYear();
 // Each occasion's date rule; moving festivals as their dates from last year on (enough for years ahead).
 const table = datesTable(dates.events, occasions);
-const schedule = occasions.map((o) => ({
+// Days switched off in the admin panel (Festival greetings) are left out.
+const off = new Set(site.greetings?.off ?? []);
+const schedule = occasions.filter((o) => !off.has(o.id)).map((o) => ({
   id: o.id,
   solemn: o.solemn ?? false,
   // The bar's title before the rest loads: the card's title when it doesn't change with the year.

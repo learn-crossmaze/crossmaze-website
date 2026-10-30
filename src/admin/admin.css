@@ -1581,6 +1581,25 @@ a.item-main:hover strong {
   margin: 4px 0 8px;
 }
 
+.greeting__show {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-bottom: 8px;
+  font-weight: 700;
+  cursor: pointer;
+}
+
+.greeting__show input {
+  width: 18px;
+  height: 18px;
+}
+
+.greeting--off .greeting__card {
+  opacity: 0.4;
+  filter: grayscale(1);
+}
+
 .greeting__text h4 {
   margin: 12px 0 4px;
 }

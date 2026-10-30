@@ -1,0 +1,18 @@
+{
+  "id": "2026-10-30-greeting-popup",
+  "description": "Festival greetings: the card opens by itself on the home page after 5 seconds (new settings)",
+  "changes": [
+    {
+      "doc": "content/site",
+      "field": "greetings.popup",
+      "from": null,
+      "to": true
+    },
+    {
+      "doc": "content/site",
+      "field": "greetings.popupDelay",
+      "from": null,
+      "to": 5
+    }
+  ]
+}

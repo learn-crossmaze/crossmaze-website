@@ -8,7 +8,8 @@ import { textFor } from './text';
 import type { Occasion } from './types';
 
 export interface GreetingData {
-  settings: { admissions: boolean };
+  /** `popupAfter`: seconds until the pop-up opens by itself (once a day), or null to wait for a tap. */
+  settings: { admissions: boolean; popupAfter: number | null };
   /** The school's blog posts about each occasion, newest first. */
   stories: Record<string, { url: string; title: string; date: string }[]>;
 }
@@ -190,4 +191,25 @@ export async function setUpBar(bar: HTMLElement, data: GreetingData) {
       // Private browsing: it simply shows again on the next page.
     }
   });
+  if (data.settings.popupAfter != null) openLater(ids, year, today, data, bar, data.settings.popupAfter);
+}
+
+/** Opens the pop-up by itself after a wait, once a day, unless the visitor is busy or closed the bar. */
+function openLater(ids: string[], year: number, today: string, data: GreetingData, bar: HTMLElement, seconds: number) {
+  const KEY = 'cm-greet-shown';
+  try {
+    if (localStorage.getItem(KEY) === today) return;
+  } catch {
+    return; // No memory of the day (private browsing): leave it to the bar rather than open on every visit.
+  }
+  setTimeout(() => {
+    const busy = document.activeElement?.closest('input, textarea, select, [contenteditable]') || document.querySelector('dialog[open]');
+    if (bar.hidden || busy || document.hidden) return;
+    try {
+      localStorage.setItem(KEY, today);
+    } catch {
+      return;
+    }
+    openGreeting(ids, year, today, data);
+  }, seconds * 1000);
 }

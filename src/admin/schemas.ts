@@ -173,7 +173,7 @@ export const siteSchema: Field[] = [
       {
         type: 'heading',
         label: 'See every greeting',
-        help: 'Each year’s cards and words, in the website’s colour themes, on the Festival greetings page of this admin panel.',
+        help: 'Each year’s cards and words, in the website’s colour themes, on the Festival greetings page of this admin panel. Untick a day there to skip it.',
         previews: [{ label: 'Every greeting, by year', path: '#/greetings', bothModes: false }],
       },
       { key: 'enabled', label: 'Show greetings on the website', type: 'boolean' },
@@ -183,6 +183,13 @@ export const siteSchema: Field[] = [
         type: 'boolean',
         help: 'With a “Book a school visit” button. The academic year is worked out by itself (from November it is the next one). Never shown on Good Friday.',
       },
+      {
+        key: 'popup',
+        label: 'Open the card by itself on the home page',
+        type: 'boolean',
+        help: 'Once a day for each visitor, a few seconds after the home page opens (not while they are typing in a form, or if they closed the greeting bar). On other pages the card opens from the bar’s “See our card”.',
+      },
+      { key: 'popupDelay', label: 'Seconds before it opens', type: 'number', help: '5 is a good wait: long enough to see the page first.' },
     ],
   },
 
