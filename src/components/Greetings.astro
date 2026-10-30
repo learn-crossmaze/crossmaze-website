@@ -48,8 +48,7 @@ const data = { settings, stories };
 </div>
 <script is:inline define:vars={{ schedule }}>
   (function () {
-    // Today in India; ?greet=diwali (and &year=2027) previews a greeting on any day.
-    var q = new URLSearchParams(location.search);
+    // Today in India (the admin panel's Festival greetings page shows every greeting before its day).
     var parts = new Intl.DateTimeFormat('en-CA', { timeZone: 'Asia/Kolkata', year: 'numeric', month: '2-digit', day: '2-digit' })
       .format(new Date())
       .split('-')
@@ -60,23 +59,21 @@ const data = { settings, stories };
       var first = new Date(Date.UTC(year, month - 1, 1)).getUTCDay();
       return 1 + ((weekday - first + 7) % 7) + (n - 1) * 7;
     };
-    var preview = q.get('greet');
     var today = schedule.filter(function (o) {
-      if (preview) return preview === o.id;
       if (o.fixed) return o.fixed[0] === m && o.fixed[1] === d;
       if (o.nth) return o.nth[2] === m && nth(y, o.nth[2], o.nth[1], o.nth[0]) === d;
       return (o.dates || []).indexOf(iso) >= 0;
     });
     if (!today.length) return;
     try {
-      if (!preview && localStorage.getItem('cm-greet-closed') === iso) return;
+      if (localStorage.getItem('cm-greet-closed') === iso) return;
     } catch (e) {}
     var bar = document.getElementById('greet-bar');
     var solemn = today.every(function (o) { return o.solemn; });
     bar.querySelector('.greet-bar__title').textContent =
       today.length === 1 ? today[0].title + (solemn ? '' : '!') : today.map(function (o) { return o.title.replace(/^Happy /, ''); }).join(' & ') + (solemn ? '' : '!');
     bar.dataset.ids = today.map(function (o) { return o.id; }).join(',');
-    bar.dataset.year = String(Number(q.get('year')) || y);
+    bar.dataset.year = String(y);
     bar.dataset.today = iso;
     if (solemn) bar.classList.add('greet-bar--solemn');
     bar.hidden = false;

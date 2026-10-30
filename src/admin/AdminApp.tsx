@@ -23,6 +23,7 @@ import { SubmissionsPage } from './components/Submissions';
 import { CallsPage } from './components/Calls';
 import { LitmusPage } from './components/Litmus';
 import { EmailAlertsPage } from './components/EmailAlerts';
+import { GreetingsPage } from './components/Greetings';
 import { AdminsPage } from './components/Admins';
 import { CentreHeadPage } from './components/CentreHead';
 
@@ -38,6 +39,7 @@ const NAV: { href: string; icon: string; label: string; roles?: Role[] }[] = [
   { href: '#/jobs', icon: 'Briefcase', label: 'Jobs' },
   { href: '#/testimonials', icon: 'Quote', label: 'Testimonials' },
   { href: '#/posts', icon: 'Newspaper', label: 'Blog', roles: BOTH },
+  { href: '#/greetings', icon: 'Gift', label: 'Festival greetings' },
   { href: '#/centre', icon: 'Building', label: 'Your branch', roles: ['branch'] },
   { href: '#/sections', icon: 'LayoutList', label: 'Page sections' },
   { href: '#/submissions', icon: 'Inbox', label: 'Submissions' },
@@ -268,6 +270,8 @@ function Shell() {
         return <LitmusPage />;
       case 'email-alerts':
         return <EmailAlertsPage />;
+      case 'greetings':
+        return <GreetingsPage />;
       case 'admins':
         return <AdminsPage />;
       case 'centre':
