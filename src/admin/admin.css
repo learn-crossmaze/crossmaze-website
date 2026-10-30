@@ -1527,3 +1527,70 @@ a.item-main:hover strong {
 .preview-links a {
   font-weight: 700;
 }
+
+/* Festival greetings (components/Greetings.tsx): the cards in their own fonts, as on the website. */
+@font-face {
+  font-family: 'CM Card Display';
+  src: url('/fonts/card-display.woff2') format('woff2');
+  font-weight: 300 700;
+}
+
+@font-face {
+  font-family: 'CM Card Text';
+  src: url('/fonts/card-text.woff2') format('woff2');
+  font-weight: 200 1000;
+}
+
+.greetings-controls {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: end;
+  gap: 16px;
+  margin-bottom: 16px;
+}
+
+.greetings-controls .field {
+  min-width: 180px;
+}
+
+.greetings-controls .muted {
+  flex-basis: 100%;
+  margin: 0;
+}
+
+.greetings-list {
+  display: grid;
+  gap: 16px;
+}
+
+.greeting {
+  display: grid;
+  grid-template-columns: minmax(0, 320px) minmax(0, 1fr);
+  gap: 20px;
+  align-items: start;
+}
+
+.greeting__card svg {
+  display: block;
+  width: 100%;
+  height: auto;
+  border-radius: 14px;
+}
+
+.greeting__text h3 {
+  margin: 4px 0 8px;
+}
+
+.greeting__text h4 {
+  margin: 12px 0 4px;
+}
+
+.greeting__text p {
+  margin: 0 0 8px;
+}
+
+@media (max-width: 760px) {
+  .greeting {
+    grid-template-columns: 1fr;
+  }
+}

@@ -33,7 +33,7 @@ export type When =
   | { calendar: string[] };
 
 export interface Occasion {
-  /** Short id, used in links (?greet=diwali) and dates.json. */
+  /** Short id, used in dates.json and the greeting bar. */
   id: string;
   /** Its name as visitors know it: "Diwali", "Children's Day". */
   name: string;

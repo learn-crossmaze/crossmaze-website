@@ -1,5 +1,5 @@
 // The greeting's pop-up and the share/download buttons (components/Greetings.astro has the bar and styles).
-// Loaded only on the days there is a greeting, or on the preview page (/greetings).
+// Loaded only on the days there is a greeting.
 import { admissionsYear } from './calendar';
 import { CARD_FONTS, type Measure, renderCard, turn } from './card';
 import { occasionById } from './occasions';

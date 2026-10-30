@@ -313,7 +313,7 @@ On 31 festivals and special days the website greets visitors by itself, with not
 **Settings:** admin panel → Site settings → **Festival greetings**:
 - switch greetings off;
 - hide the admissions line;
-- open the preview of every greeting for this year or next (`/greetings?year=2027`; on any page, `?greet=diwali&year=2027` shows that greeting's bar).
+- see every greeting for this year or the next two before the day: admin panel → **Festival greetings** (full admins only; there is no public preview, so nobody sees a greeting early).
 
 **Code:** `src/greetings/` holds the list of days (`occasions.ts`), the words (`text.ts`), the drawings (`designs/`), the card (`card.ts`) and the pop-up (`ui.ts`); the bar is `src/components/Greetings.astro`. The card fonts (Fredoka and Nunito, SIL Open Font License) are in `public/fonts/`.
 
