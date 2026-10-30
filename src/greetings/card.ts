@@ -1,6 +1,8 @@
 // A greeting card: one 1080 × 1080 SVG with the year's drawing, the school's logo and a white glass panel
 // for the words. The website shows it inline (fonts from src/components/Greetings.astro) and turns it into a
 // PNG for sharing (src/scripts/greetings.ts adds the fonts to the SVG for that).
+import { kits } from './kits';
+import { compose } from './maker';
 import { rng } from './palettes';
 import type { CardPick, Occasion, OccasionText, Palette } from './types';
 
@@ -61,7 +63,12 @@ export function autoWish(text: OccasionText, year: number) {
 
 export function renderCard({ occasion, text, year, palette: p, logo, measure = estimate, defs = '', pick = {} }: CardInput) {
   const design = pick.design != null && occasion.designs[pick.design] ? occasion.designs[pick.design] : turn(occasion.designs, year);
-  const drawing = pick.photo ? '' : design(rng(pick.seed ? `${occasion.id}-${year}-${pick.seed}` : `${occasion.id}-${year}`), p);
+  const kit = kits[occasion.id];
+  const drawing = pick.photo
+    ? ''
+    : pick.gen && kit
+      ? compose(kit, rng(`${occasion.id}-${year}-gen${pick.gen}`), p)
+      : design(rng(pick.seed ? `${occasion.id}-${year}-${pick.seed}` : `${occasion.id}-${year}`), p);
   const title = text.title(year);
   const wish = pick.wish?.trim() || autoWish(text, year);
 
