@@ -298,7 +298,7 @@ On 31 festivals and special days the website greets visitors by itself, with not
 
 **What visitors see, only on the day (India's date):**
 - A slim glass bar at the top of every page: the greeting, a short wish and a **See our card** button. Closing it hides it for the rest of the day.
-- The pop-up:
+- The pop-up opens from **See our card** and, on the home page, by itself 5 seconds after the page opens (once a day for each visitor; not while they are typing in a form, or after they closed the bar):
   - **Left:** that year's card, with **Share on WhatsApp** and **Download**. On phones, sharing sends the picture itself; on computers it opens WhatsApp with a link, and the card can be downloaded.
   - **Right:** what the day is about, what little ones can learn from it, a **Try this at home** activity, a link to the school's blog post about last year's celebration (when there is one with the festival's name in its title), and **Admissions are open for 2027–28** with a **Book a school visit** button.
 - **The admissions year** works itself out: until October it is the current year, and from November the next one. It is never shown on Good Friday, which has a quiet card and words.
@@ -313,6 +313,7 @@ On 31 festivals and special days the website greets visitors by itself, with not
 **Settings:** admin panel → Site settings → **Festival greetings**:
 - switch greetings off;
 - hide the admissions line;
+- stop the card opening by itself on the home page, or change how many seconds it waits;
 - see every greeting for this year or the next two before the day: admin panel → **Festival greetings** (full admins only; there is no public preview, so nobody sees a greeting early).
 
 **Code:** `src/greetings/` holds the list of days (`occasions.ts`), the words (`text.ts`), the drawings (`designs/`), the card (`card.ts`) and the pop-up (`ui.ts`); the bar is `src/components/Greetings.astro`. The card fonts (Fredoka and Nunito, SIL Open Font License) are in `public/fonts/`.

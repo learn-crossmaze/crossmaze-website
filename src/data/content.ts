@@ -67,8 +67,11 @@ export interface SiteContent {
   social: { label: string; href: string }[];
   /** Colour theme settings; see src/data/themes.ts. */
   theme?: Partial<ThemeSettings>;
-  /** Festival and special-day greetings (src/greetings); both on unless switched off. */
-  greetings?: { enabled?: boolean; admissions?: boolean };
+  /**
+   * Festival and special-day greetings (src/greetings); on unless switched off. `popup`: the pop-up opens by
+   * itself on the home page, once a day, `popupDelay` seconds after the page loads.
+   */
+  greetings?: { enabled?: boolean; admissions?: boolean; popup?: boolean; popupDelay?: number };
 }
 
 export interface IconItem {

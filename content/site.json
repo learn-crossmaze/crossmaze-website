@@ -156,6 +156,8 @@
   },
   "greetings": {
     "enabled": true,
-    "admissions": true
+    "admissions": true,
+    "popup": true,
+    "popupDelay": 5
   }
 }
