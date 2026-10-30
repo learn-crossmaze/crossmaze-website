@@ -496,7 +496,7 @@ const ramNavamiKit: Kit = {
 // ---------------------------------------------------------------- Mahavir Jayanti
 
 /** The Ahimsa hand: a raised open palm with a wheel in it. */
-const ahimsaHand: Piece = (r, p) => hand(pick(r, [SAFFRON, '#f4a62a', ...p.acc.slice(0, 2)]), chakra(0, 26, 27, p.ink));
+const ahimsaHand: Piece = (r, p) => hand(pick(r, [SAFFRON, '#f4a62a', '#ffa726']), chakra(0, 26, 27, p.ink));
 
 const jainTemple: Piece = (r, p) => temple(r, p, true);
 
@@ -563,6 +563,7 @@ const aartiPlate: Piece = (r, p) => {
 };
 
 const mahavirKit: Kit = {
+  calm: true,
   hero: [ahimsaHand, jainTemple, jainFlag, rath],
   small: [lotusFlower, lampOnStand, kalash, aartiPlate, jainFlag, ahimsaHand, jainTemple],
   hang: [jainPennant, bell, marigoldStrand],

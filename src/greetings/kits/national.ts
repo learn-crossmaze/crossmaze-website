@@ -948,6 +948,7 @@ const independenceDay: Kit = {
 };
 
 const gandhiJayanti: Kit = {
+  calm: true,
   hero: [charkha, spectacles, dove, cotton],
   small: [specsSmall, dove, cotton, stickSandals, khadi, charkha, indiaFlag],
   hang: [triPennant, cottonHang, triBanner],

@@ -485,7 +485,7 @@ const ahimsa: Design = (r, p) => {
 
 /** Mahavir Jayanti B: a Jain temple under a string of Jain flags, with bells, kalashes, lotuses and lamps. */
 const jainTemple: Design = (r, p) => {
-  let s = `<ellipse cx="540" cy="612" rx="490" ry="40" fill="${p.acc[2]}" opacity=".35"/>`;
+  let s = `<ellipse cx="540" cy="612" rx="490" ry="40" fill="#8fd3f4" opacity=".4"/>`;
   s += `<path d="M36 26 Q540 70 1044 26" fill="none" stroke="${p.ink}" stroke-width="4" opacity=".4"/>`;
   for (let i = 0; i < 10; i++) {
     const t = (i + 0.5) / 10, x = 36 + t * 1008, y = 26 + 2 * t * (1 - t) * 44;

@@ -26,6 +26,8 @@ export interface Kit {
   colours?: string[];
   /** A solemn day: calm layouts and soft accents, no confetti or party bunting. */
   quiet?: boolean;
+  /** A gentle day (Mahavir Jayanti, Gandhi Jayanti): any layout, but no confetti or party bunting. */
+  calm?: boolean;
 }
 
 type Spot = { x: number; y: number; size: number; tilt?: number };
@@ -98,7 +100,7 @@ function accents(r: Rng, p: Palette, kit: Kit, busy: { x: number; y: number; rad
   const spots = scatterSpots(r, whole(r, 5, 9), [30, 56], busy, { x0: 40, x1: 1040, y0: 20, y1: 630 });
   for (const sp of spots)
     s += r() < 0.6 ? sparkle(sp.x, sp.y, sp.size * 0.45, r() < 0.5 ? '#fff' : pick(r, colours)) : kit.quiet ? '' : star(sp.x, sp.y, sp.size * 0.42, pick(r, colours), r());
-  if (!kit.quiet && r() < 0.55) {
+  if (!kit.quiet && !kit.calm && r() < 0.55) {
     // Confetti only where nothing is drawn yet.
     const bits = confetti(r, colours, whole(r, 14, 26)).split('/>').filter(Boolean).map((b) => `${b}/>`);
     s += bits
@@ -142,7 +144,7 @@ const layouts: Record<string, Layout> = {
   row: (r, p, kit) => {
     const ground = 640;
     const mid = between(r, 400, 450), side = between(r, 270, 310);
-    const pieces = [draw(r, p, [...kit.small, ...kit.hero]), draw(r, p, kit.hero), draw(r, p, [...kit.small, ...kit.hero])];
+    const pieces = [draw(r, p, kit.small), draw(r, p, kit.hero), draw(r, p, kit.small)];
     const spots: Spot[] = [
       { x: 540 - mid / 2 - side / 2 + between(r, 0, 20), y: ground - side / 2, size: side },
       { x: 540, y: ground - mid / 2, size: mid },
@@ -189,7 +191,7 @@ const layouts: Record<string, Layout> = {
       const t = (i + 0.5) / count, x = 20 + t * 1040, y0 = 30 + 2 * t * (1 - t) * sag * 2;
       const drop = between(r, 30, 90) * (i % 2 ? 1 : 0.55), size = between(r, 120, 150);
       art += `<line x1="${n(x)}" y1="${n(y0)}" x2="${n(x)}" y2="${n(y0 + drop)}" stroke="${p.ink}" stroke-width="3" opacity=".4"/>`;
-      if (!kit.quiet && i < count - 1) art += `<path d="M${n(x + 520 / count - 20)} ${n(y0 + 8)} h40 l-20 40 z" fill="${pick(r, colours)}" stroke="#fff" stroke-width="3" stroke-linejoin="round"/>`;
+      if (!kit.quiet && !kit.calm && i < count - 1) art += `<path d="M${n(x + 520 / count - 20)} ${n(y0 + 8)} h40 l-20 40 z" fill="${pick(r, colours)}" stroke="#fff" stroke-width="3" stroke-linejoin="round"/>`;
       const spot = { x, y: y0 + drop + size / 2, size };
       art += place(picks[i](r, p), spot);
       busy.push(at(spot));
