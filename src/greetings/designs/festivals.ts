@@ -1,6 +1,7 @@
 // Drawings for Sankranti, Holi, Ugadi, Good Friday, Ram Navami, Mahavir Jayanti, Eid al-Fitr, Diwali and Christmas.
 import { between, pick, whole } from '../palettes';
 import { burst, cloud, diya, dots, flower, gift, grass, kite, lantern, leaf, n, OUTLINE, sparkle, star, sun } from '../motifs';
+import { jainPieces } from '../kits/festivals-a';
 import type { Design, Palette, Rng } from '../types';
 
 /** Diwali A: a rangoli above a row of diyas. */
@@ -235,15 +236,6 @@ function sugarcane(h: number, fill = '#7b3f61') {
   return s + leaf(0, -h + 6, 120, GREEN, -60) + leaf(0, -h + 6, 110, LEAF, -125) + leaf(0, -h + 20, 100, GREEN, -20);
 }
 
-/** A tiny seated bird facing right; (0, 0) is its middle. */
-const bird = (fill: string, ink: string) =>
-  `<path d="M-26 0 l-30 -14 l6 26 z" fill="${fill}" ${OUTLINE}/>
-<circle cx="0" cy="0" r="30" fill="${fill}" ${OUTLINE}/>
-<ellipse cx="6" cy="10" rx="18" ry="13" fill="#fff" opacity=".45"/>
-<path d="M-18 -4 q14 22 30 4" fill="none" stroke="#fff" stroke-width="5" stroke-linecap="round" opacity=".8"/>
-<path d="M28 -6 l16 6 l-16 6 z" fill="#ff9f43"/><circle cx="14" cy="-8" r="4.5" fill="${ink}"/>
-<path d="M-6 28 v12 M6 28 v12" stroke="#ff9f43" stroke-width="4" stroke-linecap="round"/>`;
-
 // ---- Makar Sankranti and Pongal ----
 
 /** Sankranti A: kites in a clear sky over a smiling sun. */
@@ -476,68 +468,35 @@ const bowAndSun: Design = (r, p) => {
 
 // ---- Mahavir Jayanti ----
 
-/** Mahavir Jayanti A: lotuses on a calm pond, a dove with a leaf above. */
-const lotusPond: Design = (r, p) => {
-  let s = `<ellipse cx="540" cy="560" rx="500" ry="90" fill="${p.acc[2]}" opacity=".45"/><ellipse cx="540" cy="560" rx="500" ry="90" fill="none" stroke="#fff" stroke-width="5"/>`;
-  for (let i = 0; i < 4; i++) {
-    const x = between(r, 130, 950), y = between(r, 520, 620);
-    s += `<path d="M${n(x)} ${n(y)} q30 -10 60 0" stroke="#fff" stroke-width="5" fill="none" stroke-linecap="round" opacity=".8"/>`;
-  }
-  const pads = whole(r, 2, 3);
-  for (let i = 0; i < pads; i++) {
-    const x = between(r, 120, 260) + i * 330;
-    s += `<path d="M${n(x)} ${n(600)} m-60 0 a60 22 0 1 0 120 0 a60 22 0 0 0 -50 -18 l-10 18 l-10 -18 a60 22 0 0 0 -50 18 z" fill="${GREEN}" ${OUTLINE}/>`;
-  }
-  const main = pick(r, p.acc);
-  s += at(540, 540, 1.25, lotus(main));
-  s += at(between(r, 260, 300), 575, 0.8, lotus(p.acc[(p.acc.indexOf(main) + 1) % p.acc.length]));
-  s += at(between(r, 780, 820), 575, 0.8, lotus(p.acc[(p.acc.indexOf(main) + 3) % p.acc.length]));
-  const left = r() < 0.5;
-  s += at(left ? between(r, 230, 300) : between(r, 780, 850), between(r, 150, 200), 1.2, dove(p), !left);
-  for (let i = 0; i < 3; i++) s += leaf(between(r, 120, 960), between(r, 60, 300), 48, pick(r, [GREEN, LEAF]), between(r, -80, 80));
+/** Draws one of the card maker's pieces (a 200 × 200 box around 0, 0) with its middle at (x, y), `size` wide. */
+const put = (svg: string, x: number, y: number, size: number, flip = false) => at(x, y, size / 200, svg, flip);
+
+/** Mahavir Jayanti A: the Ahimsa hand rising from a lotus, Jain flags and lamps on either side. */
+const ahimsa: Design = (r, p) => {
+  let s = `<circle cx="540" cy="300" r="250" fill="#fff" opacity=".5"/><circle cx="540" cy="300" r="290" fill="none" stroke="#fff" stroke-width="8" stroke-dasharray="2 24" stroke-linecap="round" opacity=".8"/>`;
+  s += put(jainPieces.ahimsaHand(r, p), 540, 290, 430);
+  s += put(jainPieces.lotus(r, p), 540, 575, 270);
+  const fy = between(r, 250, 300);
+  s += put(jainPieces.jainFlag(r, p), between(r, 150, 180), fy, 270) + put(jainPieces.jainFlag(r, p), between(r, 900, 930), fy, 270, true);
+  s += put(jainPieces.lamp(r, p), between(r, 270, 300), 570, 150) + put(jainPieces.lamp(r, p), between(r, 780, 810), 570, 150);
+  for (let i = 0; i < 6; i++) s += sparkle(i % 2 ? between(r, 330, 400) : between(r, 680, 750), between(r, 60, 420), between(r, 10, 18), i % 3 ? '#fff' : pick(r, p.acc));
   return s;
 };
 
-/** A sitting rabbit facing right; (0, 0) is the middle of its feet. */
-const rabbit = (p: Palette) =>
-  `<ellipse cx="34" cy="-182" rx="14" ry="44" fill="#fff" ${soft(p)} transform="rotate(-12 34 -182)"/>
-<ellipse cx="64" cy="-178" rx="14" ry="44" fill="#fff" ${soft(p)} transform="rotate(14 64 -178)"/>
-<ellipse cx="34" cy="-182" rx="6" ry="30" fill="#ffc1d2" transform="rotate(-12 34 -182)"/>
-<ellipse cx="64" cy="-178" rx="6" ry="30" fill="#ffc1d2" transform="rotate(14 64 -178)"/>
-<circle cx="-62" cy="-42" r="18" fill="#fff" ${soft(p)}/>
-<ellipse cx="0" cy="-56" rx="66" ry="56" fill="#fff" ${soft(p)}/>
-<circle cx="50" cy="-118" r="42" fill="#fff" ${soft(p)}/>
-<circle cx="66" cy="-124" r="5.5" fill="${p.ink}"/><circle cx="90" cy="-110" r="6" fill="#ff8fab"/>
-<ellipse cx="34" cy="-4" rx="26" ry="10" fill="#fff" ${soft(p)}/>`;
-
-/** A tortoise walking right; (0, 0) is the middle of its feet. */
-const tortoise = (p: Palette, shell: string) =>
-  `<ellipse cx="-50" cy="-8" rx="18" ry="12" fill="#a5d17a" ${OUTLINE}/><ellipse cx="50" cy="-8" rx="18" ry="12" fill="#a5d17a" ${OUTLINE}/>
-<path d="M60 -40 q40 -30 62 0 q4 20 -24 20 z" fill="#a5d17a" ${OUTLINE}/><circle cx="104" cy="-38" r="5" fill="${p.ink}"/>
-<path d="M-90 -18 Q-90 -116 0 -116 Q90 -116 90 -18 Z" fill="${shell}" ${OUTLINE}/>
-<path d="M-30 -86 l30 -14 l30 14 v26 l-30 14 l-30 -14 z" fill="#fff" opacity=".35"/>
-<path d="M-74 -40 l26 -12 M74 -40 l-26 -12" stroke="#fff" stroke-width="5" opacity=".5" stroke-linecap="round"/>
-<rect x="-96" y="-26" width="192" height="16" rx="8" fill="${shell}" ${OUTLINE}/>`;
-
-/** Mahavir Jayanti B: a leafy tree where birds, a rabbit and a tortoise share the shade. */
-const kindTree: Design = (r, p) => {
-  const tx = between(r, 520, 560);
-  let s = grass(r, LEAF, 650);
-  s += `<path d="M${n(tx - 34)} 640 Q${n(tx - 20)} 440 ${n(tx - 10)} 350 h20 Q${n(tx + 20)} 420 ${n(tx + 34)} 640 Z" fill="#8d5a3b" ${OUTLINE}/>`;
-  const blobs = [[0, 250, 120], [-125, 280, 90], [125, 280, 90], [-75, 190, 90], [75, 190, 90], [0, 160, 85]];
-  for (const [dx, y, R] of blobs) s += `<circle cx="${n(tx + dx)}" cy="${y}" r="${R}" fill="#fff"/>`;
-  for (const [dx, y, R] of blobs) s += `<circle cx="${n(tx + dx)}" cy="${y}" r="${R - 5}" fill="${GREEN}"/>`;
-  for (let i = 0; i < 6; i++) s += `<circle cx="${n(tx + between(r, -160, 160))}" cy="${n(between(r, 130, 320))}" r="${n(between(r, 12, 20))}" fill="${LEAF}"/>`;
-  const birds = [[-150, 320, false], [110, 200, true], [10, 110, false]] as const;
-  birds.forEach(([dx, y, flip], i) => {
-    if (i < 2 || r() < 0.6) s += at(tx + dx + between(r, -10, 10), y, 1.1, bird(p.acc[(i * 2) % p.acc.length], p.ink), flip);
-  });
-  s += at(tx - between(r, 270, 310), 640, between(r, 1.2, 1.3), rabbit(p));
-  s += at(tx + between(r, 260, 300), 640, 1.2, tortoise(p, pick(r, p.acc)), true);
-  // a little water bowl shared by all
-  s += `<ellipse cx="${n(tx)}" cy="632" rx="70" ry="16" fill="#c58b2c" ${OUTLINE}/><ellipse cx="${n(tx)}" cy="626" rx="54" ry="8" fill="${p.acc[2]}" opacity=".8"/>`;
-  s += at(tx + 60, 590, 0.6, bird(pick(r, p.acc), p.ink), true);
-  for (let i = 0; i < 3; i++) s += leaf(between(r, 80, 1000), between(r, 380, 500), 30, pick(r, [GREEN, LEAF]), between(r, -80, 80));
+/** Mahavir Jayanti B: a Jain temple under a string of Jain flags, with bells, kalashes, lotuses and lamps. */
+const jainTemple: Design = (r, p) => {
+  let s = `<ellipse cx="540" cy="612" rx="490" ry="40" fill="${p.acc[2]}" opacity=".35"/>`;
+  s += `<path d="M36 26 Q540 70 1044 26" fill="none" stroke="${p.ink}" stroke-width="4" opacity=".4"/>`;
+  for (let i = 0; i < 10; i++) {
+    const t = (i + 0.5) / 10, x = 36 + t * 1008, y = 26 + 2 * t * (1 - t) * 44;
+    if (Math.abs(x - 540) < 230) continue;
+    s += put(i % 3 === 1 ? jainPieces.bell(r, p) : jainPieces.jainPennant(r, p), x, y + 40, 84);
+  }
+  s += put(jainPieces.jainTemple(r, p), 540, 330, 520);
+  s += put(jainPieces.kalash(r, p), between(r, 160, 190), 400, 190) + put(jainPieces.kalash(r, p), between(r, 890, 920), 400, 190);
+  s += put(jainPieces.lotus(r, p), 120, 590, 160) + put(jainPieces.lotus(r, p), 960, 590, 160);
+  s += put(jainPieces.lamp(r, p), 300, 600, 110) + put(jainPieces.lamp(r, p), 780, 600, 110);
+  for (let i = 0; i < 4; i++) s += sparkle(i % 2 ? between(r, 230, 290) : between(r, 790, 850), between(r, 150, 260), between(r, 10, 16), '#fff');
   return s;
 };
 
@@ -589,7 +548,7 @@ export const holi: Design[] = [colourClouds, pichkari];
 export const ugadi: Design[] = [ugadiKolam, pachadi];
 export const goodFriday: Design[] = [hillCross, candle];
 export const ramNavami: Design[] = [cradle, bowAndSun];
-export const mahavirJayanti: Design[] = [lotusPond, kindTree];
+export const mahavirJayanti: Design[] = [ahimsa, jainTemple];
 export const eid: Design[] = [moonLanterns, mosque];
 export const diwali: Design[] = [rangoli, skyLanterns];
 export const christmas: Design[] = [tree, snowman];
