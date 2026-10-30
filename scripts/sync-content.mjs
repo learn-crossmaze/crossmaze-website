@@ -60,6 +60,12 @@ async function mapImages(kind, item, fn) {
     copy.moments = await each(copy.moments, photo);
     // Founders stored as just a name (text) have no photo.
     copy.founders = await each(copy.founders, async (f) => (f?.photo ? { ...f, photo: await fn(f.photo) } : f));
+    // Festival greeting cards with the admin's own picture ("diwali-2026": { photo }).
+    if (copy.greetings?.picks) {
+      for (const [key, pick] of Object.entries(copy.greetings.picks)) {
+        if (pick?.photo) copy.greetings.picks[key] = { ...pick, photo: await fn(pick.photo) };
+      }
+    }
   } else if (kind === 'sections') {
     copy.facilities = await each(copy.facilities, async (f) => (f?.image ? { ...f, image: await fn(f.image) } : f));
   } else if (kind === 'programs') {

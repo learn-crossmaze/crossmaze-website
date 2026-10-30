@@ -9,6 +9,7 @@ import type { ImageMetadata } from 'astro';
 import { aboutParagraphs, type AboutParagraph } from './about';
 import type { Batch } from './batches';
 import { founders, type Founder } from './founders';
+import type { CardPick } from '../greetings/types';
 import type { ThemeSettings } from './themes';
 
 const images = import.meta.glob<{ default: ImageMetadata }>('../assets/**/*.{jpg,jpeg,png,webp,gif,avif}', {
@@ -70,9 +71,10 @@ export interface SiteContent {
   /**
    * Festival and special-day greetings (src/greetings); on unless switched off. `popup`: the pop-up opens by
    * itself on the home page, once a day, `popupDelay` seconds after the page loads. `off`: the days (occasion
-   * ids) switched off in the admin panel's Festival greetings page.
+   * ids) switched off in the admin panel's Festival greetings page; `picks`: the cards changed there, by
+   * "<id>-<year>" (src/greetings/types.ts).
    */
-  greetings?: { enabled?: boolean; admissions?: boolean; popup?: boolean; popupDelay?: number; off?: string[] };
+  greetings?: { enabled?: boolean; admissions?: boolean; popup?: boolean; popupDelay?: number; off?: string[]; picks?: Record<string, CardPick> };
 }
 
 export interface IconItem {

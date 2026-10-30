@@ -4,11 +4,13 @@
 // to try at home and the admissions line. A small inline script below decides, while the page loads, whether
 // today (in India) is one of the days, so the bar is there from the first paint and nothing jumps; the card,
 // words and pop-up load afterwards, only on those days (scripts/greetings.ts).
+import { getImage } from 'astro:assets';
 import { datesTable } from '../greetings/calendar';
 import dates from '../greetings/dates.json';
 import { occasions } from '../greetings/occasions';
 import { textFor } from '../greetings/text';
 import { posts, postUrl } from '../data/blog';
+import { hasImage, image } from '../data/content';
 import { site } from '../data/site';
 import { cleanPath, jsonScript } from '../utils';
 
@@ -19,6 +21,23 @@ const settings = {
   popupAfter: site.greetings?.popup !== false && cleanPath(Astro.url.pathname) === '/' ? (delay >= 0 && delay <= 120 ? delay : 5) : null,
 };
 const thisYear = new Date().getFullYear();
+// The admin's choices for cards (Festival greetings page), from last year on; their own pictures as
+// 1080-pixel images served by the site.
+const picks = Object.fromEntries(
+  await Promise.all(
+    Object.entries(site.greetings?.picks ?? {})
+      .filter(([key]) => Number(key.slice(-4)) >= thisYear - 1)
+      .map(async ([key, pick]) => {
+        const { photo, ...rest } = pick;
+        if (!photo || !hasImage(photo)) return [key, rest];
+        // Wide enough that the short side fills the 1080 × 1080 card.
+        const src = image(photo);
+        const width = Math.min(src.width, Math.round(1080 * Math.max(1, src.width / src.height)));
+        const img = await getImage({ src, width, format: 'jpg', quality: 82 });
+        return [key, { ...rest, photo: img.src }];
+      }),
+  ),
+);
 // Each occasion's date rule; moving festivals as their dates from last year on (enough for years ahead).
 const table = datesTable(dates.events, occasions);
 // Days switched off in the admin panel (Festival greetings) are left out.
@@ -43,7 +62,7 @@ const stories = Object.fromEntries(
     ])
     .filter(([, list]) => list.length),
 );
-const data = { settings, stories };
+const data = { settings, stories, picks };
 ---
 
 <div class="greet-bar" id="greet-bar" hidden>

@@ -65,3 +65,21 @@ export interface OccasionText {
   /** The greeting bar's line after the name: "Wishing every family a bright and happy festival of lights." */
   bar: string;
 }
+
+/**
+ * An admin's choice for one day's card in one year (site.greetings.picks, keyed "<id>-<year>"), made on the
+ * admin panel's Festival greetings page. Anything left out stays automatic.
+ */
+export interface CardPick {
+  /** Which of the occasion's designs to draw (instead of taking turns by year). */
+  design?: number;
+  /** A different arrangement of the drawing ("Try another"). */
+  seed?: number;
+  /** The admin's own words for the card, instead of the year's wish. */
+  wish?: string;
+  /** The admin's own picture instead of a drawing: a Storage path in Firestore, a page address on the website. */
+  photo?: string;
+}
+
+/** The key of a pick: "diwali-2026". */
+export const pickKey = (id: string, year: number) => `${id}-${year}`;

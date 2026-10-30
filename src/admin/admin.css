@@ -1595,7 +1595,27 @@ a.item-main:hover strong {
   height: 18px;
 }
 
-.greeting--off .greeting__card {
+.greeting__tools {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 8px;
+  margin-top: 10px;
+}
+
+.greeting__wish {
+  display: grid;
+  gap: 4px;
+  margin-top: 10px;
+  font-weight: 700;
+  font-size: 0.9rem;
+}
+
+.greeting__wish input {
+  font-weight: 400;
+}
+
+.greeting--off .greeting__card svg {
   opacity: 0.4;
   filter: grayscale(1);
 }

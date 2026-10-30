@@ -2,7 +2,7 @@
 // for the words. The website shows it inline (fonts from src/components/Greetings.astro) and turns it into a
 // PNG for sharing (src/scripts/greetings.ts adds the fonts to the SVG for that).
 import { rng } from './palettes';
-import type { Occasion, OccasionText, Palette } from './types';
+import type { CardPick, Occasion, OccasionText, Palette } from './types';
 
 /** The card's two typefaces (public/fonts/*.woff2): Fredoka for the title, Nunito for the rest. */
 export const CARD_FONTS = { display: 'CM Card Display', text: 'CM Card Text' } as const;
@@ -49,14 +49,21 @@ export interface CardInput {
   measure?: Measure;
   /** Extra markup for the SVG's <defs>, such as @font-face rules with the fonts inside. */
   defs?: string;
+  /** The admin's choices for this card, if any (the picture's address must be one the SVG can load). */
+  pick?: CardPick;
 }
 
-export function renderCard({ occasion, text, year, palette: p, logo, measure = estimate, defs = '' }: CardInput) {
-  const design = turn(occasion.designs, year);
-  const drawing = design(rng(`${occasion.id}-${year}`), p);
-  const title = text.title(year);
+/** The year's wish for an occasion, before any words of the admin's own. */
+export function autoWish(text: OccasionText, year: number) {
   const chosen = turn(text.wishes, year);
-  const wish = typeof chosen === 'function' ? chosen(year) : chosen;
+  return typeof chosen === 'function' ? chosen(year) : chosen;
+}
+
+export function renderCard({ occasion, text, year, palette: p, logo, measure = estimate, defs = '', pick = {} }: CardInput) {
+  const design = pick.design != null && occasion.designs[pick.design] ? occasion.designs[pick.design] : turn(occasion.designs, year);
+  const drawing = pick.photo ? '' : design(rng(pick.seed ? `${occasion.id}-${year}-${pick.seed}` : `${occasion.id}-${year}`), p);
+  const title = text.title(year);
+  const wish = pick.wish?.trim() || autoWish(text, year);
 
   // The words: the title as big as fits on one line, the wish on up to three lines.
   const inner = 880;
@@ -89,7 +96,11 @@ export function renderCard({ occasion, text, year, palette: p, logo, measure = e
 <rect width="1080" height="1080" fill="url(#${id}bg)"/>
 <rect width="1080" height="1080" fill="url(#${id}g1)"/>
 <rect width="1080" height="1080" fill="url(#${id}g2)"/>
-<g transform="translate(98 ${Math.round(Math.min(128, panelY - 572))}) scale(.8235)" clip-path="url(#${id}art)">${drawing}</g>
+${
+  pick.photo
+    ? `<image href="${esc(pick.photo)}" xlink:href="${esc(pick.photo)}" x="0" y="0" width="1080" height="1080" preserveAspectRatio="xMidYMid slice"/>`
+    : `<g transform="translate(98 ${Math.round(Math.min(128, panelY - 572))}) scale(.8235)" clip-path="url(#${id}art)">${drawing}</g>`
+}
 <rect x="34" y="26" width="440" height="74" rx="20" fill="#fff" fill-opacity=".8" filter="url(#${id}sh)"/>
 <image href="${logo}" xlink:href="${logo}" x="54" y="37" width="400" height="52" preserveAspectRatio="xMinYMid meet"/>
 <rect x="60" y="${panelY}" width="960" height="${panelH}" rx="40" fill="#fff" fill-opacity=".82" stroke="#fff" stroke-width="2" filter="url(#${id}sh)"/>
