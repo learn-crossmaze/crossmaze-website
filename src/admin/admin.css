@@ -1700,3 +1700,19 @@ a.item-main:hover strong {
 .map-place__key input {
   flex: 1;
 }
+
+/* Google Maps page: whether a key is saved, and how to get one. */
+.maps-key-status {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-weight: 600;
+}
+
+.maps-key-steps {
+  display: grid;
+  gap: 8px;
+  margin: 8px 0 0;
+  padding-left: 1.2em;
+  line-height: 1.5;
+}

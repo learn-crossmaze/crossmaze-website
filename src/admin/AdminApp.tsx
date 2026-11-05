@@ -23,6 +23,7 @@ import { SubmissionsPage } from './components/Submissions';
 import { CallsPage } from './components/Calls';
 import { LitmusPage } from './components/Litmus';
 import { EmailAlertsPage } from './components/EmailAlerts';
+import { GoogleMapsPage } from './components/GoogleMaps';
 import { GreetingsPage } from './components/Greetings';
 import { AdminsPage } from './components/Admins';
 import { CentreHeadPage } from './components/CentreHead';
@@ -46,6 +47,7 @@ const NAV: { href: string; icon: string; label: string; roles?: Role[] }[] = [
   { href: '#/calls', icon: 'Phone', label: 'Calls' },
   { href: '#/litmus', icon: 'Plug', label: 'LITMUS' },
   { href: '#/email-alerts', icon: 'Mail', label: 'Email alerts' },
+  { href: '#/google-maps', icon: 'MapPin', label: 'Google Maps' },
   { href: '#/admins', icon: 'UserCog', label: 'Admins' },
 ];
 
@@ -270,6 +272,8 @@ function Shell() {
         return <LitmusPage />;
       case 'email-alerts':
         return <EmailAlertsPage />;
+      case 'google-maps':
+        return <GoogleMapsPage />;
       case 'greetings':
         return <GreetingsPage />;
       case 'admins':

@@ -1,13 +1,12 @@
 import { useEffect, useId, useRef, useState } from 'react';
-import { doc, setDoc } from 'firebase/firestore';
 import { useDoc } from '../data';
 import { mapEmbed, mapLocation, placeLink } from '../../data/maps';
 import { errorText, useSession } from './ui';
 
 /**
  * A branch's map field (src/data/maps.ts): search Google Maps for the centre and pick its listing, or paste a
- * Google Maps link or coordinates. The search uses Google's Places API with the school's own key, which an admin
- * adds here once (private/maps; only admins can read it).
+ * Google Maps link or coordinates. The search uses Google's Places API with the school's one key, added on the
+ * Google Maps page (components/GoogleMaps.tsx, private/maps; only admins can read it).
  */
 
 // The few parts of Google's Maps JavaScript API used here.
@@ -139,7 +138,11 @@ export function MapPlaceField({ id, value, onChange }: { id: string; value: stri
           )}
         </div>
       ) : (
-        !keyDoc.loading && !keyDoc.error && <MapsKeySetup />
+        !keyDoc.loading && (
+          <p className="help">
+            To search Google Maps here, add the school’s Google Maps key once on the <a href="#/google-maps">Google Maps</a> page (every branch uses it). Until then, paste a link from Google Maps below.
+          </p>
+        )
       )}
       {status && <p className="help">{status}</p>}
       <label className="map-place__link" htmlFor={id}>
@@ -152,35 +155,6 @@ export function MapPlaceField({ id, value, onChange }: { id: string; value: stri
       {value.trim() && !place.coords && (
         <p className="help">No exact pin in this yet: the page searches Google Maps for it. A place chosen from the search, or a full Google Maps link, gives the exact spot.</p>
       )}
-    </div>
-  );
-}
-
-/** Adding the school's Google Maps key, once (full admins). */
-function MapsKeySetup() {
-  const { services } = useSession();
-  const [key, setKey] = useState('');
-  const [error, setError] = useState('');
-  const save = async () => {
-    try {
-      await setDoc(doc(services.db, 'private/maps'), { key: key.trim() });
-    } catch (e) {
-      setError(errorText(e));
-    }
-  };
-  return (
-    <div className="map-place__setup">
-      <p className="help">
-        To search Google Maps here, add the school’s Google Maps key once. In Google Cloud (the website’s Firebase project), turn on <b>Maps JavaScript API</b> and <b>Places API (New)</b>, create an API key, and
-        restrict it to the website (<code>https://www.crossmaze.in/*</code>) and to those two APIs. Then paste it here. Until then, paste a link from Google Maps below.
-      </p>
-      <div className="map-place__key">
-        <input type="password" value={key} placeholder="Google Maps API key" autoComplete="off" onChange={(e) => setKey(e.target.value)} aria-label="Google Maps API key" />
-        <button type="button" className="btn btn-sm" disabled={key.trim().length < 20} onClick={() => void save()}>
-          Save key
-        </button>
-      </div>
-      {error && <p className="error-text">{error}</p>}
     </div>
   );
 }
