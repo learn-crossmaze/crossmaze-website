@@ -2,6 +2,7 @@
 // Each entry becomes a page at /branch/<slug>; keep slugs unchanged so old links keep working.
 // A branch's first photo is its cover; up to nine more fill the gallery, and the album has them all.
 import type { ImageMetadata } from 'astro';
+import { mapLocation } from './maps';
 import { amenityList } from './amenities';
 import { cleanBatches } from './batches';
 import { branchesContent, hasImage, image, programsContent, sectionsContent, siteContent, type BranchContent } from './content';
@@ -72,10 +73,8 @@ export function branchPlace(branch: Branch) {
 export const branchUrl = (branch: Branch) => new URL(`/branch/${branch.slug}`, siteContent.url).href;
 export const branchId = (branch: Branch) => `${branchUrl(branch)}#centre`;
 
-/** The map field as coordinates ("12.8598706,77.613154") for structured data; undefined when it is a place search. */
+/** The centre's pin from its map field (coordinates or a Google Maps link) for structured data; undefined without one. */
 export function branchGeo(branch: Branch) {
-  const m = /^\s*(-?\d{1,2}(?:\.\d+)?)\s*,\s*(-?\d{1,3}(?:\.\d+)?)\s*$/.exec(branch.mapQuery ?? '');
-  if (!m) return undefined;
-  const [latitude, longitude] = [Number(m[1]), Number(m[2])];
-  return Math.abs(latitude) <= 90 && Math.abs(longitude) <= 180 ? { '@type': 'GeoCoordinates', latitude, longitude } : undefined;
+  const coords = mapLocation(branch.mapQuery).coords;
+  return coords ? { '@type': 'GeoCoordinates', latitude: coords.lat, longitude: coords.lng } : undefined;
 }

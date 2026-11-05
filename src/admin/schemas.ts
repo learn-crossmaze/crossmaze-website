@@ -22,6 +22,8 @@ interface Base {
 
 export type Field =
   | (Base & { type: 'text' | 'email' | 'tel' | 'url'; placeholder?: string; maxLength?: number })
+  /** A branch's map: search Google Maps for its listing, or paste a link (components/MapPlace.tsx). */
+  | (Base & { type: 'mapPlace' })
   /** `suggestMax`: a soft length guide; the form shows the count against it, and never stops a save. */
   | (Base & { type: 'textarea'; rows?: number; suggestMax?: number })
   | (Base & { type: 'number' })
@@ -400,7 +402,12 @@ export const branchSchema: Field[] = [
   { type: 'heading', label: 'Contact and location' },
   { key: 'address', label: 'Address', type: 'list', itemLabel: 'Line' },
   { key: 'pincode', label: 'PIN code', type: 'text' },
-  { key: 'mapQuery', label: 'Google Maps search', type: 'text', help: 'Where the map points: the centre’s coordinates (latitude,longitude, e.g. 12.8598,77.6131) or what to search on Google Maps.' },
+  {
+    key: 'mapQuery',
+    label: 'Google Maps location',
+    type: 'mapPlace',
+    help: 'Search for the centre and pick its Google listing: the map on its page shows the listing’s name card, and “Directions” opens it. You can also paste a link from Google Maps (Share → Copy link) or coordinates (12.8187,77.6641).',
+  },
   { key: 'phone', label: 'Phone', type: 'tel' },
   {
     key: 'whatsapp',

@@ -3,6 +3,7 @@ import { icons } from '../icons';
 import { uploadImage, useImageUrl } from '../data';
 import type { FirebaseServices } from '../firebase';
 import { iconOptions, templateOptions, type Field, type Option } from '../schemas';
+import { MapPlaceField } from './MapPlace';
 
 type Value = unknown;
 type Obj = Record<string, unknown>;
@@ -161,6 +162,12 @@ export function FieldEditor({ field, value, onChange }: { field: Exclude<Field, 
             maxLength={field.maxLength}
             onChange={(e) => onChange(e.target.value)}
           />
+        </Row>
+      );
+    case 'mapPlace':
+      return (
+        <Row label={field.label} help={field.help} required={field.required} htmlFor={id}>
+          <MapPlaceField id={id} value={asText(value)} onChange={onChange} />
         </Row>
       );
     case 'textarea': {
