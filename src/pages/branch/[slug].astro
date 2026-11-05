@@ -22,6 +22,7 @@ import {
   type Branch,
 } from '../../data/branches';
 import TimeRange from '../../components/TimeRange.astro';
+import { mapDirections, mapEmbed, mapLocation } from '../../data/maps';
 import { dayRuns, formatRange, openingHoursSpecification, openingTimes, seatLabels } from '../../data/batches';
 import { programs } from '../../data/programs';
 import { site, orgId } from '../../data/site';
@@ -55,8 +56,10 @@ const [cover, ...rest] = photos;
 const photoAlt = (n: number) => (n === 1 ? `Inside ${branch.name}` : `${branch.name} – photo ${n}`);
 const fullSize = await Promise.all(photos.map((p) => getImage({ src: p, width: 1600, format: 'webp' })));
 const head = headPhoto(branch.slug);
-const mapSrc = `https://www.google.com/maps?q=${encodeURIComponent(branch.mapQuery)}&output=embed`;
-const directions = `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(branch.mapQuery)}`;
+const mapPlace = mapLocation(branch.mapQuery);
+// Without a pin (a short link that could not be opened), the map searches for the centre's address.
+const mapSrc = mapEmbed(mapPlace.coords || mapPlace.query ? mapPlace : { query: [branch.name, ...branch.address].join(', ') });
+const directions = mapDirections(mapPlace);
 const emailAt = branch.email.lastIndexOf('@');
 
 // The gallery: the photos after the cover as framed 3:2 tiles in full rows, so the owner can add any
@@ -213,7 +216,7 @@ const jsonLd = {
   ...(cover ? { image: fullSize.slice(0, 4).map((p) => new URL(p.src, site.url).href) } : {}),
   parentOrganization: { '@type': 'Preschool', '@id': orgId, name: site.fullName, url: site.url },
   ...(geo ? { geo } : {}),
-  ...(branch.mapQuery?.trim() ? { hasMap: directions } : {}),
+  ...(directions ? { hasMap: directions } : {}),
   ...(hours.length ? { openingHoursSpecification: hours } : {}),
   address: {
     '@type': 'PostalAddress',

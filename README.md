@@ -90,6 +90,8 @@ Branch admins need the database rules and functions from step 3 below (`npx fire
 
 ### WhatsApp
 
+**Map:** in **Branches → a branch → Google Maps location**, paste the centre's link from Google Maps (open the centre, then Share → Copy link, or copy the address bar). A link to the centre's own Google listing is best: the map on its page shows the listing's name card, and **Directions** opens the listing. A link to a dropped pin shows that pin. Short share links (maps.app.goo.gl) are opened into the full link when the site is published; coordinates (12.8187,77.6641) also work (`src/data/maps.ts`).
+
 There is no school-wide WhatsApp number: each centre has its own (**Branches → WhatsApp number**, e.g. +91 73380 45201; empty uses the centre's phone number). However it's typed (with or without +91, a leading 0 or spaces), the site turns it into the right WhatsApp link and shows it like the phone numbers. The WhatsApp buttons on the home page, Contact and the round green button in the corner open a list of the centres, like the call buttons do, so parents pick theirs. On a centre's own page the green button opens a chat with that centre straight away.
 
 ### Calls

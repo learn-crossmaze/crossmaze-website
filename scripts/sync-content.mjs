@@ -366,6 +366,30 @@ class ContentUpdates {
   }
 }
 
+/**
+ * A short Google Maps share link (maps.app.goo.gl/…) carries no pin, so it is opened into the full link it stands
+ * for, which does (src/data/maps.ts reads it). Only the copy the site is built from changes; if Google can't be
+ * reached the short link is kept, and the page's map falls back to the centre's address.
+ */
+async function openShortMapLink(field) {
+  let link = String(field ?? '').trim();
+  if (!/^https?:\/\/(?:maps\.app\.goo\.gl|goo\.gl\/maps)\//i.test(link)) return field;
+  try {
+    for (let hop = 0; hop < 5 && /goo\.gl/i.test(new URL(link).host + new URL(link).pathname); hop++) {
+      const res = await fetch(link, { redirect: 'manual', signal: AbortSignal.timeout(10000) });
+      const next = res.headers.get('location');
+      if (!next) break;
+      link = new URL(next, link).href;
+    }
+    if (/goo\.gl/i.test(new URL(link).host)) throw new Error('still a short link');
+    console.log(`Opened the short Google Maps link ${field} as ${link.slice(0, 80)}…`);
+    return link;
+  } catch (e) {
+    console.warn(`Could not open the Google Maps link ${field} (${e.message}); keeping it as it is.`);
+    return field;
+  }
+}
+
 async function pull(db, bucket) {
   const download = async (storagePath) => {
     if (!storagePath) return '';
@@ -418,6 +442,7 @@ async function pull(db, bucket) {
       const item = normalize[name](name === 'testimonials' ? rest : { ...rest, slug: rest.slug || id });
       if (name === 'posts' && hidden === true) item.hidden = true;
       check(name, item, `${name.replace(/s$/, '')} "${item.name ?? item.title ?? id}"`);
+      if (name === 'branches') item.mapQuery = await openShortMapLink(item.mapQuery);
       out[name].push(await mapImages(name, item, download));
     }
   }

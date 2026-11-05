@@ -400,7 +400,12 @@ export const branchSchema: Field[] = [
   { type: 'heading', label: 'Contact and location' },
   { key: 'address', label: 'Address', type: 'list', itemLabel: 'Line' },
   { key: 'pincode', label: 'PIN code', type: 'text' },
-  { key: 'mapQuery', label: 'Google Maps search', type: 'text', help: 'Where the map points: the centre’s coordinates (latitude,longitude, e.g. 12.8598,77.6131) or what to search on Google Maps.' },
+  {
+    key: 'mapQuery',
+    label: 'Google Maps location',
+    type: 'text',
+    help: 'Paste the centre’s link from Google Maps: open the centre (or drop a pin on it), then Share → Copy link, or copy the address bar. The map shows its exact pin, and “Directions” opens your link. Coordinates (12.8187,77.6641) work too.',
+  },
   { key: 'phone', label: 'Phone', type: 'tel' },
   {
     key: 'whatsapp',
