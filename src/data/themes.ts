@@ -28,6 +28,7 @@ export type ThemeMode = (typeof themeModes)[number]['value'];
 /** Who sees the dark version of the theme. */
 export const darkModes = [
   { value: 'device', label: 'Follow each visitor’s phone or computer, with a light/dark button' },
+  { value: 'time', label: 'Dark in the evening (7 pm to 6 am, by the visitor’s clock), with a light/dark button' },
   { value: 'button', label: 'Light, with a button to switch to dark' },
   { value: 'off', label: 'Light only' },
 ] as const;
@@ -52,8 +53,12 @@ export interface ThemeSettings {
   rotation: ThemeId[];
   /** One theme per day of the week, for "weekday". */
   weekdays: Record<(typeof weekdays)[number][0], ThemeId>;
-  /** Dark mode: follow the visitor's device, only by the button, or never. */
+  /** Dark mode: follow the visitor's device or the time of day, only by the button, or never. */
   dark: DarkMode;
+  /** Festive touches in festival seasons (src/styles/seasons.css). On unless switched off. */
+  seasons: boolean;
+  /** The page's light follows the time of day: fresh in the morning, golden in the afternoon, rosy at dusk. */
+  daylight: boolean;
 }
 
 export const fontsHref = (fonts: string) => `https://fonts.googleapis.com/css2?${fonts}&display=swap`;
@@ -72,6 +77,8 @@ export function themeSettings(raw: Partial<Record<keyof ThemeSettings, unknown>>
     mode,
     fixed,
     dark,
+    seasons: raw?.seasons !== false,
+    daylight: raw?.daylight !== false,
     rotation: (picked.length ? picked : [fixed]) as ThemeId[],
     weekdays: Object.fromEntries(weekdays.map(([day]) => [day, isTheme(days[day]) ? days[day] : fixed])) as ThemeSettings['weekdays'],
   };

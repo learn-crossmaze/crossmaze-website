@@ -128,10 +128,16 @@ A visit keeps one theme from page to page. To look at a theme yourself, add `?th
 | Setting | What visitors see |
 | --- | --- |
 | Follow each visitor's phone or computer, with a light/dark button | Dark when their device is set to dark mode, light otherwise. The sun/moon button in the menu bar switches, and the site remembers their choice |
+| Dark in the evening (7 pm to 6 am), with a light/dark button | Dark from 7 pm to 6 am by their own clock, light in the day; a page left open switches by itself. The button works as above |
 | Light, with a button to switch to dark | Light, until they press the sun/moon button (remembered) |
 | Light only | Light; no button |
 
 To look at dark mode yourself, add `?mode=dark` to any page address (it works even when dark mode is off, so you can check it first); `?mode=light` shows light and `?mode=auto` goes back to the setting. Combine them: `?theme=ocean&mode=dark`. The admin panel itself stays light.
+
+**Time of day and festival seasons** (both on unless switched off in **Look and feel**; `src/styles/seasons.css`):
+- **Light that follows the time of day**: by each visitor's clock, a soft cool light in the morning (5–11), a warm golden glow in the afternoon (11–4) and a rosy one at dusk (4–7), over the theme's page background, in light mode. Preview with `?daypart=morning`, `afternoon` or `evening`.
+- **Festive touches in festival seasons**: a string under the menu bar (marigolds and mango leaves for Diwali, colour splashes for Holi, fairy lights for Christmas to New Year, tricolour flags for Independence Day and Republic Day) and the season's colours in the page's glows. Diwali (four days before to two after) and Holi (the two days before) follow the festival dates (`src/data/seasons.ts`, from the same calendar as the greetings); 20 December to 1 January, 12–15 August and 23–26 January are fixed. Preview with `?season=diwali`, `holi`, `winter` or `tricolour`.
+- **Motion**: as the page scrolls, cards and photos fade up, icon badges pop, photos settle in their frames and the underline under a heading's coloured words draws itself; the doodles drift at their own pace, and wiggle when tapped or clicked (`src/scripts/motion.ts`). Nothing moves for visitors who ask their device for reduced motion.
 
 ## One-time setup
 

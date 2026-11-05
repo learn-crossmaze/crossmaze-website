@@ -443,6 +443,8 @@ main > section::before {
   background: var(--shape-1) no-repeat center / contain;
   opacity: 0.75;
   animation: cm-drift-a 19s ease-in-out infinite alternate;
+  /* A little drift as the page scrolls (src/scripts/motion.ts), on top of the floating animation. */
+  translate: 0 var(--doodle-shift, 0px);
 }
 
 /* Odd sections: the doodle sits top-left; even sections: top-right. */
@@ -1320,4 +1322,17 @@ form[data-sending] :is(input, select, textarea) {
   -webkit-mask: var(--underline-shape) no-repeat center / 100% 100%;
   mask: var(--underline-shape) no-repeat center / 100% 100%;
   z-index: -1;
+}
+
+/* The line draws itself when the heading is first seen (src/scripts/motion.ts; never without JavaScript). */
+.squiggle[data-draw]::after {
+  transition: clip-path 0.9s cubic-bezier(0.6, 0, 0.3, 1) 0.15s;
+}
+
+.squiggle[data-draw='pending']::after {
+  clip-path: inset(0 100% 0 0);
+}
+
+.squiggle[data-draw='done']::after {
+  clip-path: inset(0 0 0 0);
 }
