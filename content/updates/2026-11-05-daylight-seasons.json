@@ -1,0 +1,18 @@
+{
+  "id": "2026-11-05-daylight-seasons",
+  "description": "Look and feel: light that follows the time of day, and festive touches in festival seasons (both on)",
+  "changes": [
+    {
+      "doc": "content/site",
+      "field": "theme.daylight",
+      "from": null,
+      "to": true
+    },
+    {
+      "doc": "content/site",
+      "field": "theme.seasons",
+      "from": null,
+      "to": true
+    }
+  ]
+}

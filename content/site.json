@@ -152,7 +152,9 @@
       "sat": "candy",
       "sun": "tropical"
     },
-    "dark": "device"
+    "dark": "device",
+    "daylight": true,
+    "seasons": true
   },
   "greetings": {
     "enabled": true,

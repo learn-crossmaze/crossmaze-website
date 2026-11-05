@@ -57,6 +57,7 @@ const style = (s: Shape, n: number) =>
   [
     `--art:var(--doodle-${variant}-${n})`,
     `--size:${s.size}px`,
+    `--depth:${(s.size / 80).toFixed(2)}`,
     `--top:${s.top}`,
     `--left:${s.left}`,
     `--dur:${s.dur}s`,
@@ -161,6 +162,9 @@ const style = (s: Shape, n: number) =>
     animation-iteration-count: infinite;
     animation-timing-function: ease-in-out;
     opacity: 0.85;
+    /* They drift up at their own speed as the page scrolls (src/scripts/motion.ts sets --fx-shift on
+       the banner): the bigger the doodle, the nearer it seems and the faster it moves. */
+    translate: 0 calc(var(--fx-shift, 0px) * var(--depth, 1));
   }
 
   .fx__shape--bob {

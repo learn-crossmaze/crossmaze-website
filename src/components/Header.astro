@@ -102,13 +102,14 @@ const isActive = (href: string) => (href === '/' ? path === '/' : path === href 
   type Mode = 'light' | 'dark';
   const cm = (
     window as unknown as {
-      cmMode?: { set: (m: Mode) => void; decide: () => Mode; followsDevice: boolean; device: MediaQueryList | null };
+      cmMode?: { set: (m: Mode) => void; decide: () => Mode; auto: () => Mode; followsTime: boolean; device: MediaQueryList | null };
     }
   ).cmMode;
   const modeToggle = document.querySelector<HTMLButtonElement>('[data-mode-toggle]');
   const root = document.documentElement;
   const current = (): Mode => (root.dataset.mode === 'dark' ? 'dark' : 'light');
-  const deviceMode = (): Mode => (cm?.followsDevice && cm.device?.matches ? 'dark' : 'light');
+  // What the site shows when the visitor hasn't chosen: the device's mode, or by the time of day.
+  const autoMode = (): Mode => cm?.auto() ?? 'light';
   const show = (mode: Mode) => {
     cm?.set(mode);
     modeToggle?.setAttribute('aria-pressed', String(mode === 'dark'));
@@ -119,8 +120,8 @@ const isActive = (href: string) => (href === '/' ? path === '/' : path === href 
       const next: Mode = current() === 'dark' ? 'light' : 'dark';
       try {
         sessionStorage.removeItem('cm-mode-preview');
-        // Picking what the device shows anyway goes back to following the device.
-        if (next === deviceMode()) localStorage.removeItem('cm-mode');
+        // Picking what the site shows anyway goes back to following the device or the time of day.
+        if (next === autoMode()) localStorage.removeItem('cm-mode');
         else localStorage.setItem('cm-mode', next);
       } catch {
         // Storage blocked: the choice lasts for this page only.
@@ -133,6 +134,8 @@ const isActive = (href: string) => (href === '/' ? path === '/' : path === href 
     cm.device?.addEventListener('change', sync);
     window.addEventListener('storage', (e) => (e.key === 'cm-mode' || e.key === null) && sync());
     window.addEventListener('pageshow', (e) => e.persisted && sync());
+    // Dark in the evening: switch at 7 pm (and back at 6 am) on a page left open.
+    if (cm.followsTime) setInterval(sync, 5 * 60 * 1000);
 
     // Once the page has settled, fetch the other mode's doodles (a few small files, listed by
     // components/doodles; the section ones only show from 1360px), so they're there the moment the

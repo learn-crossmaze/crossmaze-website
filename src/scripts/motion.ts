@@ -1,6 +1,8 @@
 // Gentle motion for the public site:
-//  - cards, headings and photos fade up as they scroll into view
+//  - cards, headings and photos fade up as they scroll into view; icon badges pop, photos settle
+//    into their frames and the underline under a heading's highlighted words draws itself
 //  - numbers marked [data-countup] (e.g. "1000+") count up when first seen
+//  - the doodles drift a little as the page scrolls, and wiggle when tapped or clicked
 // Nothing happens for visitors who prefer reduced motion, and everything is fully visible without JS.
 
 const reduceMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
@@ -53,6 +55,21 @@ function setupReveal() {
       ],
       { duration: 650, delay, easing: 'cubic-bezier(.2,.7,.2,1)', fill: 'backwards' },
     );
+    // Its icon badge pops in just after, with a little bounce.
+    for (const badge of el.querySelectorAll<HTMLElement>('.icon-badge')) {
+      badge.animate(
+        [
+          { scale: '0.4', rotate: '-12deg', opacity: 0 },
+          { scale: '1.12', rotate: '6deg', opacity: 1, offset: 0.6 },
+          { scale: '1', rotate: '0deg', opacity: 1 },
+        ],
+        { duration: 620, delay: delay + 220, easing: 'cubic-bezier(.3,.8,.3,1.2)', fill: 'backwards' },
+      );
+    }
+    // Photos settle into their frames (the frame clips the slight zoom).
+    for (const img of el.querySelectorAll<HTMLElement>('img')) {
+      img.animate([{ scale: '1.08' }, { scale: '1' }], { duration: 1100, delay, easing: 'cubic-bezier(.2,.7,.2,1)', fill: 'backwards' });
+    }
   };
 
   const observer = new IntersectionObserver(
@@ -104,7 +121,110 @@ function setupCountUp() {
   items.forEach((el) => observer.observe(el));
 }
 
+/** The theme's underline under a heading's highlighted words draws itself from left to right when seen. */
+function setupUnderlines() {
+  const lines = [...document.querySelectorAll<HTMLElement>('.squiggle')];
+  const observer = new IntersectionObserver(
+    (entries) => {
+      for (const entry of entries) {
+        if (!entry.isIntersecting) continue;
+        const el = entry.target as HTMLElement;
+        observer.unobserve(el);
+        // A frame later, so the browser has drawn it hidden first and the line animates.
+        requestAnimationFrame(() => requestAnimationFrame(() => (el.dataset.draw = 'done')));
+      }
+    },
+    { rootMargin: '0px 0px -10% 0px' },
+  );
+  for (const el of lines) {
+    el.dataset.draw = 'pending';
+    observer.observe(el);
+  }
+}
+
+/**
+ * The doodles drift a little as the page scrolls, at different speeds, so the page feels deep: the
+ * banner's doodles (components/FloatingShapes.astro) and the one beside each section (global.css).
+ * They use the CSS `translate` property, which adds to their own floating animation.
+ */
+function setupDoodleDrift() {
+  const banners = [...document.querySelectorAll<HTMLElement>('.fx')];
+  const sections = [...document.querySelectorAll<HTMLElement>('main > section')];
+  const wide = matchMedia('(min-width: 1360px)');
+  let queued = false;
+  const update = () => {
+    queued = false;
+    const vh = window.innerHeight;
+    for (const fx of banners) {
+      const r = fx.getBoundingClientRect();
+      if (r.bottom < 0 || r.top > vh) continue;
+      fx.style.setProperty('--fx-shift', `${Math.round(-r.top * 0.18)}px`);
+    }
+    if (!wide.matches) return;
+    for (const section of sections) {
+      const r = section.getBoundingClientRect();
+      if (r.bottom < -100 || r.top > vh + 100) continue;
+      const progress = Math.max(-1, Math.min(1, (r.top + Math.min(r.height, vh) / 2 - vh / 2) / vh));
+      section.style.setProperty('--doodle-shift', `${Math.round(progress * 36)}px`);
+    }
+  };
+  const queue = () => {
+    if (queued) return;
+    queued = true;
+    requestAnimationFrame(update);
+  };
+  window.addEventListener('scroll', queue, { passive: true });
+  window.addEventListener('resize', queue);
+  update();
+}
+
+const WIGGLE: Keyframe[] = [
+  { rotate: '0deg', scale: '1' },
+  { rotate: '-16deg', scale: '1.18', offset: 0.25 },
+  { rotate: '12deg', scale: '1.12', offset: 0.5 },
+  { rotate: '-6deg', scale: '1.05', offset: 0.75 },
+  { rotate: '0deg', scale: '1' },
+];
+
+/** Tapping or clicking a doodle makes it wiggle (taps on links and buttons are left alone). */
+function setupDoodleWiggle() {
+  const inside = (x: number, y: number, r: { left: number; top: number; width: number; height: number }) =>
+    x >= r.left && x <= r.left + r.width && y >= r.top && y <= r.top + r.height;
+  document.addEventListener('click', (e) => {
+    if ((e.target as Element).closest('a, button, input, select, textarea, label, summary, [role="button"]')) return;
+    const { clientX: x, clientY: y } = e;
+    for (const shape of document.querySelectorAll<HTMLElement>('.fx__shape')) {
+      const r = shape.getBoundingClientRect();
+      // A little extra room around small doodles, for fingers.
+      const pad = Math.max(0, (44 - r.width) / 2);
+      if (r.width && inside(x, y, { left: r.left - pad, top: r.top - pad, width: r.width + pad * 2, height: r.height + pad * 2 })) {
+        shape.animate(WIGGLE, { duration: 750, easing: 'ease-in-out' });
+        return;
+      }
+    }
+    // The section doodles are drawn by ::before, so their place comes from its computed box.
+    const section = (e.target as Element).closest<HTMLElement>('main > section');
+    if (!section) return;
+    const before = getComputedStyle(section, '::before');
+    if (before.content === 'none' || before.display === 'none') return;
+    const s = section.getBoundingClientRect();
+    const left = parseFloat(before.left);
+    const right = parseFloat(before.right);
+    const width = parseFloat(before.width);
+    const box = {
+      left: Number.isFinite(left) ? s.left + left : s.right - right - width,
+      top: s.top + parseFloat(before.top) + parseFloat(section.style.getPropertyValue('--doodle-shift') || '0'),
+      width,
+      height: width,
+    };
+    if (inside(x, y, box)) section.animate(WIGGLE, { duration: 750, easing: 'ease-in-out', pseudoElement: '::before' });
+  });
+}
+
 if (!reduceMotion && 'IntersectionObserver' in window && 'animate' in Element.prototype) {
   setupReveal();
   setupCountUp();
+  setupUnderlines();
+  setupDoodleDrift();
+  setupDoodleWiggle();
 }
