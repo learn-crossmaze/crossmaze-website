@@ -41,8 +41,22 @@ export function coordsFromLink(link: string) {
   return view ? valid(Number(view[1]), Number(view[2])) : undefined;
 }
 
+/**
+ * The link saved when a place is chosen from the admin panel's Google Maps search: Google's own "search" link,
+ * which opens that listing (query_place_id), with its name and its pin (ll) for the page's map.
+ */
+export const placeLink = (p: { id: string; name: string; lat: number; lng: number }) =>
+  `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(p.name)}&query_place_id=${encodeURIComponent(p.id)}&ll=${p.lat},${p.lng}`;
+
 /** The listing's name in a /maps/place/<name>/ link; none when the "place" is only a dropped pin (degrees or numbers). */
 function placeName(link: string) {
+  try {
+    const url = new URL(link);
+    const query = url.searchParams.get('query');
+    if (url.searchParams.get('query_place_id') && query && !COORDS.test(query)) return query.trim();
+  } catch {
+    // Not a full address.
+  }
   const m = /\/maps\/place\/([^/@?]+)/.exec(link);
   if (!m) return undefined;
   let name: string;

@@ -1633,3 +1633,70 @@ a.item-main:hover strong {
     grid-template-columns: 1fr;
   }
 }
+
+/* A branch's map: Google Maps search, the link, and a preview of where the page's map points. */
+.map-place {
+  display: grid;
+  gap: 8px;
+}
+
+.map-place__search {
+  position: relative;
+  display: grid;
+  gap: 6px;
+}
+
+.map-place__search label,
+.map-place__link {
+  font-weight: 600;
+  font-size: 0.9rem;
+}
+
+.map-place__results {
+  margin: 0;
+  padding: 4px;
+  list-style: none;
+  border: 1px solid var(--a-line);
+  border-radius: 12px;
+  background: #fff;
+  box-shadow: 0 12px 30px -16px rgb(20 40 90 / 35%);
+}
+
+.map-place__results button {
+  display: grid;
+  width: 100%;
+  gap: 2px;
+  padding: 8px 10px;
+  border: 0;
+  border-radius: 8px;
+  background: none;
+  color: inherit;
+  text-align: left;
+  cursor: pointer;
+}
+
+.map-place__results button:hover,
+.map-place__results button:focus-visible {
+  background: var(--a-navy-50);
+}
+
+.map-place__results span {
+  font-size: 0.85rem;
+  opacity: 0.75;
+}
+
+.map-place__preview {
+  width: 100%;
+  height: 220px;
+  border: 0;
+  border-radius: 12px;
+}
+
+.map-place__key {
+  display: flex;
+  gap: 8px;
+}
+
+.map-place__key input {
+  flex: 1;
+}
