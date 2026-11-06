@@ -103,6 +103,12 @@ const data = { settings, stories, picks };
     bar.dataset.today = iso;
     if (solemn) bar.classList.add('greet-bar--solemn');
     bar.hidden = false;
+    // The banner below reaches up behind the bar (global.css): it needs the bar's height, with its margin.
+    var size = function () {
+      document.documentElement.style.setProperty('--greet-h', bar.offsetHeight + parseFloat(getComputedStyle(bar).marginTop) + 'px');
+    };
+    size();
+    if (window.ResizeObserver) new ResizeObserver(size).observe(bar);
   })();
 </script>
 <script type="application/json" id="greet-data" set:html={jsonScript(data)} />
