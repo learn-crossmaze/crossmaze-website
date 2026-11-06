@@ -1060,11 +1060,18 @@ h1 > .eyebrow > svg {
 
 /* The banner at the top of a page reaches up behind the floating header, so its colour wash
    (components/FloatingShapes.astro) runs to the top of the window with no edge where the header
-   ends. The extra padding keeps the content where it was. */
-main > :is(.hero, .page-hero):first-child {
+   ends. The extra padding keeps the content where it was. The festival greeting's bar and its scripts
+   (components/Greetings.astro) come first in <main> and don't count. */
+main > :is(.hero, .page-hero):nth-child(1 of :not(.greet-bar, script)) {
   --under-header: calc(var(--header-gap) + var(--header-h));
   margin-top: calc(-1 * var(--under-header));
   padding-top: calc(var(--banner-pad-top) + var(--under-header));
+}
+
+/* On a festival day the greeting bar sits between the header and the banner: the banner reaches up behind it too
+   (its height, with its margin, is --greet-h, set by components/Greetings.astro), so there is still no edge. */
+main:has(> .greet-bar:not([hidden])) > :is(.hero, .page-hero):nth-child(1 of :not(.greet-bar, script)) {
+  --under-header: calc(var(--header-gap) + var(--header-h) + var(--greet-h, 0px));
 }
 
 .page-hero h1 {
