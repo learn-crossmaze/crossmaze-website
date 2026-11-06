@@ -140,7 +140,7 @@ export function MapPlaceField({ id, value, onChange }: { id: string; value: stri
       ) : (
         !keyDoc.loading && (
           <p className="help">
-            To search Google Maps here, add the school’s Google Maps key once on the <a href="#/google-maps">Google Maps</a> page (every branch uses it). Until then, paste a link from Google Maps below.
+            To search Google Maps here, add the school’s Google Maps key once on the <a href="#/connections/google-maps">Connections → Google Maps</a> page (every branch uses it). Until then, paste a link from Google Maps below.
           </p>
         )
       )}

@@ -37,7 +37,7 @@ Job applications send: name, phone, email, position, branch,
 experience, qualification, resume_link, about.
 Reply with any 2xx status to confirm. Anything else is retried every
 30 minutes (up to 6 times), shown as "LITMUS failed" in Submissions,
-and emailed to the admins (admin panel → Email alerts).`;
+and emailed to the admins (admin panel → Connections → Email alerts).`;
 
 export function LitmusPage() {
   const { services } = useSession();

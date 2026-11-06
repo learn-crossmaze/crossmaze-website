@@ -32,20 +32,21 @@ The URLs match the old site, so existing links and Google results keep working.
 
 Go to **www.crossmaze.in/admin** and sign in (until the domain moves, step 6 below: **crossmaze-website.web.app/admin**).
 
+The sidebar groups the pages: **Website** (Site settings, Page sections, Branches, Programs, Jobs), **Stories** (Blog, Festival greetings, Testimonials), **Enquiries** (Submissions, Calls) and **Settings** (Connections, Admins). Branch admins see only Dashboard, Your branch and Blog.
+
 | Section | What you can change |
 | --- | --- |
 | Site settings | Logo, school name, phone, emails, address, social links, colour theme, [festival greetings](#festival-greetings), home-page banner, numbers strip, about paragraphs (each with an optional subheading), quote, photos, founders (see below) |
+| Page sections | Core values, teaching approach, a day at Crossmaze, how admission works, day care highlights, extra-curriculars, facilities (with the photos for the scrolling strip on the home page), careers perks, FAQs |
 | Branches | Add, hide, reorder or delete branches; name, area, short introduction (also shown on the Branches page), **Title in Google** (see [Search](#search-seo)), address, map, phone, **WhatsApp number** (empty: the phone; see below), size, capacity, amenities, programs offered, timings and batches (see below), photos (first = cover; the page shows six, and all of them open in a swipeable album), centre head with photo and bio |
 | Programs | Add, hide, reorder; name, **Also called** (another name parents know it by, shown in brackets after the name on Our Programs and the program cards: “Junior KG (LKG)”; empty for none), age group, who can join (e.g. “2 years or older on 1 June”), icon, colour, photo, description, focus list (timings are set per branch) |
 | Jobs | Open positions on the careers page |
-| Testimonials | Parent quotes on the home page |
-| Page sections | Core values, teaching approach, a day at Crossmaze, how admission works, day care highlights, extra-curriculars, facilities (with the photos for the scrolling strip on the home page), careers perks, FAQs |
-| Submissions | Every enquiry and application; mark as handled, resend to LITMUS, export to CSV |
 | Blog | Write posts with photos in six designs, keep them as drafts with a private preview link, then publish (see below) |
+| Festival greetings | Every greeting for a year, a tick box per day, and each card's own words, picture or a new drawing (see [Festival greetings](#festival-greetings)) |
+| Testimonials | Parent quotes on the home page |
+| Submissions | Every enquiry and application; mark as handled, resend to LITMUS, export to CSV |
 | Calls | Every tap on a call or WhatsApp button: which centre, page, device and how the visitor found the site; totals by centre; export to CSV (see below) |
-| LITMUS | Where submissions are sent, its API key, and a **Send test** button |
-| Email alerts | The Zoho CPaaS (formerly ZeptoMail) settings for the email the full admins get when a submission can't be sent to LITMUS, and a **Send me a test** button (see [Email alerts](#email-alerts-zoho-cpaas)) |
-| Google Maps | The school's one Google Maps key, used by every branch's **Search Google Maps** (Branches → Google Maps location); add, replace or remove it here (full admins only) |
+| Connections | Every outside service and its key, one tab each (full admins only; the keys are only ever read by admins): **LITMUS** (where submissions are sent, its API key and a **Send test** button), **Email alerts** (the Zoho CPaaS settings for the email the full admins get when a submission can't be sent to LITMUS, and **Send me a test**; see [Email alerts](#email-alerts-zoho-cpaas)) and **Google Maps** (the school's one key for every branch's **Search Google Maps**) |
 | Admins | Who can sign in: full admins, and branch admins (see below) |
 
 **Save** stores a change; it goes live when someone presses **Publish** (top right). Publishing rebuilds the whole site in about 3 minutes, and the Dashboard shows when it's done or if it failed. New branches, programs and jobs start hidden, so you can finish them before unticking “Hide from website”.
@@ -93,7 +94,7 @@ Branch admins need the database rules and functions from step 3 below (`npx fire
 
 **Map:** in **Branches → a branch → Google Maps location**, type the centre's name in **Search Google Maps** and pick its listing; a small map below shows where the page's map will point. Saved that way, the map on the centre's page shows the listing's name card, and **Directions** opens the listing (with its reviews and photos). You can also paste a link from Google Maps (Share → Copy link, or the address bar) or coordinates (12.8187,77.6641); short share links (maps.app.goo.gl) are opened into the full link when the site is published (`src/data/maps.ts`).
 
-The search needs the school's **Google Maps key**, one for all branches, added once on the admin panel's **Google Maps** page (full admins; it is kept in `private/maps`, which only admins can read, and is used in the admin panel only). In Google Cloud (the website's Firebase project, with billing on: the search stays within Google's free monthly allowance for a handful of admins), turn on **Maps JavaScript API** and **Places API (New)**, create an API key, restrict it to websites `https://www.crossmaze.in/*` and to those two APIs, and paste it on the **Google Maps** page. Until then, pasting a link works without a key.
+The search needs the school's **Google Maps key**, one for all branches, added once on the admin panel's **Connections → Google Maps** tab (full admins; it is kept in `private/maps`, which only admins can read, and is used in the admin panel only). In Google Cloud (the website's Firebase project, with billing on: the search stays within Google's free monthly allowance for a handful of admins), turn on **Maps JavaScript API** and **Places API (New)**, create an API key, restrict it to websites `https://www.crossmaze.in/*` and to those two APIs, and paste it on the **Connections → Google Maps** tab. Until then, pasting a link works without a key.
 
 There is no school-wide WhatsApp number: each centre has its own (**Branches → WhatsApp number**, e.g. +91 73380 45201; empty uses the centre's phone number). However it's typed (with or without +91, a leading 0 or spaces), the site turns it into the right WhatsApp link and shows it like the phone numbers. The WhatsApp buttons on the home page, Contact and the round green button in the corner open a list of the centres, like the call buttons do, so parents pick theirs. On a centre's own page the green button opens a chat with that centre straight away.
 
@@ -261,7 +262,7 @@ Wix's own email records are not copied: the CNAMEs `s1._domainkey`, `s2._domaink
 
 ## LITMUS integration
 
-Set the LITMUS URL and key in the admin panel (**LITMUS** page), then press **Send test**. For each submission, LITMUS receives:
+Set the LITMUS URL and key in the admin panel (**Connections → LITMUS**), then press **Send test**. For each submission, LITMUS receives:
 
 ```http
 POST <LITMUS URL>
@@ -295,7 +296,7 @@ To set it up (the school's Zoho account is in the US data centre, so Zoho CPaaS 
 
 1. In Zoho CPaaS → **Agents**, open the agent (or add one, e.g. `Crossmaze website`) and check that **crossmaze.in** shows as verified under **Domains**. crossmaze.in already has the records from its ZeptoMail days (the `bounce-zem` CNAME and a DKIM key, in `dns/crossmaze.in.zone`), so it should be. If Zoho CPaaS asks for a record that isn't there, add it at GoDaddy and to `dns/crossmaze.in.zone`, and don't change the existing email records.
 2. In the same agent → **SMTP/API** → **API Setup**, copy the **Agent key** (the API key; a ZeptoMail Send Mail token still works) and the API address (`https://cpaas.zoho.com/v1.1/email`; ZeptoMail's `https://api.zeptomail.com/v1.1/email` also still works).
-3. In the admin panel → **Email alerts**: tick **Email the admins…**, paste the key, enter the From address (on crossmaze.in, e.g. `noreply@crossmaze.in`) and press **Save**, then **Send me a test**. The test goes to the admin who presses it; check the inbox and the spam folder.
+3. In the admin panel → **Connections → Email alerts**: tick **Email the admins…**, paste the key, enter the From address (on crossmaze.in, e.g. `noreply@crossmaze.in`) and press **Save**, then **Send me a test**. The test goes to the admin who presses it; check the inbox and the spam folder.
 
 The key is kept in Firestore at `private/zeptomail` (the name from before the rename), which only full admins can read (the website and branch admins can't). With Email alerts off, failures are only shown in Submissions.
 
