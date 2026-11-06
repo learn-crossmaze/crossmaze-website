@@ -1,4 +1,4 @@
-import { Component, useEffect, useMemo, useState, type ReactNode } from 'react';
+import { Component, Fragment, useEffect, useMemo, useState, type ReactNode } from 'react';
 import {
   GoogleAuthProvider,
   createUserWithEmailAndPassword,
@@ -21,9 +21,7 @@ import { DocEditor } from './components/DocEditor';
 import { Dashboard, PublishButton } from './components/Dashboard';
 import { SubmissionsPage } from './components/Submissions';
 import { CallsPage } from './components/Calls';
-import { LitmusPage } from './components/Litmus';
-import { EmailAlertsPage } from './components/EmailAlerts';
-import { GoogleMapsPage } from './components/GoogleMaps';
+import { ConnectionsPage } from './components/Connections';
 import { GreetingsPage } from './components/Greetings';
 import { AdminsPage } from './components/Admins';
 import { CentreHeadPage } from './components/CentreHead';
@@ -31,25 +29,29 @@ import { CentreHeadPage } from './components/CentreHead';
 type Role = Session['role'];
 const BOTH: Role[] = ['admin', 'branch'];
 
-/** The panel's pages. `roles` says who sees each one (full admins only, unless listed). */
-const NAV: { href: string; icon: string; label: string; roles?: Role[] }[] = [
-  { href: '#/', icon: 'LayoutDashboard', label: 'Dashboard', roles: BOTH },
-  { href: '#/site', icon: 'Settings', label: 'Site settings' },
-  { href: '#/branches', icon: 'Building', label: 'Branches' },
-  { href: '#/programs', icon: 'BookMarked', label: 'Programs' },
-  { href: '#/jobs', icon: 'Briefcase', label: 'Jobs' },
-  { href: '#/testimonials', icon: 'Quote', label: 'Testimonials' },
-  { href: '#/posts', icon: 'Newspaper', label: 'Blog', roles: BOTH },
-  { href: '#/greetings', icon: 'Gift', label: 'Festival greetings' },
-  { href: '#/centre', icon: 'Building', label: 'Your branch', roles: ['branch'] },
-  { href: '#/sections', icon: 'LayoutList', label: 'Page sections' },
-  { href: '#/submissions', icon: 'Inbox', label: 'Submissions' },
-  { href: '#/calls', icon: 'Phone', label: 'Calls' },
-  { href: '#/litmus', icon: 'Plug', label: 'LITMUS' },
-  { href: '#/email-alerts', icon: 'Mail', label: 'Email alerts' },
-  { href: '#/google-maps', icon: 'MapPin', label: 'Google Maps' },
-  { href: '#/admins', icon: 'UserCog', label: 'Admins' },
+/**
+ * The panel's pages, in groups for the sidebar. `roles` says who sees each one (full admins only, unless listed);
+ * a group with nothing left for someone isn't shown to them.
+ */
+const NAV: { href: string; icon: string; label: string; group: string; roles?: Role[] }[] = [
+  { href: '#/', icon: 'LayoutDashboard', label: 'Dashboard', group: '', roles: BOTH },
+  { href: '#/site', icon: 'Settings', label: 'Site settings', group: 'Website' },
+  { href: '#/sections', icon: 'LayoutList', label: 'Page sections', group: 'Website' },
+  { href: '#/branches', icon: 'Building', label: 'Branches', group: 'Website' },
+  { href: '#/centre', icon: 'Building', label: 'Your branch', group: 'Website', roles: ['branch'] },
+  { href: '#/programs', icon: 'BookMarked', label: 'Programs', group: 'Website' },
+  { href: '#/jobs', icon: 'Briefcase', label: 'Jobs', group: 'Website' },
+  { href: '#/posts', icon: 'Newspaper', label: 'Blog', group: 'Stories', roles: BOTH },
+  { href: '#/greetings', icon: 'Gift', label: 'Festival greetings', group: 'Stories' },
+  { href: '#/testimonials', icon: 'Quote', label: 'Testimonials', group: 'Stories' },
+  { href: '#/submissions', icon: 'Inbox', label: 'Submissions', group: 'Enquiries' },
+  { href: '#/calls', icon: 'Phone', label: 'Calls', group: 'Enquiries' },
+  { href: '#/connections', icon: 'Plug', label: 'Connections', group: 'Settings' },
+  { href: '#/admins', icon: 'UserCog', label: 'Admins', group: 'Settings' },
 ];
+
+/** Pages that moved into Connections: old links still open them there. */
+const MOVED: Record<string, string> = { litmus: 'litmus', 'email-alerts': 'email-alerts', 'google-maps': 'google-maps' };
 
 function useRoute() {
   const read = () => window.location.hash.replace(/^#\/?/, '').split('/').filter(Boolean);
@@ -229,6 +231,10 @@ function Shell() {
   const [menuOpen, setMenuOpen] = useState(false);
   const [section = '', id] = route;
   useEffect(() => setMenuOpen(false), [section, id]);
+  // Old addresses of the pages now on Connections (bookmarks, links in emails) open the right tab.
+  useEffect(() => {
+    if (MOVED[section]) window.location.replace(`#/connections/${MOVED[section]}`);
+  }, [section]);
   const nav = NAV.filter((n) => (n.roles ?? ['admin']).includes(role));
 
   const page = (() => {
@@ -268,12 +274,8 @@ function Shell() {
         return <SubmissionsPage id={id} />;
       case 'calls':
         return <CallsPage />;
-      case 'litmus':
-        return <LitmusPage />;
-      case 'email-alerts':
-        return <EmailAlertsPage />;
-      case 'google-maps':
-        return <GoogleMapsPage />;
+      case 'connections':
+        return <ConnectionsPage tab={id} />;
       case 'greetings':
         return <GreetingsPage />;
       case 'admins':
@@ -293,13 +295,16 @@ function Shell() {
           <span>Website admin</span>
         </a>
         <nav aria-label="Admin">
-          {nav.map((n) => {
+          {nav.map((n, i) => {
             const active = n.href === '#/' ? section === '' : `#/${section}` === n.href;
             return (
-              <a key={n.href} href={n.href} className={active ? 'active' : ''} aria-current={active ? 'page' : undefined}>
-                <Icon name={n.icon} />
-                {n.label}
-              </a>
+              <Fragment key={n.href}>
+                {n.group && n.group !== nav[i - 1]?.group && <span className="nav-group">{n.group}</span>}
+                <a href={n.href} className={active ? 'active' : ''} aria-current={active ? 'page' : undefined}>
+                  <Icon name={n.icon} />
+                  {n.label}
+                </a>
+              </Fragment>
             );
           })}
         </nav>

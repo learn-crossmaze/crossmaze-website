@@ -174,7 +174,7 @@ function AdminDashboard() {
           <span className="stat-value">{newCount ?? '–'}</span>
           <span>new submissions to follow up</span>
         </a>
-        <a className="card stat" href="#/litmus">
+        <a className="card stat" href="#/connections/litmus">
           <span className={`stat-value ${problems ? 'warn' : ''}`}>{problems ?? '–'}</span>
           <span>submissions not delivered to LITMUS</span>
         </a>
