@@ -245,6 +245,10 @@ async function withNewFields(db, name, data) {
 // while Firestore still holds the old value, so anything an editor changed in the admin panel is kept.
 // Previews apply updates in memory only; deploys from main (--add-missing) also save them to Firestore and
 // record each update in meta/contentUpdates so it is applied once.
+//
+// A change can also add a new item to a collection: { doc: "posts/<slug>", add: { …the whole item } }. It is added
+// only while no item has that id, so a post written in the repository (as a hidden draft) reaches the admin panel
+// once, and deleting it there later is final. Its photos are copied to Cloud Storage like any other.
 
 const PHOTO = /\.(jpe?g|png|webp|gif|avif)$/i;
 const canonical = (v) =>
@@ -296,7 +300,9 @@ class ContentUpdates {
     this.pending = list.filter((u) => !applied[u.id]);
     /** @type {Map<string, Record<string, unknown>>} document path -> fields to save */
     this.writes = new Map();
-    this.report = Object.fromEntries(this.pending.map((u) => [u.id, { changed: 0, current: 0, kept: [], seen: new Set() }]));
+    /** @type {Map<string, Record<string, unknown>>} document path -> new item to create */
+    this.creates = new Map();
+    this.report = Object.fromEntries(this.pending.map((u) => [u.id, { changed: 0, added: 0, current: 0, kept: [], seen: new Set() }]));
   }
 
   /** The content updates in content/updates/, oldest first. */
@@ -323,6 +329,8 @@ class ContentUpdates {
       update.changes.forEach((change, i) => {
         if (change.doc !== docPath) return;
         report.seen.add(i);
+        // A new item that is already there (added by an earlier deploy, or made in the admin panel).
+        if (change.add) return void (report.current += 1);
         const as = comparable[`${docPath} ${change.field}`] ?? ((v) => v);
         const now = as(getPath(data, change.field) ?? null);
         if (samePhotos(now, as(change.to))) report.current += 1;
@@ -339,6 +347,29 @@ class ContentUpdates {
   }
 
   /**
+   * The new items the pending updates add to a collection that has none with their id yet, numbered after the
+   * items it has (`order`).
+   */
+  additions(collection, docs) {
+    const ids = new Set(docs.map((d) => d.id));
+    let order = Math.max(-1, ...docs.map((d) => Number(d.order) || 0));
+    const out = [];
+    for (const update of this.pending) {
+      update.changes.forEach((change, i) => {
+        const [name, id, ...rest] = String(change.doc).split('/');
+        if (!change.add || name !== collection || !id || rest.length || ids.has(id)) return;
+        this.report[update.id].seen.add(i);
+        this.report[update.id].added += 1;
+        ids.add(id);
+        const item = { ...structuredClone(change.add), order: (order += 1) };
+        this.creates.set(change.doc, item);
+        out.push({ id, ...item });
+      });
+    }
+    return out;
+  }
+
+  /**
    * Logs what happened and, when `save` is set, writes the changes and marks the updates as applied.
    * Photos in the new values (repo paths such as "facilities/fire-safe.jpg") are first copied to
    * Cloud Storage, so the admin panel can show and replace them, just as seeding does.
@@ -349,6 +380,7 @@ class ContentUpdates {
       const missing = update.changes.filter((_, i) => !r.seen.has(i)).map((c) => c.doc);
       console.log(
         `Content update ${update.id}: ${r.changed} field(s) ${save ? 'updated' : 'updated for this preview only'}` +
+          `${r.added ? `, ${r.added} new item(s) ${save ? 'added' : 'added for this preview only'}` : ''}` +
           `${r.current ? `, ${r.current} already up to date` : ''}` +
           `${r.kept.length ? `, ${r.kept.length} kept as edited in the admin panel (${r.kept.join('; ')})` : ''}` +
           `${missing.length ? `, ${missing.length} skipped because the item no longer exists (${[...new Set(missing)].join(', ')})` : ''}.`,
@@ -358,6 +390,11 @@ class ContentUpdates {
     for (const [docPath, fields] of this.writes) {
       for (const [field, value] of Object.entries(fields)) fields[field] = await withStoredPhotos(value, (p) => uploadPhoto(bucket, p));
       await db.doc(docPath).update(fields);
+    }
+    for (const [docPath, item] of this.creates) {
+      const [name] = docPath.split('/');
+      // create() refuses an id that appeared since the pull, so nothing made in the admin panel is overwritten.
+      await db.doc(docPath).create(await mapImages(name, item, (p) => uploadPhoto(bucket, p)));
     }
     const applied = Object.fromEntries(
       this.pending.map((u) => [u.id, { appliedAt: FieldValue.serverTimestamp(), changed: this.report[u.id].changed, kept: this.report[u.id].kept }]),
@@ -432,6 +469,7 @@ async function pull(db, bucket) {
       }
     }
     docs ??= snap.docs.map((d) => ({ id: d.id, ...updates.apply(`${name}/${d.id}`, d.data()) }));
+    docs.push(...updates.additions(name, docs));
     docs = docs
       // Hidden blog posts are kept as drafts: they are built only at their private preview address.
       .filter((d) => d.hidden !== true || name === 'posts')

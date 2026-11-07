@@ -1,0 +1,497 @@
+{
+  "id": "2026-11-07-parenting-posts",
+  "description": "Six new parenting blog posts as hidden drafts",
+  "changes": [
+    {
+      "doc": "posts/choosing-a-preschool",
+      "add": {
+        "slug": "choosing-a-preschool",
+        "title": "Choosing a preschool: what to look for and what to ask",
+        "date": "2026-11-07",
+        "category": "tips",
+        "template": "tips",
+        "summary": "Visiting preschools? What to look for in the rooms, the questions worth asking, and why your own gut feeling counts.",
+        "cover": "blog/choosing-a-preschool/teacher-children-mat.jpg",
+        "coverAlt": "A teacher kneels on a rainbow floor mat with three young children, matching picture cards of fruit and vegetables in a bright classroom",
+        "intro": "A three-year-old kneels by a low shelf, chooses a tray of wooden pegs and carries it, very carefully, to a mat. Nobody told her to. Small moments like this tell you more about a preschool than any brochure, and you only see them by visiting, so here is what to look for and what to ask when you do.",
+        "sections": [
+          {
+            "heading": "Start with safety and hygiene",
+            "text": "Most of this you can check with your own eyes. Walk through the rooms slowly, and look at them from a child's height as well as your own.\n\n- Who can come in, and how does the school check who collects each child?\n- Are sockets covered, sharp corners softened and heavy shelves fixed to the wall?\n- Are the toilets and wash basins child-sized, clean and easy to reach?\n- Where does drinking water come from, and where is food kept and served?\n- Are staff trained in first aid, and what happens if a child falls ill during the day?\n\nDon't feel awkward asking to see the toilets or the eating area. A good school will be glad you asked.",
+            "photo": "",
+            "caption": ""
+          },
+          {
+            "heading": "Watch how the day is spent",
+            "text": "Ask for a typical day, then see whether the rooms match it. Young children need a steady rhythm: time to move, time to sit and listen, time to eat and rest, and plenty of time to play.\n\n- What does a morning look like, from arrival to home time?\n- How much time do children spend outdoors or moving about, and what happens on rainy days?\n- Is there a quiet corner for a child who needs a break?\n- How are snack times handled? Do children learn to open their own tiffin boxes, serve themselves and wash their hands?\n\nLook at the walls too. Children's own drawings, each a little different, say more than rows of identical crafts that a grown-up clearly finished.",
+            "photo": "",
+            "caption": ""
+          },
+          {
+            "heading": "Look for play, not piles of worksheets",
+            "text": "Children under five learn best by seeing and doing. Counting buttons into a bowl, pouring water from one jug to another, or building a tower that falls and trying again teaches more than tracing numbers on a sheet.\n\nAsk how the school introduces early letters and numbers. Listen for words like **hands-on**, **materials**, **themes** and **projects**. If a three-year-old brings home written homework every day, ask why.\n\nIt is fair to want your child ready for big school. Good play-based learning gets them there: it builds concentration, language, the hand strength they will need for writing, and the confidence to have a go.",
+            "photo": "blog/choosing-a-preschool/play-blocks.jpg",
+            "caption": "Wooden alphabet blocks spelling out PLAY. At this age, simple hands-on materials teach more than worksheets."
+          },
+          {
+            "heading": "Ask about the teachers",
+            "text": "Warm, unhurried teachers matter more than anything else on this list. Watch how they speak to children. Do they kneel to a child's eye level, use names and wait for the answer? Do they stay calm with a child who is upset?\n\nQuestions worth asking:\n\n- How many children are in each class, and how many adults are with them through the day?\n- What training do the teachers and helpers have?\n- How long have most of the staff been here?\n- Who does a child go to when they are hurt or sad?\n\nRather than looking for one magic number, ask the school to explain its class sizes and adult-to-child ratios, and why they suit each age. Then check that what you hear matches what you see in the room.",
+            "photo": "",
+            "caption": ""
+          },
+          {
+            "heading": "Ask how settling in works",
+            "text": "Starting preschool is a big change, and most children need time. Ask how the first week or two are planned.\n\n- Can a parent or grandparent stay for part of the first few days?\n- Do new children start with shorter hours?\n- How will the teacher let you know how your child is coping?\n- What happens when a child cries at drop-off?\n\nA school with a clear, gentle plan that doesn't rush you or your child understands that children settle and learn at their own pace.",
+            "photo": "blog/choosing-a-preschool/toy-car-play.jpg",
+            "caption": "A small child kneels on a soft rug, playing with a red toy truck. Time for free play helps a new place feel familiar."
+          },
+          {
+            "heading": "Find out how the school talks to parents",
+            "text": "You will be handing over your child for several hours a day, so you need to know what happens in that time.\n\n- How will I hear about my child's day: a diary, an app, a quick chat at pick-up?\n- How often do parents and teachers meet?\n- If something goes wrong, how soon will I be told, and by whom?\n- Is there CCTV, and who is allowed to see it?\n\nOpen, honest schools answer these easily. At Crossmaze, for example, families have a parents' app, and day-care parents can see a live CCTV view. Whatever the school, if an answer feels vague, ask again.",
+            "photo": "",
+            "caption": ""
+          },
+          {
+            "heading": "Trust your gut feeling",
+            "text": "Before you leave, stand quietly in a classroom for five minutes. Are the children busy and absorbed? Is there a happy hum, rather than silence or chaos? Do they turn to their teachers easily? Can you picture your own child here?\n\nYou know your child best. If a place looks perfect on paper but doesn't feel right, that feeling counts. If it does feel right, that counts too.\n\nWe'd love you to bring this list to a Crossmaze centre. Book a visit to one of our five centres in Electronic City and Begur, look around for yourself, and ask us every question on it.",
+            "photo": "",
+            "caption": ""
+          }
+        ],
+        "quote": {
+          "text": "You know your child best. If a place looks perfect on paper but doesn't feel right, that feeling counts.",
+          "by": ""
+        },
+        "takeaways": [
+          "Check safety and hygiene with your own eyes",
+          "Look for hands-on play, not stacks of worksheets",
+          "Ask about class sizes and ratios, and watch the teachers",
+          "Look for a gentle settling-in plan and open, honest communication",
+          "Trust how the room feels"
+        ],
+        "author": {
+          "name": "The Crossmaze team",
+          "role": "",
+          "photo": ""
+        },
+        "cta": {
+          "label": "Book a school visit",
+          "link": "/contact#enquire"
+        },
+        "hidden": true,
+        "previewKey": "0de4c8a9d0164f3f"
+      }
+    },
+    {
+      "doc": "posts/screens-and-little-ones",
+      "add": {
+        "slug": "screens-and-little-ones",
+        "title": "Screens and little ones: a calm, guilt-free guide",
+        "date": "2026-11-06",
+        "category": "tips",
+        "template": "classic",
+        "summary": "What the WHO actually recommends for under-fives, plus easy swaps, screen-free zones and rainy-day ideas for a busy Indian home.",
+        "cover": "blog/screens-and-little-ones/children-on-steps.jpg",
+        "coverAlt": "A group of smiling young children sitting together on stone steps outside a house with a blue wooden door",
+        "intro": "It is late afternoon, it has been raining since lunch, the pressure cooker is whistling and your three-year-old wants one more video. If that sounds familiar, you are not alone, and this is not a guide to feeling guilty. It is a handful of small, realistic changes that make screens a smaller part of the day.",
+        "sections": [
+          {
+            "heading": "What the guidance actually says",
+            "text": "In 2019 the World Health Organization published guidelines on physical activity, sedentary behaviour and sleep for children under five. On screens, they are short and clear:\n\n- **Under 1 year:** screen time is not recommended.\n- **1 year:** sedentary screen time, such as watching TV or videos or playing computer games, is not recommended.\n- **2 to 4 years:** no more than one hour a day of sedentary screen time, and less is better.\n\nThe same guidelines encourage reading and storytelling with a caregiver whenever a young child is sitting still. Think of the hour as a ceiling, not a target.\n\nThese guidelines cover children under five, so they give no number for five- and six-year-olds. The same spirit is a sensible guide, and your paediatrician can help you decide what suits your child.",
+            "photo": "",
+            "caption": ""
+          },
+          {
+            "heading": "Swap, don't just switch off",
+            "text": "Taking a screen away leaves a gap, and a bored toddler will fill it loudly. It works better to have something ready to put in its place:\n\n- **Instead of a video at breakfast:** let your child help by counting idlis onto plates or stirring the batter.\n- **Instead of cartoons while you cook:** a small ball of chapati dough of their own to roll, poke and shape beside you.\n- **Instead of a phone in the car:** play I spy with colours, count red buses or sing the rhymes they know.\n- **Instead of a tablet at the clinic:** a small pouch with a board book, a notepad and two chunky crayons.\n- **Instead of a show to wind down:** the same short story every night. Repetition is comforting at this age.",
+            "photo": "",
+            "caption": ""
+          },
+          {
+            "heading": "Make some places screen-free",
+            "text": "Rules about places are easier to keep than rules about minutes, because nobody has to watch the clock. Two good places to start:\n\n- **Meal times.** Without a screen, a meal becomes a time to taste, chat and notice when the tummy is full. A plate of dal and rice eaten slowly, with the family talking, teaches a lot.\n- **Bedrooms.** Keep TVs, tablets and phones out of the room where your child sleeps, and switch screens off a while before bed so the evening can slow down.",
+            "photo": "",
+            "caption": ""
+          },
+          {
+            "heading": "When the screen is on, sit with them",
+            "text": "Some screen time is part of modern family life. When it happens, a few habits make it gentler:\n\n1. Choose slow, simple programmes with a real story over fast, noisy ones, and turn off autoplay.\n2. Watch together when you can, and talk about it: **“Why do you think the elephant looked sad?”**\n3. Agree on the end before you start, such as two episodes and then hand-washing for dinner, and give a five-minute warning.\n4. Prefer the living-room TV to a phone held close to the face, so it stays a shared, visible activity.",
+            "photo": "",
+            "caption": ""
+          },
+          {
+            "heading": "Bring grandparents and helpers along",
+            "text": "In many homes, children spend long hours with grandparents or a nanny while parents work. Screens often appear because they are the easiest way through a long afternoon, not because anyone is careless. Talk it through kindly rather than handing over a list of rules:\n\n- Explain the why, and share the WHO guidance in your own words.\n- Ask for their ideas. Grandparents often know more rhymes, stories and games than any app.\n- Leave easy options within reach: a basket of books, some play-dough, a ball.\n- Agree on one or two rules everyone keeps, such as no screens at meals.\n\nMany families see a video call with a grandparent who lives far away as different from cartoons, because the child is talking and listening to someone they love. That is your family's choice to make.",
+            "photo": "",
+            "caption": ""
+          },
+          {
+            "heading": "Children copy what they see",
+            "text": "Little ones watch us far more closely than they watch any screen. If they see a parent scrolling at the dinner table, they learn that phones belong there. Try leaving your own phone in another room during meals and for the first hour after you come home.\n\nWhen you do pick it up, say what you are doing: **“I'm checking when Ajji's bus arrives.”** It shows that a phone is a tool you use for a reason, then put down.",
+            "photo": "",
+            "caption": ""
+          },
+          {
+            "heading": "A rainy afternoon without the tablet",
+            "text": "Bengaluru's rain can keep everyone indoors for hours. Keep this list on the fridge:\n\n1. **Paper boats.** Fold them together, then float them in a bucket of water. Stay right beside your child; even a little water needs an adult close by.\n2. **Kitchen band.** Steel plates, wooden spoons and a shaker made from a small box of rice, taped firmly shut. March and sing.\n3. **Painting.** Spread old newspaper on the floor and paint with fingers or a thick brush, using washable, child-safe paints.\n4. **Bedsheet fort.** Drape a sheet over two chairs to make a cave for reading by torchlight.\n5. **Rain watching.** Sit by the window, race the drops down the glass and name the sounds you hear.\n6. **Animal yoga.** Be a cat, a cobra, then a tree, holding each pose for three slow breaths.\n\nKeep small things such as beads and dry beans away from under-threes, as they can cause choking. Keep button batteries well out of reach of all young children: the NHS warns they can cause severe internal burns if swallowed.",
+            "photo": "blog/screens-and-little-ones/painting-hands.jpg",
+            "caption": "Children's paint-covered hands over a shared sheet of paper. Messy, hands-on play can fill a long indoor afternoon."
+          },
+          {
+            "heading": "Be kind to yourself",
+            "text": "Some days will have more screen time than you planned: a fever, a work deadline, a long journey. That is normal. What matters is the pattern across weeks, not one hard afternoon. Pick one change from this list, try it for a week, and add another when it feels easy.\n\nAt Crossmaze, our Montessori-based approach is built on visual, practical, hands-on learning, because children under five learn best by seeing and doing. The same is true at home: a lump of dough, a stack of blocks and a grown-up who joins in go a long way.",
+            "photo": "",
+            "caption": ""
+          }
+        ],
+        "quote": {
+          "text": "Think of the hour as a ceiling, not a target.",
+          "by": ""
+        },
+        "takeaways": [
+          "Under two: no sedentary screen time, says the WHO",
+          "Two to four: an hour a day at most, less is better",
+          "Keep meals and bedrooms screen-free",
+          "Have a swap ready before you switch off",
+          "Watch together, and model the habits you want"
+        ],
+        "author": {
+          "name": "The Crossmaze team",
+          "role": "",
+          "photo": ""
+        },
+        "cta": {
+          "label": "Book a school visit",
+          "link": "/contact#enquire"
+        },
+        "hidden": true,
+        "previewKey": "252f1e343e0221bb"
+      }
+    },
+    {
+      "doc": "posts/happy-mealtimes-choosy-eaters",
+      "add": {
+        "slug": "happy-mealtimes-choosy-eaters",
+        "title": "Happy mealtimes with a choosy eater",
+        "date": "2026-11-05",
+        "category": "tips",
+        "template": "tips",
+        "summary": "Calm, no-pressure ideas for the child who pushes the beans to the side: small portions, eating together and a colourful thali.",
+        "cover": "blog/happy-mealtimes-choosy-eaters/chapati-sambar.jpg",
+        "coverAlt": "Folded chapatis beside a mixed vegetable sambar in a steel plate",
+        "intro": "The dal is going cold, the chapati has been torn into twenty pieces and not one has been eaten. If mealtimes with your little one feel like a daily tug of war, you are not alone, and a calmer table usually helps more than a cleverer trick.",
+        "sections": [
+          {
+            "heading": "Take the pressure off",
+            "text": "Choosy eating is common in the toddler and preschool years. The NHS, the UK's health service, says it is perfectly normal for toddlers to refuse new foods, and that it helps to look at what your child eats over a week rather than in a single day. Tastes change, too.\n\nA helpful way to share the job: **you decide what is served, when and where; your child decides whether to eat it and how much.** This idea, called the division of responsibility, comes from the American dietitian Ellyn Satter. It lets you stop counting mouthfuls and lets your child listen to their own hunger.",
+            "photo": "",
+            "caption": ""
+          },
+          {
+            "heading": "Small portions, offered again and again",
+            "text": "A full plate can look like a mountain to a three-year-old. Start with a spoonful of each thing and let them ask for more.\n\nIf a food is refused, don't make a fuss and don't give up on it. The NHS says it may take lots of attempts before a child accepts some foods. Put two or three green peas or a thin slice of carrot on the plate again next week, and the week after. Touching, smelling and licking a food all count as progress.",
+            "photo": "blog/happy-mealtimes-choosy-eaters/vegetable-flower-plate.jpg",
+            "caption": "Crinkle-cut carrot, sweetcorn and peas laid out as a flower on a white plate"
+          },
+          {
+            "heading": "Serve a familiar food alongside a new one",
+            "text": "New foods feel safer next to old friends. Put a little of something new beside a food your child already enjoys, so there is always something on the plate they are happy to eat.\n\n- A spoon of beans palya next to their favourite curd rice\n- A small piece of beetroot or palak chapati beside a plain one\n- One mini idli with a new chutney, and the usual sambar too",
+            "photo": "",
+            "caption": ""
+          },
+          {
+            "heading": "Eat together when you can",
+            "text": "Children copy what they see. The NHS calls copying you the best way for a child to learn to enjoy new foods. When parents, grandparents or older cousins sit down and eat the same food, a child is more likely to try it than when they eat alone.\n\nYou don't need a family dinner every night. Even one shared meal a day, or a weekend breakfast of dosa together, gives your child a chance to watch you eat, talk about the food and see that new tastes are nothing to worry about.",
+            "photo": "blog/happy-mealtimes-choosy-eaters/toddler-high-chair.jpg",
+            "caption": "A parent offers a spoonful to a little one in a high chair. Sharing the table, even briefly, makes meals feel sociable."
+          },
+          {
+            "heading": "Let them wash, mix and help",
+            "text": "Children are much more curious about food they have touched. Give your little one a real job in the kitchen:\n\n- Wash tomatoes or rinse spinach leaves in a bowl of water\n- Tear coriander or curry leaves\n- Stir curd into rice, or mix a dosa topping\n- Roll a small ball of chapati dough\n\nAt Crossmaze we believe children under five learn best by seeing and doing, and the kitchen is a lovely place for it. **Safety first:** keep little hands away from the stove, hot oil, pressure cookers and knives, and stay beside them the whole time.",
+            "photo": "",
+            "caption": ""
+          },
+          {
+            "heading": "No bribes, no screens at the table",
+            "text": "\"Two more bites and you can have a chocolate\" can work tonight, but it teaches that vegetables are a chore and sweets are the prize. The NHS advises against using food as a reward; a trip to the park or a game together works better.\n\nScreens are tempting too, because a child watching cartoons will open their mouth without thinking. But a distracted child is less likely to notice the taste, or when they are full. Keep phones and the TV off at meals, for grown-ups as well, and talk about the food instead: its colour, its crunch, where it came from.",
+            "photo": "",
+            "caption": ""
+          },
+          {
+            "heading": "Keep regular meal and snack times",
+            "text": "A child who has been nibbling biscuits all afternoon won't be hungry for dinner. The NHS suggests three meals a day for young children, with up to two healthy snacks in between. A simple, regular rhythm like this helps your child come to the table hungry.\n\nGood snacks can be simple: a banana, a few pieces of guava, a small bowl of poha or a slice of chapati with ghee. **Choking safety:** the NHS advises cutting small, round foods such as grapes and cherry tomatoes into quarters, and not giving whole nuts to children under five. Have your child sit down to eat, and stay with them while they do.",
+            "photo": "",
+            "caption": ""
+          },
+          {
+            "heading": "Make a colourful thali",
+            "text": "A steel thali with small katoris turns a meal into a little adventure. Fill a few with bright, simple foods and let your child choose where to start.\n\n- Orange: steamed carrot sticks or a piece of pumpkin\n- Green: cucumber slices or a spoon of peas\n- Yellow: dal or a little lemon rice\n- White: curd or a mini idli\n- Red: pomegranate seeds or beetroot\n\nName the colours together and count the katoris. Some days your child will only eat the yellow ones, and that is fine. Exploring is part of learning, and every child gets there at their own pace.",
+            "photo": "",
+            "caption": ""
+          },
+          {
+            "heading": "When to talk to your paediatrician",
+            "text": "Most choosy eating is a phase, but do speak to your child's paediatrician if:\n\n- They are losing weight, or you are worried about their growth\n- They eat only a very small number of foods, or are dropping foods they used to eat\n- They often gag, choke or have trouble chewing or swallowing\n- They seem unwell or very tired, or mealtimes cause them real distress\n\nYour doctor can check their growth and tell you whether anything more is needed. If you are unsure, it is always fine to ask.",
+            "photo": "",
+            "caption": ""
+          }
+        ],
+        "quote": {
+          "text": "Touching, smelling and licking a food all count as progress.",
+          "by": ""
+        },
+        "takeaways": [
+          "Keep the table calm and pressure-free",
+          "Offer small portions, and offer new foods again and again",
+          "Eat together and let your child help in the kitchen",
+          "No bribes and no screens at meals",
+          "Ask your paediatrician if you are worried about weight or growth"
+        ],
+        "author": {
+          "name": "The Crossmaze team",
+          "role": "",
+          "photo": ""
+        },
+        "cta": {
+          "label": "Book a school visit",
+          "link": "/contact#enquire"
+        },
+        "hidden": true,
+        "previewKey": "9859ef6155c6c4d0"
+      }
+    },
+    {
+      "doc": "posts/body-safety-safe-and-unsafe-touch",
+      "add": {
+        "slug": "body-safety-safe-and-unsafe-touch",
+        "title": "Safe and unsafe touch: talking to young children about body safety",
+        "date": "2026-11-04",
+        "category": "tips",
+        "template": "classic",
+        "summary": "Simple, calm words and everyday habits that help children aged two to six understand body safety and know they can always tell you.",
+        "cover": "blog/body-safety-safe-and-unsafe-touch/walking-hand-in-hand.jpg",
+        "coverAlt": "A small child walking between two adults and holding both their hands, seen from behind on a sunny road",
+        "intro": "Bath time, a cuddle with a cousin, a visit to the doctor: everyday moments give us easy ways to teach children about their bodies. Body safety doesn't need one big, scary talk. It grows from small, calm conversations that tell your child their body belongs to them and they can always tell you anything.",
+        "sections": [
+          {
+            "heading": "Start with the right words",
+            "text": "Teach the real names for every part of the body, private parts included, in the same matter-of-fact voice you use for elbow or knee. The UK children's charity NSPCC, in its PANTS guide for parents, says it is good to use the correct names if you are comfortable doing so. A child who has the words can tell you clearly if something is wrong, and words said without embarrassment send a quiet message: this is not a shameful subject, and you can talk to me about it.\n\nPet names are sweet, but they can confuse a teacher, a doctor or a grandparent who is trying to understand what a child means. Bath time and getting dressed are natural moments to practise.",
+            "photo": "",
+            "caption": ""
+          },
+          {
+            "heading": "The swimsuit rule",
+            "text": "A simple way to explain private parts is the swimsuit rule: **the parts of your body that a swimsuit covers are private.** The Council of Europe's Underwear Rule and the NSPCC's PANTS guide use the same idea, with underwear in place of a swimsuit. Explain it plainly:\n\n- Nobody should touch your private parts, or ask to see them\n- Nobody should ask you to touch or look at theirs\n- Nobody should show you pictures or videos of private parts\n\nThen explain the exceptions, so the rule makes sense in real life. While your child is small, mum, dad or a carer you have chosen may help with washing or the toilet. A doctor or nurse may need to check, with mum or dad there; they should explain why and ask first.\n\nYou can describe a **safe touch** as one that feels kind and okay, like a high five, holding hands to cross the road, or a hug they wanted. An **unsafe touch** is one that hurts, feels confusing or uncomfortable, touches private parts, or comes with a request to keep it secret. Make it clear that the rule is the same for everyone, including people your child knows and loves.",
+            "photo": "",
+            "caption": ""
+          },
+          {
+            "heading": "Surprises, not secrets",
+            "text": "Young children find the difference between a surprise and a secret easy to grasp. A surprise is something happy that everyone finds out soon, like a birthday present for Appa or a cake for Ajji. A secret is something someone tells you never to share.\n\nMake it a family rule: **we have surprises, not secrets.** If any grown-up or older child ever asks your child to keep a secret from you, they should tell you, and they will never be in trouble for it. This one habit takes away a tool that people who harm children often rely on.",
+            "photo": "",
+            "caption": ""
+          },
+          {
+            "heading": "Hugs are a choice",
+            "text": "Consent starts with everyday affection. If your child doesn't want to hug an uncle at a family function or sit on a neighbour's lap, let them say no. Offer another way to greet people: a wave, a namaste or a high five. It can feel awkward in front of relatives, but a quiet word to grandparents beforehand usually helps.\n\nPractise both sides. Stop tickling the moment your child says stop, and ask before you hug them now and then. Teach them to ask a friend, \"Can I hug you?\" and to accept a no. Children whose no is respected at home learn that their voice counts.",
+            "photo": "",
+            "caption": ""
+          },
+          {
+            "heading": "Choose trusted adults together",
+            "text": "Help your child name three to five grown-ups they could go to if they felt unsafe or worried: perhaps mum and dad, a grandparent, an aunt, and their class teacher. Count them on one hand together. Remind your child that if one adult doesn't listen, they should keep telling the next one until someone helps.\n\nPractise saying no in a strong, clear voice, then walking away and telling. A little role-play makes it feel like a skill rather than a fear: \"What would you do if someone asked you to keep a secret?\"",
+            "photo": "blog/body-safety-safe-and-unsafe-touch/grandparent-path.jpg",
+            "caption": "A grown-up and a small child walking hand in hand along a path beside the grass, seen from behind."
+          },
+          {
+            "heading": "What to say at each age",
+            "text": "Keep it short, repeat it often and go at your child's pace.\n\n- **Two to three:** name the body parts at bath time, use \"stop means stop\" during play, and say \"your body belongs to you\"\n- **Three to four:** introduce the swimsuit rule and the difference between surprises and secrets, and name trusted adults together\n- **Four to six:** role-play saying no and telling, talk about touches that feel confusing, and remind them that rules about bodies apply to everyone, even people they know",
+            "photo": "",
+            "caption": ""
+          },
+          {
+            "heading": "If your child tells you something",
+            "text": "How you react in the first few minutes matters most. Stay as calm as you can, even if you feel shaken inside.\n\n1. Listen, and let your child use their own words\n2. Believe them, and tell them so\n3. Thank them for telling you, and say it is not their fault\n4. Don't press them with lots of questions or promise to keep it secret\n5. Get help the same day\n\nIn India, you can call the free Child Helpline on 1098, day or night. If a child is in danger right now, call 112, the national emergency number. Talk to your paediatrician too; they can check your child and point you to the right support.",
+            "photo": "",
+            "caption": ""
+          },
+          {
+            "heading": "Keep the conversation going",
+            "text": "Body safety works best as a quiet thread through ordinary days, not a single lecture. Read a picture book about feelings, ask \"How did that make you feel?\" after a playdate, and notice when your child speaks up for themselves.\n\nA good preschool will be happy to talk to you about how it keeps children safe. At Crossmaze we want every child to feel cherished and respected, and we are happy to answer your questions about safety when you visit.",
+            "photo": "",
+            "caption": ""
+          }
+        ],
+        "quote": {
+          "text": "Children whose no is respected at home learn that their voice counts.",
+          "by": ""
+        },
+        "takeaways": [
+          "Use the real names for all body parts",
+          "Teach the swimsuit rule, with its exceptions",
+          "Have surprises, not secrets",
+          "Let hugs be a choice",
+          "Stay calm, believe your child and get help"
+        ],
+        "author": {
+          "name": "The Crossmaze team",
+          "role": "",
+          "photo": ""
+        },
+        "cta": {
+          "label": "Book a school visit",
+          "link": "/contact#enquire"
+        },
+        "hidden": true,
+        "previewKey": "aa12ddf680d41d2e"
+      }
+    },
+    {
+      "doc": "posts/big-feelings-little-people",
+      "add": {
+        "slug": "big-feelings-little-people",
+        "title": "Big feelings, little people: helping children name and manage emotions",
+        "date": "2026-11-03",
+        "category": "learning",
+        "template": "magazine",
+        "summary": "Meltdowns are a normal part of growing up. Calm, simple ways to help children aged 2 to 6 name their feelings and find their way back to calm.",
+        "cover": "blog/big-feelings-little-people/holding-hands.jpg",
+        "coverAlt": "Close-up of a small child’s hand holding an adult’s finger, with blurred green trees behind",
+        "intro": "The block tower falls, and a happy three-year-old turns into a storm of tears and stamping feet. Moments like this happen in every home and classroom. They are not a sign that anything is wrong; they are a chance to teach a skill your child will use for life.",
+        "sections": [
+          {
+            "heading": "Why little storms happen",
+            "text": "Young children feel things fully, but the part of them that says “wait, let’s think about this” is still being built. Harvard University’s Center on the Developing Child explains that the skills behind self-control start to develop soon after birth, grow especially fast between about three and five years old, and keep developing through the teenage years into early adulthood.\n\nSo when a two-year-old melts down because the banana broke in half, or a five-year-old storms off after losing a game, they are not being naughty. Their feelings have simply run ahead of their skills. Our job is not to stop the feelings but to lend children our calm and, bit by bit, teach them what to do next.\n\nKnow the usual triggers too: hunger, tiredness, too much noise and sudden changes, such as leaving the park or turning off a cartoon. A snack, a rest or a five-minute warning prevents more storms than clever words afterwards.",
+            "photo": "",
+            "caption": ""
+          },
+          {
+            "heading": "Give the feeling a name",
+            "text": "Children can’t manage a feeling they have no words for. Naming it out loud, without judging it, is the first step: **“You’re really angry that the tower fell.”** It shows you understand, and slowly gives them words to use themselves.\n\nIt changes with age:\n\n- **2 to 3 years:** keep to a few simple words such as happy, sad, angry and scared, and say what you see: “You’re sad. Appa has gone to work.”\n- **3 to 4 years:** add words like frustrated, worried, excited and disappointed, and link them to a reason: “You’re frustrated because the zip is stuck.”\n- **4 to 6 years:** start asking instead of telling: “How did your body feel when that happened?” Children this age can begin to notice clues such as a hot face or tight fists.\n\nUse your home language too: feelings words in Kannada, Tamil, Hindi or English all count, and grandparents can join in.",
+            "photo": "",
+            "caption": ""
+          },
+          {
+            "heading": "Stay close, stay calm",
+            "text": "In the middle of a meltdown, a child is too upset to take in a lesson. This is the moment to say less and be there more.\n\n- Get down to your child’s level and keep your voice low and slow\n- Offer a hug, or simply sit nearby if they don’t want to be touched\n- Keep everyone safe: move breakable things and gently stop hitting or throwing\n- Hold the limit kindly: “I won’t let you hit. You can stamp your feet instead.”\n\nYour calm rubs off on your child, and so does your stress. If your own temper rises, take a slow breath first. Saying “I need a moment to calm down too” shows your child exactly what calming down looks like.\n\nIf parents and grandparents share the care, agree together on the same few words and the same response.",
+            "photo": "",
+            "caption": ""
+          },
+          {
+            "heading": "A calm corner and a few breathing games",
+            "text": "A calm corner is a cosy spot to settle down: a comfort, not a punishment. A floor cushion, a favourite soft toy and two or three picture books are enough. Set it up together on a happy day so it feels like your child’s own.\n\nSlow breathing can help the body settle, and children learn it best as a game. Practise when everyone is relaxed, so it is ready when feelings run high:\n\n1. **Smell the flower, blow the candle:** breathe in through the nose as if smelling a flower, then breathe out slowly as if blowing out a birthday candle.\n2. **Teddy ride:** lie down with a soft toy on the tummy and watch it rise and fall with each slow breath.\n3. **Bubble breath:** pretend to blow one big, slow bubble without popping it.\n4. **Hissing snake:** breathe in, then let the air out in a long, quiet “ssss”.\n\nKeep it to three or four breaths, and do them with your child rather than telling them to.",
+            "photo": "blog/big-feelings-little-people/teddy-bear.jpg",
+            "caption": "A favourite soft toy is a simple start for a calm corner, and a breathing buddy too."
+          },
+          {
+            "heading": "Feelings faces, drawings and stories",
+            "text": "Children learn about feelings most easily when they are not in the middle of one, so use calm, playful moments.\n\n- **Feelings faces:** draw simple happy, sad, angry and scared faces on paper plates or cards. Ask your child to point to the one that matches how they feel, or how a character in a story feels.\n- **Draw it out:** older children can draw a time they felt cross or proud and tell you about it.\n- **Picture books:** pause on a page and wonder aloud: “How do you think she feels? What could she do?” Stories let children try out big feelings from a safe distance.\n\nThis is learning by seeing and doing at its simplest, and children under five learn best that way.",
+            "photo": "blog/big-feelings-little-people/child-drawing.jpg",
+            "caption": "Drawing gives children a way to show a feeling they can’t yet put into words."
+          },
+          {
+            "heading": "After the storm",
+            "text": "Once your child is calm, reconnect before you teach. A cuddle, a sip of water and a quiet “That was a big feeling, wasn’t it?” mend the moment. Then talk briefly about what might help next time. With a two-year-old that might be one sentence; a five-year-old can help you make a plan.\n\nPraise the effort, not only the result: **“You took three big breaths and calmed your body. That was hard, and you did it.”** Children repeat what we notice.\n\nProgress is slow and uneven, and every child learns at their own pace. At Crossmaze, celebrating every milestone, big or small, is one of our core values, and learning to calm down after a big feeling is one of the big milestones of the early years. Notice the small wins at home too.\n\nIf meltdowns are very frequent or very long, if your child often hurts themselves or others, or if you are simply worried, talk to your paediatrician about what is typical for your child.",
+            "photo": "",
+            "caption": ""
+          }
+        ],
+        "quote": {
+          "text": "Our job is not to stop the feelings but to lend children our calm.",
+          "by": ""
+        },
+        "takeaways": [
+          "Meltdowns are normal: feelings grow faster than self-control",
+          "Name the feeling out loud, without judging it",
+          "Stay close, speak softly and keep everyone safe",
+          "Practise breathing games when everyone is calm",
+          "Reconnect first, then praise the effort"
+        ],
+        "author": {
+          "name": "The Crossmaze team",
+          "role": "",
+          "photo": ""
+        },
+        "cta": {
+          "label": "Book a school visit",
+          "link": "/contact#enquire"
+        },
+        "hidden": true,
+        "previewKey": "a81f9d130efef83d"
+      }
+    },
+    {
+      "doc": "posts/learning-in-everyday-moments",
+      "add": {
+        "slug": "learning-in-everyday-moments",
+        "title": "Learning hides in everyday moments at home",
+        "date": "2026-11-02",
+        "category": "learning",
+        "template": "magazine",
+        "summary": "Pouring water, counting idlis, matching socks: simple jobs at home that build maths, language and independence, with ideas for ages 2 to 6.",
+        "cover": "blog/learning-in-everyday-moments/shelling-peas.jpg",
+        "coverAlt": "A young child's hands holding a fresh pea pod, with more pods resting on their lap",
+        "intro": "Watch a two-year-old pour water from a small jug into a steel tumbler: the tongue pokes out, the whole body goes still, and a little splash lands on the tray. That is real learning, and your home is full of moments like it.",
+        "sections": [
+          {
+            "heading": "Why small jobs are big learning",
+            "text": "Pouring, sorting, wiping and carrying look like simple chores to us. To a young child they are puzzles to solve with hands, eyes and the whole body. Maria Montessori called this kind of work practical life, and it is still a core part of Montessori classrooms today.\n\nEach small job quietly builds something:\n\n- **Fine motor control:** pouring, pinching pegs and shelling peas work the same small hand muscles a child will later use to hold a crayon and a pencil\n- **Early maths:** counting, matching, and sorting by colour or size\n- **Language:** new words for what they see, touch and smell\n- **Concentration:** a task with a clear beginning and end holds attention\n- **Independence:** the quiet pride of “I did it myself”\n\nAt Crossmaze, learning is Montessori-based, practical and hands-on, because children under five learn best by seeing and doing. Home is a natural place to keep that going.",
+            "photo": "",
+            "caption": ""
+          },
+          {
+            "heading": "In the kitchen",
+            "text": "The kitchen is full of real work, and children love real work.\n\n- **Pouring:** put a small steel jug with a little water and a tumbler on a tray. Spills are part of the lesson, so keep a cloth nearby and show how to wipe up\n- **Counting idlis:** “How many idlis for Appa? How many for you?” Count them onto the plates, then count again as they disappear\n- **Sorting vegetables:** potatoes in one basket, onions in another, tomatoes in a third. Ask which is the heaviest, the smoothest, the biggest\n- **Washing and picking:** rinsing fruit, shelling peas or picking coriander leaves off the stalks is slow, satisfying work for busy fingers\n\nTalk while you cook. Name what you are doing (“I’m stirring the dal”, “Look, the chapati is puffing up”), ask what they can smell, and let them guess what comes next. This easy running chatter is one of the simplest ways to give a child new words.",
+            "photo": "blog/learning-in-everyday-moments/strawberries-counter.jpg",
+            "caption": "A small hand reaching for strawberries on a chopping board by the kitchen sink. Rinsing fruit is a good first kitchen job."
+          },
+          {
+            "heading": "Around the house",
+            "text": "- **Laundry by colour:** before clothes go into the machine, sort them into piles of whites, darks and colours. Later, hunt for everything blue\n- **Matching socks:** a basket of clean socks is a ready-made matching game. Pair them, count the pairs and find the odd one out\n- **Laying the table:** one plate, one tumbler and one spoon for each person. It is counting with a purpose, and it tells a child they are helping the family\n- **Putting things back:** a low shelf or basket for toys and shoes means a child can tidy up without help\n\nGrandparents at home are often wonderful at this: patient, unhurried and full of stories to tell while the work gets done.",
+            "photo": "",
+            "caption": ""
+          },
+          {
+            "heading": "Balcony, garden and the shops",
+            "text": "- **Watering plants:** a small mug or watering can, one pot at a time. Talk about which plant looks thirsty and how the soil changes after a Bengaluru shower\n- **Counting steps:** count the stairs up to your flat or the steps to the gate. Count backwards on the way down for a challenge\n- **A picture shopping list:** draw or cut out pictures of tomatoes, bananas and milk. Your child holds the list and ticks off each item at the shop\n- **Noticing:** the colours at the vegetable cart, the numbers on the gates, the shapes of leaves on the walk home",
+            "photo": "blog/learning-in-everyday-moments/planting-seedling.jpg",
+            "caption": "A child pressing soil around a young plant. Looking after plants teaches patience and gentle hands."
+          },
+          {
+            "heading": "Ideas by age",
+            "text": "Every child learns at their own pace, so treat these as starting points rather than milestones.\n\n**Two to three years**\n\n- Pour water between two small jugs over a tray\n- Put spoons in the drawer and socks in the basket\n- Name vegetables as you unpack the shopping\n- Water one plant with a small mug\n\n**Three to four years**\n\n- Sort laundry or vegetables by colour\n- Match socks and count the pairs\n- Count idlis, chapatis or stairs up to ten\n- Lay the table for two or three people\n\n**Four to six years**\n\n- Help plan a meal and make a picture shopping list\n- Share things out fairly: “Six biscuits, three people. How many each?”\n- Measure rice or dal with a cup for cooking\n- Look after a plant of their own and notice how it changes each week",
+            "photo": "",
+            "caption": ""
+          },
+          {
+            "heading": "Keeping it safe and calm",
+            "text": "- Stay close whenever water is involved, and never leave a small child alone with a bucket or tub of water\n- Keep little ones away from the hob, hot pans, pressure cookers and sharp knives\n- Choose objects too big to fit in a small child's mouth, and watch closely when food is part of the job. The American Academy of Pediatrics advises keeping high-risk foods such as whole grapes, nuts, popcorn and chunks of raw vegetable or fruit away from children until at least age four\n- Keep cleaning products and medicines out of reach, even when your child is “helping”\n- Go slowly and expect some mess. A job done imperfectly with pride is worth more than one done perfectly by you\n\nIf you are unsure what suits your child, talk to your paediatrician.",
+            "photo": "",
+            "caption": ""
+          }
+        ],
+        "quote": {
+          "text": "A job done imperfectly with pride is worth more than one done perfectly by you.",
+          "by": ""
+        },
+        "takeaways": [
+          "Everyday jobs build hands, maths, words and focus",
+          "Start small: one job, one tray, a few minutes",
+          "Talk as you work to give your child new words",
+          "Match the job to your child's age and stay close"
+        ],
+        "author": {
+          "name": "The Crossmaze team",
+          "role": "",
+          "photo": ""
+        },
+        "cta": {
+          "label": "Book a school visit",
+          "link": "/contact#enquire"
+        },
+        "hidden": true,
+        "previewKey": "40740d2e0f587fcf"
+      }
+    }
+  ]
+}
