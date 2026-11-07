@@ -8,6 +8,10 @@
 // photos) are left out, and so are new or removed items, which belong in the admin panel. Photos inside
 // a list that changes as a whole (such as each facility's photo) are included; the deploy that saves
 // the update copies them to Cloud Storage first.
+//
+// A new blog post in content/posts.json becomes { doc: "posts/<slug>", add: { …the post } }: the deploy adds it to
+// the admin panel once (keep it "hidden": true, so it starts as a draft with its preview link). Other new or removed
+// items are left out; they belong in the admin panel.
 import { execFileSync } from 'node:child_process';
 import fs from 'node:fs';
 import path from 'node:path';
@@ -22,7 +26,15 @@ if (!id || !/^[a-z0-9-]+$/.test(id) || !description) {
 
 const IMAGE_FIELDS = new Set(['logo', 'photo', 'photos', 'image', 'aboutPhoto', 'daycarePhoto', 'moments', 'hero.photos', 'centerHead.photo']);
 const SKIP = new Set(['order', 'hidden', 'slug']);
-const COLLECTIONS = { branches: (b) => b.slug, programs: (p) => p.slug, jobs: (j) => j.slug, testimonials: (_, i) => `t${String(i + 1).padStart(3, '0')}` };
+const COLLECTIONS = {
+  branches: (b) => b.slug,
+  programs: (p) => p.slug,
+  jobs: (j) => j.slug,
+  testimonials: (_, i) => `t${String(i + 1).padStart(3, '0')}`,
+  posts: (p) => p.slug,
+};
+/** Collections whose new items are carried over whole. */
+const ADDABLE = new Set(['posts']);
 
 const before = (name) => JSON.parse(execFileSync('git', ['show', `${ref}:content/${name}.json`], { cwd: root, encoding: 'utf8' }));
 const after = (name) => JSON.parse(fs.readFileSync(path.join(root, 'content', `${name}.json`), 'utf8'));
@@ -50,7 +62,10 @@ for (const [name, keyOf] of Object.entries(COLLECTIONS)) {
   const old = new Map(before(name).map((item, i) => [keyOf(item, i), item]));
   after(name).forEach((item, i) => {
     const key = keyOf(item, i);
-    if (!old.has(key)) console.warn(`New ${name} item "${key}" is not included: add it in the admin panel.`);
+    if (!old.has(key) && ADDABLE.has(name)) {
+      if (item.hidden !== true) console.warn(`New ${name} item "${key}" is not hidden: it goes live with the next deploy.`);
+      changes.push({ doc: `${name}/${key}`, add: item });
+    } else if (!old.has(key)) console.warn(`New ${name} item "${key}" is not included: add it in the admin panel.`);
     else changes.push(...diff(`${name}/${key}`, old.get(key), item));
   });
 }
@@ -58,4 +73,5 @@ for (const [name, keyOf] of Object.entries(COLLECTIONS)) {
 const file = path.join(root, 'content', 'updates', `${id}.json`);
 fs.mkdirSync(path.dirname(file), { recursive: true });
 fs.writeFileSync(file, `${JSON.stringify({ id, description, changes }, null, 2)}\n`);
-console.log(`Wrote ${path.relative(root, file)} with ${changes.length} field change(s).`);
+const added = changes.filter((c) => c.add).length;
+console.log(`Wrote ${path.relative(root, file)} with ${changes.length - added} field change(s)${added ? ` and ${added} new item(s)` : ''}.`);
