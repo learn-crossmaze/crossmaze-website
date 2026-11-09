@@ -64,12 +64,15 @@ service cloud.firestore {
       // They may look up an address nobody has used yet, to check it's free.
       allow get: if isBranchAdmin() && (resource == null || resource.data.createdBy == email());
       allow list: if isBranchAdmin() && resource.data.createdBy == email();
+      // reviewRequested (the email review of drafts written in the repository) is set only by the deploy.
       allow create: if isBranchAdmin()
         && request.resource.data.createdBy == email()
+        && !('reviewRequested' in request.resource.data)
         && slug.matches('^[a-z0-9]+(-[a-z0-9]+)*$');
       allow update: if isBranchAdmin()
         && resource.data.createdBy == email()
-        && request.resource.data.createdBy == email();
+        && request.resource.data.createdBy == email()
+        && !('reviewRequested' in request.resource.data);
       allow delete: if isBranchAdmin() && resource.data.createdBy == email();
     }
 
@@ -121,6 +124,11 @@ service cloud.firestore {
     }
 
     match /ratelimits/{id} {
+      allow read, write: if false;
+    }
+
+    // Email review links for blog drafts (a hash of each link's secret), used only by the functions.
+    match /reviews/{slug} {
       allow read, write: if false;
     }
   }

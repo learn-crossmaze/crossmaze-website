@@ -65,6 +65,12 @@ test('posts the email with the token', async () => {
     await sendEmail({ ...config, token: 'Zoho-enczapikey xyz', fromName: 'Crossmaze' }, message);
     assert.equal(zepto.received[1].headers.authorization, 'Zoho-enczapikey xyz');
     assert.equal(zepto.received[1].body.from.name, 'Crossmaze');
+    // Tracking is left to the account's settings, except for emails whose links hold a secret.
+    assert.equal('track_clicks' in body, false);
+    await sendEmail(config, { ...message, noTracking: true });
+    assert.equal(zepto.received[2].body.track_clicks, false);
+    assert.equal(zepto.received[2].body.track_opens, false);
+    assert.equal('noTracking' in zepto.received[2].body, false);
   } finally {
     zepto.server.close();
   }

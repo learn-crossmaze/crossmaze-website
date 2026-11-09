@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import { addDoc, collection, deleteDoc, doc, getDoc, setDoc, writeBatch } from 'firebase/firestore';
 import { clean, markChanged, same, useCollection, useImageUrl, type WithId } from '../data';
 import { slugify, type CollectionConfig } from '../schemas';
@@ -211,6 +211,14 @@ function ItemEditor({ config, item }: { config: CollectionConfig; item: Item }) 
   const { id, ...stored } = item;
   const [draft, setDraft] = useState<Obj>(stored);
   const [saving, setSaving] = useState(false);
+  // "Hide from website" changed elsewhere while this was open (a blog draft approved from the email, or another
+  // admin): take the new value unless it was changed here too, so a later Save doesn't quietly undo it.
+  const storedHidden = useRef(stored.hidden);
+  useEffect(() => {
+    const before = storedHidden.current;
+    storedHidden.current = stored.hidden;
+    if (before !== stored.hidden) setDraft((d) => (d.hidden === before ? { ...d, hidden: stored.hidden } : d));
+  }, [stored.hidden]);
   const dirty = !same(forStorage(config.schema, draft, true), forStorage(config.schema, stored, true));
   useUnsavedWarning(dirty);
 

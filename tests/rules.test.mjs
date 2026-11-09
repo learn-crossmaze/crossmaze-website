@@ -92,6 +92,7 @@ test('admins can edit content, submissions, LITMUS and email settings', async ()
   await assertSucceeds(getDoc(doc(db, 'meta/publish')));
   await assertFails(setDoc(doc(db, 'meta/publish'), { status: 'live' }));
   await assertFails(getDoc(doc(db, 'ratelimits/x')));
+  await assertFails(getDoc(doc(db, 'reviews/x')));
 });
 
 test('people can check their own admin entry; only admins manage the list', async () => {
@@ -142,6 +143,8 @@ test('branch admins write and publish only their own blog posts', async () => {
   await assertFails(setDoc(doc(db, 'posts/as-someone-else'), { title: 'X', hidden: true, createdBy: ADMIN }));
   await assertFails(setDoc(doc(db, 'posts/no-owner'), { title: 'X', hidden: true }));
   await assertFails(setDoc(doc(db, 'posts/Bad Address'), { title: 'X', hidden: true, createdBy: HEAD }));
+  await assertFails(setDoc(doc(db, 'posts/review-me'), { title: 'X', hidden: true, createdBy: HEAD, reviewRequested: true }));
+  await assertFails(updateDoc(doc(db, 'posts/neotown-post'), { reviewRequested: true }));
   await assertSucceeds(setDoc(doc(db, 'posts/neotown-post'), { title: 'By Neotown', hidden: false, createdBy: HEAD }));
   await assertFails(updateDoc(doc(db, 'posts/neotown-post'), { createdBy: ADMIN }));
   await assertFails(updateDoc(doc(db, 'posts/school-post'), { title: 'Changed' }));

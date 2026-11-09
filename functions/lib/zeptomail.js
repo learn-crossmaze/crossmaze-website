@@ -29,7 +29,8 @@ export function isZeptoUrl(url) {
 /**
  * Sends one email.
  * @param {{ enabled?: boolean, url?: string, token?: string, fromAddress?: string, fromName?: string } | undefined} config
- * @param {{ to: string[], subject: string, html: string, text: string }} message
+ * @param {{ to: string[], subject: string, html: string, text: string, noTracking?: boolean }} message
+ *   noTracking: no open or click tracking, so links holding a secret aren't rewritten or kept by Zoho
  * @param {typeof fetch} [fetchImpl]
  * @returns {Promise<{ status: 'sent' | 'failed' | 'not_configured', httpStatus?: number, error?: string }>}
  */
@@ -44,6 +45,7 @@ export async function sendEmail(config, message, fetchImpl = fetch) {
     subject: message.subject,
     htmlbody: message.html,
     textbody: message.text,
+    ...(message.noTracking ? { track_clicks: false, track_opens: false } : {}),
   };
   try {
     const res = await fetchImpl(config.url || DEFAULT_URL, {

@@ -393,8 +393,12 @@ class ContentUpdates {
     }
     for (const [docPath, item] of this.creates) {
       const [name] = docPath.split('/');
+      const data = await mapImages(name, item, (p) => uploadPhoto(bucket, p));
+      // A hidden post from the repository asks for review: the admins get an email with a link to publish it
+      // (announceDraft in functions/index.js).
+      if (name === 'posts' && data.hidden === true) data.reviewRequested = true;
       // create() refuses an id that appeared since the pull, so nothing made in the admin panel is overwritten.
-      await db.doc(docPath).create(await mapImages(name, item, (p) => uploadPhoto(bucket, p)));
+      await db.doc(docPath).create(data);
     }
     const applied = Object.fromEntries(
       this.pending.map((u) => [u.id, { appliedAt: FieldValue.serverTimestamp(), changed: this.report[u.id].changed, kept: this.report[u.id].kept }]),
@@ -476,7 +480,7 @@ async function pull(db, bucket) {
       .sort((a, b) => (a.order ?? 0) - (b.order ?? 0));
     out[name] = [];
     for (const doc of docs) {
-      const { id, order, hidden, updatedAt, ...rest } = doc;
+      const { id, order, hidden, updatedAt, reviewRequested, ...rest } = doc;
       const item = normalize[name](name === 'testimonials' ? rest : { ...rest, slug: rest.slug || id });
       if (name === 'posts' && hidden === true) item.hidden = true;
       check(name, item, `${name.replace(/s$/, '')} "${item.name ?? item.title ?? id}"`);
