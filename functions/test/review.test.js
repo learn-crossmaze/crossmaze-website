@@ -6,6 +6,7 @@ import {
   donePage,
   hashToken,
   linkState,
+  versionOf,
   messagePage,
   newToken,
   reviewEmail,
@@ -15,7 +16,8 @@ import {
 } from '../lib/review.js';
 
 const token = newToken();
-const review = (extra = {}) => ({ tokenHash: hashToken(token), status: 'emailed', expiresAt: { toMillis: () => Date.now() + 1000 }, ...extra });
+const V = versionOf({ seconds: 1794053000, nanoseconds: 12345 });
+const review = (extra = {}) => ({ tokenHash: hashToken(token), postVersion: V, status: 'emailed', expiresAt: { toMillis: () => Date.now() + 1000 }, ...extra });
 const draft = { title: 'Calm <bedtimes>', summary: 'Sleep & "routines"', previewKey: '0123456789abcdef', hidden: true };
 
 test('review links carry a long random secret, stored only as a hash', () => {
@@ -37,17 +39,22 @@ test('malformed links are refused before anything is looked up', () => {
   assert.equal(validLink(undefined, token), false);
 });
 
-test('a link publishes only a hidden draft, once, before it expires', () => {
-  assert.equal(linkState(review(), draft, token), 'ok');
-  assert.equal(linkState(undefined, draft, token), 'invalid');
-  assert.equal(linkState(review(), draft, newToken()), 'invalid');
-  assert.equal(linkState(review(), undefined, token), 'gone');
-  assert.equal(linkState(review({ status: 'approved' }), draft, token), 'used');
-  assert.equal(linkState(review(), { ...draft, hidden: false }, token), 'live');
-  assert.equal(linkState(review({ expiresAt: { toMillis: () => Date.now() - 1 } }), draft, token), 'expired');
-  assert.equal(linkState(review({ expiresAt: undefined }), draft, token), 'expired');
+test('a link publishes only the hidden draft it was sent for, once, before it expires', () => {
+  assert.equal(V, '1794053000.000012345');
+  assert.equal(versionOf(undefined), '');
+  assert.equal(linkState(review(), draft, token, V), 'ok');
+  assert.equal(linkState(undefined, draft, token, V), 'invalid');
+  assert.equal(linkState(review(), draft, newToken(), V), 'invalid');
+  assert.equal(linkState(review(), undefined, token, ''), 'gone');
+  assert.equal(linkState(review({ status: 'approved' }), draft, token, V), 'used');
+  assert.equal(linkState(review(), { ...draft, hidden: false }, token, V), 'live');
+  // Edited, published and hidden again, or deleted and made again since the email: a different version.
+  assert.equal(linkState(review(), draft, token, versionOf({ seconds: 1794053999, nanoseconds: 0 })), 'changed');
+  assert.equal(linkState(review({ postVersion: undefined }), draft, token, V), 'changed');
+  assert.equal(linkState(review({ expiresAt: { toMillis: () => Date.now() - 1 } }), draft, token, V), 'expired');
+  assert.equal(linkState(review({ expiresAt: undefined }), draft, token, V), 'expired');
   // A wrong secret never learns anything about the post.
-  assert.equal(linkState(review({ status: 'approved' }), undefined, newToken()), 'invalid');
+  assert.equal(linkState(review({ status: 'approved' }), undefined, newToken(), ''), 'invalid');
 });
 
 test('the email links to the review page and the preview, with the text escaped', () => {
@@ -60,6 +67,8 @@ test('the email links to the review page and the preview, with the text escaped'
   assert.ok(email.html.includes('Sleep &amp; &quot;routines&quot;'));
   assert.ok(!email.html.includes('<bedtimes>'));
   assert.ok(email.html.includes(`t=${token}`));
+  // Zoho must not rewrite (and keep) the secret link for click tracking.
+  assert.equal(email.noTracking, true);
 });
 
 test('the review page publishes only with a POST of the same link', () => {
@@ -70,7 +79,7 @@ test('the review page publishes only with a POST of the same link', () => {
   assert.ok(html.includes('Calm &lt;bedtimes&gt;'));
   assert.ok(html.includes('rel="noopener noreferrer"'));
   assert.ok(donePage(draft).includes('Calm &lt;bedtimes&gt;'));
-  for (const state of ['invalid', 'expired', 'used', 'live', 'gone', 'busy', 'failed', 'unknown']) {
+  for (const state of ['invalid', 'expired', 'used', 'live', 'gone', 'changed', 'busy', 'failed', 'unknown']) {
     assert.match(messagePage(state), /<h1>[^<]+<\/h1>/);
   }
 });

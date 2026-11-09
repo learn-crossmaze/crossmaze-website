@@ -2,7 +2,9 @@
 // adds it with `reviewRequested: true`, see scripts/sync-content.mjs), the full admins get an email with a
 // secret link. The link opens a small page with the post's summary, its preview and a "Publish this post"
 // button; only pressing the button (a POST) publishes, because email scanners open links by themselves.
-// Each link works once and for REVIEW_DAYS days. Only a hash of its token is stored (reviews/{slug}).
+// Each link works once, for REVIEW_DAYS days, and only for the draft exactly as it was emailed: any change to the
+// post since (edited, published and hidden again, deleted and made again) ends it. Only a hash of its token is
+// stored (reviews/{slug}), with the post's Firestore update time (postVersion).
 import { createHash, randomBytes, timingSafeEqual } from 'node:crypto';
 import { SITE } from './litmus.js';
 
@@ -31,16 +33,23 @@ export const reviewUrl = (slug, token) => `https://${SITE}${REVIEW_PATH}?post=${
 export const previewUrl = (previewKey) => `https://${SITE}/blog/preview/${encodeURIComponent(previewKey)}`;
 const adminUrl = `https://${SITE}/admin#/posts`;
 
+/** A Firestore Timestamp (or anything with toMillis, or a number) as milliseconds, else NaN. */
+const millis = (t) => (typeof t?.toMillis === 'function' ? t.toMillis() : typeof t === 'number' ? t : NaN);
+/** A snapshot's update time as a string that survives being stored (seconds and nanoseconds). */
+export const versionOf = (time) => (time && Number.isFinite(time.seconds) ? `${time.seconds}.${String(time.nanoseconds ?? 0).padStart(9, '0')}` : '');
+
 /**
- * Where a review link stands, from its stored record (reviews/{slug}) and the post itself.
- * @returns {'ok' | 'invalid' | 'expired' | 'used' | 'live' | 'gone'}
+ * Where a review link stands, from its stored record (reviews/{slug}), the post and the post's version (its
+ * snapshot's update time, versionOf).
+ * @returns {'ok' | 'invalid' | 'expired' | 'used' | 'live' | 'gone' | 'changed'}
  */
-export function linkState(review, post, token, now = Date.now()) {
+export function linkState(review, post, token, version, now = Date.now()) {
   if (!review || !tokenMatches(token, review.tokenHash)) return 'invalid';
   if (!post) return 'gone';
   if (review.status === 'approved') return 'used';
   if (post.hidden !== true) return 'live';
-  const expires = review.expiresAt?.toMillis?.() ?? Number(review.expiresAt);
+  if (!review.postVersion || review.postVersion !== version) return 'changed';
+  const expires = millis(review.expiresAt);
   if (!Number.isFinite(expires) || now > expires) return 'expired';
   return 'ok';
 }
@@ -55,7 +64,7 @@ export function reviewEmail(post, token) {
   const preview = post.previewKey ? previewUrl(post.previewKey) : '';
   const subject = `New blog draft to review: ${post.title}`;
   const intro = 'A new blog post is ready for you to review. It is a hidden draft: nobody else can see it until it is published.';
-  const after = `Publishing makes it visible on the website's blog within a few minutes. To change it first, edit it in the admin panel (Blog) and publish from there. This link works once and for ${REVIEW_DAYS} days.`;
+  const after = `Publishing makes it visible on the website's blog within a few minutes. To change it first, edit it in the admin panel (Blog) and publish from there (this link then stops working). It works once and for ${REVIEW_DAYS} days.`;
   const text = [
     intro,
     '',
@@ -75,7 +84,7 @@ export function reviewEmail(post, token) {
 ${preview ? `<p><a href="${escape(preview)}">See the preview</a> (ready a few minutes after this email)</p>` : ''}
 <p><a href="${escape(adminUrl)}">Edit it in the admin panel</a></p>
 <p style="color:#555;font-size:13px">${escape(after)}</p>`;
-  return { subject, html, text };
+  return { subject, html, text, noTracking: true };
 }
 
 const MESSAGES = {
@@ -84,6 +93,7 @@ const MESSAGES = {
   used: ['Already published', 'This post was published with this link. The website shows it a few minutes after publishing.'],
   live: ['Already on the website', 'This post is no longer a hidden draft, so there is nothing to approve.'],
   gone: ['Post not found', 'This post has been deleted from the admin panel.'],
+  changed: ['This draft has changed', 'The post was changed in the admin panel after this email was sent, so this link no longer publishes it. Check it in the admin panel (Blog) and publish it from there.'],
   busy: ['Please try again later', 'Too many attempts from this connection. Please wait a while, or publish the post from the admin panel (Blog).'],
   failed: ['Published, but the website didn’t update', 'The post is no longer hidden, but the website could not be rebuilt just now. Press Publish in the admin panel to update the website.'],
 };

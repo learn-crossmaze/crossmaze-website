@@ -29,7 +29,7 @@ import { defineSecret, defineString } from 'firebase-functions/params';
 import { logger } from 'firebase-functions';
 import { assertAdmin } from './lib/admin.js';
 import { litmusFailureEmail, testEmail } from './lib/alerts.js';
-import { REVIEW_DAYS, confirmPage, donePage, hashToken, linkState, messagePage, newToken, reviewEmail, validLink } from './lib/review.js';
+import { REVIEW_DAYS, confirmPage, donePage, hashToken, linkState, messagePage, newToken, reviewEmail, validLink, versionOf } from './lib/review.js';
 import { deviceOf, validateCall } from './lib/calls.js';
 import { isSpam, validateSubmission } from './lib/forms.js';
 import { buildPayload, sendToLitmus } from './lib/litmus.js';
@@ -50,6 +50,7 @@ const githubRef = defineString('GITHUB_REF', { default: 'main' });
 const RATE_LIMIT = { max: 8, windowMs: 60 * 60 * 1000 };
 const CALL_RATE_LIMIT = { max: 30, windowMs: 60 * 60 * 1000 };
 const REVIEW_RATE_LIMIT = { max: 20, windowMs: 60 * 60 * 1000 };
+const REVIEW_RETRY_MS = 60 * 60 * 1000;
 const MAX_LITMUS_ATTEMPTS = 6;
 // Nobody waits for the background sends (forwardSubmission, retryLitmus), so a slow LITMUS gets longer.
 const BACKGROUND_LITMUS_TIMEOUT_MS = 20 * 1000;
@@ -341,30 +342,48 @@ export const publishSite = onCall({ secrets: [githubToken] }, async (request) =>
   return { ok: true, actionsUrl: await startDeploy(email) };
 });
 
-export const announceDraft = onDocumentCreated({ document: 'posts/{slug}', timeoutSeconds: 60 }, async (event) => {
-  const post = event.data?.data();
-  // Only drafts the deploy added from the repository: posts written in the admin panel start hidden too.
-  if (!post || post.hidden !== true || post.reviewRequested !== true) return;
-  const slug = event.params.slug;
-  const ref = db.doc(`reviews/${slug}`);
-  const token = newToken();
-  // One email per post, even if the trigger runs twice.
-  const claimed = await db.runTransaction(async (tx) => {
-    if ((await tx.get(ref)).exists) return false;
-    tx.create(ref, {
-      tokenHash: hashToken(token),
-      status: 'emailing',
-      createdAt: FieldValue.serverTimestamp(),
-      expiresAt: new Date(Date.now() + REVIEW_DAYS * 24 * 60 * 60 * 1000),
+export const announceDraft = onDocumentCreated(
+  { document: 'posts/{slug}', timeoutSeconds: 60, retry: true },
+  async (event) => {
+    const post = event.data?.data();
+    // Only drafts the deploy added from the repository: posts written in the admin panel start hidden too, and a
+    // branch admin's own post (createdBy) never sends one.
+    if (!post || post.hidden !== true || post.reviewRequested !== true || post.createdBy) return;
+    const slug = event.params.slug;
+    // A failed send is retried (retry: true) for up to an hour, then left in the logs and on reviews/{slug}.
+    if (Date.now() - Date.parse(event.time) > REVIEW_RETRY_MS) {
+      logger.error('Blog review email given up', { slug });
+      return;
+    }
+    const version = versionOf(event.data.updateTime);
+    const ref = db.doc(`reviews/${slug}`);
+    const token = newToken();
+    // One email per post even if the trigger runs twice; a record left by an earlier post with this address is
+    // replaced (its link no longer matches anything).
+    const claimed = await db.runTransaction(async (tx) => {
+      const current = (await tx.get(ref)).data();
+      if (current?.postVersion === version) {
+        const stuck = current.status === 'emailing' && Date.now() - (current.claimedAt?.toMillis?.() ?? 0) > PENDING_GRACE_MS;
+        if (current.status !== 'email_failed' && !stuck) return false;
+      }
+      tx.set(ref, {
+        tokenHash: hashToken(token),
+        postVersion: version,
+        status: 'emailing',
+        claimedAt: FieldValue.serverTimestamp(),
+        expiresAt: new Date(Date.now() + REVIEW_DAYS * 24 * 60 * 60 * 1000),
+      });
+      return true;
     });
-    return true;
-  });
-  if (!claimed) return;
-  const [config, admins] = await Promise.all([emailConfig(), db.collection('admins').get()]);
-  const result = await sendEmail(config, { to: admins.docs.map((admin) => admin.id), ...reviewEmail({ slug, ...post }, token) });
-  await ref.update({ status: result.status === 'sent' ? 'emailed' : `email_${result.status}`, emailError: result.error ?? FieldValue.delete() });
-  if (result.status !== 'sent') logger.warn('Blog review email not sent', { slug, status: result.status, error: result.error });
-});
+    if (!claimed) return;
+    const [config, admins] = await Promise.all([emailConfig(), db.collection('admins').get()]);
+    const result = await sendEmail(config, { to: admins.docs.map((admin) => admin.id), ...reviewEmail({ ...post, slug }, token) });
+    await ref.update({ status: result.status === 'sent' ? 'emailed' : `email_${result.status}`, emailError: result.error ?? FieldValue.delete() });
+    // Not set up (or no admins): nothing to retry. A failed send is retried with a new link.
+    if (result.status === 'not_configured') logger.warn('Blog review email not sent: Email alerts are not set up', { slug });
+    if (result.status === 'failed') throw new Error(`Blog review email for ${slug} failed: ${result.error}`);
+  },
+);
 
 /** Sends an HTML page that is never cached, indexed or used as a referrer (its address holds the secret). */
 function sendPage(res, status, html) {
@@ -396,14 +415,14 @@ export const blogReview = onRequest({ secrets: [githubToken], memory: '256MiB', 
   const postRef = db.doc(`posts/${slug}`);
   if (req.method === 'GET') {
     const [review, post] = await Promise.all([reviewRef.get(), postRef.get()]);
-    const state = linkState(review.data(), post.data(), token);
+    const state = linkState(review.data(), post.data(), token, versionOf(post.updateTime));
     return state === 'ok' ? sendPage(res, 200, confirmPage(post.data(), slug, token)) : sendPage(res, state === 'invalid' ? 404 : 200, messagePage(state));
   }
 
   // POST: check again and unhide in one transaction, so a link is used once.
   const outcome = await db.runTransaction(async (tx) => {
     const [review, post] = await Promise.all([tx.get(reviewRef), tx.get(postRef)]);
-    const state = linkState(review.data(), post.data(), token);
+    const state = linkState(review.data(), post.data(), token, versionOf(post.updateTime));
     if (state !== 'ok') return { state };
     tx.update(postRef, { hidden: false });
     tx.update(reviewRef, { status: 'approved', approvedAt: FieldValue.serverTimestamp() });
