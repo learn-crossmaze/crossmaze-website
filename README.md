@@ -68,6 +68,8 @@ A post has an opening paragraph, then **sections** (a heading, text and an optio
 
 New posts start **hidden**. Each hidden post has a private **preview link** (at the top of the post in the admin panel) that shows it after you press **Publish**, so you can check it before anyone else sees it. When it's ready, untick “Hide from website” and press **Publish**. The blog is at /blog, the newest three posts show on the home page, and “Blog” appears in the menu once a post is published.
 
+**Drafts written for you, approved from email.** A scheduled Claude task writes a new parenting post on the 1st and 15th of each month (its topic list and rules are in the task itself; ask Claude to change them) and adds it as a hidden draft through a pull request it merges itself (see “A blog post written in the repository” below). When such a draft reaches the admin panel, every full admin gets an email (Email alerts must be set up, below) with the post's title, summary, preview and a **Review and publish** button. The button opens a page with the summary and a **Publish this post** button: pressing it unhides the post and publishes the website, the same as unticking “Hide from website” and pressing Publish. Opening the link alone changes nothing (email scanners open links by themselves). Each link works once and for 30 days, and only a hash of it is stored (`reviews/{slug}`, which only the functions can read). To change a draft first, edit it in the admin panel and publish from there; the email's link then says it is already on the website. Posts written in the admin panel send no email. The code is `announceDraft` and `blogReview` in `functions/index.js` and `functions/lib/review.js`.
+
 ### Founders
 
 **Site settings → About page → Founders** lists the founders, each with a name, a role (such as "Co-founder"; leave it empty for none), a photo (a square portrait works best; without one, their initials are shown), a photo description and a few lines about them. They appear on the About page, a card each, and in what search engines read about the school, only while **Show the founders on the About page** is switched on; while it is off (as it is now) the website leaves them out entirely. Founders entered before this editor existed are just names: they open in it with that name, and are saved with their details from the next save on.
@@ -289,6 +291,8 @@ The website doesn't wait for LITMUS: `submit` saves the submission (and the resu
 The form fields and validation live in `functions/lib/forms.js`; the delivery code is `functions/lib/litmus.js`.
 
 ### Email alerts (Zoho CPaaS)
+
+The same settings send the **blog draft review emails** (see Blog above).
 
 When a submission can't be sent to LITMUS, every full admin (admin panel → Admins, not branch admins) gets one email with everything the visitor filled in, the page and a link to Submissions, so the school can call them back while the website keeps trying. It is sent once per submission, not on every retry (again only if that email failed), and the submission's LITMUS card in Submissions says whether the admins were emailed. Alerts go through [Zoho CPaaS](https://www.zoho.com/cpaas/), Zoho's service for emails sent by websites and apps, called ZeptoMail until 2026 (accounts, Agents, keys and verified domains carried over). The code is `functions/lib/zeptomail.js` and `functions/lib/alerts.js`.
 

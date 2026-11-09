@@ -123,5 +123,10 @@ service cloud.firestore {
     match /ratelimits/{id} {
       allow read, write: if false;
     }
+
+    // Email review links for blog drafts (a hash of each link's secret), used only by the functions.
+    match /reviews/{slug} {
+      allow read, write: if false;
+    }
   }
 }

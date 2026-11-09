@@ -19,6 +19,10 @@
       {
         "source": "/api/submit",
         "function": { "functionId": "submit", "region": "asia-south1" }
+      },
+      {
+        "source": "/api/blog-review",
+        "function": { "functionId": "blogReview", "region": "asia-south1" }
       }
     ],
     "headers": [

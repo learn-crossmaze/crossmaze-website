@@ -13,6 +13,10 @@
 //                      deploy, which pulls the latest content from Firestore and rebuilds the site.
 //   retryLitmus        Every 30 minutes, retries submissions that failed to reach LITMUS (and any
 //                      that were never tried).
+//   announceDraft      When a blog draft written in the repository reaches Firestore (reviewRequested),
+//                      emails the full admins a link to review and publish it (lib/review.js).
+//   blogReview         GET/POST /api/blog-review (Hosting rewrite): the page that link opens, and its
+//                      "Publish this post" button, which unhides the post and starts the deploy.
 import { createHash, randomUUID } from 'node:crypto';
 import { initializeApp } from 'firebase-admin/app';
 import { FieldValue, getFirestore } from 'firebase-admin/firestore';
@@ -25,6 +29,7 @@ import { defineSecret, defineString } from 'firebase-functions/params';
 import { logger } from 'firebase-functions';
 import { assertAdmin } from './lib/admin.js';
 import { litmusFailureEmail, testEmail } from './lib/alerts.js';
+import { REVIEW_DAYS, confirmPage, donePage, hashToken, linkState, messagePage, newToken, reviewEmail, validLink } from './lib/review.js';
 import { deviceOf, validateCall } from './lib/calls.js';
 import { isSpam, validateSubmission } from './lib/forms.js';
 import { buildPayload, sendToLitmus } from './lib/litmus.js';
@@ -44,6 +49,7 @@ const githubRef = defineString('GITHUB_REF', { default: 'main' });
 
 const RATE_LIMIT = { max: 8, windowMs: 60 * 60 * 1000 };
 const CALL_RATE_LIMIT = { max: 30, windowMs: 60 * 60 * 1000 };
+const REVIEW_RATE_LIMIT = { max: 20, windowMs: 60 * 60 * 1000 };
 const MAX_LITMUS_ATTEMPTS = 6;
 // Nobody waits for the background sends (forwardSubmission, retryLitmus), so a slow LITMUS gets longer.
 const BACKGROUND_LITMUS_TIMEOUT_MS = 20 * 1000;
@@ -291,9 +297,12 @@ export const testEmailAlert = onCall(async (request) => {
   return sendEmail({ ...config, enabled: true }, { to: [email], ...testEmail(email) });
 });
 
-export const publishSite = onCall({ secrets: [githubToken] }, async (request) => {
-  // Branch admins publish too, so their blog posts and centre head changes reach the website.
-  const email = await assertAdmin(db, request, { branchAdmins: true });
+/**
+ * Starts the GitHub Actions deploy (which pulls the latest content from Firestore and rebuilds the site) and
+ * records it in meta/publish. Throws an HttpsError GitHub refuses.
+ * @param {string} requestedBy who asked (an admin's email, or how it was asked)
+ */
+async function startDeploy(requestedBy) {
   const repo = githubRepo.value();
   const res = await fetch(
     `https://api.github.com/repos/${repo}/actions/workflows/${githubWorkflow.value()}/dispatches`,
@@ -320,10 +329,96 @@ export const publishSite = onCall({ secrets: [githubToken] }, async (request) =>
   }
   const actionsUrl = `https://github.com/${repo}/actions/workflows/${githubWorkflow.value()}`;
   await db.doc('meta/publish').set(
-    { status: 'building', requestedAt: FieldValue.serverTimestamp(), requestedBy: email, actionsUrl },
+    { status: 'building', requestedAt: FieldValue.serverTimestamp(), requestedBy, actionsUrl },
     { merge: true },
   );
-  return { ok: true, actionsUrl };
+  return actionsUrl;
+}
+
+export const publishSite = onCall({ secrets: [githubToken] }, async (request) => {
+  // Branch admins publish too, so their blog posts and centre head changes reach the website.
+  const email = await assertAdmin(db, request, { branchAdmins: true });
+  return { ok: true, actionsUrl: await startDeploy(email) };
+});
+
+export const announceDraft = onDocumentCreated({ document: 'posts/{slug}', timeoutSeconds: 60 }, async (event) => {
+  const post = event.data?.data();
+  // Only drafts the deploy added from the repository: posts written in the admin panel start hidden too.
+  if (!post || post.hidden !== true || post.reviewRequested !== true) return;
+  const slug = event.params.slug;
+  const ref = db.doc(`reviews/${slug}`);
+  const token = newToken();
+  // One email per post, even if the trigger runs twice.
+  const claimed = await db.runTransaction(async (tx) => {
+    if ((await tx.get(ref)).exists) return false;
+    tx.create(ref, {
+      tokenHash: hashToken(token),
+      status: 'emailing',
+      createdAt: FieldValue.serverTimestamp(),
+      expiresAt: new Date(Date.now() + REVIEW_DAYS * 24 * 60 * 60 * 1000),
+    });
+    return true;
+  });
+  if (!claimed) return;
+  const [config, admins] = await Promise.all([emailConfig(), db.collection('admins').get()]);
+  const result = await sendEmail(config, { to: admins.docs.map((admin) => admin.id), ...reviewEmail({ slug, ...post }, token) });
+  await ref.update({ status: result.status === 'sent' ? 'emailed' : `email_${result.status}`, emailError: result.error ?? FieldValue.delete() });
+  if (result.status !== 'sent') logger.warn('Blog review email not sent', { slug, status: result.status, error: result.error });
+});
+
+/** Sends an HTML page that is never cached, indexed or used as a referrer (its address holds the secret). */
+function sendPage(res, status, html) {
+  res
+    .set({
+      'Cache-Control': 'no-store',
+      'X-Robots-Tag': 'noindex, nofollow',
+      'Referrer-Policy': 'no-referrer',
+      'X-Frame-Options': 'DENY',
+      'Content-Security-Policy': "default-src 'none'; style-src 'unsafe-inline'; form-action 'self'; base-uri 'none'; frame-ancestors 'none'",
+    })
+    .status(status)
+    .type('html')
+    .send(html);
+}
+
+export const blogReview = onRequest({ secrets: [githubToken], memory: '256MiB', timeoutSeconds: 30 }, async (req, res) => {
+  if (req.method !== 'GET' && req.method !== 'POST') {
+    res.set('Allow', 'GET, POST').status(405).send('Use GET or POST');
+    return;
+  }
+  const source = req.method === 'POST' ? (req.body ?? {}) : req.query;
+  const slug = typeof source.post === 'string' ? source.post : '';
+  const token = typeof source.t === 'string' ? source.t : '';
+  if (!(await withinRateLimit(`review:${req.ip ?? 'unknown'}`, REVIEW_RATE_LIMIT))) return sendPage(res, 429, messagePage('busy'));
+  if (!validLink(slug, token)) return sendPage(res, 400, messagePage('invalid'));
+
+  const reviewRef = db.doc(`reviews/${slug}`);
+  const postRef = db.doc(`posts/${slug}`);
+  if (req.method === 'GET') {
+    const [review, post] = await Promise.all([reviewRef.get(), postRef.get()]);
+    const state = linkState(review.data(), post.data(), token);
+    return state === 'ok' ? sendPage(res, 200, confirmPage(post.data(), slug, token)) : sendPage(res, state === 'invalid' ? 404 : 200, messagePage(state));
+  }
+
+  // POST: check again and unhide in one transaction, so a link is used once.
+  const outcome = await db.runTransaction(async (tx) => {
+    const [review, post] = await Promise.all([tx.get(reviewRef), tx.get(postRef)]);
+    const state = linkState(review.data(), post.data(), token);
+    if (state !== 'ok') return { state };
+    tx.update(postRef, { hidden: false });
+    tx.update(reviewRef, { status: 'approved', approvedAt: FieldValue.serverTimestamp() });
+    tx.set(db.doc('meta/content'), { updatedAt: FieldValue.serverTimestamp(), updatedBy: 'email approval' }, { merge: true });
+    return { state, post: post.data() };
+  });
+  if (outcome.state !== 'ok') return sendPage(res, outcome.state === 'invalid' ? 404 : 200, messagePage(outcome.state));
+  logger.info('Blog post approved by email', { slug });
+  try {
+    await startDeploy(`email approval (${slug})`);
+  } catch (err) {
+    logger.error('Deploy after email approval failed', { slug, err });
+    return sendPage(res, 200, messagePage('failed'));
+  }
+  return sendPage(res, 200, donePage(outcome.post));
 });
 
 export const retryLitmus = onSchedule({ schedule: 'every 30 minutes', timeoutSeconds: 900 }, async () => {

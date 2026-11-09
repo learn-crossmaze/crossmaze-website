@@ -92,6 +92,7 @@ test('admins can edit content, submissions, LITMUS and email settings', async ()
   await assertSucceeds(getDoc(doc(db, 'meta/publish')));
   await assertFails(setDoc(doc(db, 'meta/publish'), { status: 'live' }));
   await assertFails(getDoc(doc(db, 'ratelimits/x')));
+  await assertFails(getDoc(doc(db, 'reviews/x')));
 });
 
 test('people can check their own admin entry; only admins manage the list', async () => {
