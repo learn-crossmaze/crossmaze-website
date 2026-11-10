@@ -93,6 +93,10 @@ test('admins can edit content, submissions, LITMUS and email settings', async ()
   await assertFails(setDoc(doc(db, 'meta/publish'), { status: 'live' }));
   await assertFails(getDoc(doc(db, 'ratelimits/x')));
   await assertFails(getDoc(doc(db, 'reviews/x')));
+  // "Ask for a draft" requests: read and cleared by admins, written only by the function and the deploy.
+  await assertSucceeds(getDocs(collection(db, 'blogRequests')));
+  await assertFails(setDoc(doc(db, 'blogRequests/r1'), { concept: 'A post about sharing', status: 'writing' }));
+  await assertSucceeds(deleteDoc(doc(db, 'blogRequests/r1')));
 });
 
 test('people can check their own admin entry; only admins manage the list', async () => {
@@ -180,6 +184,8 @@ test('branch admins can see publish status and mark a change, and nothing else',
   await assertFails(setDoc(doc(db, 'programs/x'), { name: 'X' }));
   await assertFails(setDoc(doc(db, 'testimonials/x'), { quote: 'X' }));
   await assertFails(updateDoc(doc(db, 'submissions/s1'), { handled: true }));
+  await assertFails(getDocs(collection(db, 'blogRequests')));
+  await assertFails(deleteDoc(doc(db, 'blogRequests/r1')));
 });
 
 test('branch admins can check their own entry but not change the list', async () => {

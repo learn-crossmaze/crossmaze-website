@@ -2,6 +2,7 @@ import { useEffect, useRef, useState } from 'react';
 import { addDoc, collection, deleteDoc, doc, getDoc, setDoc, writeBatch } from 'firebase/firestore';
 import { clean, markChanged, same, useCollection, useImageUrl, type WithId } from '../data';
 import { slugify, type CollectionConfig } from '../schemas';
+import { DraftRequests } from './DraftRequests';
 import { Icon, SchemaForm, forStorage, formProblem } from './fields';
 import { ErrorBox, PageHeader, SITE_URL, Spinner, errorText, useSession, useToast, useUnsavedWarning } from './ui';
 
@@ -77,6 +78,7 @@ function ItemList({ config, items: stored }: { config: CollectionConfig; items: 
           </a>
         }
       />
+      {config.name === 'posts' && role === 'admin' && <DraftRequests />}
       {items.length === 0 ? (
         <div className="card empty">
           {role === 'branch' && config.owned ? `You haven’t written any ${config.singular}s yet.` : `No ${config.title.toLowerCase()} yet.`}

@@ -249,6 +249,8 @@ async function withNewFields(db, name, data) {
 // A change can also add a new item to a collection: { doc: "posts/<slug>", add: { …the whole item } }. It is added
 // only while no item has that id, so a post written in the repository (as a hidden draft) reaches the admin panel
 // once, and deleting it there later is final. Its photos are copied to Cloud Storage like any other.
+// With `request: "<id>"` beside `add`, the post answers an "Ask for a draft" request from the admin panel
+// (blogRequests/<id>), which is marked ready once the post is saved.
 
 const PHOTO = /\.(jpe?g|png|webp|gif|avif)$/i;
 const canonical = (v) =>
@@ -302,6 +304,8 @@ class ContentUpdates {
     this.writes = new Map();
     /** @type {Map<string, Record<string, unknown>>} document path -> new item to create */
     this.creates = new Map();
+    /** @type {Map<string, string>} new item's document path -> the "Ask for a draft" request it answers */
+    this.requests = new Map();
     this.report = Object.fromEntries(this.pending.map((u) => [u.id, { changed: 0, added: 0, current: 0, kept: [], seen: new Set() }]));
   }
 
@@ -363,6 +367,7 @@ class ContentUpdates {
         ids.add(id);
         const item = { ...structuredClone(change.add), order: (order += 1) };
         this.creates.set(change.doc, item);
+        if (typeof change.request === 'string' && /^[A-Za-z0-9]{16,32}$/.test(change.request)) this.requests.set(change.doc, change.request);
         out.push({ id, ...item });
       });
     }
@@ -399,6 +404,14 @@ class ContentUpdates {
       if (name === 'posts' && data.hidden === true) data.reviewRequested = true;
       // create() refuses an id that appeared since the pull, so nothing made in the admin panel is overwritten.
       await db.doc(docPath).create(data);
+      // The admin panel's "Ask for a draft" list shows the request as ready, with links to the draft.
+      const request = this.requests.get(docPath);
+      if (request) {
+        await db
+          .doc(`blogRequests/${request}`)
+          .update({ status: 'ready', slug: docPath.split('/')[1], previewKey: data.previewKey ?? '', readyAt: FieldValue.serverTimestamp() })
+          .catch((e) => console.warn(`Could not mark draft request ${request} as ready (${e.message}).`));
+      }
     }
     const applied = Object.fromEntries(
       this.pending.map((u) => [u.id, { appliedAt: FieldValue.serverTimestamp(), changed: this.report[u.id].changed, kept: this.report[u.id].kept }]),

@@ -15,6 +15,8 @@
 //                      that were never tried).
 //   announceDraft      When a blog draft written in the repository reaches Firestore (reviewRequested),
 //                      emails the full admins a link to review and publish it (lib/review.js).
+//   requestDraft       Admin panel → Blog → "Ask for a draft" (full admins): records what the post should be
+//                      about and starts the Claude task that writes it as a hidden draft (lib/blogRequest.js).
 //   blogReview         GET/POST /api/blog-review (Hosting rewrite): the page that link opens, and its
 //                      "Publish this post" button, which unhides the post and starts the deploy.
 import { createHash, randomUUID } from 'node:crypto';
@@ -30,6 +32,7 @@ import { logger } from 'firebase-functions';
 import { assertAdmin } from './lib/admin.js';
 import { litmusFailureEmail, testEmail } from './lib/alerts.js';
 import { REVIEW_DAYS, confirmPage, donePage, hashToken, linkState, messagePage, newToken, reviewEmail, validLink, versionOf } from './lib/review.js';
+import { cleanConcept, fireText, mayRequest, startProblem, startWriting } from './lib/blogRequest.js';
 import { deviceOf, validateCall } from './lib/calls.js';
 import { isSpam, validateSubmission } from './lib/forms.js';
 import { buildPayload, sendToLitmus } from './lib/litmus.js';
@@ -46,6 +49,11 @@ const githubToken = defineSecret('GITHUB_DISPATCH_TOKEN');
 const githubRepo = defineString('GITHUB_REPO', { default: 'learn-crossmaze/crossmaze-website' });
 const githubWorkflow = defineString('GITHUB_WORKFLOW', { default: 'firebase-hosting.yml' });
 const githubRef = defineString('GITHUB_REF', { default: 'main' });
+// The Claude scheduled task that writes blog drafts: its API trigger's address and token (README, "Ask for a draft").
+const blogWriterToken = defineSecret('BLOG_WRITER_TOKEN');
+const blogWriterUrl = defineString('BLOG_WRITER_URL', {
+  default: 'https://api.anthropic.com/v1/claude_code/routines/trig_01VVGpXZbDD4tsWPrH9nYUyz/fire',
+});
 
 const RATE_LIMIT = { max: 8, windowMs: 60 * 60 * 1000 };
 const CALL_RATE_LIMIT = { max: 30, windowMs: 60 * 60 * 1000 };
@@ -340,6 +348,30 @@ export const publishSite = onCall({ secrets: [githubToken] }, async (request) =>
   // Branch admins publish too, so their blog posts and centre head changes reach the website.
   const email = await assertAdmin(db, request, { branchAdmins: true });
   return { ok: true, actionsUrl: await startDeploy(email) };
+});
+
+export const requestDraft = onCall({ secrets: [blogWriterToken], timeoutSeconds: 60 }, async (request) => {
+  const email = await assertAdmin(db, request);
+  const cleaned = cleanConcept(request.data?.concept);
+  if (!cleaned.ok) throw new HttpsError('invalid-argument', cleaned.error);
+  const requests = db.collection('blogRequests');
+  const ref = requests.doc();
+  // The limits are checked and the request recorded together, so two admins asking at once can't both start.
+  const allowed = await db.runTransaction(async (tx) => {
+    const recent = await tx.get(requests.where('createdAt', '>=', new Date(Date.now() - 24 * 60 * 60 * 1000)));
+    const check = mayRequest(recent.docs.map((d) => ({ status: d.get('status'), at: d.get('createdAt')?.toMillis?.() ?? 0 })));
+    if (check.ok) tx.create(ref, { concept: cleaned.concept, requestedBy: email, createdAt: FieldValue.serverTimestamp(), status: 'writing' });
+    return check;
+  });
+  if (!allowed.ok) throw new HttpsError('resource-exhausted', allowed.error);
+  const started = await startWriting({ url: blogWriterUrl.value(), token: blogWriterToken.value() }, fireText(ref.id, cleaned.concept));
+  if (!started.ok) {
+    logger.error('Blog draft request could not be started', { id: ref.id, error: started.error });
+    await ref.update({ status: 'failed', error: started.error });
+    throw new HttpsError('failed-precondition', startProblem(started.error));
+  }
+  await ref.update({ sessionUrl: started.sessionUrl });
+  return { ok: true, id: ref.id };
 });
 
 export const announceDraft = onDocumentCreated(
