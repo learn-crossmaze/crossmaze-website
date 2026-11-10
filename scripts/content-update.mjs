@@ -11,7 +11,8 @@
 //
 // A new blog post in content/posts.json becomes { doc: "posts/<slug>", add: { …the post } }: the deploy adds it to
 // the admin panel once (keep it "hidden": true, so it starts as a draft with its preview link). Other new or removed
-// items are left out; they belong in the admin panel.
+// items are left out; they belong in the admin panel. A post written for an "Ask for a draft" request names it
+// (BLOG_REQUEST=<the request's id> in the environment), so the deploy can mark the request ready.
 import { execFileSync } from 'node:child_process';
 import fs from 'node:fs';
 import path from 'node:path';
@@ -33,6 +34,9 @@ const COLLECTIONS = {
   testimonials: (_, i) => `t${String(i + 1).padStart(3, '0')}`,
   posts: (p) => p.slug,
 };
+/** The "Ask for a draft" request this update's new post answers, if any. */
+const request = /^[A-Za-z0-9]{16,32}$/.test(process.env.BLOG_REQUEST ?? '') ? process.env.BLOG_REQUEST : undefined;
+if (process.env.BLOG_REQUEST && !request) console.warn('BLOG_REQUEST is not a request id; it is left out.');
 /** Collections whose new items are carried over whole. */
 const ADDABLE = new Set(['posts']);
 
@@ -63,8 +67,8 @@ for (const [name, keyOf] of Object.entries(COLLECTIONS)) {
   after(name).forEach((item, i) => {
     const key = keyOf(item, i);
     if (!old.has(key) && ADDABLE.has(name)) {
-      if (item.hidden !== true) console.warn(`New ${name} item "${key}" is not hidden: it goes live with the next deploy.`);
-      changes.push({ doc: `${name}/${key}`, add: item });
+      if (item.hidden !== true) console.warn(`New ${name} item "${key}" is not hidden: the deploy adds it as a hidden draft all the same.`);
+      changes.push({ doc: `${name}/${key}`, add: item, ...(request ? { request } : {}) });
     } else if (!old.has(key)) console.warn(`New ${name} item "${key}" is not included: add it in the admin panel.`);
     else changes.push(...diff(`${name}/${key}`, old.get(key), item));
   });

@@ -1765,3 +1765,82 @@ a.item-main:hover strong {
   background: var(--a-navy-50);
   box-shadow: inset 0 0 0 1px var(--a-navy);
 }
+
+/* ---------- Blog: ask for a draft ---------- */
+.draft-requests {
+  display: grid;
+  gap: 14px;
+  margin-bottom: 22px;
+}
+
+.draft-requests h2 {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin: 0;
+  font-size: 1.15rem;
+}
+
+.draft-requests > .btn {
+  justify-self: start;
+}
+
+.draft-requests__guide {
+  padding: 10px 14px;
+  border: 1px solid var(--a-line);
+  border-radius: 10px;
+  background: var(--a-navy-50);
+}
+
+.draft-requests__guide summary {
+  font-weight: 800;
+  cursor: pointer;
+}
+
+.draft-requests__guide ul {
+  margin: 6px 0 12px;
+  padding-left: 20px;
+}
+
+.draft-requests__guide p {
+  margin: 10px 0 4px;
+}
+
+.draft-requests__list {
+  display: grid;
+  gap: 12px;
+  margin: 6px 0 0;
+  padding: 0;
+  list-style: none;
+}
+
+.draft-requests__list li {
+  display: grid;
+  gap: 6px;
+  padding-top: 12px;
+  border-top: 1px solid var(--a-line);
+}
+
+.draft-requests__concept {
+  display: -webkit-box;
+  margin: 0;
+  overflow: hidden;
+  white-space: pre-line;
+  -webkit-box-orient: vertical;
+  -webkit-line-clamp: 3;
+  line-clamp: 3;
+}
+
+.draft-requests__actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin: 0;
+}
+
+.draft-requests__example {
+  padding: 10px 12px;
+  border-left: 3px solid var(--a-navy);
+  background: #fff;
+  border-radius: 0 8px 8px 0;
+}
