@@ -366,9 +366,10 @@ export const requestDraft = onCall({ secrets: [blogWriterToken], timeoutSeconds:
   if (!allowed.ok) throw new HttpsError('resource-exhausted', allowed.error);
   const started = await startWriting({ url: blogWriterUrl.value(), token: blogWriterToken.value() }, fireText(ref.id, cleaned.concept));
   if (!started.ok) {
-    logger.error('Blog draft request could not be started', { id: ref.id, error: started.error });
-    await ref.update({ status: 'failed', error: started.error });
-    throw new HttpsError('failed-precondition', startProblem(started.error));
+    logger.error('Blog draft request could not be started', { id: ref.id, error: started.error, started: started.started });
+    // A request that may have started stays "writing", so the limits hold and nobody asks for the same post twice.
+    await ref.update(started.started === 'maybe' ? { error: started.error } : { status: 'failed', error: started.error });
+    throw new HttpsError(started.started === 'maybe' ? 'unavailable' : 'failed-precondition', startProblem(started.error, started.started));
   }
   await ref.update({ sessionUrl: started.sessionUrl });
   return { ok: true, id: ref.id };

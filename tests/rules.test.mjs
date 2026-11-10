@@ -39,6 +39,11 @@ beforeEach(async () => {
     await setDoc(doc(db, 'branches/crossmaze-the-hub'), { name: 'The Hub', centerHead: { name: 'B', bio: [], photo: '' } });
     await setDoc(doc(db, 'posts/school-post'), { title: 'By the school', hidden: false });
     await setDoc(doc(db, 'posts/neotown-post'), { title: 'By Neotown', hidden: true, createdBy: HEAD });
+    const hoursAgo = (h) => new Date(Date.now() - h * 3600000);
+    await setDoc(doc(db, 'blogRequests/writing'), { concept: 'A', status: 'writing', createdAt: hoursAgo(0.2) });
+    await setDoc(doc(db, 'blogRequests/ready-today'), { concept: 'B', status: 'ready', createdAt: hoursAgo(5) });
+    await setDoc(doc(db, 'blogRequests/failed'), { concept: 'C', status: 'failed', createdAt: hoursAgo(1) });
+    await setDoc(doc(db, 'blogRequests/ready-old'), { concept: 'D', status: 'ready', createdAt: hoursAgo(30) });
   });
 });
 
@@ -96,7 +101,11 @@ test('admins can edit content, submissions, LITMUS and email settings', async ()
   // "Ask for a draft" requests: read and cleared by admins, written only by the function and the deploy.
   await assertSucceeds(getDocs(collection(db, 'blogRequests')));
   await assertFails(setDoc(doc(db, 'blogRequests/r1'), { concept: 'A post about sharing', status: 'writing' }));
-  await assertSucceeds(deleteDoc(doc(db, 'blogRequests/r1')));
+  // Only requests that no longer count towards the day's limit can be cleared.
+  await assertFails(deleteDoc(doc(db, 'blogRequests/writing')));
+  await assertFails(deleteDoc(doc(db, 'blogRequests/ready-today')));
+  await assertSucceeds(deleteDoc(doc(db, 'blogRequests/failed')));
+  await assertSucceeds(deleteDoc(doc(db, 'blogRequests/ready-old')));
 });
 
 test('people can check their own admin entry; only admins manage the list', async () => {
@@ -185,7 +194,7 @@ test('branch admins can see publish status and mark a change, and nothing else',
   await assertFails(setDoc(doc(db, 'testimonials/x'), { quote: 'X' }));
   await assertFails(updateDoc(doc(db, 'submissions/s1'), { handled: true }));
   await assertFails(getDocs(collection(db, 'blogRequests')));
-  await assertFails(deleteDoc(doc(db, 'blogRequests/r1')));
+  await assertFails(deleteDoc(doc(db, 'blogRequests/failed')));
 });
 
 test('branch admins can check their own entry but not change the list', async () => {

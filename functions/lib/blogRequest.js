@@ -24,8 +24,11 @@ export function cleanConcept(value) {
   if (typeof value !== 'string') return { ok: false, error: 'Write what the post should be about.' };
   const concept = value
     .replace(/\r\n?/g, '\n')
+    // Control characters, and characters that don't show (tag characters, direction overrides, zero-width spaces):
+    // text pasted from an email or a web page must not carry words the admin can't see. The zero-width joiners
+    // Indian scripts need (U+200C, U+200D) stay.
     // eslint-disable-next-line no-control-regex
-    .replace(/[\u0000-\u0008\u000b-\u001f\u007f]/g, '')
+    .replace(/[\u0000-\u0008\u000b-\u001f\u007f-\u009f\u200b\u200e\u200f\u202a-\u202e\u2060-\u2069\ufeff\u{e0000}-\u{e007f}]/gu, '')
     .replace(/[ \t]+\n/g, '\n')
     .replace(/\n{3,}/g, '\n\n')
     .trim();
@@ -54,17 +57,19 @@ export function mayRequest(recent, now = Date.now()) {
 export const fireText = (id, concept) => `Blog draft request ${id}\n\nWhat the school's admin asked for:\n${concept}`;
 
 /**
- * Starts the writing task through its API trigger.
+ * Starts the writing task through its API trigger. When it fails, `started` says whether the task may have started
+ * all the same (a slow or broken answer after the request was sent): such a request keeps counting as being
+ * written, so asking again can't start a second run of the same post.
  * @param {{ url?: string, token?: string }} config the trigger's address and its token
- * @returns {Promise<{ ok: true, sessionUrl: string } | { ok: false, error: string }>}
+ * @returns {Promise<{ ok: true, sessionUrl: string } | { ok: false, error: string, started: 'no' | 'maybe' }>}
  */
 export async function startWriting(config, text, fetchImpl = fetch) {
   const url = (config.url ?? '').trim();
   const token = (config.token ?? '').trim();
-  if (!url || !token) return { ok: false, error: 'not_configured' };
+  if (!url || !token) return { ok: false, error: 'not_configured', started: 'no' };
   // The token is only ever sent to Anthropic's trigger address (or a local one in tests).
   const local = /^http:\/\/(127\.0\.0\.1|localhost)(:\d+)?\//.test(url);
-  if (!FIRE_URL.test(url) && !local) return { ok: false, error: 'bad_address' };
+  if (!FIRE_URL.test(url) && !local) return { ok: false, error: 'bad_address', started: 'no' };
   try {
     const res = await fetchImpl(url, {
       method: 'POST',
@@ -75,19 +80,25 @@ export async function startWriting(config, text, fetchImpl = fetch) {
         'Content-Type': 'application/json',
       },
       body: JSON.stringify({ text }),
+      // The token is never sent on to another address.
+      redirect: 'error',
       signal: AbortSignal.timeout(20000),
     });
-    if (!res.ok) return { ok: false, error: `http_${res.status}` };
+    if (!res.ok) return { ok: false, error: `http_${res.status}`, started: res.status >= 500 ? 'maybe' : 'no' };
     const answer = await res.json().catch(() => ({}));
     const sessionUrl = typeof answer.claude_code_session_url === 'string' && answer.claude_code_session_url.startsWith('https://claude.ai/') ? answer.claude_code_session_url : '';
     return { ok: true, sessionUrl };
   } catch (err) {
-    return { ok: false, error: err?.name === 'TimeoutError' ? 'timeout' : 'network' };
+    if (err?.name === 'TimeoutError') return { ok: false, error: 'timeout', started: 'maybe' };
+    // Never connected: it certainly didn't start. Anything else may have broken after the request was sent.
+    const unreachable = ['ECONNREFUSED', 'ENOTFOUND', 'EAI_AGAIN'].includes(err?.cause?.code);
+    return { ok: false, error: 'network', started: unreachable ? 'no' : 'maybe' };
   }
 }
 
-/** What to tell the admin when the task couldn't be started. */
-export function startProblem(error) {
+/** What to tell the admin when the task couldn't be started (or may have started without saying so). */
+export function startProblem(error, started = 'no') {
+  if (started === 'maybe') return 'The writer was slow to answer, so the draft may be on its way. Look at the list in a few minutes before asking again.';
   if (error === 'not_configured' || error === 'bad_address') return 'Draft requests are not set up yet (see “Ask for a draft” in the README).';
   if (error === 'http_401' || error === 'http_403' || error === 'http_404') return 'Claude refused the request. The task’s API token may have been changed (see “Ask for a draft” in the README).';
   if (error === 'http_429') return 'Too many requests just now. Please try again in an hour.';

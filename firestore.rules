@@ -128,9 +128,14 @@ service cloud.firestore {
     }
 
     // "Ask for a draft" requests (admin panel → Blog): written by the requestDraft function and the deploy;
-    // full admins read them and may clear them from the list.
+    // full admins read them and may clear the ones that no longer count towards the day's limit (those that
+    // never started, and those over a day old).
     match /blogRequests/{id} {
-      allow read, delete: if isAdmin();
+      allow read: if isAdmin();
+      allow delete: if isAdmin()
+        && (resource == null
+          || resource.data.status == 'failed'
+          || resource.data.createdAt < request.time - duration.value(1, 'd'));
       allow create, update: if false;
     }
 

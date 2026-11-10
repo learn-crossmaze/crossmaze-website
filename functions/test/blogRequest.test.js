@@ -13,6 +13,11 @@ test('the concept is tidied and must be a sensible length', () => {
   assert.equal(cleanConcept('x'.repeat(CONCEPT_MAX)).ok, true);
   assert.equal(cleanConcept(undefined).ok, false);
   assert.equal(cleanConcept({ concept: 'An object, not text, of some length' }).ok, false);
+  // Characters that don't show (tag characters, direction overrides, zero-width spaces) are dropped, so pasted
+  // text can't carry words the admin never saw; the joiners Indian scripts need stay.
+  const hidden = 'A post about sharing toys\u200b\u202e\u2066\ufeff\u{e0041}\u{e0042}\u0085 for toddlers';
+  assert.equal(cleanConcept(hidden).concept, 'A post about sharing toys for toddlers');
+  assert.equal(cleanConcept('ಕನ್ನಡ ರಾಜ್‌ಯೋತ್ಸವ ಕ್‍ಷ: a post for Rajyotsava').concept, 'ಕನ್ನಡ ರಾಜ್‌ಯೋತ್ಸವ ಕ್‍ಷ: a post for Rajyotsava');
 });
 
 test('one draft at a time, and a daily limit for the school', () => {
@@ -74,24 +79,47 @@ test('a session link from anywhere else is not kept', async () => {
 });
 
 test('reports why the writing task could not be started', async () => {
-  assert.deepEqual(await startWriting({ url: '', token: 't' }, 'x'), { ok: false, error: 'not_configured' });
-  assert.deepEqual(await startWriting({ url: 'https://api.anthropic.com/v1/claude_code/routines/trig_01Ab/fire', token: '' }, 'x'), { ok: false, error: 'not_configured' });
+  assert.deepEqual(await startWriting({ url: '', token: 't' }, 'x'), { ok: false, error: 'not_configured', started: 'no' });
+  assert.deepEqual(await startWriting({ url: 'https://api.anthropic.com/v1/claude_code/routines/trig_01Ab/fire', token: '' }, 'x'), { ok: false, error: 'not_configured', started: 'no' });
   // The token never goes anywhere but Anthropic's trigger address.
   let called = false;
   const spy = async () => ((called = true), new Response('{}'));
   for (const url of ['https://evil.example/v1/claude_code/routines/trig_01Ab/fire', 'https://api.anthropic.com.evil.example/v1/claude_code/routines/trig_01Ab/fire', 'https://api.anthropic.com/v1/messages', 'http://api.anthropic.com/v1/claude_code/routines/trig_01Ab/fire']) {
-    assert.deepEqual(await startWriting({ url, token: 't' }, 'x', spy), { ok: false, error: 'bad_address' });
+    assert.deepEqual(await startWriting({ url, token: 't' }, 'x', spy), { ok: false, error: 'bad_address', started: 'no' });
   }
   assert.equal(called, false);
   const ok = await startWriting({ url: 'https://api.anthropic.com/v1/claude_code/routines/trig_01Ab/fire', token: 't' }, 'x', async () => new Response('{}', { status: 200 }));
   assert.deepEqual(ok, { ok: true, sessionUrl: '' });
   const refused = await fakeWriter(401, { error: 'no' });
   try {
-    assert.deepEqual(await startWriting({ url: refused.url, token: 't' }, 'x'), { ok: false, error: 'http_401' });
+    assert.deepEqual(await startWriting({ url: refused.url, token: 't' }, 'x'), { ok: false, error: 'http_401', started: 'no' });
   } finally {
     refused.server.close();
   }
-  assert.deepEqual(await startWriting({ url: 'http://127.0.0.1:9/fire', token: 't' }, 'x'), { ok: false, error: 'network' });
+  // Never connected: it certainly didn't start.
+  const closed = await fakeWriter(200, {});
+  await new Promise((resolve) => closed.server.close(resolve));
+  assert.deepEqual(await startWriting({ url: closed.url, token: 't' }, 'x'), { ok: false, error: 'network', started: 'no' });
+  // A broken answer after the request was sent, a server error or a slow answer: it may have started.
+  const broken = await fakeWriter(503, { error: 'busy' });
+  try {
+    assert.deepEqual(await startWriting({ url: broken.url, token: 't' }, 'x'), { ok: false, error: 'http_503', started: 'maybe' });
+  } finally {
+    broken.server.close();
+  }
+  const reset = async () => {
+    throw Object.assign(new TypeError('fetch failed'), { cause: { code: 'ECONNRESET' } });
+  };
+  assert.deepEqual(await startWriting({ url: 'http://127.0.0.1:9/fire', token: 't' }, 'x', reset), { ok: false, error: 'network', started: 'maybe' });
+  const slow = async () => {
+    throw Object.assign(new Error('timed out'), { name: 'TimeoutError' });
+  };
+  assert.deepEqual(await startWriting({ url: 'http://127.0.0.1:9/fire', token: 't' }, 'x', slow), { ok: false, error: 'timeout', started: 'maybe' });
+  assert.match(startProblem('timeout', 'maybe'), /may be on its way/);
+  // A redirect is refused, so the token is never sent on.
+  let options;
+  await startWriting({ url: 'http://127.0.0.1:9/fire', token: 't' }, 'x', async (_url, init) => ((options = init), new Response('{}')));
+  assert.equal(options.redirect, 'error');
   assert.match(startProblem('not_configured'), /not set up/);
   assert.match(startProblem('http_401'), /token/);
   assert.match(startProblem('http_429'), /hour/);

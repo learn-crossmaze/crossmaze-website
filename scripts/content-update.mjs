@@ -67,7 +67,7 @@ for (const [name, keyOf] of Object.entries(COLLECTIONS)) {
   after(name).forEach((item, i) => {
     const key = keyOf(item, i);
     if (!old.has(key) && ADDABLE.has(name)) {
-      if (item.hidden !== true) console.warn(`New ${name} item "${key}" is not hidden: it goes live with the next deploy.`);
+      if (item.hidden !== true) console.warn(`New ${name} item "${key}" is not hidden: the deploy adds it as a hidden draft all the same.`);
       changes.push({ doc: `${name}/${key}`, add: item, ...(request ? { request } : {}) });
     } else if (!old.has(key)) console.warn(`New ${name} item "${key}" is not included: add it in the admin panel.`);
     else changes.push(...diff(`${name}/${key}`, old.get(key), item));

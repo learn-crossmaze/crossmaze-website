@@ -1837,3 +1837,10 @@ a.item-main:hover strong {
   gap: 8px;
   margin: 0;
 }
+
+.draft-requests__example {
+  padding: 10px 12px;
+  border-left: 3px solid var(--a-navy);
+  background: #fff;
+  border-radius: 0 8px 8px 0;
+}

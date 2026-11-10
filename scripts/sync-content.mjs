@@ -366,6 +366,9 @@ class ContentUpdates {
         this.report[update.id].added += 1;
         ids.add(id);
         const item = { ...structuredClone(change.add), order: (order += 1) };
+        // A post from the repository always starts as a hidden draft, whatever its file says: only an admin
+        // publishes it (the admin panel, or the review email's button).
+        if (collection === 'posts') item.hidden = true;
         this.creates.set(change.doc, item);
         if (typeof change.request === 'string' && /^[A-Za-z0-9]{16,32}$/.test(change.request)) this.requests.set(change.doc, change.request);
         out.push({ id, ...item });
