@@ -109,10 +109,15 @@ function setupCountUp() {
       const suffix = match[2] ?? '';
       const start = performance.now();
       const duration = 1400;
+      // The number is changed in its text node. Replacing the element's text (textContent) on every frame
+      // made phones work out the style of most of the page again each time (the card rules with :has()).
+      const text = el.childNodes.length === 1 && el.firstChild instanceof Text ? el.firstChild : null;
       const tick = (now: number) => {
         const t = Math.min(1, (now - start) / duration);
         const eased = 1 - Math.pow(1 - t, 3);
-        el.textContent = `${Math.round(target * eased)}${suffix}`;
+        const value = `${Math.round(target * eased)}${suffix}`;
+        if (text) text.nodeValue = value;
+        else el.textContent = value;
         if (t < 1) requestAnimationFrame(tick);
       };
       requestAnimationFrame(tick);

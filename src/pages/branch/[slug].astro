@@ -236,6 +236,8 @@ const jsonLd = {
   jsonLd={[jsonLd, breadcrumbList(crumbs, site.url)]}
   whatsappHref={whatsappHref(branch)}
   whatsappBranch={shortName}
+  callHref={telHref(branch.phone || site.phone)}
+  visitHref="#enquire"
 >
   <section class="page-hero branch-hero">
     <FloatingShapes />
@@ -494,7 +496,7 @@ const jsonLd = {
 
   <FormSection
     id="enquire"
-    eyebrow="Admissions open"
+    admissions
     title={`Book a visit to ${shortName}`}
     lead={`Leave your details and our team at ${shortName} will call you to arrange a visit at a time that suits you.`}
   >

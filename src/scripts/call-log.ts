@@ -61,6 +61,7 @@ function placeOf(link: Element) {
   if (link.closest('.site-header')) return 'Menu bar';
   if (link.closest('.site-footer')) return 'Footer';
   if (link.closest('.whatsapp-fab')) return 'WhatsApp button';
+  if (link.closest('.action-bar')) return 'Phone action bar';
   if (link.closest('.branch-card')) return 'Branch card';
   if (link.closest('.hero, .page-hero')) return 'Top of the page';
   const heading = link.closest('section')?.querySelector('h1, h2');

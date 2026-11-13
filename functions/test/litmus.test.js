@@ -33,6 +33,17 @@ test('payload shape', () => {
   });
 });
 
+test('the preferred visit time also goes at the top of the message, which LITMUS keeps as notes', () => {
+  const at = new Date('2026-11-13T10:00:00Z');
+  const withBoth = buildPayload('v1', { type: 'admission_enquiry', data: { parent_name: 'Asha', visit_time: 'A weekday morning', message: 'Is there a bus from Hosa Road?' }, createdAt: at });
+  assert.equal(withBoth.data.message, 'Preferred visit: A weekday morning\nIs there a bus from Hosa Road?');
+  assert.equal(withBoth.data.visit_time, 'A weekday morning');
+  const visitOnly = buildPayload('v2', { type: 'admission_enquiry', data: { parent_name: 'Asha', visit_time: 'Any time' }, createdAt: at });
+  assert.equal(visitOnly.data.message, 'Preferred visit: Any time');
+  const neither = buildPayload('v3', { type: 'admission_enquiry', data: { parent_name: 'Asha', message: 'Hello' }, createdAt: at });
+  assert.deepEqual(neither.data, { parent_name: 'Asha', message: 'Hello' });
+});
+
 test('does nothing until LITMUS is enabled', async () => {
   assert.deepEqual(await sendToLitmus(undefined, payload), { status: 'not_configured' });
   assert.deepEqual(await sendToLitmus({ enabled: false, url: 'http://x' }, payload), { status: 'not_configured' });

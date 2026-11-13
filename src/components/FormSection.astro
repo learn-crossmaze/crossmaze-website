@@ -5,24 +5,29 @@
 // can use it the same way.
 //  - Wide screens (from 1001px): two columns. While the form scrolls past, the intro and aside stay in
 //    view under the floating header (only on screens tall enough to show them whole).
-//  - Narrower: the intro and aside first, then the form across the full width, so its fields stay two
-//    to a row on tablets.
+//  - Narrower: the intro, then the form across the full width (so its fields stay two to a row on
+//    tablets), then the aside. "Book a visit" (#enquire) then lands with the form's first fields in view
+//    on a phone instead of the address card or the admission steps.
 //
-//   <FormSection id="enquire" eyebrow="Admissions open" title="Book a visit" lead="…">
+//   <FormSection id="enquire" admissions title="Book a visit" lead="…">
 //     <div slot="aside">…</div>
 //     <EnquiryForm slot="form" … />
 //   </FormSection>
+import AdmissionsYear from './AdmissionsYear.astro';
+
 interface Props {
   /** The section's id (a link target such as #enquire); the heading's id is this plus "-title". */
   id?: string;
   eyebrow?: string;
+  /** The eyebrow says "Admissions open for 2027–28" (the coming school year, kept up to date). */
+  admissions?: boolean;
   title: string;
   lead?: string;
   /** More classes for the <section>. */
   class?: string;
 }
 
-const { id, eyebrow, title, lead, class: className } = Astro.props;
+const { id, eyebrow, admissions = false, title, lead, class: className } = Astro.props;
 const headingId = id ? `${id}-title` : undefined;
 const hasAside = Astro.slots.has('aside');
 ---
@@ -30,7 +35,17 @@ const hasAside = Astro.slots.has('aside');
 <section class:list={['section', 'form-section', className]} id={id} aria-labelledby={headingId}>
   <div class="container form-section__inner">
     <div class="form-section__intro">
-      {eyebrow && <span class="eyebrow">{eyebrow}</span>}
+      {
+        admissions ? (
+          <span class="eyebrow">
+            <span>
+              Admissions open for <AdmissionsYear />
+            </span>
+          </span>
+        ) : (
+          eyebrow && <span class="eyebrow">{eyebrow}</span>
+        )
+      }
       <h2 id={headingId}>{title}</h2>
       {lead && <p class="lead">{lead}</p>}
       {
@@ -91,10 +106,32 @@ const hasAside = Astro.slots.has('aside');
     }
   }
 
+  /* The intro's pieces join the column (display: contents), so the form can come between the lead and the
+     aside. */
   @media (max-width: 1000px) {
     .form-section__inner {
-      grid-template-columns: minmax(0, 1fr);
-      gap: clamp(28px, 4vw, 40px);
+      display: flex;
+      flex-direction: column;
+      align-items: flex-start;
+      gap: 0;
+    }
+
+    .form-section__intro {
+      display: contents;
+    }
+
+    .form-section__form,
+    .form-section__aside {
+      width: 100%;
+      margin-top: clamp(28px, 4vw, 40px);
+    }
+
+    .form-section__form {
+      order: 1;
+    }
+
+    .form-section__aside {
+      order: 2;
     }
   }
 </style>

@@ -16,6 +16,8 @@ export const FORMS = {
       branch: { label: 'Branch', required: true, max: 120 },
       // Asked on branch pages when the program runs in more than one batch there.
       batch: { label: 'Batch', max: 120 },
+      // "When would you like to visit?" (optional): a weekday morning, afternoon or any time.
+      visit_time: { label: 'Preferred visit', max: 60 },
       message: { label: 'Message', max: 3000 },
     },
   },
