@@ -1,0 +1,75 @@
+{
+  "id": "2026-11-10-blog-importance-of-structured-routine",
+  "description": "New blog draft: Why a structured routine matters: 5 simple reasons",
+  "changes": [
+    {
+      "doc": "posts/importance-of-structured-routine",
+      "add": {
+        "slug": "importance-of-structured-routine",
+        "title": "Why a structured routine matters: 5 simple reasons",
+        "date": "2026-11-10",
+        "category": "tips",
+        "template": "tips",
+        "summary": "Five simple reasons a steady daily routine helps children aged 2 to 6 feel safe, manage big feelings and grow in independence, at school and at home.",
+        "cover": "blog/importance-of-structured-routine/painted-hands.jpg",
+        "coverAlt": "Children's hands covered in bright paint on a large sheet of paper",
+        "intro": "Ask any preschool teacher what makes a good day, and they will often say: a good rhythm. Children between two and six are still learning how a day fits together, and a steady routine gives them that picture. Here are five simple reasons it matters, for school mornings and for home.",
+        "sections": [
+          {
+            "heading": "A routine tells your child what comes next",
+            "text": "Young children don't read clocks, so the day can feel like a series of surprises. A steady order of events gives them a map: first we arrive, then we play, then we wash hands and eat. When children know what comes next, they stop spending energy on worrying and have more left for exploring.\n\nThis is why a classroom with a clear daily rhythm feels calm even with a dozen busy two- and three-year-olds in it. The same is true at home. You don't need a timetable on the wall. You need the same order, most days.",
+            "photo": "",
+            "caption": ""
+          },
+          {
+            "heading": "Routines make big feelings smaller",
+            "text": "Many meltdowns happen at the moment of change: the cartoon ends, the park closes, it is time to leave. A child who knows the pattern, and gets a gentle warning, copes far better than one who is surprised.\n\n- Give a five-minute warning: “Two more turns on the slide, then we go home.”\n- Use the same words each time, such as “first shoes, then bag”\n- Sing a short tidy-up song so the change has a signal\n- Say what is coming next, not only what must stop\n\nFor a child who finds goodbyes hard, a small repeated ritual, such as a wave at the gate and a special phrase, becomes a comfort in itself. Some children will still cry, and that is normal. A predictable goodbye helps them settle faster.",
+            "photo": "",
+            "caption": ""
+          },
+          {
+            "heading": "Regular sleep, meals and play help little bodies",
+            "text": "The World Health Organization recommends 10 to 13 hours of good-quality sleep a day for children aged 3 to 4, which may include a nap, with regular sleep and wake-up times. It also advises no more than one hour a day of sedentary screen time for children aged 2 to 4, and less is better.\n\nA steady rhythm makes both easier. When breakfast, tiffin, lunch and bedtime come at roughly the same times, hunger and tiredness stop being daily surprises. Active play, outdoors when the Bengaluru weather allows, fits best in the same slots each day.\n\nEvery child is different, so if you are worried about your child's sleep, appetite or energy, talk to your paediatrician.",
+            "photo": "blog/importance-of-structured-routine/crayons.jpg",
+            "caption": "A child colouring with a box of crayons close by. A calm, regular drawing time builds focus."
+          },
+          {
+            "heading": "Routines build independence and confidence",
+            "text": "When the order of the day is familiar, children can start doing parts of it by themselves. They hang up the bag, wash hands, put on shoes, wipe the table. Each small job done without help brings the quiet pride of “I did it myself”.\n\nThis fits well with Montessori-based learning, which Crossmaze uses: children work with hands-on materials at their own pace, and take care of their own space. A predictable day gives that independence a safe frame.\n\nAt home, try a simple morning and evening pattern:\n\n1. **Morning:** wake up, toilet, wash face, dress (with help for the buttons), breakfast, bag by the door\n2. **Evening:** wash hands, snack, play, bath, dinner, two books, lights out\n\nChoose which steps your child can do alone, and let them. It will take longer at first, but it is worth the extra minutes.",
+            "photo": "",
+            "caption": ""
+          },
+          {
+            "heading": "Home and school working together",
+            "text": "Children settle best when the rhythm at home and at school feels like one story. Crossmaze's thematic curriculum brings language, numbers, social skills and physical development together in every theme. A clear rhythm at home supports that kind of steady learning, and you can build it in simple ways.\n\n- **Ask about the day in the same order:** “What did you play? What did you eat? Who did you sit with?”\n- **Keep the school-morning pattern the same** on most days, and a gentler version on holidays\n- **Share what works.** Tell your child's teacher about any change at home, such as a new baby, a trip or a bad night. Small changes can show up as big feelings in class\n- **Be flexible.** Fever, festivals and guests will change the day. Go back to the pattern as soon as you can, and your child will follow\n\nA routine is a frame, not a cage. The aim is a child who feels safe, not a day run by the clock.",
+            "photo": "blog/importance-of-structured-routine/pencils.jpg",
+            "caption": "Coloured pencils lined up in a neat row. Order and rhythm help children feel secure."
+          }
+        ],
+        "quote": {
+          "text": "A routine is a frame, not a cage. The aim is a child who feels safe, not a day run by the clock.",
+          "by": ""
+        },
+        "takeaways": [
+          "A steady order of events helps young children feel safe and know what comes next",
+          "Warnings and familiar words make changes and goodbyes easier",
+          "WHO advises 10 to 13 hours of sleep for ages 3 to 4, with regular sleep and wake-up times",
+          "Let children do small steps of the routine themselves",
+          "Stay flexible on special days and return to the pattern soon"
+        ],
+        "author": {
+          "name": "The Crossmaze team",
+          "role": "",
+          "photo": ""
+        },
+        "cta": {
+          "label": "Book a school visit",
+          "link": "/contact#enquire"
+        },
+        "hidden": true,
+        "previewKey": "e9c22b9739f0a49d"
+      },
+      "request": "ke63oIODVOMP0snPDIxI"
+    }
+  ]
+}
