@@ -30,6 +30,7 @@ const FIELDS: Record<Submission['type'], [string, string][]> = {
     ['program', 'Program'],
     ['branch', 'Branch'],
     ['batch', 'Batch'],
+    ['visit_time', 'Preferred visit'],
     ['message', 'Message'],
   ],
   job_application: [

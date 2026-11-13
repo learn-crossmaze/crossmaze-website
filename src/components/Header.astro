@@ -299,6 +299,11 @@ const isActive = (href: string) => (href === '/' ? path === '/' : path === href 
     white-space: nowrap;
   }
 
+  /* The phone icon keeps its size when the bar is tight (it was squeezed to a dot, or to nothing). */
+  .site-nav__cta .btn :global(svg) {
+    flex-shrink: 0;
+  }
+
   /* Narrower desktops: tighter links so the bar stays on one line in every theme's font. */
   @media (max-width: 1260px) {
     .site-nav {

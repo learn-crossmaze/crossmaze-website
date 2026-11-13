@@ -1,0 +1,9 @@
+---
+// The school year admissions are open for ("2027–28"), as of the day the site is built; scripts/admissions.ts
+// brings it up to date in the visitor's browser. From November it is the next school year (June start).
+import { admissionsYear } from '../greetings/calendar';
+
+const today = new Date(Date.now() + 5.5 * 60 * 60 * 1000).toISOString().slice(0, 10);
+---
+
+<span data-admissions-year>{admissionsYear(today)}</span>

@@ -34,9 +34,25 @@ interface Props {
   whatsappHref?: string;
   /** That branch's short name, which the call log records for a tap on the button. */
   whatsappBranch?: string;
+  /** A branch page's own phone link: the phone action bar's Call button rings that centre straight away. */
+  callHref?: string;
+  /** Where the phone action bar's "Book a visit" goes: the page's own enquiry form when it has one. */
+  visitHref?: string;
 }
 
-const { title, fullTitle, description = site.description, jsonLd, image: shareImage, type = 'website', noindex = false, whatsappHref, whatsappBranch } = Astro.props;
+const {
+  title,
+  fullTitle,
+  description = site.description,
+  jsonLd,
+  image: shareImage,
+  type = 'website',
+  noindex = false,
+  whatsappHref,
+  whatsappBranch,
+  callHref,
+  visitHref = '/contact#enquire',
+} = Astro.props;
 
 // Which centre each phone number on the site belongs to (last 10 digits), so the call log
 // (scripts/call-log.ts) can say which centre a visitor tried to call. Later entries win, so a centre's phone
@@ -315,10 +331,49 @@ const themeConfig = {
       )
     }
 
+    {/* Phones: Call, WhatsApp and Book a visit always within reach at the bottom of the screen (it takes the
+        WhatsApp button's place). On a branch page Call and WhatsApp reach that centre; elsewhere they open the
+        list of centres. It moves out of the way while the enquiry form is on screen, while typing and while
+        the menu is open (scripts/action-bar.ts). */}
+    <nav class="action-bar" aria-label="Call, WhatsApp or book a visit" data-action-bar>
+      {
+        callHref ? (
+          <a class="action-bar__item" href={callHref}>
+            <Icon name="Phone" size={20} />
+            <span>Call</span>
+          </a>
+        ) : (
+          <a class="action-bar__item" href={site.phoneHref} data-call-picker>
+            <Icon name="Phone" size={20} />
+            <span>Call</span>
+          </a>
+        )
+      }
+      {
+        whatsappHref ? (
+          <a class="action-bar__item action-bar__item--whatsapp" href={whatsappHref} target="_blank" rel="noopener" data-branch={whatsappBranch}>
+            <Icon name="MessageCircle" size={20} />
+            <span>WhatsApp</span>
+          </a>
+        ) : (
+          <a class="action-bar__item action-bar__item--whatsapp" href="/branch" data-whatsapp-picker>
+            <Icon name="MessageCircle" size={20} />
+            <span>WhatsApp</span>
+          </a>
+        )
+      }
+      <a class="action-bar__item action-bar__item--visit" href={visitHref}>
+        <Icon name="CalendarCheck" size={20} />
+        <span>Book a visit</span>
+      </a>
+    </nav>
+
     <script type="application/json" id="cm-call-numbers" set:html={jsonScript(callNumbers)} />
     <script>
       import '../scripts/motion';
       import '../scripts/call-log';
+      import '../scripts/action-bar';
+      import '../scripts/admissions';
     </script>
 
     <style>
@@ -340,6 +395,107 @@ const themeConfig = {
       .whatsapp-fab:hover {
         color: #fff;
         transform: scale(1.06);
+      }
+
+      /* ---------- Phones: the action bar at the bottom of the screen (floating glass, like the menu bar) */
+      .action-bar {
+        display: none;
+      }
+
+      @media (max-width: 760px) {
+        .whatsapp-fab {
+          display: none;
+        }
+
+        /* Room under the footer, so the bar never covers its last lines. */
+        :global(body) {
+          padding-bottom: calc(84px + env(safe-area-inset-bottom));
+        }
+
+        .action-bar {
+          position: fixed;
+          left: max(10px, env(safe-area-inset-left));
+          right: max(10px, env(safe-area-inset-right));
+          bottom: max(10px, env(safe-area-inset-bottom));
+          z-index: 40;
+          display: grid;
+          grid-template-columns: 0.85fr 1.15fr 1.45fr;
+          gap: 6px;
+          padding: 6px;
+          border: 1px solid var(--glass-edge);
+          border-radius: 22px;
+          background: var(--glass-thick);
+          -webkit-backdrop-filter: var(--glass-blur);
+          backdrop-filter: var(--glass-blur);
+          box-shadow: var(--glass-rim), var(--shadow);
+          transition:
+            transform 0.25s ease,
+            opacity 0.25s ease,
+            visibility 0.25s;
+        }
+
+        /* Out of the way while the form is on screen, while typing (the keyboard is open) and while the menu
+           is open. Hidden this way it can't be tapped or reached with the keyboard either. */
+        .action-bar[data-hidden],
+        :global(body:has(.site-header.is-open)) .action-bar,
+        :global(body:has(:is(input, textarea, select):focus)) .action-bar {
+          transform: translateY(calc(100% + 24px));
+          opacity: 0;
+          visibility: hidden;
+        }
+
+        .action-bar__item {
+          display: flex;
+          align-items: center;
+          justify-content: center;
+          gap: 5px;
+          min-height: 50px;
+          padding: 6px;
+          border-radius: 16px;
+          background: linear-gradient(135deg, var(--navy-50) 0%, var(--navy-100) 100%);
+          color: var(--navy);
+          font-family: var(--font-display);
+          font-weight: 700;
+          font-size: 0.95rem;
+          line-height: 1.1;
+          text-align: center;
+          text-decoration: none;
+        }
+
+        .action-bar__item :global(svg) {
+          flex-shrink: 0;
+        }
+
+        /* Dark words on WhatsApp's green: white text on it is too faint to read easily. */
+        .action-bar__item--whatsapp {
+          background: var(--g-whatsapp);
+          color: var(--sun-btn-fg);
+        }
+
+        .action-bar__item--visit {
+          background: var(--g-sun);
+          color: var(--sun-btn-fg);
+        }
+
+        .action-bar__item:hover,
+        .action-bar__item:focus-visible {
+          filter: brightness(1.04);
+        }
+      }
+
+      /* The narrowest phones: icons over the words, so all three still fit. */
+      @media (max-width: 359px) {
+        .action-bar__item {
+          flex-direction: column;
+          gap: 2px;
+          font-size: 0.8rem;
+        }
+      }
+
+      @media (prefers-reduced-motion: reduce) {
+        .action-bar {
+          transition: none;
+        }
       }
     </style>
   </body>

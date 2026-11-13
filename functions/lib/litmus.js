@@ -20,8 +20,20 @@ export function buildPayload(id, submission) {
     type: submission.type,
     submittedAt: (submission.createdAt ?? new Date()).toISOString(),
     source: { site: SITE, page: submission.page || '/' },
-    data: submission.data,
+    data: withVisitInMessage(submission.data ?? {}),
   };
+}
+
+/**
+ * LITMUS keeps an enquiry's message as its notes but doesn't read the preferred visit time, so the time also
+ * goes at the top of the message (where the notes' length limit can't cut it off).
+ * @param {Record<string, string>} data
+ */
+function withVisitInMessage(data) {
+  const visit = typeof data.visit_time === 'string' ? data.visit_time.trim() : '';
+  if (!visit) return data;
+  const message = typeof data.message === 'string' ? data.message.trim() : '';
+  return { ...data, message: [`Preferred visit: ${visit}`, message].filter(Boolean).join('\n') };
 }
 
 /**

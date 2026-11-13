@@ -58,7 +58,7 @@ const careRatioWide = Math.min(Math.max(careShape, 16 / 9), 2.4).toFixed(4);
 const careCols = daycareHighlights.length === 4 ? 2 : 3;
 ---
 
-<BaseLayout fullTitle={`${site.name} Preschool & Day Care in Electronic City & Begur, Bengaluru`} jsonLd={website}>
+<BaseLayout fullTitle={`${site.name} Preschool & Day Care in Electronic City & Begur, Bengaluru`} jsonLd={website} visitHref="#enquire">
   <!-- Hero -->
   <section class="hero">
     <FloatingShapes variant="home" />
@@ -309,7 +309,7 @@ const careCols = daycareHighlights.length === 4 ? 2 : 3;
   <!-- Admission enquiry, with how admission works beside the form -->
   <FormSection
     id="enquire"
-    eyebrow="Admissions open"
+    admissions
     title="Admission enquiry"
     lead="Share a few details and our admissions team will call you to answer your questions and set up a visit to your nearest centre."
   >

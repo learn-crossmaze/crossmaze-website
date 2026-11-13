@@ -95,6 +95,7 @@
   --field-dash: color-mix(in srgb, var(--navy) 28%, #fff); /* the file drop area's dashed edge */
   --success-fg: #1e6b31;
   --error-fg: #a3301e;
+  --field-edge: color-mix(in srgb, var(--navy) 72%, transparent);
   /* Mixed into an accent text colour for more contrast (the home page's stat numbers). */
   --contrast-mix: #000;
   --quote-mark: var(--coral); /* the big soft opening quote marks */
@@ -225,6 +226,7 @@
   --field-dash: color-mix(in srgb, var(--navy) 40%, transparent);
   --success-fg: var(--green-fg);
   --error-fg: var(--coral-fg);
+  --field-edge: color-mix(in srgb, var(--navy) 60%, transparent);
   --contrast-mix: #fff;
   --quote-mark: var(--navy);
   --photo-scrim: linear-gradient(160deg, rgb(var(--glass-rgb) / 74%) 0%, color-mix(in srgb, var(--paper) 86%, transparent) 100%);
@@ -1030,6 +1032,12 @@ h1 > .eyebrow > svg {
   font-size: 0.85rem;
 }
 
+/* In light mode the chip's words are taken darker than its colour, so small text reads at 4.5:1 on its
+   pale background in every theme (the tone stays recognisable). */
+:root:not([data-mode='dark']) .pill {
+  color: color-mix(in oklab, var(--badge-fg, var(--navy)) 80%, #000);
+}
+
 .check-list {
   list-style: none;
   padding: 0;
@@ -1136,7 +1144,8 @@ main:has(> .greet-bar:not([hidden])) > :is(.hero, .page-hero):nth-child(1 of :no
   width: 100%;
   min-height: 48px;
   padding: 12px 14px;
-  border: 1.5px solid color-mix(in srgb, var(--navy) 12%, transparent);
+  /* Strong enough to see where each box is (3:1 against the card) in every theme, light and dark. */
+  border: 1.5px solid var(--field-edge);
   border-radius: 14px;
   background: var(--glass-thick);
   color: var(--ink);
@@ -1181,6 +1190,31 @@ main:has(> .greet-bar:not([hidden])) > :is(.hero, .page-hero):nth-child(1 of :no
   outline: none;
   border-color: var(--navy);
   box-shadow: 0 0 0 4px color-mix(in srgb, var(--navy) 14%, transparent);
+}
+
+/* A field brought into view by a mistake (or a link) keeps its label clear of the floating header. */
+.field input,
+.field select,
+.field textarea {
+  scroll-margin-top: calc(var(--header-gap) + var(--header-h) + 48px);
+}
+
+/* What is wrong with a field, written under it (scripts/forms.ts). */
+.field [aria-invalid='true'] {
+  border-color: var(--error-fg);
+}
+
+.field-error {
+  margin: 0;
+  font-size: 0.9rem;
+  font-weight: 700;
+  color: var(--error-fg);
+}
+
+/* When the form can't be sent online: send on WhatsApp or by email instead (scripts/forms.ts). */
+.form-fallback__whatsapp {
+  --btn-grad: var(--g-whatsapp);
+  --btn-fg: var(--sun-btn-fg);
 }
 
 .form-status {

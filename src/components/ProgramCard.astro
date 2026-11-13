@@ -88,6 +88,10 @@ const { program, sizes = '(max-width: 551px) calc(100vw - 32px), (max-width: 879
     font-size: 0.85rem;
     line-height: 1.3;
   }
+  /* Darker words in light mode, as on the chips (global.css .pill), so they read at 4.5:1. */
+  :global(:root:not([data-mode='dark'])) .program-card__ages {
+    color: color-mix(in oklab, var(--badge-fg) 80%, #000);
+  }
   .program-card__body {
     display: flex;
     flex-direction: column;

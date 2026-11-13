@@ -3,6 +3,7 @@ import { Image } from 'astro:assets';
 import BaseLayout from '../layouts/BaseLayout.astro';
 import PageHero from '../components/PageHero.astro';
 import EnquiryForm from '../components/EnquiryForm.astro';
+import AdmissionsYear from '../components/AdmissionsYear.astro';
 import Icon from '../components/Icon.astro';
 import SectionHeading from '../components/SectionHeading.astro';
 import Steps from '../components/Steps.astro';
@@ -29,6 +30,7 @@ const branchRows = branches.map((b, i) => ({
 <BaseLayout
   fullTitle={`Contact & Admissions | ${site.fullName}`}
   description={`Contact ${site.fullName} for admissions, school visits and enquiries. Call ${site.phone} or email ${site.admissionsEmail}.`}
+  visitHref="#enquire"
 >
   <PageHero
     eyebrow="Contact & admissions"
@@ -40,6 +42,7 @@ const branchRows = branches.map((b, i) => ({
   <section class="section section--white" id="enquire">
     <div class="container contact">
       <div class="card contact__form">
+        <span class="eyebrow"><span>Admissions open for <AdmissionsYear /></span></span>
         <h2>Admission enquiry</h2>
         <EnquiryForm id="contact-enquiry" />
       </div>

@@ -1,9 +1,12 @@
 // Progressive enhancement for every <form data-cm-form>.
 //
 // Submissions go to /api/submit, the Firebase function that saves them and forwards them to LITMUS
-// (override with PUBLIC_FORM_ENDPOINT). If that can't be reached (e.g. local dev without the
-// functions emulator), the visitor's email app opens with the details filled in instead, so no
-// enquiry is lost.
+// (override with PUBLIC_FORM_ENDPOINT). If that can't be reached (a weak connection, or local dev without
+// the functions emulator), the details stay in the form and buttons offer to send them on WhatsApp to the
+// chosen centre or by email instead, so no enquiry is lost.
+//
+// Mistakes are written under the field they belong to (not the browser's passing bubble), and the first one
+// is brought into view below the floating header.
 //
 // File inputs (the resume on the careers form) are checked here for type and size, then sent in the
 // same JSON body as { name, data } with the contents base64-encoded.
@@ -31,19 +34,119 @@ function showStatus(form: HTMLFormElement, state: 'success' | 'error', message: 
   status.focus();
 }
 
-function openEmail(form: HTMLFormElement, data: FormData) {
-  const mailto = form.dataset.mailto ?? '';
-  const body = [...data.entries()]
+/** The filled-in fields as "Label: value" lines, for a WhatsApp message or an email. */
+function detailsText(form: HTMLFormElement, data: FormData) {
+  return [...data.entries()]
     .filter(([name, value]) => !name.startsWith('_') && typeof value === 'string' && value.trim())
     .map(([name, value]) => `${labelFor(form, name)}: ${value}`)
     .join('\n');
-  window.location.href = `mailto:${mailto}?subject=${encodeURIComponent(form.dataset.subject ?? 'Website enquiry')}&body=${encodeURIComponent(body)}`;
+}
+
+/**
+ * Sending online failed: the details stay in the form, and buttons offer to send them on WhatsApp to the
+ * chosen centre (enquiries) or by email, with everything filled in.
+ */
+function offerOtherWays(form: HTMLFormElement, data: FormData) {
+  const mailto = form.dataset.mailto ?? '';
+  const subject = form.dataset.subject ?? 'Website enquiry';
+  const body = detailsText(form, data);
+  let chats: Record<string, string> = {};
+  try {
+    chats = JSON.parse(form.dataset.whatsapp ?? '{}');
+  } catch {
+    // No chats: email only.
+  }
+  const chat = chats[String(data.get('branch') ?? '')];
   const attach = form.querySelector('input[type="file"]') ? ' Please attach your resume to the email.' : '';
   showStatus(
     form,
-    'success',
-    `We couldn't send this online, so your email app should open with these details filled in.${attach} If it didn't, write to us at ${mailto}.`,
+    'error',
+    `We couldn’t send this online just now. Your details are still here: send them to us ${chat ? 'on WhatsApp or ' : ''}by email instead.${attach}`,
   );
+  const box = document.createElement('div');
+  box.className = 'form-fallback btn-row';
+  if (chat) {
+    const whatsapp = document.createElement('a');
+    whatsapp.className = 'btn btn--sm form-fallback__whatsapp';
+    whatsapp.href = `${chat}?text=${encodeURIComponent(`${subject}\n${body}`)}`;
+    whatsapp.target = '_blank';
+    whatsapp.rel = 'noopener';
+    whatsapp.textContent = 'Send on WhatsApp';
+    box.append(whatsapp);
+  }
+  const email = document.createElement('a');
+  email.className = 'btn btn--ghost btn--sm';
+  email.href = `mailto:${mailto}?subject=${encodeURIComponent(subject)}&body=${encodeURIComponent(body)}`;
+  email.textContent = 'Send by email';
+  box.append(email);
+  form.querySelector('.form-status')?.after(box);
+}
+
+// ---------------------------------------------------------------- mistakes, written under each field
+
+/** A mobile number as LITMUS accepts it: 10 digits starting 6 to 9, with or without +91, 91 or 0. */
+function isMobile(value: string) {
+  if (!/^[0-9 +()-]+$/.test(value.trim())) return false; // as the server allows (functions/lib/forms.js)
+  const digits = value.replace(/[\s()-]/g, '').replace(/^(\+91|0091|91|0)(?=\d{10}$)/, '');
+  return /^[6-9]\d{9}$/.test(digits);
+}
+
+type Field = HTMLInputElement | HTMLSelectElement | HTMLTextAreaElement;
+
+function messageFor(field: Field) {
+  const v = field.validity;
+  if (v.customError) return field.validationMessage;
+  if (v.valueMissing) {
+    if (field instanceof HTMLSelectElement) return 'Please choose one.';
+    if (field instanceof HTMLInputElement && field.type === 'file') return 'Please choose a file.';
+    return 'Please fill this in.';
+  }
+  if (v.typeMismatch && field.type === 'email') return 'Please enter an email address, like name@example.com.';
+  return field.validationMessage;
+}
+
+function clearError(field: Field) {
+  field.removeAttribute('aria-invalid');
+  const error = field.id ? document.getElementById(`${field.id}-error`) : null;
+  if (!error) return;
+  error.remove();
+  const ids = (field.getAttribute('aria-describedby') ?? '').split(' ').filter((id) => id && id !== error.id);
+  if (ids.length) field.setAttribute('aria-describedby', ids.join(' '));
+  else field.removeAttribute('aria-describedby');
+}
+
+function showError(field: Field, message: string) {
+  clearError(field);
+  field.setAttribute('aria-invalid', 'true');
+  if (!field.id) return;
+  const error = document.createElement('p');
+  error.className = 'field-error';
+  error.id = `${field.id}-error`;
+  error.textContent = message;
+  (field.closest('.field') ?? field.parentElement)?.append(error);
+  field.setAttribute('aria-describedby', [field.getAttribute('aria-describedby'), error.id].filter(Boolean).join(' '));
+}
+
+/** Checks every field, writes what is wrong under each one and brings the first into view. */
+function checkFields(form: HTMLFormElement) {
+  const fields = [...form.querySelectorAll<Field>('input, select, textarea')].filter(
+    (field) => !field.disabled && field.name && !field.name.startsWith('_'),
+  );
+  for (const field of fields) {
+    if (field instanceof HTMLInputElement && 'mobile' in field.dataset) {
+      field.setCustomValidity(field.value.trim() && !isMobile(field.value) ? 'Please enter a 10-digit mobile number, like 98765 43210.' : '');
+    }
+  }
+  let first: Field | undefined;
+  for (const field of fields) {
+    if (field.checkValidity()) clearError(field);
+    else {
+      showError(field, messageFor(field));
+      first ??= field;
+    }
+  }
+  if (first) first.focus();
+  return !first;
 }
 
 /** Checks a chosen file against the input's accept list and data-max-mb; the message shows on submit. */
@@ -129,6 +232,9 @@ function post(body: string, onUpload: (fraction: number) => void) {
       resolve({ ok: xhr.status >= 200 && xhr.status < 300, status: xhr.status, result });
     });
     for (const failure of ['error', 'abort', 'timeout']) xhr.addEventListener(failure, () => reject(new Error(failure)));
+    // A connection that stalls (a weak phone signal) gives up after a while, so the other ways to send show
+    // instead of a form that waits for ever. Long enough for a resume to upload.
+    xhr.timeout = 60000;
     xhr.send(body);
   });
 }
@@ -154,13 +260,21 @@ for (const form of document.querySelectorAll<HTMLFormElement>('form[data-cm-form
 
   const fileInputs = [...form.querySelectorAll<HTMLInputElement>('input[type="file"]')];
   for (const input of fileInputs) input.addEventListener('change', () => checkFile(input));
+  // A mistake's note goes as soon as the field is changed.
+  for (const name of ['input', 'change']) {
+    form.addEventListener(name, (event) => {
+      const field = event.target as Field;
+      if (field.getAttribute?.('aria-invalid') === 'true') clearError(field);
+    });
+  }
 
   let sending = false;
   form.addEventListener('submit', async (event) => {
     event.preventDefault();
     if (sending) return;
     fileInputs.forEach(checkFile);
-    if (!form.reportValidity()) return;
+    form.querySelector('.form-fallback')?.remove();
+    if (!checkFields(form)) return;
 
     const data = new FormData(form);
     const payload: Record<string, unknown> = {
@@ -248,11 +362,11 @@ for (const form of document.querySelectorAll<HTMLFormElement>('form[data-cm-form
       } else if (status === 429) {
         showStatus(form, 'error', typeof result.error === 'string' ? result.error : 'Too many submissions. Please call us instead.');
       } else {
-        openEmail(form, data);
+        offerOtherWays(form, data);
       }
     } catch {
       done();
-      openEmail(form, data);
+      offerOtherWays(form, data);
     }
   });
 }

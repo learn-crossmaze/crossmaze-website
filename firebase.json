@@ -13,7 +13,8 @@
       { "regex": "^/(?:feedback(?:/(?:ptm|annual-day|sports-day|graduates))?|transportrequests(?:/[0-9a-f-]+)?)$", "destination": "https://litmus.crossmaze.in/parents", "type": 301 },
       { "regex": "^/(?:feedback/(?:employee|separations)|(?:employee-onboard|employee-offboard|employees-compliance-profile)/[^/]+)$", "destination": "https://litmus.crossmaze.in/staff", "type": 301 },
       { "regex": "^/(?:documents|record-payment/[^/]+|admin/.+)$", "destination": "https://litmus.crossmaze.in/", "type": 301 },
-      { "source": "/favicon.ico", "destination": "/favicon.png", "type": 301 }
+      { "source": "/favicon.ico", "destination": "/favicon.png", "type": 301 },
+      { "regex": "^/gallery(?:/.*)?$", "destination": "/about", "type": 301 }
     ],
     "rewrites": [
       {
@@ -26,6 +27,15 @@
       }
     ],
     "headers": [
+      {
+        "source": "**",
+        "headers": [
+          { "key": "X-Content-Type-Options", "value": "nosniff" },
+          { "key": "X-Frame-Options", "value": "SAMEORIGIN" },
+          { "key": "Referrer-Policy", "value": "strict-origin-when-cross-origin" },
+          { "key": "Permissions-Policy", "value": "camera=(), microphone=(), payment=(), usb=(), geolocation=(self)" }
+        ]
+      },
       {
         "source": "/_astro/**",
         "headers": [{ "key": "Cache-Control", "value": "public, max-age=31536000, immutable" }]
