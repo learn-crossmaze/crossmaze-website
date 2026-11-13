@@ -86,7 +86,8 @@ function offerOtherWays(form: HTMLFormElement, data: FormData) {
 
 /** A mobile number as LITMUS accepts it: 10 digits starting 6 to 9, with or without +91, 91 or 0. */
 function isMobile(value: string) {
-  const digits = value.replace(/[\s().-]/g, '').replace(/^(\+91|0091|91|0)(?=\d{10}$)/, '');
+  if (!/^[0-9 +()-]+$/.test(value.trim())) return false; // as the server allows (functions/lib/forms.js)
+  const digits = value.replace(/[\s()-]/g, '').replace(/^(\+91|0091|91|0)(?=\d{10}$)/, '');
   return /^[6-9]\d{9}$/.test(digits);
 }
 
