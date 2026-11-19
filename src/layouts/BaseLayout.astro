@@ -26,6 +26,8 @@ interface Props {
   jsonLd?: Record<string, unknown> | Record<string, unknown>[];
   /** The picture shown when the page is shared (default: the site's own). */
   image?: ImageMetadata;
+  /** Or a picture already made at 1200 × 630, by its address on the site (a job's, /share/jobs/<slug>-link.png). */
+  imageUrl?: string;
   /** "article" for blog posts. */
   type?: 'website' | 'article';
   /** Keeps the page out of search results (blog draft previews). */
@@ -46,6 +48,7 @@ const {
   description = site.description,
   jsonLd,
   image: shareImage,
+  imageUrl,
   type = 'website',
   noindex = false,
   whatsappHref,
@@ -67,7 +70,9 @@ const callNumbers = Object.fromEntries([
 // The short name as the suffix, so the words that say what the page is about have the room.
 const pageTitle = fullTitle?.trim() || (title ? `${title} | ${site.name}` : site.fullName);
 const canonical = new URL(cleanPath(Astro.url.pathname), Astro.site ?? site.url).href;
-const ogImage = shareImage
+const ogImage = imageUrl
+  ? new URL(imageUrl, Astro.site ?? site.url).href
+  : shareImage
   ? new URL((await getImage({ src: shareImage, width: 1200, height: 630, fit: 'cover', format: 'jpg' })).src, Astro.site ?? site.url).href
   : new URL('/og-image.jpg', Astro.site ?? site.url).href;
 // Google's copy of the logo follows the one set in the admin panel. Google wants it at least 112 px tall: a

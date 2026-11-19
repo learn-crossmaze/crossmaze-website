@@ -1,0 +1,74 @@
+{
+  "id": "2026-11-19-job-share-pictures",
+  "description": "Jobs: qualification in a few words for the share pictures; Facility Manager's age limit (it held the experience) and tidier experience and timings on two jobs",
+  "changes": [
+    {
+      "doc": "jobs/teacher-facilitator",
+      "field": "shortQualification",
+      "from": null,
+      "to": "Graduate with NTT, Montessori, ECE or CIDTT"
+    },
+    {
+      "doc": "jobs/day-care-in-charge",
+      "field": "shortQualification",
+      "from": null,
+      "to": "Graduate trained in early childhood education"
+    },
+    {
+      "doc": "jobs/center-head",
+      "field": "shortQualification",
+      "from": null,
+      "to": "1+ year of administrative experience"
+    },
+    {
+      "doc": "jobs/facility-manager",
+      "field": "ageLimit",
+      "from": "1 year and Above",
+      "to": ""
+    },
+    {
+      "doc": "jobs/facility-manager",
+      "field": "experience",
+      "from": "1 years and above",
+      "to": "1+ year"
+    },
+    {
+      "doc": "jobs/facility-manager",
+      "field": "timings",
+      "from": [
+        "8.00 AM to 6.00 PM"
+      ],
+      "to": [
+        "8:00 am – 6:00 pm"
+      ]
+    },
+    {
+      "doc": "jobs/facility-manager",
+      "field": "shortQualification",
+      "from": null,
+      "to": "Graduate in any stream"
+    },
+    {
+      "doc": "jobs/admin-and-operations-associate",
+      "field": "experience",
+      "from": "1 years Onwards",
+      "to": "1+ year"
+    },
+    {
+      "doc": "jobs/admin-and-operations-associate",
+      "field": "timings",
+      "from": [
+        "10.00 AM to 7.00 PM"
+      ],
+      "to": [
+        "10:00 am – 7:00 pm"
+      ]
+    },
+    {
+      "doc": "jobs/admin-and-operations-associate",
+      "field": "shortQualification",
+      "from": null,
+      "to": "Graduate in any stream"
+    }
+  ]
+}

@@ -1,0 +1,248 @@
+---
+// "Share this job" (each job on the careers page, CareersContent.astro). On a phone it opens the phone's own
+// share menu (WhatsApp, Instagram…) with the job's poster picture and its own link (/careers/<slug>, whose
+// preview in a chat is the job's picture too). On a computer, or a phone that can't share pictures, it opens
+// this list instead: send on WhatsApp, copy the link, download the picture. The pictures are made when the site
+// is built (src/careers/poster.ts, /share/jobs/<slug>.png).
+import Icon from './Icon.astro';
+---
+
+<dialog class="job-share" id="job-share" aria-labelledby="job-share-title">
+  <div class="job-share__panel">
+    <button type="button" class="job-share__close" data-share-close aria-label="Close">
+      <Icon name="X" size={22} />
+    </button>
+    <h2 id="job-share-title">Share this job</h2>
+    <div class="job-share__job">
+      <img class="job-share__poster" alt="" width="108" height="135" data-share-poster />
+      <div>
+        <strong data-share-title></strong>
+        <p class="muted">The picture and the job’s own link go together, so people can read it and apply from their phone.</p>
+      </div>
+    </div>
+    <div class="job-share__actions">
+      <a class="btn job-share__whatsapp" target="_blank" rel="noopener" data-share-whatsapp>
+        <Icon name="MessageCircle" size={20} /> Send on WhatsApp
+      </a>
+      <button type="button" class="btn btn--ghost" data-share-copy>
+        <Icon name="Link" size={20} /> <span>Copy the job’s link</span>
+      </button>
+      <a class="btn btn--ghost" data-share-download>
+        <Icon name="Download" size={20} /> Download the picture
+      </a>
+    </div>
+    <p class="job-share__note muted" role="status" data-share-status></p>
+  </div>
+</dialog>
+
+<script>
+  const dialog = document.querySelector<HTMLDialogElement>('#job-share');
+  const posterOf = (slug: string) => `/share/jobs/${slug}.png`;
+  // Pictures fetched ahead, so the phone's share menu can open straight from the tap (some phones refuse to
+  // open it once the tap is more than a moment old).
+  const files = new Map<string, Promise<File | null>>();
+  const fileFor = (slug: string) => {
+    let file = files.get(slug);
+    if (!file) {
+      file = fetch(posterOf(slug))
+        .then((res) => (res.ok ? res.blob() : null))
+        .then((blob) => (blob ? new File([blob], `crossmaze-${slug}.png`, { type: 'image/png' }) : null))
+        .catch(() => null);
+      files.set(slug, file);
+    }
+    return file;
+  };
+  const ready = new Map<string, File | null>();
+  const buttons = [...document.querySelectorAll<HTMLAnchorElement>('[data-share-job]')];
+  if ('IntersectionObserver' in window) {
+    const observer = new IntersectionObserver((entries) => {
+      for (const entry of entries) {
+        if (!entry.isIntersecting) continue;
+        observer.unobserve(entry.target);
+        const slug = (entry.target as HTMLElement).dataset.shareJob ?? '';
+        fileFor(slug).then((file) => ready.set(slug, file));
+      }
+    });
+    for (const button of buttons) observer.observe(button);
+  }
+
+  const touch = matchMedia('(pointer: coarse)');
+
+  function openList(slug: string, title: string, text: string, url: string) {
+    if (!dialog) return;
+    const poster = posterOf(slug);
+    dialog.querySelector<HTMLImageElement>('[data-share-poster]')!.src = poster;
+    dialog.querySelector<HTMLElement>('[data-share-title]')!.textContent = title;
+    dialog.querySelector<HTMLAnchorElement>('[data-share-whatsapp]')!.href = `https://wa.me/?text=${encodeURIComponent(text)}`;
+    const download = dialog.querySelector<HTMLAnchorElement>('[data-share-download]')!;
+    download.href = poster;
+    download.download = `crossmaze-${slug}.png`;
+    dialog.dataset.url = url;
+    dialog.querySelector<HTMLElement>('[data-share-status]')!.textContent = '';
+    dialog.showModal();
+  }
+
+  for (const button of buttons) {
+    button.addEventListener('click', async (event) => {
+      event.preventDefault();
+      const slug = button.dataset.shareJob ?? '';
+      const title = button.dataset.title ?? '';
+      const text = button.dataset.text ?? '';
+      const url = new URL(button.getAttribute('href') ?? '', location.href).href;
+      // Phones: the share menu, with the picture when the phone can share one.
+      if (touch.matches && navigator.share) {
+        const file = ready.get(slug) ?? (await fileFor(slug));
+        try {
+          if (file && navigator.canShare?.({ files: [file] })) await navigator.share({ files: [file], text });
+          else await navigator.share({ title, text, url });
+          return;
+        } catch (err) {
+          if ((err as Error).name === 'AbortError') return; // they closed the share menu
+          // Refused (the tap was too long ago, or no app takes it): the list below instead.
+        }
+      }
+      openList(slug, title, text, url);
+    });
+  }
+
+  dialog?.addEventListener('click', async (event) => {
+    const target = event.target as Element;
+    if (target === dialog || target.closest('[data-share-close]')) {
+      dialog.close();
+      return;
+    }
+    if (target.closest('[data-share-copy]')) {
+      const status = dialog.querySelector<HTMLElement>('[data-share-status]')!;
+      try {
+        await navigator.clipboard.writeText(dialog.dataset.url ?? '');
+        status.textContent = 'Link copied. Paste it into a message or a post.';
+      } catch {
+        status.textContent = `Copy this link: ${dialog.dataset.url ?? ''}`;
+      }
+    }
+  });
+</script>
+
+<style>
+  .job-share {
+    width: min(520px, calc(100% - 24px));
+    max-height: calc(100dvh - 24px);
+    margin: auto;
+    padding: 0;
+    border: 0;
+    border-radius: 32px;
+    background: transparent;
+    color: var(--ink);
+    overflow: visible;
+  }
+
+  .job-share::backdrop {
+    background: var(--scrim, color-mix(in srgb, var(--ink, #131a3a) 30%, transparent));
+    -webkit-backdrop-filter: blur(10px);
+    backdrop-filter: blur(10px);
+  }
+
+  .job-share[open] {
+    animation: job-share-in 0.28s cubic-bezier(0.2, 0.8, 0.2, 1);
+  }
+
+  @keyframes job-share-in {
+    from {
+      opacity: 0;
+      transform: translateY(16px) scale(0.97);
+    }
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .job-share[open] {
+      animation: none;
+    }
+  }
+
+  .job-share__panel {
+    position: relative;
+    max-height: calc(100dvh - 24px);
+    overflow-y: auto;
+    padding: clamp(24px, 4vw, 32px);
+    border: 1px solid var(--glass-edge);
+    border-radius: 32px;
+    background: var(--glass-thick);
+    -webkit-backdrop-filter: var(--glass-blur);
+    backdrop-filter: var(--glass-blur);
+    box-shadow: var(--glass-rim), var(--shadow-lift);
+  }
+
+  .job-share h2 {
+    margin-bottom: 16px;
+    padding-right: 44px;
+    font-size: clamp(1.35rem, 3vw, 1.6rem);
+  }
+
+  .job-share__close {
+    position: absolute;
+    top: 14px;
+    right: 14px;
+    display: grid;
+    place-items: center;
+    width: 44px;
+    height: 44px;
+    border: 1px solid var(--glass-edge);
+    border-radius: 50%;
+    background: var(--glass);
+    box-shadow: var(--glass-rim);
+    color: var(--navy);
+    cursor: pointer;
+  }
+
+  .job-share__job {
+    display: flex;
+    gap: 16px;
+    align-items: center;
+    margin-bottom: 20px;
+  }
+
+  .job-share__job strong {
+    color: var(--navy);
+    font-family: var(--font-display);
+    font-size: 1.1rem;
+  }
+
+  .job-share__job p {
+    margin: 4px 0 0;
+    font-size: 0.92rem;
+  }
+
+  .job-share__poster {
+    flex: none;
+    width: 108px;
+    height: 135px;
+    border-radius: 14px;
+    object-fit: cover;
+    box-shadow: var(--glass-rim), var(--shadow-sm);
+  }
+
+  .job-share__actions {
+    display: grid;
+    gap: 10px;
+  }
+
+  .job-share__actions .btn {
+    justify-content: flex-start;
+  }
+
+  /* WhatsApp's green with dark words, which read better on it than white. */
+  .job-share__whatsapp {
+    --btn-grad: var(--g-whatsapp);
+    --btn-fg: var(--sun-btn-fg);
+    --btn-glow: rgb(37 211 102 / 45%);
+  }
+
+  .job-share__note {
+    margin: 12px 0 0;
+    font-size: 0.92rem;
+  }
+
+  .job-share__note:empty {
+    display: none;
+  }
+</style>
