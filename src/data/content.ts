@@ -148,6 +148,10 @@ export interface JobContent {
   experience: string;
   timings: string[];
   ageLimit?: string;
+  /** The qualification in a few words, for the job's share picture (src/careers/poster.ts). */
+  shortQualification?: string;
+  /** Which centre or area the job is at, on the share picture and the job's own page. */
+  location?: string;
   overview: string;
   responsibilities: { title?: string; text: string }[];
   extra?: { title: string; text: string };

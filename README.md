@@ -23,7 +23,8 @@ The URLs match the old site, so existing links and Google results keep working.
 | `/about` | Who we are, core values, approach, annual-day photos, and the founders once they are switched on in the admin panel |
 | `/our-programs` | Play Group, Nursery, Junior KG, Senior KG, Day Care, how we teach, a day at Crossmaze, extra-curriculars, FAQs |
 | `/branch` and `/branch/<slug>` | All branches, each with its area and short introduction, then one page per branch: photos, facts (including opening hours), programs with their batches and timings, about the centre with its amenities and centre head, gallery, then the visit details and map beside the enquiry form |
-| `/careers` | Why work with us, open roles, application form with resume upload |
+| `/careers` | Why work with us, open roles, application form with resume upload; each role has **Share this job** |
+| `/careers/<slug>` | A role's own page, the link Share this job sends: the careers page with that role open, its own title and its own picture in chats |
 | `/contact` | Admission enquiry, phone / WhatsApp / email, how admission works, all branch addresses |
 | `/privacy-policy`, `/terms` | Carried over from the old site (`src/pages/*.md`) |
 | `/admin` | The admin panel (not indexed by search engines) |
@@ -134,6 +135,17 @@ A website can't see who phoned or whether the call got through: tapping a call b
 Several taps in one visit count as one person. Nothing that identifies the visitor is stored (no phone number, name or IP address), and taps from preview links aren't counted. Compare the counts with the centres' own call logs to see how many website visitors got through. The Dashboard shows the number of taps in the last 7 days.
 
 To know who called (their number) you'd need call-tracking numbers from a telephony provider, shown on the website in place of the centres' own numbers.
+
+### Sharing a job
+
+Every role on Careers has a **Share this job** button. On a phone it opens the phone's own share menu (WhatsApp, Instagram…) with the role's picture and its own link (`/careers/<slug>`); on a computer it offers **Send on WhatsApp**, **Copy the job’s link** and **Download the picture**. The link opens the careers page with that role open and chosen in the application form, and in a chat it shows the role's own picture.
+
+The pictures are made by themselves each time the website is published, from the role's details (`src/careers/poster.ts`, served at `/share/jobs/<slug>.png` and `/share/jobs/<slug>-link.png`): the logo, “We’re hiring”, the title, where, up to three facts (the qualification, experience and work timings), “Apply in 2 minutes” with the link, and a QR code to it, so the poster also works printed. Two fields on each job (admin panel → Jobs) are for them:
+
+- **Qualification in a few words**: the full qualification is usually too long for the picture (it is used as it is only when it is 60 characters or less).
+- **Where**: the centre or area, e.g. “Neotown, Electronic City”. Empty: Electronic City & Begur, Bengaluru.
+
+The overview and the age limit are not on the picture.
 
 ### Colour themes
 
@@ -477,5 +489,7 @@ On 27 October 2026 the school asked for:
 - [ ] **Firebase project ID**: `.firebaserc` and the workflow use `crossmaze-website`. If the console shows a different ID, update both.
 
 ## Credits
+
+- **Fonts in the job share pictures** (`src/careers/fonts/`): Fredoka Bold and Nunito Bold and ExtraBold, from Google Fonts, under the SIL Open Font License 1.1 (https://openfontlicense.org). Cut down to the Latin letters the pictures use.
 
 - **Owl illustration** on the “page not found” page (`src/assets/brand/owl.svg`): “Owl” by anarres, from Openclipart (https://openclipart.org/detail/328460/owl), dedicated to the public domain under CC0 1.0 (https://creativecommons.org/publicdomain/zero/1.0/), so no credit is needed on the site. Only editor metadata was removed and a viewBox added.

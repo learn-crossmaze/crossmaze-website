@@ -473,6 +473,22 @@ export const jobSchema: Field[] = [
   { key: 'timings', label: 'Work timings', type: 'list', itemLabel: 'Timing' },
   { key: 'ageLimit', label: 'Age limit', type: 'text', help: 'Optional.' },
   {
+    key: 'shortQualification',
+    label: 'Qualification in a few words',
+    type: 'text',
+    maxLength: 60,
+    placeholder: 'Graduate with NTT, Montessori, ECE or CIDTT',
+    help: 'For the picture the job is shared with (Careers → Share this job), where the full qualification is too long. Empty: a qualification of up to 60 characters is used as it is, a longer one is left off the picture.',
+  },
+  {
+    key: 'location',
+    label: 'Where',
+    type: 'text',
+    maxLength: 50,
+    placeholder: 'Electronic City & Begur, Bengaluru',
+    help: 'The centre or area the job is at, on the share picture and the job’s own page. Empty: Electronic City & Begur, Bengaluru.',
+  },
+  {
     key: 'responsibilities',
     label: 'Responsibilities',
     type: 'objects',

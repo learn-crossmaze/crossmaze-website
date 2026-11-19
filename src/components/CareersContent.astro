@@ -1,0 +1,444 @@
+---
+import PageHero from './PageHero.astro';
+import SectionHeading from './SectionHeading.astro';
+import FormSection from './FormSection.astro';
+import StepList from './StepList.astro';
+import CareerForm from './CareerForm.astro';
+import Icon from './Icon.astro';
+import { jobs, perks, type Job } from '../data/jobs';
+import JobShare from './JobShare.astro';
+import { shareText } from '../careers/jobs';
+import { site } from '../data/site';
+
+// The careers page: why work with us, the open positions and the application form. /careers shows it as it is;
+// each job's own page (/careers/<slug>, the link "Share this job" sends) shows it with that job open and in view.
+interface Props {
+  /** The job whose own page this is. */
+  focus?: Job;
+}
+const { focus } = Astro.props;
+
+// A job's work timings are the owner's own words, one per line ("Full day: 9:00 am – 6:00 pm"). The time
+// range in each is kept on one line, so a narrow screen breaks before it rather than inside it.
+const timeRange = /\d{1,2}(?:[:.]\d{2})?\s*(?:[ap]\.?\s?m\.?)?\s*(?:[–—-]|to)\s*\d{1,2}(?:[:.]\d{2})?\s*(?:[ap]\.?\s?m\.?)?/i;
+function splitTiming(text: string): [string, string, string] {
+  const match = timeRange.exec(text);
+  if (!match) return [text, '', ''];
+  return [text.slice(0, match.index), match[0], text.slice(match.index + match[0].length)];
+}
+
+// The careers address may wrap after its @ in a narrow column, never inside a word.
+const emailAt = site.careersEmail.indexOf('@');
+---
+  <PageHero
+    eyebrow="Careers"
+    title="Join us"
+    lead="Crossmaze is an ideal workplace for women: equal opportunities, real support for your career, flexible working and a culture of respect and inclusion. Join a community where your talents are recognised, your voice is heard and your potential has no limits."
+    crumbs={focus ? [{ label: 'Careers', href: '/careers' }, { label: focus.title }] : [{ label: 'Careers' }]}
+  >
+    <div class="btn-row hero-actions">
+      <a class="btn btn--sun" href="#openings">See open positions</a>
+      <a class="btn btn--ghost" href="#apply">Apply now</a>
+    </div>
+  </PageHero>
+
+  <section class="section">
+    <div class="container perks">
+      <SectionHeading eyebrow="Why work with us" title="A workplace that cares about you, too" />
+      {/* Four in a row, two by two on tablets; on phones compact rows with the badge beside the title. */}
+      <div class="grid grid--4">
+        {
+          perks.map((p, i) => (
+            <div class:list={['card', 'perk', `tone-${['coral', 'navy', 'green', 'sun'][i % 4]}`]}>
+              <span class="icon-badge">
+                <Icon name={p.icon} size={26} />
+              </span>
+              <h3>{p.title}</h3>
+              <p class="muted">{p.text}</p>
+            </div>
+          ))
+        }
+      </div>
+    </div>
+  </section>
+
+  <section class="section" id="openings">
+    <div class="container">
+      <SectionHeading
+        eyebrow="Open positions"
+        title="Current openings"
+        lead={`${jobs.length} roles across our branches in Electronic City and Begur.`}
+      />
+      <div class="jobs__list" data-focus={focus?.slug}>
+        {
+          jobs.map((job, i) => (
+            <details class="job" id={job.slug} open={focus ? job.slug === focus.slug : i === 0}>
+              <summary>
+                <span class="job__title">
+                  <span class="icon-badge">
+                    <Icon name="Briefcase" size={22} />
+                  </span>
+                  <strong>{job.title}</strong>
+                </span>
+                <Icon name="ChevronDown" size={22} class="job__chev" />
+              </summary>
+              <div class="job__body">
+                <p class="lead">{job.overview}</p>
+                {/* The long qualification on a row of its own, the short facts in one compact row under it. */}
+                <dl class="job__facts">
+                  <div class="job__fact job__fact--wide">
+                    <dt><Icon name="GraduationCap" size={18} /> Qualification</dt>
+                    <dd>{job.qualification}</dd>
+                  </div>
+                  <div class="job__fact">
+                    <dt><Icon name="Award" size={18} /> Experience</dt>
+                    <dd>{job.experience}</dd>
+                  </div>
+                  {job.timings.length > 0 && (
+                    <div class="job__fact">
+                      <dt><Icon name="Clock" size={18} /> Work timings</dt>
+                      {job.timings.map((timing) => {
+                        const [before, range, after] = splitTiming(timing);
+                        return (
+                          <dd>
+                            {before}
+                            {range && <span class="job__range">{range}</span>}
+                            {after}
+                          </dd>
+                        );
+                      })}
+                    </div>
+                  )}
+                  {job.ageLimit && (
+                    <div class="job__fact">
+                      <dt><Icon name="UserRound" size={18} /> Age limit</dt>
+                      <dd>{job.ageLimit}</dd>
+                    </div>
+                  )}
+                </dl>
+                <h3>Primary responsibilities</h3>
+                <ul class="check-list job__list">
+                  {job.responsibilities.map((r) => (
+                    <li>
+                      <Icon name="Check" size={20} />
+                      <span>
+                        {r.title && <strong>{r.title}: </strong>}
+                        {r.text}
+                      </span>
+                    </li>
+                  ))}
+                </ul>
+                {job.extra && (
+                  <p class="job__extra">
+                    <strong>{job.extra.title}:</strong> {job.extra.text}
+                  </p>
+                )}
+                <div class="btn-row">
+                  <a class="btn" href={`/careers?position=${encodeURIComponent(job.title)}#apply`} data-apply={job.title}>
+                    Apply for this role
+                  </a>
+                  {/* Shares the job's own link with its picture (JobShare.astro). Without JavaScript it is that link. */}
+                  <a class="btn btn--ghost" href={`/careers/${job.slug}`} data-share-job={job.slug} data-title={job.title} data-text={shareText(job)}>
+                    <Icon name="Share2" size={18} /> Share this job
+                  </a>
+                </div>
+              </div>
+            </details>
+          ))
+        }
+      </div>
+    </div>
+  </section>
+
+  <FormSection
+    id="apply"
+    eyebrow="Apply"
+    title="Send us your application"
+    lead="Fill in the form and our team will be in touch. Don’t see the right role? Apply anyway and choose “Other”. We’re always happy to meet great people."
+  >
+    <div class="apply-aside" slot="aside">
+      <div class="apply-aside__inner">
+        {/* Only what the form and its thank-you message already say. */}
+        <StepList
+          title="What happens next"
+          items={[
+            { text: 'Fill in the form and upload your resume.' },
+            { text: 'Our team reviews your profile.' },
+            { text: 'We get in touch with you.' },
+          ]}
+        />
+        <a class="card apply-mail tone-coral" href={`mailto:${site.careersEmail}`}>
+          <span class="icon-badge">
+            <Icon name="Mail" size={22} />
+          </span>
+          <span class="apply-mail__text">
+            <strong>Prefer email?</strong>
+            <span class="muted">You can also email your resume to</span>
+            <span class="apply-mail__address">
+              {
+                emailAt >= 0 ? (
+                  <>
+                    {site.careersEmail.slice(0, emailAt + 1)}
+                    <wbr />
+                    {site.careersEmail.slice(emailAt + 1)}
+                  </>
+                ) : (
+                  site.careersEmail
+                )
+              }
+            </span>
+          </span>
+        </a>
+      </div>
+    </div>
+    <CareerForm slot="form" />
+  </FormSection>
+
+  {/* The "Share this job" list, once for every job. */}
+  <JobShare />
+
+
+<script>
+  // Clicking "Apply for this role" pre-selects the position without reloading the page. Up to 1000px the
+  // intro and the steps sit above the form (FormSection.astro), so the form itself is scrolled into view
+  // there, with the name field and the position in sight.
+  const stacked = matchMedia('(max-width: 1000px)');
+  for (const link of document.querySelectorAll<HTMLAnchorElement>('[data-apply]')) {
+    link.addEventListener('click', (event) => {
+      const select = document.querySelector<HTMLSelectElement>('#job-role');
+      if (!select) return;
+      event.preventDefault();
+      select.value = link.dataset.apply ?? '';
+      const name = document.querySelector<HTMLInputElement>('#job-name');
+      (stacked.matches ? name?.closest('.card') : document.querySelector('#apply'))?.scrollIntoView();
+      name?.focus({ preventScroll: true });
+    });
+  }
+
+  // A job's own page (/careers/<slug>): that job in view, and chosen in the application form.
+  const focus = document.querySelector<HTMLElement>('.jobs__list[data-focus]')?.dataset.focus;
+  const job = focus ? document.getElementById(focus) : null;
+  if (job && !location.hash) {
+    job.scrollIntoView({ block: 'start' });
+    const apply = job.querySelector<HTMLElement>('[data-apply]')?.dataset.apply;
+    const select = document.querySelector<HTMLSelectElement>('#job-role');
+    if (select && apply && [...select.options].some((o) => o.value === apply)) select.value = apply;
+  }
+</script>
+
+<style>
+  .hero-actions {
+    margin-top: 28px;
+  }
+
+  /* ---------- Current openings ---------- */
+  .jobs__list {
+    display: grid;
+    gap: 16px;
+  }
+
+  .job {
+    border: 1px solid var(--glass-edge);
+    border-radius: var(--radius);
+    background: var(--g-card);
+    -webkit-backdrop-filter: var(--glass-blur);
+    backdrop-filter: var(--glass-blur);
+    box-shadow: var(--glass-rim), var(--shadow-sm);
+  }
+
+  .job summary {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 16px;
+    padding: 20px clamp(18px, 3vw, 28px);
+    cursor: pointer;
+    list-style: none;
+  }
+
+  .job summary::-webkit-details-marker {
+    display: none;
+  }
+
+  .job__title {
+    display: flex;
+    align-items: center;
+    gap: 14px;
+  }
+
+  .job__title .icon-badge {
+    margin: 0;
+    flex: none;
+  }
+
+  .job__title strong {
+    font-family: var(--font-display);
+    font-weight: 600;
+    font-size: 1.3rem;
+    line-height: 1.3;
+  }
+
+  .job summary :global(.job__chev) {
+    flex: none;
+    transition: transform 0.2s ease;
+  }
+
+  .job[open] summary :global(.job__chev) {
+    transform: rotate(180deg);
+  }
+
+  /* The card runs the width of the other sections; the text inside keeps a comfortable line length. */
+  .job__body {
+    container-type: inline-size;
+    padding: 24px clamp(18px, 3vw, 28px) 28px;
+    border-top: 1px solid color-mix(in srgb, var(--navy) 10%, transparent);
+  }
+
+  .job__facts {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 18px clamp(28px, 4vw, 48px);
+    margin: 0 0 28px;
+    padding: 20px clamp(16px, 2.4vw, 24px);
+    border: 1px solid var(--glass-edge);
+    border-radius: var(--radius);
+    background: var(--g-soft);
+  }
+
+  /* Short facts sit side by side at their own width, and wrap one under another where they don't fit. */
+  .job__fact {
+    flex: 0 1 auto;
+    min-width: 0;
+  }
+
+  .job__fact--wide {
+    flex-basis: 100%;
+    padding-bottom: 18px;
+    border-bottom: 1px solid color-mix(in srgb, var(--navy) 10%, transparent);
+  }
+
+  .job__fact--wide dd {
+    max-width: 75ch;
+  }
+
+  .job__facts dt {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    font-weight: 800;
+  }
+
+  .job__facts dt :global(svg) {
+    flex: none;
+    color: var(--coral);
+  }
+
+  .job__facts dd {
+    margin: 4px 0 0;
+    color: var(--muted);
+    font-size: 0.97rem;
+  }
+
+  /* Each timing on its own line. */
+  .job__facts dd + dd {
+    margin-top: 2px;
+  }
+
+  .job__range {
+    white-space: nowrap;
+  }
+
+  .job__body h3 {
+    font-size: 1.1rem;
+    margin-bottom: 14px;
+  }
+
+  .job__list {
+    max-width: 75ch;
+    margin-bottom: 24px;
+  }
+
+  /* With room, the responsibilities in two columns of about 55–65 characters each. */
+  @container (min-width: 800px) {
+    .job__list {
+      display: block;
+      max-width: none;
+      columns: 2;
+      column-gap: clamp(32px, 4vw, 56px);
+    }
+
+    .job__list li {
+      break-inside: avoid;
+      margin-bottom: 10px;
+    }
+  }
+
+  .job__extra {
+    max-width: 75ch;
+    color: var(--muted);
+  }
+
+  /* ---------- Apply (beside the form, components/FormSection.astro) ---------- */
+  /* Beside the form, the steps above the email card; above the form (tablets), side by side. */
+  .apply-aside {
+    container-type: inline-size;
+  }
+
+  .apply-aside__inner {
+    display: grid;
+    gap: clamp(22px, 2.6vw, 28px);
+  }
+
+  @container (min-width: 680px) {
+    .apply-aside__inner {
+      grid-template-columns: minmax(0, max-content) minmax(0, 1fr);
+      align-items: center;
+      column-gap: clamp(32px, 5vw, 56px);
+    }
+
+    .apply-mail {
+      max-width: 28rem;
+    }
+  }
+
+  .apply-mail {
+    display: flex;
+    align-items: center;
+    gap: 16px;
+    padding: 18px 20px;
+    color: var(--ink);
+    text-decoration: none;
+    transition:
+      border-color 0.2s ease,
+      box-shadow 0.2s ease;
+  }
+
+  .apply-mail:hover {
+    color: var(--ink);
+    border-color: var(--tone);
+    box-shadow: var(--glass-rim), var(--shadow);
+  }
+
+  .apply-mail .icon-badge {
+    flex: none;
+    margin: 0;
+  }
+
+  .apply-mail__text {
+    display: grid;
+    min-width: 0;
+    line-height: 1.4;
+  }
+
+  .apply-mail__text .muted {
+    font-size: 0.92rem;
+  }
+
+  .apply-mail__address {
+    color: var(--navy);
+    font-weight: 700;
+    text-decoration: underline;
+    text-underline-offset: 3px;
+    overflow-wrap: break-word;
+  }
+</style>

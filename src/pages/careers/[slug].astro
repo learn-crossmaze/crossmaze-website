@@ -1,0 +1,29 @@
+---
+// A job's own page, the link "Share this job" sends: the careers page with that job open and in view, its own
+// title and description, and its own picture under the link in a chat (/share/jobs/<slug>-link.png).
+import BaseLayout from '../../layouts/BaseLayout.astro';
+import CareersContent from '../../components/CareersContent.astro';
+import { jobs, type Job } from '../../data/jobs';
+import { site } from '../../data/site';
+import { jobWhere } from '../../careers/jobs';
+import { breadcrumbList } from '../../utils';
+
+export function getStaticPaths() {
+  return jobs.map((job) => ({ params: { slug: job.slug }, props: { job } }));
+}
+
+const { job } = Astro.props as { job: Job };
+const where = jobWhere(job).replace(/, Bengaluru$/, '');
+const facts = [job.experience?.trim(), job.timings[0]?.trim()].filter(Boolean).join(', ');
+const description = `${job.title} at ${site.fullName}, ${where}, Bengaluru${facts ? `: ${facts}` : ''}. See the details and apply online.`;
+const crumbs = [{ label: 'Careers', href: '/careers' }, { label: job.title }];
+---
+
+<BaseLayout
+  fullTitle={`${job.title} | Careers at ${site.name}`}
+  description={description}
+  imageUrl={`/share/jobs/${job.slug}-link.png`}
+  jsonLd={breadcrumbList(crumbs, site.url)}
+>
+  <CareersContent focus={job} />
+</BaseLayout>
